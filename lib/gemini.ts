@@ -1,6 +1,17 @@
 import Groq from "groq-sdk";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let groqClient: Groq | null = null;
+
+function getGroq(): Groq {
+  if (!groqClient) {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+      throw new Error("GROQ_API_KEY is not set. Add it to your environment variables.");
+    }
+    groqClient = new Groq({ apiKey });
+  }
+  return groqClient;
+}
 
 export async function geminiGenerate(
   prompt: string,
@@ -12,10 +23,9 @@ export async function geminiGenerate(
   if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
   messages.push({ role: "user", content: prompt });
 
-  // 70b for all tasks — better Hebrew and complex nested JSON. 8b truncated outputs.
   const model = "llama-3.3-70b-versatile";
 
-  const response = await groq.chat.completions.create({
+  const response = await getGroq().chat.completions.create({
     model,
     messages,
     max_tokens: maxTokens,
