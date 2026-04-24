@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { adminAuthOptions } from "@/lib/adminAuth";
 import { getAllUsers, deleteUser } from "@/lib/users";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "")
@@ -13,7 +13,7 @@ function isAdmin(email?: string | null) {
 }
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(adminAuthOptions);
   if (!isAdmin(session?.user?.email)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -21,7 +21,7 @@ export async function GET() {
 }
 
 export async function DELETE(req: NextRequest) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(adminAuthOptions);
   if (!isAdmin(session?.user?.email)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

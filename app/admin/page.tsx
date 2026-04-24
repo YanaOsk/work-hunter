@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useState, useEffect, useMemo } from "react";
 
 interface User {
@@ -8,6 +7,10 @@ interface User {
   name: string;
   email: string;
   createdAt: string;
+}
+
+interface AdminSession {
+  user?: { name?: string; email?: string; image?: string };
 }
 
 function StatCard({ label, value, sub }: { label: string; value: number; sub?: string }) {
@@ -20,20 +23,50 @@ function StatCard({ label, value, sub }: { label: string; value: number; sub?: s
   );
 }
 
+async function adminSignOut() {
+  const res = await fetch("/api/admin/auth/csrf");
+  const { csrfToken } = (await res.json()) as { csrfToken: string };
+  await fetch("/api/admin/auth/signout", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `csrfToken=${csrfToken}&callbackUrl=/admin/signin`,
+  });
+  window.location.href = "/admin/signin";
+}
+
 export default function AdminPage() {
-  const { data: session, status } = useSession();
+  const [session, setSession] = useState<AdminSession | null>(null);
+  const [sessionStatus, setSessionStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [usersLoading, setUsersLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
-  const [deleting, setDeleting] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
-  const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase());
-  const isAdmin = session?.user?.email && adminEmails.includes(session.user.email.toLowerCase());
+  // Load admin session from separate auth endpoint
+  useEffect(() => {
+    fetch("/api/admin/auth/session")
+      .then((r) => r.json())
+      .then((data: AdminSession) => {
+        if (data?.user?.email) {
+          setSession(data);
+          setSessionStatus("authenticated");
+        } else {
+          setSessionStatus("unauthenticated");
+        }
+      })
+      .catch(() => setSessionStatus("unauthenticated"));
+  }, []);
 
   useEffect(() => {
-    if (status !== "authenticated") return;
+    if (sessionStatus === "unauthenticated") {
+      window.location.href = "/admin/signin";
+    }
+  }, [sessionStatus]);
+
+  useEffect(() => {
+    if (sessionStatus !== "authenticated") return;
     fetch("/api/admin/users")
       .then((r) => r.json())
       .then((data) => {
@@ -41,8 +74,8 @@ export default function AdminPage() {
         else setError(data.error ?? "Failed to load");
       })
       .catch(() => setError("Network error"))
-      .finally(() => setLoading(false));
-  }, [status]);
+      .finally(() => setUsersLoading(false));
+  }, [sessionStatus]);
 
   const filtered = useMemo(
     () =>
@@ -71,7 +104,7 @@ export default function AdminPage() {
     setDeleting(null);
   }
 
-  if (status === "loading" || loading) {
+  if (sessionStatus === "loading") {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
@@ -79,33 +112,7 @@ export default function AdminPage() {
     );
   }
 
-  if (status === "unauthenticated") {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-white/60 mb-4">You must be signed in to access admin.</p>
-          <a href="/auth/signin" className="bg-purple-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-purple-500 transition">
-            Sign in
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-rose-500/20 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-            </svg>
-          </div>
-          <p className="text-white/60">Access denied.</p>
-        </div>
-      </div>
-    );
-  }
+  if (sessionStatus === "unauthenticated") return null;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -123,9 +130,17 @@ export default function AdminPage() {
               <p className="text-white/35 text-xs mt-0.5">Work Hunter</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="text-white/40 text-sm">{session.user?.email}</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span className="text-white/40 text-sm">{session?.user?.email}</span>
+            </div>
+            <button
+              onClick={adminSignOut}
+              className="text-white/30 hover:text-white/70 text-sm transition px-3 py-1.5 rounded-lg hover:bg-white/5"
+            >
+              התנתק
+            </button>
           </div>
         </div>
       </div>
@@ -147,10 +162,10 @@ export default function AdminPage() {
 
         {/* Users Table */}
         <div className="bg-white/3 border border-white/8 rounded-2xl overflow-hidden">
-          {/* Table Header */}
           <div className="px-5 py-4 border-b border-white/8 flex items-center justify-between gap-4">
             <h2 className="text-white font-semibold text-sm">
-              Registered Users <span className="text-white/30 font-normal ml-1">({filtered.length})</span>
+              Registered Users{" "}
+              <span className="text-white/30 font-normal ml-1">({filtered.length})</span>
             </h2>
             <div className="relative">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,7 +180,9 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {filtered.length === 0 ? (
+          {usersLoading ? (
+            <div className="px-5 py-12 text-center text-white/30 text-sm">טוען...</div>
+          ) : filtered.length === 0 ? (
             <div className="px-5 py-12 text-center text-white/30 text-sm">
               {search ? "No users match your search." : "No users yet."}
             </div>
@@ -182,10 +199,7 @@ export default function AdminPage() {
               </thead>
               <tbody>
                 {filtered.map((user, idx) => (
-                  <tr
-                    key={user.id}
-                    className="border-b border-white/5 last:border-0 hover:bg-white/3 transition-colors"
-                  >
+                  <tr key={user.id} className="border-b border-white/5 last:border-0 hover:bg-white/3 transition-colors">
                     <td className="px-5 py-3.5 text-white/25">{idx + 1}</td>
                     <td className="px-5 py-3.5 font-medium text-white">{user.name}</td>
                     <td className="px-5 py-3.5 text-white/55">{user.email}</td>

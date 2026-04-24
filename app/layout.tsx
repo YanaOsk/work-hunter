@@ -3,8 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import LanguageToggle from "@/components/LanguageToggle";
 import Providers from "@/components/Providers";
-import PromoBanner from "@/components/PromoBanner";
-import NavBar from "@/components/NavBar";
+import NavBarWrapper from "@/components/NavBarWrapper";
 import ScrollToTop from "@/components/ScrollToTop";
 import "./globals.css";
 
@@ -36,10 +35,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <LanguageProvider>
-            <div className="print:hidden">
-              <PromoBanner />
-              <NavBar />
-            </div>
+            <NavBarWrapper />
             <ScrollToTop />
             <LanguageToggle />
             {children}
