@@ -21,8 +21,7 @@ export default function SiteFooter() {
           <Link href="/pricing" className="text-white/60 hover:text-white transition">
             {tx.pricingLink}
           </Link>
-          <span className="text-white/30 cursor-default">{tx.footerBlog}</span>
-          <span className="text-white/30 cursor-default">{tx.footerPrivacy}</span>
+<span className="text-white/30 cursor-default">{tx.footerPrivacy}</span>
           <span className="text-white/30 cursor-default">{tx.footerTerms}</span>
           <span className="text-white/30 cursor-default">{tx.footerContact}</span>
         </nav>
