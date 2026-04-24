@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
         try {
-          const user = verifyUser(credentials.email, credentials.password);
+          const user = await verifyUser(credentials.email, credentials.password);
           console.log("[authorize]", credentials.email, "→", user ? "OK" : "null");
           return user;
         } catch (err) {

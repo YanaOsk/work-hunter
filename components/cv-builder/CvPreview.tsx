@@ -8,7 +8,6 @@ interface Props {
   data: CvData;
 }
 
-// Convert hex color to rgba string
 function rgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -24,29 +23,29 @@ export default function CvPreview({ data }: Props) {
 
   const skillsList = data.skills.split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
   const languagesList = data.languages.split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
+  const hasMilitary = !!(data.military.unit || data.military.role);
 
   const isEmpty =
     !data.summary &&
     data.experiences.length === 0 &&
     data.educations.length === 0 &&
     skillsList.length === 0 &&
-    languagesList.length === 0;
+    languagesList.length === 0 &&
+    !hasMilitary;
 
-  const props = { data, tx, dir, skillsList, languagesList, isEmpty, ac };
+  const props: TemplateProps = { data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac };
 
   switch (data.template) {
-    case "minimal":    return <MinimalTemplate {...props} />;
-    case "accent":     return <AccentTemplate {...props} />;
-    case "executive":  return <ExecutiveTemplate {...props} />;
-    case "tech":       return <TechTemplate {...props} />;
-    case "bold":       return <BoldTemplate {...props} />;
-    case "elegant":    return <ElegantTemplate {...props} />;
-    case "gradient":   return <GradientTemplate {...props} />;
-    default:           return <SlateTemplate {...props} />;
+    case "minimal":   return <NordicTemplate {...props} />;
+    case "accent":    return <SidebarTemplate {...props} />;
+    case "executive": return <ClassicTemplate {...props} />;
+    case "tech":      return <CodeTemplate {...props} />;
+    case "bold":      return <ImpactTemplate {...props} />;
+    case "elegant":   return <TimelineTemplate {...props} />;
+    case "gradient":  return <PrismTemplate {...props} />;
+    default:          return <NovaTemplate {...props} />;
   }
 }
-
-// ─── Shared types ─────────────────────────────────────────────────────────────
 
 interface TemplateProps {
   data: CvData;
@@ -55,309 +54,292 @@ interface TemplateProps {
   skillsList: string[];
   languagesList: string[];
   isEmpty: boolean;
-  ac: string; // accent color hex
+  hasMilitary: boolean;
+  ac: string;
 }
 
-// ─── Contact row helper ────────────────────────────────────────────────────────
-
-function ContactRow({ icon, children, light }: { icon: string; children: React.ReactNode; light?: boolean }) {
-  return (
-    <span className={`flex items-center gap-1.5 ${light ? "text-white/80" : "text-slate-600"}`}>
-      <svg className="w-3.5 h-3.5 flex-shrink-0 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-      </svg>
-      <span className="text-[13px]">{children}</span>
-    </span>
-  );
-}
-
+// ─── Icon paths ────────────────────────────────────────────────────────────────
 const ICON_EMAIL    = "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z";
 const ICON_PHONE    = "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z";
 const ICON_LOCATION = "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z";
 const ICON_LINK     = "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1";
 
-// ─── Template 1: Slate (Modern dark header) ───────────────────────────────────
-
-function SlateTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ac }: TemplateProps) {
+function CIcon({ d, cls = "w-3 h-3" }: { d: string; cls?: string }) {
   return (
-    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none print:rounded-none overflow-hidden" dir={dir}>
-      <div className="px-8 py-10 text-white print:py-8" style={{ backgroundColor: ac }}>
-        <h1 className="text-3xl md:text-4xl font-bold mb-1 tracking-tight">
-          {data.personal.fullName || <span className="text-white/40">{tx.cvPreviewEmptyName}</span>}
-        </h1>
-        <p className="text-lg text-white/80 mb-5">
-          {data.personal.title || <span className="text-white/40">{tx.cvPreviewEmptyTitle}</span>}
-        </p>
-        <div className="flex flex-wrap gap-x-5 gap-y-2">
-          {data.personal.email    && <ContactRow icon={ICON_EMAIL}    light>{data.personal.email}</ContactRow>}
-          {data.personal.phone    && <ContactRow icon={ICON_PHONE}    light>{data.personal.phone}</ContactRow>}
-          {data.personal.location && <ContactRow icon={ICON_LOCATION} light>{data.personal.location}</ContactRow>}
-          {data.personal.linkedin && <ContactRow icon={ICON_LINK}     light><span dir="ltr">{data.personal.linkedin}</span></ContactRow>}
-          {data.personal.website  && <ContactRow icon={ICON_LINK}     light><span dir="ltr">{data.personal.website}</span></ContactRow>}
+    <svg className={`${cls} flex-shrink-0 opacity-75`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={d} />
+    </svg>
+  );
+}
+
+// ─── Template 1: Nova (modern photo header) ────────────────────────────────────
+
+function NovaTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+  const p = data.personal;
+  return (
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
+      {/* Header */}
+      <div className="relative px-8 py-9 text-white" style={{ backgroundColor: ac }}>
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-[32px] font-extrabold leading-tight tracking-tight mb-1 text-white">
+              {p.fullName || <span className="opacity-40">{tx.cvPreviewEmptyName}</span>}
+            </h1>
+            <p className="text-white/80 font-medium text-[15px] mb-5">
+              {p.title || <span className="opacity-40">{tx.cvPreviewEmptyTitle}</span>}
+            </p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+              {p.email    && <span className="flex items-center gap-1.5 text-white/85 text-[12px]"><CIcon d={ICON_EMAIL} cls="w-3 h-3" />{p.email}</span>}
+              {p.phone    && <span className="flex items-center gap-1.5 text-white/85 text-[12px]"><CIcon d={ICON_PHONE} cls="w-3 h-3" />{p.phone}</span>}
+              {p.location && <span className="flex items-center gap-1.5 text-white/85 text-[12px]"><CIcon d={ICON_LOCATION} cls="w-3 h-3" />{p.location}</span>}
+              {p.linkedin && <span className="flex items-center gap-1.5 text-white/85 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3" />{p.linkedin}</span>}
+              {p.website  && <span className="flex items-center gap-1.5 text-white/85 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3" />{p.website}</span>}
+            </div>
+          </div>
+          {p.photo && (
+            <img src={p.photo} className="w-[88px] h-[88px] rounded-full object-cover border-[3px] border-white/30 flex-shrink-0 shadow-lg" alt="" />
+          )}
         </div>
+        {/* Bottom wave decoration */}
+        <div className="absolute bottom-0 left-0 right-0 h-3" style={{ background: `linear-gradient(to bottom, transparent, ${rgba(ac, 0.3)})` }} />
       </div>
 
-      <div className="px-8 py-8 text-slate-800">
+      {/* Body */}
+      <div className="px-8 py-7">
         {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+
         {data.summary && (
-          <SlateSection title={tx.cvSecSummary} ac={ac}>
-            <p className="text-slate-700 leading-relaxed whitespace-pre-wrap text-sm">{data.summary}</p>
-          </SlateSection>
+          <NovaSection title={tx.cvSecSummary} ac={ac}>
+            <p className="text-slate-600 leading-relaxed text-[13.5px] whitespace-pre-wrap">{data.summary}</p>
+          </NovaSection>
         )}
+
         {data.experiences.length > 0 && (
-          <SlateSection title={tx.cvSecExperience} ac={ac}>
+          <NovaSection title={tx.cvSecExperience} ac={ac}>
             <div className="space-y-5">
               {data.experiences.map((exp) => (
                 <div key={exp.id}>
-                  <div className="flex flex-wrap items-baseline justify-between gap-2 mb-0.5">
-                    <h3 className="font-semibold text-slate-900 text-[15px]">
-                      {exp.role || "—"}
-                      {exp.company && <span className="text-slate-500 font-normal"> · {exp.company}</span>}
-                    </h3>
-                    <span className="text-slate-400 text-xs font-mono" dir="ltr">
+                  <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-0.5">
+                    <div>
+                      <h3 className="font-bold text-slate-900 text-[14.5px]">{exp.role || "—"}</h3>
+                      {exp.company && (
+                        <span className="text-[12.5px] font-semibold" style={{ color: ac }}>
+                          {exp.company}{exp.location ? ` · ${exp.location}` : ""}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-slate-400 text-[11.5px] font-medium mt-0.5 whitespace-nowrap" dir="ltr">
                       {exp.start || "—"} – {exp.current ? tx.cvFieldPresent : exp.end || "—"}
                     </span>
                   </div>
-                  {exp.location && <div className="text-slate-400 text-xs mb-1.5">{exp.location}</div>}
-                  {exp.description && <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                  {exp.description && <p className="text-slate-600 text-[13px] leading-relaxed mt-1.5 whitespace-pre-wrap">{exp.description}</p>}
                 </div>
               ))}
             </div>
-          </SlateSection>
+          </NovaSection>
         )}
+
         {data.educations.length > 0 && (
-          <SlateSection title={tx.cvSecEducation} ac={ac}>
+          <NovaSection title={tx.cvSecEducation} ac={ac}>
             <div className="space-y-4">
               {data.educations.map((edu) => (
-                <div key={edu.id}>
-                  <div className="flex flex-wrap items-baseline justify-between gap-2 mb-0.5">
-                    <h3 className="font-semibold text-slate-900 text-[15px]">
-                      {edu.degree || "—"}
-                      {edu.school && <span className="text-slate-500 font-normal"> · {edu.school}</span>}
-                    </h3>
-                    <span className="text-slate-400 text-xs font-mono" dir="ltr">
-                      {edu.start || "—"} – {edu.current ? tx.cvFieldPresent : edu.end || "—"}
-                    </span>
+                <div key={edu.id} className="flex flex-wrap items-start justify-between gap-x-3 gap-y-0.5">
+                  <div>
+                    <h3 className="font-bold text-slate-900 text-[14px]">{edu.degree || "—"}</h3>
+                    {edu.school && <span className="text-[12.5px] font-semibold" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</span>}
                   </div>
-                  {edu.location && <div className="text-slate-400 text-xs">{edu.location}</div>}
+                  <span className="text-slate-400 text-[11.5px] font-medium mt-0.5" dir="ltr">
+                    {edu.start || "—"} – {edu.current ? tx.cvFieldPresent : edu.end || "—"}
+                  </span>
                 </div>
               ))}
             </div>
-          </SlateSection>
+          </NovaSection>
         )}
+
+        {hasMilitary && (
+          <NovaSection title={tx.cvSecMilitary} ac={ac}>
+            <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-0.5">
+              <div>
+                {data.military.role && <h3 className="font-bold text-slate-900 text-[14px]">{data.military.role}</h3>}
+                {data.military.unit && <span className="text-[12.5px] font-semibold" style={{ color: ac }}>{data.military.unit}</span>}
+              </div>
+              {(data.military.start || data.military.end) && (
+                <span className="text-slate-400 text-[11.5px] font-medium mt-0.5" dir="ltr">
+                  {data.military.start || "—"} – {data.military.end || "—"}
+                </span>
+              )}
+            </div>
+            {data.military.reserveDuty && (
+              <div className="flex items-center gap-1.5 mt-1.5 text-[12.5px] text-slate-500">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ac }} />
+                {tx.cvFieldMilReserve}
+              </div>
+            )}
+          </NovaSection>
+        )}
+
         {skillsList.length > 0 && (
-          <SlateSection title={tx.cvSecSkills} ac={ac}>
-            <div className="flex flex-wrap gap-2">
+          <NovaSection title={tx.cvSecSkills} ac={ac}>
+            <div className="flex flex-wrap gap-1.5">
               {skillsList.map((s, i) => (
-                <span key={i} className="text-xs px-3 py-1 rounded-md" style={{ backgroundColor: rgba(ac, 0.08), color: ac, border: `1px solid ${rgba(ac, 0.2)}` }}>{s}</span>
+                <span key={i} className="text-[11.5px] font-medium px-2.5 py-1 rounded-md"
+                  style={{ backgroundColor: rgba(ac, 0.08), color: ac, border: `1px solid ${rgba(ac, 0.18)}` }}>
+                  {s}
+                </span>
               ))}
             </div>
-          </SlateSection>
+          </NovaSection>
         )}
+
         {languagesList.length > 0 && (
-          <SlateSection title={tx.cvSecLanguages} ac={ac}>
-            <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-slate-600 text-sm">
+          <NovaSection title={tx.cvSecLanguages} ac={ac}>
+            <div className="flex flex-wrap gap-x-5 gap-y-1 text-slate-600 text-[13px]">
               {languagesList.map((l, i) => <span key={i}>{l}</span>)}
             </div>
-          </SlateSection>
+          </NovaSection>
         )}
       </div>
     </div>
   );
 }
 
-function SlateSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+function NovaSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
   return (
     <section className="mb-6 last:mb-0">
-      <h2 className="text-[11px] font-bold uppercase tracking-widest mb-3 pb-2 border-b" style={{ color: ac, borderColor: rgba(ac, 0.2) }}>{title}</h2>
+      <div className="flex items-center gap-3 mb-3">
+        <span className="h-[2px] w-4 rounded-full flex-shrink-0" style={{ backgroundColor: ac }} />
+        <h2 className="text-[10.5px] font-black uppercase tracking-[0.12em]" style={{ color: ac }}>{title}</h2>
+        <span className="flex-1 h-px" style={{ background: `linear-gradient(to right, ${rgba(ac, 0.2)}, transparent)` }} />
+      </div>
       {children}
     </section>
   );
 }
 
-// ─── Template 2: Minimal (elegant thin accent line) ──────────────────────────
+// ─── Template 2: Nordic (clean two-column with photo) ─────────────────────────
 
-function MinimalTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ac }: TemplateProps) {
+function NordicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+  const p = data.personal;
   return (
-    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none print:rounded-none overflow-hidden" dir={dir}>
-      <div className="px-10 pt-10 pb-6 border-b-4" style={{ borderColor: ac }}>
-        <h1 className="text-4xl font-light text-slate-900 tracking-tight mb-1">
-          {data.personal.fullName || <span className="text-slate-300">{tx.cvPreviewEmptyName}</span>}
-        </h1>
-        <p className="font-medium text-base mb-4 tracking-wide uppercase text-sm" style={{ color: ac }}>
-          {data.personal.title || <span className="text-slate-300">{tx.cvPreviewEmptyTitle}</span>}
-        </p>
-        <div className="flex flex-wrap gap-x-6 gap-y-1.5">
-          {data.personal.email    && <ContactRow icon={ICON_EMAIL}>{data.personal.email}</ContactRow>}
-          {data.personal.phone    && <ContactRow icon={ICON_PHONE}>{data.personal.phone}</ContactRow>}
-          {data.personal.location && <ContactRow icon={ICON_LOCATION}>{data.personal.location}</ContactRow>}
-          {data.personal.linkedin && <ContactRow icon={ICON_LINK}><span dir="ltr">{data.personal.linkedin}</span></ContactRow>}
-          {data.personal.website  && <ContactRow icon={ICON_LINK}><span dir="ltr">{data.personal.website}</span></ContactRow>}
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
+      {/* Top header row */}
+      <div className="px-8 pt-8 pb-5 border-b-[3px]" style={{ borderColor: ac }}>
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex-1">
+            <h1 className="text-[38px] font-light text-slate-900 tracking-tight leading-none mb-2">
+              {p.fullName || <span className="text-slate-300">{tx.cvPreviewEmptyName}</span>}
+            </h1>
+            <p className="text-[13px] font-semibold uppercase tracking-[0.15em] mb-4" style={{ color: ac }}>
+              {p.title || <span className="text-slate-300">{tx.cvPreviewEmptyTitle}</span>}
+            </p>
+            <div className="flex flex-wrap gap-x-5 gap-y-1.5">
+              {p.email    && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_EMAIL} />{p.email}</span>}
+              {p.phone    && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_PHONE} />{p.phone}</span>}
+              {p.location && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_LOCATION} />{p.location}</span>}
+              {p.linkedin && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} />{p.linkedin}</span>}
+              {p.website  && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} />{p.website}</span>}
+            </div>
+          </div>
+          {p.photo && (
+            <img src={p.photo} className="w-[90px] h-[90px] rounded-full object-cover flex-shrink-0 shadow-md" style={{ border: `3px solid ${rgba(ac, 0.3)}` }} alt="" />
+          )}
         </div>
       </div>
 
-      <div className="px-10 py-8 text-slate-800">
-        {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
-        {data.summary && (
-          <MinimalSection title={tx.cvSecSummary} ac={ac}>
-            <p className="text-slate-600 leading-relaxed text-sm whitespace-pre-wrap italic">{data.summary}</p>
-          </MinimalSection>
-        )}
-        {data.experiences.length > 0 && (
-          <MinimalSection title={tx.cvSecExperience} ac={ac}>
-            <div className="space-y-5">
-              {data.experiences.map((exp) => (
-                <div key={exp.id} className="flex gap-4">
-                  <div className="pt-1 text-xs font-mono whitespace-nowrap" dir="ltr" style={{ color: rgba(ac, 0.7) }}>
-                    {exp.start || "—"}<br />{exp.current ? tx.cvFieldPresent : exp.end || "—"}
-                  </div>
-                  <div className="flex-1 border-s-2 ps-4" style={{ borderColor: rgba(ac, 0.2) }}>
-                    <h3 className="font-semibold text-slate-900 text-[15px]">{exp.role || "—"}</h3>
-                    {exp.company && <div className="text-slate-500 text-sm mb-1">{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
-                    {exp.description && <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </MinimalSection>
-        )}
-        {data.educations.length > 0 && (
-          <MinimalSection title={tx.cvSecEducation} ac={ac}>
-            <div className="space-y-4">
-              {data.educations.map((edu) => (
-                <div key={edu.id} className="flex gap-4">
-                  <div className="pt-1 text-xs font-mono whitespace-nowrap" dir="ltr" style={{ color: rgba(ac, 0.7) }}>
-                    {edu.start || "—"}<br />{edu.current ? tx.cvFieldPresent : edu.end || "—"}
-                  </div>
-                  <div className="flex-1 border-s-2 ps-4" style={{ borderColor: rgba(ac, 0.2) }}>
-                    <h3 className="font-semibold text-slate-900 text-[15px]">{edu.degree || "—"}</h3>
-                    {edu.school && <div className="text-slate-500 text-sm">{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </MinimalSection>
-        )}
-        {skillsList.length > 0 && (
-          <MinimalSection title={tx.cvSecSkills} ac={ac}>
-            <div className="flex flex-wrap gap-2">
-              {skillsList.map((s, i) => (
-                <span key={i} className="text-xs px-3 py-1 rounded-full" style={{ color: ac, borderColor: rgba(ac, 0.3), border: `1px solid ${rgba(ac, 0.3)}`, backgroundColor: rgba(ac, 0.07) }}>{s}</span>
-              ))}
-            </div>
-          </MinimalSection>
-        )}
-        {languagesList.length > 0 && (
-          <MinimalSection title={tx.cvSecLanguages} ac={ac}>
-            <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-slate-600 text-sm">
-              {languagesList.map((l, i) => <span key={i}>{l}</span>)}
-            </div>
-          </MinimalSection>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function MinimalSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
-  return (
-    <section className="mb-7 last:mb-0">
-      <h2 className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: ac }}>{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-// ─── Template 3: Accent (colored sidebar) ────────────────────────────────────
-
-function AccentTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ac }: TemplateProps) {
-  return (
-    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none print:rounded-none overflow-hidden" dir={dir}>
-      <div className="flex min-h-full">
-        <div className="w-[38%] text-white px-6 py-8 flex-shrink-0" style={{ background: `linear-gradient(160deg, ${ac}, ${rgba(ac, 0.7)})` }}>
-          <div className="mb-6">
-            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-3 text-2xl font-bold">
-              {data.personal.fullName ? data.personal.fullName.charAt(0).toUpperCase() : "?"}
-            </div>
-            <h1 className="text-xl font-bold leading-tight mb-1">
-              {data.personal.fullName || <span className="text-white/40">{tx.cvPreviewEmptyName}</span>}
-            </h1>
-            <p className="text-white/75 text-xs font-medium uppercase tracking-wide">
-              {data.personal.title || <span className="text-white/30">{tx.cvPreviewEmptyTitle}</span>}
-            </p>
-          </div>
-
-          <div className="space-y-2 mb-6">
-            {data.personal.email    && <ContactRow icon={ICON_EMAIL}    light>{data.personal.email}</ContactRow>}
-            {data.personal.phone    && <ContactRow icon={ICON_PHONE}    light>{data.personal.phone}</ContactRow>}
-            {data.personal.location && <ContactRow icon={ICON_LOCATION} light>{data.personal.location}</ContactRow>}
-            {data.personal.linkedin && <ContactRow icon={ICON_LINK}     light><span dir="ltr" className="break-all">{data.personal.linkedin}</span></ContactRow>}
-          </div>
+      {/* Two-column body */}
+      <div className="flex">
+        {/* Left sidebar */}
+        <div className="w-[34%] border-e border-slate-100 px-5 py-6 flex-shrink-0 bg-slate-50/50">
+          {isEmpty && <p className="text-slate-400 text-center py-10 text-sm">{tx.cvPlaceholder}</p>}
 
           {skillsList.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-3">{tx.cvSecSkills}</h2>
-              <div className="flex flex-wrap gap-1.5">
+            <NordicSideSection title={tx.cvSecSkills} ac={ac}>
+              <div className="space-y-1.5">
                 {skillsList.map((s, i) => (
-                  <span key={i} className="bg-white/15 text-white text-[11px] px-2.5 py-1 rounded-full">{s}</span>
+                  <div key={i} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: ac }} />
+                    <span className="text-slate-700 text-[12.5px]">{s}</span>
+                  </div>
                 ))}
               </div>
-            </div>
+            </NordicSideSection>
           )}
 
           {languagesList.length > 0 && (
-            <div>
-              <h2 className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-3">{tx.cvSecLanguages}</h2>
-              <div className="space-y-1">
+            <NordicSideSection title={tx.cvSecLanguages} ac={ac}>
+              <div className="space-y-1.5">
                 {languagesList.map((l, i) => (
-                  <div key={i} className="text-white/80 text-xs">{l}</div>
+                  <div key={i} className="text-slate-700 text-[12.5px]">{l}</div>
                 ))}
               </div>
-            </div>
+            </NordicSideSection>
+          )}
+
+          {hasMilitary && (
+            <NordicSideSection title={tx.cvSecMilitary} ac={ac}>
+              {data.military.role && <div className="text-slate-800 text-[12.5px] font-semibold">{data.military.role}</div>}
+              {data.military.unit && <div className="text-[12px] mt-0.5" style={{ color: ac }}>{data.military.unit}</div>}
+              {(data.military.start || data.military.end) && (
+                <div className="text-slate-400 text-[11px] mt-1" dir="ltr">
+                  {data.military.start || "—"} – {data.military.end || "—"}
+                </div>
+              )}
+              {data.military.reserveDuty && (
+                <div className="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-slate-500">
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: ac }} />
+                  {tx.cvFieldMilReserve}
+                </div>
+              )}
+            </NordicSideSection>
           )}
         </div>
 
-        <div className="flex-1 px-7 py-8">
-          {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+        {/* Main content */}
+        <div className="flex-1 px-7 py-6">
           {data.summary && (
-            <AccentSection title={tx.cvSecSummary} ac={ac}>
-              <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">{data.summary}</p>
-            </AccentSection>
+            <NordicMainSection title={tx.cvSecSummary} ac={ac}>
+              <p className="text-slate-600 text-[13px] leading-relaxed whitespace-pre-wrap italic">{data.summary}</p>
+            </NordicMainSection>
           )}
+
           {data.experiences.length > 0 && (
-            <AccentSection title={tx.cvSecExperience} ac={ac}>
+            <NordicMainSection title={tx.cvSecExperience} ac={ac}>
               <div className="space-y-5">
                 {data.experiences.map((exp) => (
-                  <div key={exp.id}>
-                    <div className="flex flex-wrap items-baseline justify-between gap-1 mb-0.5">
-                      <h3 className="font-semibold text-slate-900 text-sm">{exp.role || "—"}</h3>
-                      <span className="text-slate-400 text-[11px] font-mono" dir="ltr">
-                        {exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}
-                      </span>
+                  <div key={exp.id} className="flex gap-4">
+                    <div className="text-[11px] font-medium whitespace-nowrap pt-0.5 w-[70px] flex-shrink-0 text-end" style={{ color: rgba(ac, 0.8) }} dir="ltr">
+                      <div>{exp.start || "—"}</div>
+                      <div>{exp.current ? tx.cvFieldPresent : exp.end || "—"}</div>
                     </div>
-                    {exp.company && <div className="text-xs font-medium mb-1" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
-                    {exp.description && <p className="text-slate-600 text-xs leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                    <div className="flex-1 border-s-2 ps-4" style={{ borderColor: rgba(ac, 0.25) }}>
+                      <h3 className="font-bold text-slate-900 text-[14px]">{exp.role || "—"}</h3>
+                      {exp.company && <div className="text-[12px] font-semibold mb-1" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                      {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                    </div>
                   </div>
                 ))}
               </div>
-            </AccentSection>
+            </NordicMainSection>
           )}
+
           {data.educations.length > 0 && (
-            <AccentSection title={tx.cvSecEducation} ac={ac}>
-              <div className="space-y-3">
+            <NordicMainSection title={tx.cvSecEducation} ac={ac}>
+              <div className="space-y-4">
                 {data.educations.map((edu) => (
-                  <div key={edu.id}>
-                    <div className="flex flex-wrap items-baseline justify-between gap-1">
-                      <h3 className="font-semibold text-slate-900 text-sm">{edu.degree || "—"}</h3>
-                      <span className="text-slate-400 text-[11px] font-mono" dir="ltr">
-                        {edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}
-                      </span>
+                  <div key={edu.id} className="flex gap-4">
+                    <div className="text-[11px] font-medium whitespace-nowrap pt-0.5 w-[70px] flex-shrink-0 text-end" style={{ color: rgba(ac, 0.8) }} dir="ltr">
+                      <div>{edu.start || "—"}</div>
+                      <div>{edu.current ? tx.cvFieldPresent : edu.end || "—"}</div>
                     </div>
-                    {edu.school && <div className="text-xs font-medium" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
+                    <div className="flex-1 border-s-2 ps-4" style={{ borderColor: rgba(ac, 0.25) }}>
+                      <h3 className="font-bold text-slate-900 text-[14px]">{edu.degree || "—"}</h3>
+                      {edu.school && <div className="text-[12px] font-semibold" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
+                    </div>
                   </div>
                 ))}
               </div>
-            </AccentSection>
+            </NordicMainSection>
           )}
         </div>
       </div>
@@ -365,390 +347,638 @@ function AccentTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ac 
   );
 }
 
-function AccentSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+function NordicSideSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
   return (
-    <section className="mb-6 last:mb-0">
-      <h2 className="text-[10px] font-bold uppercase tracking-widest mb-3 pb-1.5 border-b" style={{ color: ac, borderColor: rgba(ac, 0.25) }}>{title}</h2>
+    <div className="mb-6 last:mb-0">
+      <h2 className="text-[10px] font-black uppercase tracking-[0.14em] mb-2.5 pb-1.5 border-b" style={{ color: ac, borderColor: rgba(ac, 0.2) }}>{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function NordicMainSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <section className="mb-7 last:mb-0">
+      <h2 className="text-[10.5px] font-black uppercase tracking-[0.14em] mb-3" style={{ color: ac }}>{title}</h2>
       {children}
     </section>
   );
 }
 
-// ─── Template 4: Executive (classic professional) ─────────────────────────────
+// ─── Template 3: Sidebar (bold accent sidebar with photo) ─────────────────────
 
-function ExecutiveTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ac }: TemplateProps) {
+function SidebarTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+  const p = data.personal;
   return (
-    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none print:rounded-none overflow-hidden" dir={dir}>
-      <div className="px-10 pt-10 pb-6 text-center border-b-2" style={{ borderColor: ac }}>
-        <h1 className="text-4xl font-bold text-slate-900 tracking-wide uppercase mb-2">
-          {data.personal.fullName || <span className="text-slate-300">{tx.cvPreviewEmptyName}</span>}
-        </h1>
-        <p className="text-sm tracking-widest uppercase mb-4" style={{ color: ac }}>
-          {data.personal.title || <span className="text-slate-300">{tx.cvPreviewEmptyTitle}</span>}
-        </p>
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-1.5">
-          {data.personal.email    && <ContactRow icon={ICON_EMAIL}>{data.personal.email}</ContactRow>}
-          {data.personal.phone    && <ContactRow icon={ICON_PHONE}>{data.personal.phone}</ContactRow>}
-          {data.personal.location && <ContactRow icon={ICON_LOCATION}>{data.personal.location}</ContactRow>}
-          {data.personal.linkedin && <ContactRow icon={ICON_LINK}><span dir="ltr">{data.personal.linkedin}</span></ContactRow>}
-          {data.personal.website  && <ContactRow icon={ICON_LINK}><span dir="ltr">{data.personal.website}</span></ContactRow>}
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
+      <div className="flex min-h-full">
+        {/* Sidebar */}
+        <div className="w-[36%] flex-shrink-0 text-white px-5 py-8" style={{ background: `linear-gradient(175deg, ${ac} 0%, ${rgba(ac, 0.82)} 100%)` }}>
+          {p.photo ? (
+            <img src={p.photo} className="w-[90px] h-[90px] rounded-full object-cover border-[3px] border-white/40 shadow-lg mx-auto mb-4" alt="" />
+          ) : (
+            <div className="w-[72px] h-[72px] rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow">
+              {p.fullName ? p.fullName.charAt(0).toUpperCase() : "?"}
+            </div>
+          )}
+
+          <h1 className="text-[18px] font-bold text-white leading-tight text-center mb-1">
+            {p.fullName || <span className="opacity-50">{tx.cvPreviewEmptyName}</span>}
+          </h1>
+          <p className="text-white/70 text-[11.5px] font-medium uppercase tracking-widest text-center mb-6">
+            {p.title || <span className="opacity-50">{tx.cvPreviewEmptyTitle}</span>}
+          </p>
+
+          {/* Contact */}
+          <div className="space-y-2 mb-7">
+            {p.email    && <div className="flex items-center gap-2 text-white/80 text-[11.5px]"><CIcon d={ICON_EMAIL} cls="w-3 h-3" />{p.email}</div>}
+            {p.phone    && <div className="flex items-center gap-2 text-white/80 text-[11.5px]"><CIcon d={ICON_PHONE} cls="w-3 h-3" />{p.phone}</div>}
+            {p.location && <div className="flex items-center gap-2 text-white/80 text-[11.5px]"><CIcon d={ICON_LOCATION} cls="w-3 h-3" />{p.location}</div>}
+            {p.linkedin && <div className="flex items-start gap-2 text-white/80 text-[11.5px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3 mt-0.5" /><span className="break-all">{p.linkedin}</span></div>}
+          </div>
+
+          {skillsList.length > 0 && (
+            <SidebarSideSection title={tx.cvSecSkills}>
+              <div className="flex flex-wrap gap-1.5">
+                {skillsList.map((s, i) => (
+                  <span key={i} className="bg-white/20 text-white text-[11px] px-2.5 py-0.5 rounded-full">{s}</span>
+                ))}
+              </div>
+            </SidebarSideSection>
+          )}
+
+          {languagesList.length > 0 && (
+            <SidebarSideSection title={tx.cvSecLanguages}>
+              <div className="space-y-1">
+                {languagesList.map((l, i) => <div key={i} className="text-white/80 text-[12px]">{l}</div>)}
+              </div>
+            </SidebarSideSection>
+          )}
+
+          {hasMilitary && (
+            <SidebarSideSection title={tx.cvSecMilitary}>
+              {data.military.role && <div className="text-white font-semibold text-[12px]">{data.military.role}</div>}
+              {data.military.unit && <div className="text-white/70 text-[11.5px]">{data.military.unit}</div>}
+              {(data.military.start || data.military.end) && (
+                <div className="text-white/55 text-[11px] mt-0.5" dir="ltr">
+                  {data.military.start || "—"} – {data.military.end || "—"}
+                </div>
+              )}
+              {data.military.reserveDuty && (
+                <div className="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-white/75">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+                  {tx.cvFieldMilReserve}
+                </div>
+              )}
+            </SidebarSideSection>
+          )}
+        </div>
+
+        {/* Main */}
+        <div className="flex-1 px-7 py-8">
+          {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+
+          {data.summary && (
+            <SidebarMainSection title={tx.cvSecSummary} ac={ac}>
+              <p className="text-slate-600 text-[13px] leading-relaxed whitespace-pre-wrap">{data.summary}</p>
+            </SidebarMainSection>
+          )}
+
+          {data.experiences.length > 0 && (
+            <SidebarMainSection title={tx.cvSecExperience} ac={ac}>
+              <div className="space-y-5">
+                {data.experiences.map((exp) => (
+                  <div key={exp.id}>
+                    <div className="flex justify-between items-start gap-2 flex-wrap mb-0.5">
+                      <h3 className="font-bold text-slate-900 text-[14px]">{exp.role || "—"}</h3>
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap" style={{ backgroundColor: rgba(ac, 0.1), color: ac }} dir="ltr">
+                        {exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}
+                      </span>
+                    </div>
+                    {exp.company && <div className="text-[12.5px] font-semibold mb-1.5" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                    {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                  </div>
+                ))}
+              </div>
+            </SidebarMainSection>
+          )}
+
+          {data.educations.length > 0 && (
+            <SidebarMainSection title={tx.cvSecEducation} ac={ac}>
+              <div className="space-y-4">
+                {data.educations.map((edu) => (
+                  <div key={edu.id}>
+                    <div className="flex justify-between items-start gap-2 flex-wrap">
+                      <h3 className="font-bold text-slate-900 text-[14px]">{edu.degree || "—"}</h3>
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap" style={{ backgroundColor: rgba(ac, 0.1), color: ac }} dir="ltr">
+                        {edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}
+                      </span>
+                    </div>
+                    {edu.school && <div className="text-[12.5px] font-semibold" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
+                  </div>
+                ))}
+              </div>
+            </SidebarMainSection>
+          )}
         </div>
       </div>
+    </div>
+  );
+}
 
-      <div className="px-10 py-8 text-slate-800">
+function SidebarSideSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-6 last:mb-0">
+      <h2 className="text-[10px] font-black uppercase tracking-[0.14em] text-white/55 mb-2.5 pb-1.5 border-b border-white/20">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function SidebarMainSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <section className="mb-6 last:mb-0">
+      <h2 className="text-[10.5px] font-black uppercase tracking-[0.14em] mb-3 pb-1.5 border-b" style={{ color: ac, borderColor: rgba(ac, 0.2) }}>{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+// ─── Template 4: Classic (traditional centered) ───────────────────────────────
+
+function ClassicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+  const p = data.personal;
+  return (
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
+      {/* Header */}
+      <div className="px-10 pt-10 pb-7 text-center">
+        <h1 className="text-[34px] font-bold text-slate-900 tracking-wide uppercase mb-2 leading-tight">
+          {p.fullName || <span className="text-slate-300">{tx.cvPreviewEmptyName}</span>}
+        </h1>
+        <p className="text-[12.5px] tracking-[0.18em] uppercase font-semibold mb-5" style={{ color: ac }}>
+          {p.title || <span className="text-slate-300">{tx.cvPreviewEmptyTitle}</span>}
+        </p>
+        <div className="flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-slate-500 text-[12px]">
+          {p.email    && <span className="flex items-center gap-1.5"><CIcon d={ICON_EMAIL} />{p.email}</span>}
+          {p.phone    && <span className="flex items-center gap-1.5"><CIcon d={ICON_PHONE} />{p.phone}</span>}
+          {p.location && <span className="flex items-center gap-1.5"><CIcon d={ICON_LOCATION} />{p.location}</span>}
+          {p.linkedin && <span className="flex items-center gap-1.5" dir="ltr"><CIcon d={ICON_LINK} />{p.linkedin}</span>}
+          {p.website  && <span className="flex items-center gap-1.5" dir="ltr"><CIcon d={ICON_LINK} />{p.website}</span>}
+        </div>
+      </div>
+      {/* Double line */}
+      <div className="mx-8 mb-6" style={{ borderTop: `3px solid ${ac}`, paddingTop: 3, borderBottom: `1px solid ${rgba(ac, 0.3)}` }} />
+
+      <div className="px-10 pb-8">
         {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+
         {data.summary && (
-          <ExecSection title={tx.cvSecSummary} ac={ac}>
-            <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">{data.summary}</p>
-          </ExecSection>
+          <ClassicSection title={tx.cvSecSummary} ac={ac}>
+            <p className="text-slate-600 text-[13.5px] leading-relaxed whitespace-pre-wrap">{data.summary}</p>
+          </ClassicSection>
         )}
+
         {data.experiences.length > 0 && (
-          <ExecSection title={tx.cvSecExperience} ac={ac}>
+          <ClassicSection title={tx.cvSecExperience} ac={ac}>
             <div className="space-y-5">
               {data.experiences.map((exp) => (
                 <div key={exp.id}>
                   <div className="flex flex-wrap items-baseline justify-between gap-2 mb-0.5">
                     <h3 className="font-bold text-slate-900 text-[15px] uppercase tracking-wide">{exp.role || "—"}</h3>
-                    <span className="text-slate-500 text-xs font-mono" dir="ltr">
+                    <span className="text-slate-500 text-[11.5px] font-medium" dir="ltr">
                       {exp.start || "—"} – {exp.current ? tx.cvFieldPresent : exp.end || "—"}
                     </span>
                   </div>
-                  {exp.company && <div className="text-slate-600 text-sm font-medium mb-1.5 italic">{exp.company}{exp.location ? `, ${exp.location}` : ""}</div>}
-                  {exp.description && <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                  {exp.company && <div className="text-slate-600 text-[13px] font-medium mb-1.5 italic">{exp.company}{exp.location ? `, ${exp.location}` : ""}</div>}
+                  {exp.description && <p className="text-slate-600 text-[13px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                 </div>
               ))}
             </div>
-          </ExecSection>
+          </ClassicSection>
         )}
+
         {data.educations.length > 0 && (
-          <ExecSection title={tx.cvSecEducation} ac={ac}>
+          <ClassicSection title={tx.cvSecEducation} ac={ac}>
             <div className="space-y-4">
               {data.educations.map((edu) => (
                 <div key={edu.id}>
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h3 className="font-bold text-slate-900 text-[15px]">{edu.degree || "—"}</h3>
-                    <span className="text-slate-500 text-xs font-mono" dir="ltr">
+                    <h3 className="font-bold text-slate-900 text-[15px] uppercase tracking-wide">{edu.degree || "—"}</h3>
+                    <span className="text-slate-500 text-[11.5px] font-medium" dir="ltr">
                       {edu.start || "—"} – {edu.current ? tx.cvFieldPresent : edu.end || "—"}
                     </span>
                   </div>
-                  {edu.school && <div className="text-slate-600 text-sm italic">{edu.school}{edu.location ? `, ${edu.location}` : ""}</div>}
+                  {edu.school && <div className="text-slate-600 text-[13px] italic">{edu.school}{edu.location ? `, ${edu.location}` : ""}</div>}
                 </div>
               ))}
             </div>
-          </ExecSection>
+          </ClassicSection>
         )}
+
+        {hasMilitary && (
+          <ClassicSection title={tx.cvSecMilitary} ac={ac}>
+            <div className="flex flex-wrap items-baseline justify-between gap-2 mb-0.5">
+              {data.military.role && <h3 className="font-bold text-slate-900 text-[15px] uppercase tracking-wide">{data.military.role}</h3>}
+              {(data.military.start || data.military.end) && (
+                <span className="text-slate-500 text-[11.5px] font-medium" dir="ltr">
+                  {data.military.start || "—"} – {data.military.end || "—"}
+                </span>
+              )}
+            </div>
+            {data.military.unit && <div className="text-slate-600 text-[13px] italic">{data.military.unit}</div>}
+            {data.military.reserveDuty && <div className="text-slate-500 text-[13px] mt-1 italic">{tx.cvFieldMilReserve}</div>}
+          </ClassicSection>
+        )}
+
         {skillsList.length > 0 && (
-          <ExecSection title={tx.cvSecSkills} ac={ac}>
-            <p className="text-slate-700 text-sm leading-relaxed">{skillsList.join("  ·  ")}</p>
-          </ExecSection>
+          <ClassicSection title={tx.cvSecSkills} ac={ac}>
+            <p className="text-slate-700 text-[13.5px] leading-relaxed">{skillsList.join("  ·  ")}</p>
+          </ClassicSection>
         )}
         {languagesList.length > 0 && (
-          <ExecSection title={tx.cvSecLanguages} ac={ac}>
-            <p className="text-slate-700 text-sm">{languagesList.join("  ·  ")}</p>
-          </ExecSection>
+          <ClassicSection title={tx.cvSecLanguages} ac={ac}>
+            <p className="text-slate-700 text-[13.5px]">{languagesList.join("  ·  ")}</p>
+          </ClassicSection>
         )}
       </div>
     </div>
   );
 }
 
-function ExecSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+function ClassicSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
   return (
     <section className="mb-6 last:mb-0">
-      <h2 className="text-xs font-bold uppercase tracking-widest mb-3 pb-1 border-b-2" style={{ color: ac, borderColor: ac }}>{title}</h2>
+      <h2 className="text-[11px] font-black uppercase tracking-[0.15em] mb-3 pb-1 border-b-2" style={{ color: ac, borderColor: ac }}>{title}</h2>
       {children}
     </section>
   );
 }
 
-// ─── Template 5: Tech (dark monospace developer) ──────────────────────────────
+// ─── Template 5: Code (dark developer) ────────────────────────────────────────
 
-function TechTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ac }: TemplateProps) {
+function CodeTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
   const p = data.personal;
   return (
-    <div className="bg-gray-950 text-gray-100 rounded-xl shadow-xl overflow-hidden font-mono" dir={dir} style={{ minHeight: 900 }}>
-      <div className="px-8 py-8" style={{ backgroundColor: ac }}>
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+    <div className="bg-[#0d1117] text-gray-100 rounded-xl shadow-xl overflow-hidden font-mono" dir={dir} style={{ minHeight: 900 }}>
+      {/* Header */}
+      <div className="px-8 py-8 relative overflow-hidden" style={{ backgroundColor: ac }}>
+        <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(255,255,255,0.3) 28px, rgba(255,255,255,0.3) 29px)" }} />
+        <div className="relative z-10 flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">{p.fullName || <span className="opacity-50">{tx.cvPreviewEmptyName}</span>}</h1>
-            {p.title && <p className="text-white/80 text-sm mt-1 font-normal">{p.title}</p>}
+            <h1 className="text-[26px] font-bold text-white tracking-tight leading-tight">
+              {p.fullName || <span className="opacity-50">{tx.cvPreviewEmptyName}</span>}
+            </h1>
+            {p.title && <p className="text-white/80 text-[13.5px] font-normal mt-1">{`> ${p.title}`}</p>}
           </div>
-          <div className="text-xs text-white/70 space-y-0.5 text-end">
-            {p.email    && <div>$ {p.email}</div>}
-            {p.phone    && <div>$ {p.phone}</div>}
-            {p.location && <div>📍 {p.location}</div>}
+          <div className="text-[11.5px] text-white/75 space-y-0.5 text-start" dir="ltr">
+            {p.email    && <div>@ {p.email}</div>}
+            {p.phone    && <div># {p.phone}</div>}
+            {p.location && <div>$ {p.location}</div>}
             {p.linkedin && <div>in {p.linkedin}</div>}
           </div>
         </div>
       </div>
 
+      {/* Body */}
       <div className="p-8 space-y-7">
         {isEmpty && <p className="text-gray-600 text-center py-10">{tx.cvPlaceholder}</p>}
+
         {data.summary && (
-          <section>
-            <h2 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: ac }}>// {tx.cvSecSummary}</h2>
-            <p className="text-gray-300 text-sm leading-relaxed border-s-2 ps-3" style={{ borderColor: rgba(ac, 0.5) }}>{data.summary}</p>
-          </section>
+          <CodeSection title={tx.cvSecSummary} ac={ac}>
+            <p className="text-gray-400 text-[13px] leading-relaxed border-s-2 ps-4" style={{ borderColor: rgba(ac, 0.5) }}>{data.summary}</p>
+          </CodeSection>
         )}
+
         {data.experiences.length > 0 && (
-          <section>
-            <h2 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ac }}>// {tx.cvSecExperience}</h2>
+          <CodeSection title={tx.cvSecExperience} ac={ac}>
             <div className="space-y-5">
               {data.experiences.map((exp) => (
-                <div key={exp.id} className="border-s-2 border-gray-700 ps-4">
+                <div key={exp.id} className="border-s-2 border-[#21262d] ps-4 hover:border-s-[3px] transition-all">
                   <div className="flex justify-between flex-wrap gap-1 mb-1">
-                    <span className="text-white font-semibold text-sm">{exp.role}</span>
-                    <span className="text-gray-500 text-xs font-mono">{exp.start}{exp.start && (exp.end || exp.current) ? " → " : ""}{exp.current ? "present" : exp.end}</span>
+                    <span className="text-white font-semibold text-[13.5px]">{exp.role || "—"}</span>
+                    <span className="text-gray-500 text-[11.5px]" dir="ltr">{exp.start}{exp.start && (exp.end || exp.current) ? " → " : ""}{exp.current ? "present" : exp.end}</span>
                   </div>
-                  {exp.company && <div className="text-xs mb-2" style={{ color: rgba(ac, 0.9) }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
-                  {exp.description && <p className="text-gray-400 text-xs leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                  {exp.company && <div className="text-[12px] mb-1.5 font-medium" style={{ color: rgba(ac, 0.9) }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                  {exp.description && <p className="text-gray-400 text-[12px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                 </div>
               ))}
             </div>
-          </section>
+          </CodeSection>
         )}
-        <div className="grid grid-cols-2 gap-6">
-          {skillsList.length > 0 && (
-            <section>
-              <h2 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: ac }}>// {tx.cvSecSkills}</h2>
-              <div className="flex flex-wrap gap-1.5">
-                {skillsList.map((s, i) => (
-                  <span key={i} className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: rgba(ac, 0.15), border: `1px solid ${rgba(ac, 0.3)}`, color: rgba(ac, 0.95) }}>{s}</span>
-                ))}
-              </div>
-            </section>
-          )}
-          {languagesList.length > 0 && (
-            <section>
-              <h2 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: ac }}>// {tx.cvSecLanguages}</h2>
-              <div className="space-y-0.5">
-                {languagesList.map((l, i) => <div key={i} className="text-gray-400 text-xs">› {l}</div>)}
-              </div>
-            </section>
-          )}
-        </div>
+
         {data.educations.length > 0 && (
-          <section>
-            <h2 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ac }}>// {tx.cvSecEducation}</h2>
+          <CodeSection title={tx.cvSecEducation} ac={ac}>
             <div className="space-y-3">
               {data.educations.map((edu) => (
-                <div key={edu.id} className="border-s-2 border-gray-700 ps-4">
+                <div key={edu.id} className="border-s-2 border-[#21262d] ps-4">
                   <div className="flex justify-between flex-wrap gap-1">
-                    <span className="text-white text-sm font-semibold">{edu.degree}</span>
-                    <span className="text-gray-500 text-xs">{edu.start}{edu.start && edu.end ? "–" : ""}{edu.end}</span>
+                    <span className="text-white text-[13.5px] font-semibold">{edu.degree || "—"}</span>
+                    <span className="text-gray-500 text-[11px]" dir="ltr">{edu.start}{edu.start && edu.end ? "–" : ""}{edu.end}</span>
                   </div>
-                  {edu.school && <div className="text-gray-400 text-xs">{edu.school}{edu.location ? `, ${edu.location}` : ""}</div>}
+                  {edu.school && <div className="text-gray-400 text-[12px]">{edu.school}{edu.location ? `, ${edu.location}` : ""}</div>}
                 </div>
               ))}
             </div>
-          </section>
+          </CodeSection>
         )}
+
+        {hasMilitary && (
+          <CodeSection title={tx.cvSecMilitary} ac={ac}>
+            <div className="border-s-2 border-[#21262d] ps-4">
+              <div className="flex justify-between flex-wrap gap-1 mb-1">
+                {data.military.role && <span className="text-white font-semibold text-[13.5px]">{data.military.role}</span>}
+                {(data.military.start || data.military.end) && (
+                  <span className="text-gray-500 text-[11px]" dir="ltr">{data.military.start}–{data.military.end}</span>
+                )}
+              </div>
+              {data.military.unit && <div className="text-[12px] font-medium" style={{ color: rgba(ac, 0.9) }}>{data.military.unit}</div>}
+              {data.military.reserveDuty && <div className="text-gray-400 text-[12px] mt-1">{`// ${tx.cvFieldMilReserve}`}</div>}
+            </div>
+          </CodeSection>
+        )}
+
+        <div className="grid grid-cols-2 gap-6">
+          {skillsList.length > 0 && (
+            <CodeSection title={tx.cvSecSkills} ac={ac}>
+              <div className="flex flex-wrap gap-1.5">
+                {skillsList.map((s, i) => (
+                  <span key={i} className="text-[11px] px-2 py-0.5 rounded"
+                    style={{ backgroundColor: rgba(ac, 0.12), border: `1px solid ${rgba(ac, 0.3)}`, color: rgba(ac, 0.95) }}>
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </CodeSection>
+          )}
+          {languagesList.length > 0 && (
+            <CodeSection title={tx.cvSecLanguages} ac={ac}>
+              <div className="space-y-0.5">
+                {languagesList.map((l, i) => <div key={i} className="text-gray-400 text-[12px]">› {l}</div>)}
+              </div>
+            </CodeSection>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── Template 6: Bold (large name, strong accent stripe) ─────────────────────
+function CodeSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <section>
+      <h2 className="text-[10.5px] font-bold uppercase tracking-widest mb-3" style={{ color: ac }}>
+        {`// ${title}`}
+      </h2>
+      {children}
+    </section>
+  );
+}
 
-function BoldTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ac }: TemplateProps) {
+// ─── Template 6: Impact (bold typography, vertical accent bar) ────────────────
+
+function ImpactTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
   const p = data.personal;
   return (
     <div className="bg-white rounded-xl shadow-xl overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
+      {/* Header with left bar */}
       <div className="relative">
-        <div className="absolute start-0 top-0 bottom-0 w-2" style={{ backgroundColor: ac }} />
-        <div className="ps-10 pe-8 pt-10 pb-8 bg-slate-50 border-b border-slate-200">
-          {p.fullName && <h1 className="text-4xl font-black text-slate-900 leading-none mb-2 tracking-tight uppercase">{p.fullName}</h1>}
-          {p.title   && <p className="font-bold text-lg tracking-wide" style={{ color: ac }}>{p.title}</p>}
-          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-slate-500 text-xs">
-            {p.email && <span>{p.email}</span>}
-            {p.phone && <span>{p.phone}</span>}
-            {p.location && <span>{p.location}</span>}
-            {p.linkedin && <span>{p.linkedin}</span>}
+        <div className="absolute start-0 top-0 bottom-0 w-1.5 rounded-e-full" style={{ backgroundColor: ac }} />
+        <div className="ps-9 pe-8 pt-9 pb-7 bg-slate-50 border-b border-slate-200">
+          <h1 className="text-[38px] font-black text-slate-900 leading-none mb-2 tracking-tight">
+            {p.fullName || <span className="text-slate-300">{tx.cvPreviewEmptyName}</span>}
+          </h1>
+          <p className="font-bold text-[15px] tracking-wide mb-4" style={{ color: ac }}>
+            {p.title || <span className="text-slate-400">{tx.cvPreviewEmptyTitle}</span>}
+          </p>
+          <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-slate-500 text-[12px]">
+            {p.email    && <span className="flex items-center gap-1.5"><CIcon d={ICON_EMAIL} />{p.email}</span>}
+            {p.phone    && <span className="flex items-center gap-1.5"><CIcon d={ICON_PHONE} />{p.phone}</span>}
+            {p.location && <span className="flex items-center gap-1.5"><CIcon d={ICON_LOCATION} />{p.location}</span>}
+            {p.linkedin && <span className="flex items-center gap-1.5" dir="ltr"><CIcon d={ICON_LINK} />{p.linkedin}</span>}
           </div>
         </div>
       </div>
 
-      <div className="ps-10 pe-8 py-8 space-y-7">
+      <div className="ps-9 pe-8 py-8 space-y-7">
         {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+
         {data.summary && (
-          <section>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-5 w-1 rounded-full" style={{ backgroundColor: ac }} />
-              <h2 className="text-xs font-black uppercase tracking-widest text-slate-900">{tx.cvSecSummary}</h2>
-            </div>
-            <p className="text-slate-600 text-sm leading-relaxed">{data.summary}</p>
-          </section>
+          <ImpactSection title={tx.cvSecSummary} ac={ac}>
+            <p className="text-slate-600 text-[13.5px] leading-relaxed">{data.summary}</p>
+          </ImpactSection>
         )}
+
         {data.experiences.length > 0 && (
-          <section>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-5 w-1 rounded-full" style={{ backgroundColor: ac }} />
-              <h2 className="text-xs font-black uppercase tracking-widest text-slate-900">{tx.cvSecExperience}</h2>
-            </div>
+          <ImpactSection title={tx.cvSecExperience} ac={ac}>
             <div className="space-y-5">
               {data.experiences.map((exp) => (
                 <div key={exp.id}>
                   <div className="flex justify-between items-start gap-2 flex-wrap">
-                    <h3 className="font-bold text-slate-900 text-sm">{exp.role}</h3>
-                    <span className="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-0.5 rounded-full whitespace-nowrap">
-                      {exp.start}{exp.start && (exp.end || exp.current) ? "–" : ""}{exp.current ? "Now" : exp.end}
+                    <h3 className="font-bold text-slate-900 text-[14.5px]">{exp.role || "—"}</h3>
+                    <span className="text-[11px] text-slate-400 font-semibold bg-slate-100 px-2.5 py-0.5 rounded-full whitespace-nowrap">
+                      {exp.start}{exp.start && (exp.end || exp.current) ? "–" : ""}{exp.current ? tx.cvFieldPresent : exp.end}
                     </span>
                   </div>
-                  {exp.company && <div className="font-semibold text-xs mt-0.5" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
-                  {exp.description && <p className="text-slate-600 text-xs mt-2 leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                  {exp.company && <div className="font-bold text-[12.5px] mt-0.5" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                  {exp.description && <p className="text-slate-600 text-[13px] mt-2 leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                 </div>
               ))}
             </div>
-          </section>
+          </ImpactSection>
         )}
-        <div className="grid grid-cols-2 gap-6">
-          {skillsList.length > 0 && (
-            <section>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-5 w-1 rounded-full" style={{ backgroundColor: ac }} />
-                <h2 className="text-xs font-black uppercase tracking-widest text-slate-900">{tx.cvSecSkills}</h2>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {skillsList.map((s, i) => (
-                  <span key={i} className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: rgba(ac, 0.08), border: `1px solid ${rgba(ac, 0.25)}`, color: ac }}>{s}</span>
-                ))}
-              </div>
-            </section>
-          )}
-          {languagesList.length > 0 && (
-            <section>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-5 w-1 rounded-full" style={{ backgroundColor: ac }} />
-                <h2 className="text-xs font-black uppercase tracking-widest text-slate-900">{tx.cvSecLanguages}</h2>
-              </div>
-              <div className="space-y-1">
-                {languagesList.map((l, i) => <div key={i} className="text-slate-600 text-xs font-medium">• {l}</div>)}
-              </div>
-            </section>
-          )}
-        </div>
+
         {data.educations.length > 0 && (
-          <section>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-5 w-1 rounded-full" style={{ backgroundColor: ac }} />
-              <h2 className="text-xs font-black uppercase tracking-widest text-slate-900">{tx.cvSecEducation}</h2>
-            </div>
+          <ImpactSection title={tx.cvSecEducation} ac={ac}>
             <div className="space-y-4">
               {data.educations.map((edu) => (
                 <div key={edu.id}>
                   <div className="flex justify-between items-start gap-2 flex-wrap">
-                    <h3 className="font-bold text-slate-900 text-sm">{edu.degree}</h3>
-                    <span className="text-xs text-slate-400">{edu.start}{edu.start && edu.end ? "–" : ""}{edu.end}</span>
+                    <h3 className="font-bold text-slate-900 text-[14.5px]">{edu.degree || "—"}</h3>
+                    <span className="text-[11px] text-slate-400">{edu.start}{edu.start && edu.end ? "–" : ""}{edu.end}</span>
                   </div>
-                  {edu.school && <div className="text-slate-500 text-xs mt-0.5">{edu.school}{edu.location ? `, ${edu.location}` : ""}</div>}
+                  {edu.school && <div className="text-slate-500 text-[13px] mt-0.5">{edu.school}{edu.location ? `, ${edu.location}` : ""}</div>}
                 </div>
               ))}
             </div>
-          </section>
+          </ImpactSection>
         )}
+
+        {hasMilitary && (
+          <ImpactSection title={tx.cvSecMilitary} ac={ac}>
+            <div className="flex justify-between items-start gap-2 flex-wrap">
+              {data.military.role && <h3 className="font-bold text-slate-900 text-[14.5px]">{data.military.role}</h3>}
+              {(data.military.start || data.military.end) && (
+                <span className="text-[11px] text-slate-400 font-semibold bg-slate-100 px-2.5 py-0.5 rounded-full" dir="ltr">
+                  {data.military.start}–{data.military.end}
+                </span>
+              )}
+            </div>
+            {data.military.unit && <div className="font-bold text-[12.5px] mt-0.5" style={{ color: ac }}>{data.military.unit}</div>}
+            {data.military.reserveDuty && <div className="text-slate-500 text-[12.5px] mt-1 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ac }} />{tx.cvFieldMilReserve}</div>}
+          </ImpactSection>
+        )}
+
+        <div className="grid grid-cols-2 gap-6">
+          {skillsList.length > 0 && (
+            <ImpactSection title={tx.cvSecSkills} ac={ac}>
+              <div className="flex flex-wrap gap-1.5">
+                {skillsList.map((s, i) => (
+                  <span key={i} className="text-[11.5px] font-semibold px-2.5 py-0.5 rounded-full"
+                    style={{ backgroundColor: rgba(ac, 0.08), border: `1px solid ${rgba(ac, 0.2)}`, color: ac }}>
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </ImpactSection>
+          )}
+          {languagesList.length > 0 && (
+            <ImpactSection title={tx.cvSecLanguages} ac={ac}>
+              <div className="space-y-1">
+                {languagesList.map((l, i) => <div key={i} className="text-slate-600 text-[12.5px] font-medium">· {l}</div>)}
+              </div>
+            </ImpactSection>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── Template 7: Elegant (serif-inspired, clean two-column) ───────────────────
+function ImpactSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <section>
+      <div className="flex items-center gap-3 mb-3">
+        <div className="h-5 w-1 rounded-full flex-shrink-0" style={{ backgroundColor: ac }} />
+        <h2 className="text-[10.5px] font-black uppercase tracking-[0.14em] text-slate-900">{title}</h2>
+      </div>
+      {children}
+    </section>
+  );
+}
 
-function ElegantTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ac }: TemplateProps) {
+// ─── Template 7: Timeline (elegant centered photo) ────────────────────────────
+
+function TimelineTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
   const p = data.personal;
   return (
-    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
-      {/* Top accent bar */}
-      <div className="h-1.5 w-full" style={{ backgroundColor: ac }} />
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
+      {/* Thin accent top bar */}
+      <div className="h-1.5" style={{ backgroundColor: ac }} />
 
       <div className="flex min-h-full">
-        {/* Left column */}
-        <div className="w-[34%] border-e border-slate-100 px-6 py-8 flex-shrink-0">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-slate-900 leading-tight mb-1">
-              {p.fullName || <span className="text-slate-300">{tx.cvPreviewEmptyName}</span>}
-            </h1>
-            <p className="text-xs font-semibold uppercase tracking-widest mb-5" style={{ color: ac }}>
-              {p.title || <span className="text-slate-300">{tx.cvPreviewEmptyTitle}</span>}
-            </p>
-            <div className="space-y-2">
-              {p.email    && <ContactRow icon={ICON_EMAIL}>{p.email}</ContactRow>}
-              {p.phone    && <ContactRow icon={ICON_PHONE}>{p.phone}</ContactRow>}
-              {p.location && <ContactRow icon={ICON_LOCATION}>{p.location}</ContactRow>}
-              {p.linkedin && <ContactRow icon={ICON_LINK}><span dir="ltr" className="break-all text-[11px]">{p.linkedin}</span></ContactRow>}
-              {p.website  && <ContactRow icon={ICON_LINK}><span dir="ltr" className="break-all text-[11px]">{p.website}</span></ContactRow>}
+        {/* Left sidebar */}
+        <div className="w-[32%] border-e border-slate-100 bg-slate-50/60 px-5 py-8 flex-shrink-0">
+          {/* Photo */}
+          {p.photo ? (
+            <img src={p.photo} className="w-[80px] h-[80px] rounded-full object-cover mx-auto mb-4 shadow-md" style={{ border: `3px solid ${rgba(ac, 0.35)}` }} alt="" />
+          ) : (
+            <div className="w-[68px] h-[68px] rounded-full bg-gradient-to-br from-slate-200 to-slate-100 flex items-center justify-center mx-auto mb-4 shadow text-slate-400">
+              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
             </div>
+          )}
+
+          <h1 className="text-center text-[17px] font-bold text-slate-900 leading-tight mb-1">
+            {p.fullName || <span className="text-slate-400">{tx.cvPreviewEmptyName}</span>}
+          </h1>
+          <p className="text-center text-[11px] font-semibold uppercase tracking-widest mb-5" style={{ color: ac }}>
+            {p.title || <span className="text-slate-300">{tx.cvPreviewEmptyTitle}</span>}
+          </p>
+
+          <div className="space-y-2 mb-7">
+            {p.email    && <div className="flex items-center gap-2 text-slate-600 text-[12px]"><CIcon d={ICON_EMAIL} />{p.email}</div>}
+            {p.phone    && <div className="flex items-center gap-2 text-slate-600 text-[12px]"><CIcon d={ICON_PHONE} />{p.phone}</div>}
+            {p.location && <div className="flex items-center gap-2 text-slate-600 text-[12px]"><CIcon d={ICON_LOCATION} />{p.location}</div>}
+            {p.linkedin && <div className="flex items-start gap-2 text-slate-600 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3 mt-0.5" /><span className="break-all">{p.linkedin}</span></div>}
+            {p.website  && <div className="flex items-start gap-2 text-slate-600 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3 mt-0.5" /><span className="break-all">{p.website}</span></div>}
           </div>
 
           {skillsList.length > 0 && (
-            <div className="mb-7">
-              <h2 className="text-[10px] font-bold uppercase tracking-widest mb-3 pb-1 border-b" style={{ color: ac, borderColor: rgba(ac, 0.25) }}>{tx.cvSecSkills}</h2>
+            <TimelineSideSection title={tx.cvSecSkills} ac={ac}>
               <div className="space-y-1.5">
                 {skillsList.map((s, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: ac }} />
-                    <span className="text-slate-700 text-xs">{s}</span>
+                    <span className="text-slate-700 text-[12px]">{s}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </TimelineSideSection>
           )}
 
           {languagesList.length > 0 && (
-            <div>
-              <h2 className="text-[10px] font-bold uppercase tracking-widest mb-3 pb-1 border-b" style={{ color: ac, borderColor: rgba(ac, 0.25) }}>{tx.cvSecLanguages}</h2>
+            <TimelineSideSection title={tx.cvSecLanguages} ac={ac}>
               <div className="space-y-1.5">
-                {languagesList.map((l, i) => (
-                  <div key={i} className="text-slate-700 text-xs">{l}</div>
-                ))}
+                {languagesList.map((l, i) => <div key={i} className="text-slate-700 text-[12px]">{l}</div>)}
               </div>
-            </div>
+            </TimelineSideSection>
+          )}
+
+          {hasMilitary && (
+            <TimelineSideSection title={tx.cvSecMilitary} ac={ac}>
+              {data.military.role && <div className="text-slate-800 text-[12px] font-semibold">{data.military.role}</div>}
+              {data.military.unit && <div className="text-[11.5px] mt-0.5" style={{ color: ac }}>{data.military.unit}</div>}
+              {(data.military.start || data.military.end) && (
+                <div className="text-slate-400 text-[11px] mt-1" dir="ltr">{data.military.start || "—"} – {data.military.end || "—"}</div>
+              )}
+              {data.military.reserveDuty && (
+                <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-slate-500">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ac }} />
+                  {tx.cvFieldMilReserve}
+                </div>
+              )}
+            </TimelineSideSection>
           )}
         </div>
 
-        {/* Right column */}
-        <div className="flex-1 px-8 py-8">
+        {/* Right main */}
+        <div className="flex-1 px-7 py-8">
           {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+
           {data.summary && (
-            <ElegantSection title={tx.cvSecSummary} ac={ac}>
-              <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">{data.summary}</p>
-            </ElegantSection>
+            <TimelineMainSection title={tx.cvSecSummary} ac={ac}>
+              <p className="text-slate-600 text-[13px] leading-relaxed whitespace-pre-wrap">{data.summary}</p>
+            </TimelineMainSection>
           )}
+
           {data.experiences.length > 0 && (
-            <ElegantSection title={tx.cvSecExperience} ac={ac}>
+            <TimelineMainSection title={tx.cvSecExperience} ac={ac}>
               <div className="space-y-6">
                 {data.experiences.map((exp) => (
-                  <div key={exp.id} className="relative ps-4 border-s" style={{ borderColor: rgba(ac, 0.2) }}>
-                    <div className="absolute -start-[5px] top-1.5 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ac }} />
-                    <div className="flex justify-between flex-wrap gap-1 mb-0.5">
+                  <div key={exp.id} className="relative ps-5 border-s-2" style={{ borderColor: rgba(ac, 0.25) }}>
+                    <div className="absolute -start-[7px] top-1 w-3 h-3 rounded-full border-2 border-white shadow" style={{ backgroundColor: ac }} />
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 mb-0.5">
                       <h3 className="font-bold text-slate-900 text-[14px]">{exp.role || "—"}</h3>
-                      <span className="text-slate-400 text-xs font-mono" dir="ltr">
+                      <span className="text-slate-400 text-[11px] font-medium" dir="ltr">
                         {exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}
                       </span>
                     </div>
-                    {exp.company && <div className="text-xs font-medium mb-1.5" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
-                    {exp.description && <p className="text-slate-600 text-xs leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                    {exp.company && <div className="text-[12px] font-semibold mb-1.5" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                    {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                   </div>
                 ))}
               </div>
-            </ElegantSection>
+            </TimelineMainSection>
           )}
+
           {data.educations.length > 0 && (
-            <ElegantSection title={tx.cvSecEducation} ac={ac}>
-              <div className="space-y-4">
+            <TimelineMainSection title={tx.cvSecEducation} ac={ac}>
+              <div className="space-y-5">
                 {data.educations.map((edu) => (
-                  <div key={edu.id} className="relative ps-4 border-s" style={{ borderColor: rgba(ac, 0.2) }}>
-                    <div className="absolute -start-[5px] top-1.5 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ac }} />
-                    <div className="flex justify-between flex-wrap gap-1">
+                  <div key={edu.id} className="relative ps-5 border-s-2" style={{ borderColor: rgba(ac, 0.25) }}>
+                    <div className="absolute -start-[7px] top-1 w-3 h-3 rounded-full border-2 border-white shadow" style={{ backgroundColor: ac }} />
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
                       <h3 className="font-bold text-slate-900 text-[14px]">{edu.degree || "—"}</h3>
-                      <span className="text-slate-400 text-xs font-mono" dir="ltr">
+                      <span className="text-slate-400 text-[11px] font-medium" dir="ltr">
                         {edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}
                       </span>
                     </div>
-                    {edu.school && <div className="text-xs font-medium" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
+                    {edu.school && <div className="text-[12px] font-semibold" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
                   </div>
                 ))}
               </div>
-            </ElegantSection>
+            </TimelineMainSection>
           )}
         </div>
       </div>
@@ -756,11 +986,20 @@ function ElegantTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ac
   );
 }
 
-function ElegantSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+function TimelineSideSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
   return (
-    <section className="mb-7 last:mb-0">
-      <h2 className="text-[11px] font-bold uppercase tracking-widest mb-4 flex items-center gap-2" style={{ color: ac }}>
-        <span className="inline-block w-4 h-px" style={{ backgroundColor: ac }} />
+    <div className="mb-6 last:mb-0">
+      <h2 className="text-[10px] font-black uppercase tracking-[0.14em] mb-2.5 pb-1.5 border-b" style={{ color: ac, borderColor: rgba(ac, 0.2) }}>{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function TimelineMainSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <section className="mb-8 last:mb-0">
+      <h2 className="text-[11px] font-black uppercase tracking-[0.13em] mb-5 flex items-center gap-2" style={{ color: ac }}>
+        <span className="inline-block w-5 h-0.5 rounded-full" style={{ backgroundColor: ac }} />
         {title}
       </h2>
       {children}
@@ -768,91 +1007,121 @@ function ElegantSection({ title, children, ac }: { title: string; children: Reac
   );
 }
 
-// ─── Template 8: Gradient (full gradient header, bold modern) ─────────────────
+// ─── Template 8: Prism (rich gradient header, card sections) ──────────────────
 
-function GradientTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ac }: TemplateProps) {
+function PrismTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
   const p = data.personal;
   return (
-    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
       {/* Gradient header */}
-      <div className="px-8 py-10 text-white relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${ac} 0%, ${rgba(ac, 0.6)} 100%)` }}>
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 80% 50%, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+      <div className="relative px-8 py-11 text-white overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${ac} 0%, ${rgba(ac, 0.65)} 60%, ${rgba(ac, 0.9)} 100%)` }}>
+        <div className="absolute inset-0 opacity-[0.06]"
+          style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "28px 28px" }} />
+        <div className="absolute top-0 end-0 w-64 h-64 rounded-full opacity-10"
+          style={{ background: "radial-gradient(circle, white 0%, transparent 70%)", transform: "translate(30%, -30%)" }} />
         <div className="relative z-10">
-          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-1">
-            {p.fullName || <span className="text-white/40">{tx.cvPreviewEmptyName}</span>}
+          <h1 className="text-[34px] font-black text-white tracking-tight leading-tight mb-2">
+            {p.fullName || <span className="opacity-40">{tx.cvPreviewEmptyName}</span>}
           </h1>
-          <p className="text-white/85 text-base font-light mb-5">
-            {p.title || <span className="text-white/40">{tx.cvPreviewEmptyTitle}</span>}
+          <p className="text-white/80 text-[15px] font-light mb-6">
+            {p.title || <span className="opacity-40">{tx.cvPreviewEmptyTitle}</span>}
           </p>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
-            {p.email    && <ContactRow icon={ICON_EMAIL}    light>{p.email}</ContactRow>}
-            {p.phone    && <ContactRow icon={ICON_PHONE}    light>{p.phone}</ContactRow>}
-            {p.location && <ContactRow icon={ICON_LOCATION} light>{p.location}</ContactRow>}
-            {p.linkedin && <ContactRow icon={ICON_LINK}     light><span dir="ltr">{p.linkedin}</span></ContactRow>}
-            {p.website  && <ContactRow icon={ICON_LINK}     light><span dir="ltr">{p.website}</span></ContactRow>}
+            {p.email    && <span className="flex items-center gap-2 text-white/85 text-[12px]"><CIcon d={ICON_EMAIL} cls="w-3.5 h-3.5" />{p.email}</span>}
+            {p.phone    && <span className="flex items-center gap-2 text-white/85 text-[12px]"><CIcon d={ICON_PHONE} cls="w-3.5 h-3.5" />{p.phone}</span>}
+            {p.location && <span className="flex items-center gap-2 text-white/85 text-[12px]"><CIcon d={ICON_LOCATION} cls="w-3.5 h-3.5" />{p.location}</span>}
+            {p.linkedin && <span className="flex items-center gap-2 text-white/85 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3.5 h-3.5" />{p.linkedin}</span>}
+            {p.website  && <span className="flex items-center gap-2 text-white/85 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3.5 h-3.5" />{p.website}</span>}
           </div>
         </div>
       </div>
 
-      <div className="px-8 py-8">
+      <div className="px-8 py-7">
         {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+
         {data.summary && (
-          <GradSection title={tx.cvSecSummary} ac={ac}>
-            <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">{data.summary}</p>
-          </GradSection>
+          <PrismSection title={tx.cvSecSummary} ac={ac}>
+            <p className="text-slate-600 text-[13.5px] leading-relaxed whitespace-pre-wrap">{data.summary}</p>
+          </PrismSection>
         )}
+
         {data.experiences.length > 0 && (
-          <GradSection title={tx.cvSecExperience} ac={ac}>
-            <div className="space-y-5">
+          <PrismSection title={tx.cvSecExperience} ac={ac}>
+            <div className="space-y-4">
               {data.experiences.map((exp) => (
                 <div key={exp.id} className="rounded-xl p-4" style={{ backgroundColor: rgba(ac, 0.04), border: `1px solid ${rgba(ac, 0.1)}` }}>
                   <div className="flex justify-between flex-wrap gap-1 mb-0.5">
-                    <h3 className="font-bold text-slate-900 text-[15px]">{exp.role || "—"}</h3>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: rgba(ac, 0.1), color: ac }}>
+                    <h3 className="font-bold text-slate-900 text-[14.5px]">{exp.role || "—"}</h3>
+                    <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full" style={{ backgroundColor: rgba(ac, 0.1), color: ac }} dir="ltr">
                       {exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}
                     </span>
                   </div>
-                  {exp.company && <div className="font-semibold text-xs mb-2" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
-                  {exp.description && <p className="text-slate-600 text-xs leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                  {exp.company && <div className="font-semibold text-[12.5px] mb-2" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                  {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                 </div>
               ))}
             </div>
-          </GradSection>
+          </PrismSection>
         )}
+
         {data.educations.length > 0 && (
-          <GradSection title={tx.cvSecEducation} ac={ac}>
-            <div className="space-y-4">
+          <PrismSection title={tx.cvSecEducation} ac={ac}>
+            <div className="space-y-3">
               {data.educations.map((edu) => (
                 <div key={edu.id} className="rounded-xl p-4" style={{ backgroundColor: rgba(ac, 0.04), border: `1px solid ${rgba(ac, 0.1)}` }}>
                   <div className="flex justify-between flex-wrap gap-1">
-                    <h3 className="font-bold text-slate-900 text-[15px]">{edu.degree || "—"}</h3>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: rgba(ac, 0.1), color: ac }}>
+                    <h3 className="font-bold text-slate-900 text-[14.5px]">{edu.degree || "—"}</h3>
+                    <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full" style={{ backgroundColor: rgba(ac, 0.1), color: ac }} dir="ltr">
                       {edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}
                     </span>
                   </div>
-                  {edu.school && <div className="font-semibold text-xs" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
+                  {edu.school && <div className="font-semibold text-[12.5px] mt-0.5" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
                 </div>
               ))}
             </div>
-          </GradSection>
+          </PrismSection>
         )}
+
+        {hasMilitary && (
+          <PrismSection title={tx.cvSecMilitary} ac={ac}>
+            <div className="rounded-xl p-4" style={{ backgroundColor: rgba(ac, 0.04), border: `1px solid ${rgba(ac, 0.1)}` }}>
+              <div className="flex justify-between flex-wrap gap-1 mb-0.5">
+                {data.military.role && <h3 className="font-bold text-slate-900 text-[14.5px]">{data.military.role}</h3>}
+                {(data.military.start || data.military.end) && (
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full" style={{ backgroundColor: rgba(ac, 0.1), color: ac }} dir="ltr">
+                    {data.military.start} – {data.military.end}
+                  </span>
+                )}
+              </div>
+              {data.military.unit && <div className="font-semibold text-[12.5px]" style={{ color: ac }}>{data.military.unit}</div>}
+              {data.military.reserveDuty && (
+                <div className="flex items-center gap-1.5 mt-2 text-[12px] text-slate-500">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ac }} />
+                  {tx.cvFieldMilReserve}
+                </div>
+              )}
+            </div>
+          </PrismSection>
+        )}
+
         {(skillsList.length > 0 || languagesList.length > 0) && (
           <div className="grid grid-cols-2 gap-6">
             {skillsList.length > 0 && (
-              <GradSection title={tx.cvSecSkills} ac={ac}>
+              <PrismSection title={tx.cvSecSkills} ac={ac}>
                 <div className="flex flex-wrap gap-2">
                   {skillsList.map((s, i) => (
-                    <span key={i} className="text-xs font-semibold px-3 py-1 rounded-lg" style={{ backgroundColor: rgba(ac, 0.1), color: ac }}>{s}</span>
+                    <span key={i} className="text-[12px] font-semibold px-3 py-1 rounded-lg" style={{ backgroundColor: rgba(ac, 0.1), color: ac }}>{s}</span>
                   ))}
                 </div>
-              </GradSection>
+              </PrismSection>
             )}
             {languagesList.length > 0 && (
-              <GradSection title={tx.cvSecLanguages} ac={ac}>
+              <PrismSection title={tx.cvSecLanguages} ac={ac}>
                 <div className="space-y-1.5">
-                  {languagesList.map((l, i) => <div key={i} className="text-slate-600 text-sm">{l}</div>)}
+                  {languagesList.map((l, i) => <div key={i} className="text-slate-600 text-[13px]">{l}</div>)}
                 </div>
-              </GradSection>
+              </PrismSection>
             )}
           </div>
         )}
@@ -861,14 +1130,14 @@ function GradientTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, a
   );
 }
 
-function GradSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+function PrismSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
   return (
     <section className="mb-6 last:mb-0">
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-3 mb-4">
         <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: rgba(ac, 0.12) }}>
-          <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: ac }} />
+          <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: ac }} />
         </div>
-        <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: ac }}>{title}</h2>
+        <h2 className="text-[10.5px] font-black uppercase tracking-[0.14em]" style={{ color: ac }}>{title}</h2>
       </div>
       {children}
     </section>

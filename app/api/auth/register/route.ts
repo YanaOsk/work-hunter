@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     let user: { id: string; name: string; email: string } | null = null;
     try {
-      user = createUser(name.trim(), email.trim(), password);
+      user = await createUser(name.trim(), email.trim(), password);
     } catch (err) {
       console.error("[register] createUser threw:", err);
       return NextResponse.json({ error: "Could not save user — check server logs" }, { status: 500 });

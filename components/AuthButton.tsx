@@ -85,6 +85,16 @@ export default function AuthButton() {
             </div>
 
             <div className="p-1.5">
+              <Link
+                href="/profile"
+                onClick={() => setOpen(false)}
+                className="w-full text-start px-3 py-2.5 text-white/70 hover:text-white hover:bg-white/5 rounded-xl text-sm transition flex items-center gap-2.5"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                {lang === "he" ? "הפרופיל שלי" : "My profile"}
+              </Link>
               <button
                 onClick={() => {
                   setOpen(false);

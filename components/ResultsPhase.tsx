@@ -6,14 +6,17 @@ import JobCard from "./JobCard";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 
+const FREE_RESULTS = 3;
+
 interface Props {
   jobs: JobResult[];
   userProfile: UserProfile;
   demoMode: boolean;
+  isSubscribed?: boolean;
   onReset: () => void;
 }
 
-export default function ResultsPhase({ jobs, userProfile, demoMode, onReset }: Props) {
+export default function ResultsPhase({ jobs, userProfile, demoMode, isSubscribed = false, onReset }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
   const [filterRemote, setFilterRemote] = useState(false);
@@ -24,6 +27,10 @@ export default function ResultsPhase({ jobs, userProfile, demoMode, onReset }: P
     if (j.matchScore < filterMinScore) return false;
     return true;
   });
+
+  const showPaywall = !isSubscribed && !demoMode && filtered.length > FREE_RESULTS;
+  const visibleJobs = showPaywall ? filtered.slice(0, FREE_RESULTS) : filtered;
+  const hiddenCount = showPaywall ? filtered.length - FREE_RESULTS : 0;
 
   const profile = userProfile.parsedData;
 
@@ -95,7 +102,55 @@ export default function ResultsPhase({ jobs, userProfile, demoMode, onReset }: P
           </div>
         ) : (
           <div className="grid gap-4">
-            {filtered.map((job, i) => <JobCard key={job.id} job={job} rank={i + 1} />)}
+            {visibleJobs.map((job, i) => <JobCard key={job.id} job={job} rank={i + 1} />)}
+
+            {showPaywall && (
+              <div className="mt-2 rounded-3xl overflow-hidden border border-white/10">
+                <div className="bg-gradient-to-br from-purple-900/80 via-slate-900/90 to-purple-950/80 backdrop-blur-sm px-8 py-10 text-center">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-purple-600/30 border border-purple-500/40 mb-5">
+                    <svg className="w-7 h-7 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+
+                  <p className="text-2xl font-bold text-white mb-1">
+                    {tx.paywallUnlock.replace("{hidden}", String(hiddenCount))}
+                  </p>
+                  <p className="text-white/50 text-sm mb-6">
+                    {tx.paywallTeaser.replace("{shown}", String(FREE_RESULTS)).replace("{total}", String(filtered.length))}
+                  </p>
+
+                  <div className="flex flex-col items-center gap-2 mb-7 text-sm text-white/60">
+                    <span>✓ {tx.paywallPerk1.replace("{total}", String(filtered.length))}</span>
+                    <span>✓ {tx.paywallPerk2}</span>
+                    <span>✓ {tx.paywallPerk3}</span>
+                  </div>
+
+                  <div className="inline-block bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-medium px-4 py-1.5 rounded-full mb-5">
+                    {tx.paywallDiscount}
+                  </div>
+
+                  <div className="flex justify-center">
+                    <a
+                      href="/pricing"
+                      className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-8 py-3.5 rounded-xl transition-all duration-200 text-sm"
+                    >
+                      {tx.paywallCta}
+                    </a>
+                  </div>
+                </div>
+
+                {/* Blurred preview of hidden jobs */}
+                <div className="relative">
+                  <div className="blur-sm pointer-events-none select-none opacity-40 divide-y divide-white/5">
+                    {filtered.slice(FREE_RESULTS, FREE_RESULTS + 2).map((job, i) => (
+                      <JobCard key={job.id} job={job} rank={FREE_RESULTS + i + 1} />
+                    ))}
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-900/95" />
+                </div>
+              </div>
+            )}
           </div>
         )}
 

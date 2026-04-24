@@ -1,9 +1,5 @@
-import fs from "fs";
-import path from "path";
 import crypto from "crypto";
-
-const DATA_DIR = path.join(process.cwd(), "data");
-const USERS_FILE = path.join(DATA_DIR, "users.json");
+import { getDb } from "./mongodb";
 
 interface StoredUser {
   id: string;
@@ -14,31 +10,23 @@ interface StoredUser {
   createdAt: string;
 }
 
-function readUsers(): StoredUser[] {
-  try {
-    if (!fs.existsSync(USERS_FILE)) return [];
-    return JSON.parse(fs.readFileSync(USERS_FILE, "utf8")) as StoredUser[];
-  } catch {
-    return [];
-  }
-}
-
-function writeUsers(users: StoredUser[]): void {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
-
 function hashPassword(password: string, salt: string): string {
   return crypto.pbkdf2Sync(password, salt, 100_000, 64, "sha512").toString("hex");
 }
 
-export function createUser(
+async function col() {
+  const db = await getDb();
+  return db.collection<StoredUser>("users");
+}
+
+export async function createUser(
   name: string,
   email: string,
   password: string,
-): { id: string; name: string; email: string } | null {
-  const users = readUsers();
-  if (users.find((u) => u.email.toLowerCase() === email.toLowerCase())) return null;
+): Promise<{ id: string; name: string; email: string } | null> {
+  const c = await col();
+  const exists = await c.findOne({ email: email.toLowerCase() });
+  if (exists) return null;
 
   const salt = crypto.randomBytes(16).toString("hex");
   const user: StoredUser = {
@@ -49,29 +37,32 @@ export function createUser(
     salt,
     createdAt: new Date().toISOString(),
   };
-  writeUsers([...users, user]);
+  await c.insertOne(user);
   return { id: user.id, name: user.name, email: user.email };
 }
 
-export function getAllUsers(): { id: string; name: string; email: string; createdAt: string }[] {
-  return readUsers().map(({ id, name, email, createdAt }) => ({ id, name, email, createdAt }));
-}
-
-export function deleteUser(id: string): boolean {
-  const users = readUsers();
-  const filtered = users.filter((u) => u.id !== id);
-  if (filtered.length === users.length) return false;
-  writeUsers(filtered);
-  return true;
-}
-
-export function verifyUser(
+export async function verifyUser(
   email: string,
   password: string,
-): { id: string; name: string; email: string } | null {
-  const users = readUsers();
-  const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+): Promise<{ id: string; name: string; email: string } | null> {
+  const c = await col();
+  const user = await c.findOne({ email: email.toLowerCase() });
   if (!user) return null;
   if (hashPassword(password, user.salt) !== user.passwordHash) return null;
   return { id: user.id, name: user.name, email: user.email };
+}
+
+export async function getAllUsers(): Promise<
+  { id: string; name: string; email: string; createdAt: string }[]
+> {
+  const c = await col();
+  return c
+    .find({}, { projection: { _id: 0, id: 1, name: 1, email: 1, createdAt: 1 } })
+    .toArray() as Promise<{ id: string; name: string; email: string; createdAt: string }[]>;
+}
+
+export async function deleteUser(id: string): Promise<boolean> {
+  const c = await col();
+  const result = await c.deleteOne({ id });
+  return result.deletedCount > 0;
 }

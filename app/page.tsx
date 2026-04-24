@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { AppState, AppMode, UserProfile } from "@/lib/types";
 import { saveProfile } from "@/lib/profiles";
 import { DEFAULT_ADVISOR_ID, getOrCreateAdvisorState } from "@/lib/advisorState";
@@ -29,11 +30,16 @@ const emptyProfile: UserProfile = {
 
 export default function Home() {
   const router = useRouter();
+  const { status } = useSession();
   const [mode, setMode] = useState<AppMode | null>(null);
   const [state, setState] = useState<AppState>(initialState);
   const [demoMode, setDemoMode] = useState(false);
 
   const handleModeChoice = (chosen: AppMode) => {
+    if (status !== "authenticated") {
+      router.push("/auth/signin");
+      return;
+    }
     if (chosen === "advisor") {
       getOrCreateAdvisorState(DEFAULT_ADVISOR_ID, emptyProfile);
       router.push(`/advisor?profileId=${DEFAULT_ADVISOR_ID}`);
@@ -46,7 +52,10 @@ export default function Home() {
     setState((s) => ({ ...s, phase: "interview", userProfile: profile }));
   };
 
-  const handleInterviewComplete = async (context: string) => {
+  const handleInterviewComplete = async (
+    context: string,
+    convMessages: Array<{ role: "user" | "assistant"; content: string }>
+  ) => {
     if (state.userProfile) saveProfile(state.userProfile);
     setState((s) => ({ ...s, phase: "searching" }));
 
@@ -61,12 +70,18 @@ export default function Home() {
       });
 
       const data = await res.json();
+      const jobs = data.jobs || [];
+
+      if (status === "authenticated") {
+        fetch("/api/conversations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: convMessages, searchContext: context, jobs }),
+        }).catch(() => {});
+      }
+
       setDemoMode(data.demoMode || false);
-      setState((s) => ({
-        ...s,
-        phase: "results",
-        jobResults: data.jobs || [],
-      }));
+      setState((s) => ({ ...s, phase: "results", jobResults: jobs }));
     } catch {
       setState((s) => ({
         ...s,
@@ -94,7 +109,7 @@ export default function Home() {
       return (
         <InterviewPhase
           userProfile={state.userProfile!}
-          onComplete={handleInterviewComplete}
+          onComplete={(ctx, msgs) => handleInterviewComplete(ctx, msgs)}
           onBack={() => setState((s) => ({ ...s, phase: "upload", userProfile: null }))}
         />
       );
@@ -106,6 +121,7 @@ export default function Home() {
           jobs={state.jobResults}
           userProfile={state.userProfile!}
           demoMode={demoMode}
+          isSubscribed={false}
           onReset={handleReset}
         />
       );

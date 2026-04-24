@@ -17,7 +17,7 @@ export async function GET() {
   if (!isAdmin(session?.user?.email)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  return NextResponse.json(getAllUsers());
+  return NextResponse.json(await getAllUsers());
 }
 
 export async function DELETE(req: NextRequest) {
@@ -26,7 +26,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   const { id } = (await req.json()) as { id: string };
-  const deleted = deleteUser(id);
+  const deleted = await deleteUser(id);
   if (!deleted) return NextResponse.json({ error: "User not found" }, { status: 404 });
   return NextResponse.json({ success: true });
 }

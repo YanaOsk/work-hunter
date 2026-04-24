@@ -20,28 +20,44 @@ export interface CvEducation {
   description: string;
 }
 
+export interface CvMilitary {
+  unit: string;
+  role: string;
+  start: string;
+  end: string;
+  reserveDuty: boolean;
+}
+
 export type CvTemplate = "slate" | "minimal" | "accent" | "executive" | "tech" | "bold" | "elegant" | "gradient";
 
-export const CV_TEMPLATES: { id: CvTemplate; labelHe: string; labelEn: string }[] = [
-  { id: "slate", labelHe: "מודרני", labelEn: "Modern" },
-  { id: "minimal", labelHe: "מינימלי", labelEn: "Minimal" },
-  { id: "accent", labelHe: "צבעוני", labelEn: "Accent" },
-  { id: "executive", labelHe: "קלאסי", labelEn: "Classic" },
-  { id: "tech", labelHe: "טכנולוגי", labelEn: "Tech" },
-  { id: "bold", labelHe: "נועז", labelEn: "Bold" },
-  { id: "elegant", labelHe: "אלגנטי", labelEn: "Elegant" },
-  { id: "gradient", labelHe: "גרדיאנט", labelEn: "Gradient" },
+export const CV_TEMPLATES: { id: CvTemplate; labelHe: string; labelEn: string; supportsPhoto?: boolean }[] = [
+  { id: "slate",     labelHe: "Nova",     labelEn: "Nova",     supportsPhoto: true  },
+  { id: "minimal",   labelHe: "Nordic",   labelEn: "Nordic",   supportsPhoto: true  },
+  { id: "accent",    labelHe: "Sidebar",  labelEn: "Sidebar",  supportsPhoto: true  },
+  { id: "executive", labelHe: "Classic",  labelEn: "Classic"                        },
+  { id: "tech",      labelHe: "Code",     labelEn: "Code"                           },
+  { id: "bold",      labelHe: "Impact",   labelEn: "Impact"                         },
+  { id: "elegant",   labelHe: "Timeline", labelEn: "Timeline", supportsPhoto: true  },
+  { id: "gradient",  labelHe: "Prism",    labelEn: "Prism"                          },
 ];
 
 export const CV_ACCENT_COLORS: { hex: string; labelHe: string; labelEn: string }[] = [
-  { hex: "#7c3aed", labelHe: "סגול", labelEn: "Purple" },
-  { hex: "#2563eb", labelHe: "כחול", labelEn: "Blue" },
-  { hex: "#059669", labelHe: "ירוק", labelEn: "Emerald" },
-  { hex: "#e11d48", labelHe: "אדום", labelEn: "Rose" },
-  { hex: "#d97706", labelHe: "כתום", labelEn: "Amber" },
-  { hex: "#0891b2", labelHe: "ציאן", labelEn: "Cyan" },
-  { hex: "#6366f1", labelHe: "אינדיגו", labelEn: "Indigo" },
-  { hex: "#0f172a", labelHe: "כהה", labelEn: "Slate" },
+  { hex: "#7c3aed", labelHe: "סגול",      labelEn: "Purple"   },
+  { hex: "#2563eb", labelHe: "כחול",      labelEn: "Blue"     },
+  { hex: "#059669", labelHe: "ירוק",      labelEn: "Emerald"  },
+  { hex: "#e11d48", labelHe: "אדום",      labelEn: "Rose"     },
+  { hex: "#d97706", labelHe: "כתום",      labelEn: "Amber"    },
+  { hex: "#0891b2", labelHe: "ציאן",      labelEn: "Cyan"     },
+  { hex: "#6366f1", labelHe: "אינדיגו",   labelEn: "Indigo"   },
+  { hex: "#0f172a", labelHe: "כהה",       labelEn: "Slate"    },
+  { hex: "#ec4899", labelHe: "ורוד",      labelEn: "Pink"     },
+  { hex: "#ea580c", labelHe: "כתום כהה",  labelEn: "Orange"   },
+  { hex: "#0d9488", labelHe: "טורקיז",    labelEn: "Teal"     },
+  { hex: "#16a34a", labelHe: "ירוק כהה",  labelEn: "Green"    },
+  { hex: "#9333ea", labelHe: "סגול בהיר", labelEn: "Violet"   },
+  { hex: "#0369a1", labelHe: "כחול כהה",  labelEn: "Navy"     },
+  { hex: "#be123c", labelHe: "ארגמן",     labelEn: "Crimson"  },
+  { hex: "#92400e", labelHe: "ברונזה",    labelEn: "Bronze"   },
 ];
 
 export interface CvData {
@@ -53,10 +69,12 @@ export interface CvData {
     location: string;
     linkedin: string;
     website: string;
+    photo: string;
   };
   summary: string;
   experiences: CvExperience[];
   educations: CvEducation[];
+  military: CvMilitary;
   skills: string;
   languages: string;
   template: CvTemplate;
@@ -72,10 +90,18 @@ export const EMPTY_CV: CvData = {
     location: "",
     linkedin: "",
     website: "",
+    photo: "",
   },
   summary: "",
   experiences: [],
   educations: [],
+  military: {
+    unit: "",
+    role: "",
+    start: "",
+    end: "",
+    reserveDuty: false,
+  },
   skills: "",
   languages: "",
   template: "slate",
@@ -95,6 +121,7 @@ export function loadCv(): CvData {
       summary: parsed.summary ?? "",
       experiences: parsed.experiences ?? [],
       educations: parsed.educations ?? [],
+      military: { ...EMPTY_CV.military, ...(parsed.military || {}) },
       skills: parsed.skills ?? "",
       languages: parsed.languages ?? "",
       template: parsed.template ?? "slate",

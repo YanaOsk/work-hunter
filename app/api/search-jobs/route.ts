@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { geminiGenerate } from "@/lib/gemini";
 import { SEARCH_QUERY_PROMPT, MATCH_ANALYSIS_PROMPT } from "@/lib/prompts";
 import { JobResult } from "@/lib/types";
@@ -204,6 +206,11 @@ function getMockJobs(profile: Record<string, unknown>): JobResult[] {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { userProfile, chatContext } = body;

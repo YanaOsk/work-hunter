@@ -7,7 +7,7 @@ import { t } from "@/lib/i18n";
 
 interface Props {
   userProfile: UserProfile;
-  onComplete: (context: string) => void;
+  onComplete: (context: string, messages: Array<{ role: "user" | "assistant"; content: string }>) => void;
   onBack: () => void;
 }
 
@@ -101,8 +101,10 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
   };
 
   const startSearch = () => {
-    const context = (allMessages.length ? allMessages : messages).map((m) => `${m.role}: ${m.content}`).join("\n");
-    onComplete(context);
+    const msgs = allMessages.length ? allMessages : messages;
+    const context = msgs.map((m) => `${m.role}: ${m.content}`).join("\n");
+    const plainMsgs = msgs.map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
+    onComplete(context, plainMsgs);
   };
 
   const profileData = userProfile.parsedData;
