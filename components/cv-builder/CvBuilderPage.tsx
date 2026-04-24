@@ -38,57 +38,74 @@ export default function CvBuilderPage() {
     const wrapper = previewRef.current;
     if (!wrapper || downloading) return;
     setDownloading(true);
+
+    let clone: HTMLElement | null = null;
     try {
       const html2canvas = (await import("html2canvas")).default;
       const { jsPDF } = await import("jspdf");
 
-      // Clone the element into an off-screen container so sticky positioning
-      // doesn't affect the captured area and no visible layout shift occurs.
-      const clone = wrapper.cloneNode(true) as HTMLElement;
-      clone.style.cssText = `
-        position: absolute;
-        left: -9999px;
-        top: 0;
-        width: ${wrapper.scrollWidth}px;
-        pointer-events: none;
-      `;
+      // Capture the CV content (first child) to avoid sticky-wrapper issues
+      const target = (wrapper.firstElementChild as HTMLElement) ?? wrapper;
+      const targetW = target.offsetWidth || target.scrollWidth || 794;
+
+      clone = target.cloneNode(true) as HTMLElement;
+      clone.style.cssText = [
+        "position:fixed",
+        "top:0",
+        "left:-9999px",
+        `width:${targetW}px`,
+        "z-index:-1",
+        "pointer-events:none",
+        "overflow:visible",
+      ].join(";");
       document.body.appendChild(clone);
+
+      // Let browser compute layout before measuring
+      await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 
       const canvas = await html2canvas(clone, {
         scale: 2,
         useCORS: true,
+        allowTaint: true,
         logging: false,
         backgroundColor: "#ffffff",
-        windowWidth: clone.scrollWidth,
-        windowHeight: clone.scrollHeight,
+        width: targetW,
+        height: clone.scrollHeight,
       });
 
       document.body.removeChild(clone);
+      clone = null;
 
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-
-      const pageW = 210;
-      const pageH = 297;
-      const imgH = (canvas.height * pageW) / canvas.width;
-      let remainingH = imgH;
-      let yOffset = 0;
-
-      pdf.addImage(imgData, "PNG", 0, yOffset, pageW, imgH);
-      remainingH -= pageH;
-
-      while (remainingH > 0) {
-        yOffset -= pageH;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, yOffset, pageW, imgH);
-        remainingH -= pageH;
+      if (canvas.width === 0 || canvas.height === 0) {
+        throw new Error("Canvas is empty");
       }
 
-      const fileName = (data.personal.fullName || "cv").replace(/\s+/g, "_");
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+      const pageW = 210;
+      const pageH = 297;
+      const ratio = pageW / canvas.width;
+      const totalH = canvas.height * ratio;
+
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+      let yOffset = 0;
+      let remaining = totalH;
+
+      while (remaining > 0) {
+        pdf.addImage(imgData, "JPEG", 0, -yOffset, pageW, totalH);
+        remaining -= pageH;
+        if (remaining > 0) {
+          pdf.addPage();
+          yOffset += pageH;
+        }
+      }
+
+      const fileName = (data.personal.fullName?.trim() || "cv").replace(/\s+/g, "_");
       pdf.save(`${fileName}.pdf`);
     } catch (err) {
+      if (clone) { try { document.body.removeChild(clone); } catch { /* ignore */ } }
       console.error("PDF generation failed:", err);
-      window.print();
+      alert(lang === "he" ? "שגיאה ביצירת PDF — אנא נסי שוב." : "PDF generation failed — please try again.");
     } finally {
       setDownloading(false);
     }
