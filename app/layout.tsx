@@ -5,6 +5,7 @@ import LanguageToggle from "@/components/LanguageToggle";
 import Providers from "@/components/Providers";
 import NavBarWrapper from "@/components/NavBarWrapper";
 import ScrollToTop from "@/components/ScrollToTop";
+import AdminFab from "@/components/AdminFab";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,6 +38,7 @@ export default function RootLayout({
           <LanguageProvider>
             <NavBarWrapper />
             <ScrollToTop />
+            <AdminFab />
             <LanguageToggle />
             {children}
           </LanguageProvider>
