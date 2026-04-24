@@ -18,9 +18,6 @@ export default function SiteFooter() {
         </div>
 
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-          <Link href="/reviews" className="text-white/60 hover:text-white transition">
-            {tx.reviewsLink.split(" ").slice(-3).join(" ").replace("→", "")}
-          </Link>
           <Link href="/pricing" className="text-white/60 hover:text-white transition">
             {tx.pricingLink}
           </Link>
