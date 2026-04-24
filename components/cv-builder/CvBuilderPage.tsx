@@ -39,42 +39,17 @@ export default function CvBuilderPage() {
     if (!wrapper || downloading) return;
     setDownloading(true);
 
-    let clone: HTMLElement | null = null;
     try {
-      const html2canvas = (await import("html2canvas")).default;
+      const { toCanvas } = await import("html-to-image");
       const { jsPDF } = await import("jspdf");
 
-      // Capture the CV content (first child) to avoid sticky-wrapper issues
       const target = (wrapper.firstElementChild as HTMLElement) ?? wrapper;
-      const targetW = target.offsetWidth || target.scrollWidth || 794;
 
-      clone = target.cloneNode(true) as HTMLElement;
-      clone.style.cssText = [
-        "position:fixed",
-        "top:0",
-        "left:-9999px",
-        `width:${targetW}px`,
-        "z-index:-1",
-        "pointer-events:none",
-        "overflow:visible",
-      ].join(";");
-      document.body.appendChild(clone);
-
-      // Let browser compute layout before measuring
-      await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
-
-      const canvas = await html2canvas(clone, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        logging: false,
+      const canvas = await toCanvas(target, {
+        pixelRatio: 2,
         backgroundColor: "#ffffff",
-        width: targetW,
-        height: clone.scrollHeight,
+        skipFonts: false,
       });
-
-      document.body.removeChild(clone);
-      clone = null;
 
       if (canvas.width === 0 || canvas.height === 0) {
         throw new Error("Canvas is empty");
@@ -103,9 +78,9 @@ export default function CvBuilderPage() {
       const fileName = (data.personal.fullName?.trim() || "cv").replace(/\s+/g, "_");
       pdf.save(`${fileName}.pdf`);
     } catch (err) {
-      if (clone) { try { document.body.removeChild(clone); } catch { /* ignore */ } }
-      console.error("PDF generation failed:", err);
-      alert(lang === "he" ? "שגיאה ביצירת PDF — אנא נסי שוב." : "PDF generation failed — please try again.");
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("PDF generation failed:", msg);
+      alert(`שגיאה: ${msg}`);
     } finally {
       setDownloading(false);
     }
