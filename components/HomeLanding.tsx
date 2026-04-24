@@ -1,8 +1,6 @@
 "use client";
 
 import { AppMode } from "@/lib/types";
-import PromoBanner from "./PromoBanner";
-import NavBar from "./NavBar";
 import HeroSection from "./HeroSection";
 import PainPoints from "./PainPoints";
 import HowItWorks from "./HowItWorks";
@@ -25,9 +23,6 @@ const Divider = () => <div className="border-t border-white/5" />;
 export default function HomeLanding({ onChoose }: Props) {
   return (
     <div className="bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 min-h-screen">
-      <PromoBanner />
-      <NavBar onStart={() => onChoose("advisor")} />
-
       <HeroSection onChoose={onChoose} />
 
       <Divider />

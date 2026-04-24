@@ -14,7 +14,7 @@ interface Props {
 export default function SummaryView({ advisorState, onBack, onOpenInterview, onExit }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
-  const { diagnosis, direction, cvReview, linkedin, strategy, chosenPath, userProfile } = advisorState;
+  const { diagnosis, direction, cvReview, strategy, chosenPath, userProfile } = advisorState;
   const name = userProfile.parsedData?.name || "";
 
   const chosenOption = direction?.options?.find((o) => o.path === chosenPath);
@@ -154,28 +154,6 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </Section>
         )}
 
-        {linkedin && (
-          <Section title={tx.summarySection4}>
-            <LinkedInBlock label={tx.linkedinHeadline} text={linkedin.headline} />
-            <LinkedInBlock label={tx.linkedinAbout} text={linkedin.about} multiline />
-            <div>
-              <h4 className="text-blue-300 text-sm font-semibold mb-2">{tx.linkedinExperience}</h4>
-              <ul className="bg-white/5 border border-white/10 rounded-lg p-3 space-y-1">
-                {linkedin.experienceBullets.map((b, i) => (
-                  <li key={i} className="text-white/85 text-sm flex gap-2">
-                    <span className="text-blue-400">•</span>
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="grid md:grid-cols-2 gap-3 mt-3">
-              <Pills label={tx.linkedinSkills} items={linkedin.skills} color="emerald" />
-              <Pills label={tx.linkedinKeywords} items={linkedin.keywords} color="purple" />
-            </div>
-          </Section>
-        )}
-
         {strategy && (
           <Section title={tx.summarySection5}>
             <div className="mb-4">
@@ -205,7 +183,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </Section>
         )}
 
-        <div className="mt-10 bg-gradient-to-br from-rose-600/20 to-amber-600/20 backdrop-blur-sm border border-rose-500/30 rounded-3xl p-8">
+        <div className="mt-10 bg-gradient-to-br from-rose-600/20 to-amber-600/20 border border-rose-500/30 rounded-3xl p-8">
           <div className="flex items-start gap-4 mb-4">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-rose-500/20 flex-shrink-0">
               <svg className="w-6 h-6 text-rose-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -221,7 +199,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
             onClick={onOpenInterview}
             className="w-full bg-rose-600 hover:bg-rose-500 text-white font-semibold py-3 rounded-xl transition"
           >
-            {tx.openInterview} →
+            {tx.openInterview}
           </button>
         </div>
       </div>
@@ -231,7 +209,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-6 mb-5">
+    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-5">
       <h2 className="text-lg font-bold text-white mb-4 border-b border-white/10 pb-3">{title}</h2>
       {children}
     </div>

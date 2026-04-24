@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   AdvisorStage,
   AdvisorState,
@@ -9,7 +10,6 @@ import {
   DiagnosisResult,
   DirectionResult,
   LifePath,
-  LinkedInProfile,
   MockInterview,
   SearchStrategy,
   UserProfile,
@@ -17,20 +17,23 @@ import {
 import {
   advanceStage,
   clearAdvisorState,
+  createInitialAdvisorState,
   getAdvisorState,
+  migrateGuestToUser,
   saveAdvisorState,
 } from "@/lib/advisorState";
 import JourneyMap from "./JourneyMap";
 import DiagnosisTool from "./DiagnosisTool";
 import DirectionTool from "./DirectionTool";
 import CVReviewTool from "./CVReviewTool";
-import LinkedInTool from "./LinkedInTool";
 import StrategyTool from "./StrategyTool";
 import MockInterviewTool from "./MockInterviewTool";
 import SummaryView from "./SummaryView";
+import SummaryGate, { UnlockPlan } from "./SummaryGate";
 import AdvisorChat from "./AdvisorChat";
 import PreJourneyIntro from "./PreJourneyIntro";
 import SelfIntro from "./SelfIntro";
+import AdvisorHomeButton from "./AdvisorHomeButton";
 
 type StageView = Exclude<AdvisorStage, "done">;
 type View = "map" | "chat" | "summary" | "interview" | StageView;
@@ -38,23 +41,32 @@ type View = "map" | "chat" | "summary" | "interview" | StageView;
 export default function AdvisorPageInner() {
   const router = useRouter();
   const params = useSearchParams();
-  const profileId = params.get("profileId");
+  const { data: session } = useSession();
+  const guestProfileId = params.get("profileId");
   const [advisorState, setAdvisorState] = useState<AdvisorState | null>(null);
   const [view, setView] = useState<View>("map");
+
+  // Use Google user ID when logged in, otherwise fall back to URL profileId
+  const profileId = session?.user?.id ?? guestProfileId;
 
   useEffect(() => {
     if (!profileId) {
       router.replace("/");
       return;
     }
-    const state = getAdvisorState(profileId);
+    // If user is logged in, migrate any guest session into their account
+    if (session?.user?.id && guestProfileId && guestProfileId !== session.user.id) {
+      migrateGuestToUser(guestProfileId, session.user.id);
+    }
+    const emptyProfile: UserProfile = { rawText: "", parsedData: {}, missingFields: [], clarifyingQuestions: [] };
+    let state = getAdvisorState(profileId);
     if (!state) {
-      router.replace("/");
-      return;
+      state = createInitialAdvisorState(emptyProfile);
+      saveAdvisorState(profileId, state);
     }
     setAdvisorState(state);
     if (state.currentStage === "done") setView("summary");
-  }, [profileId, router]);
+  }, [profileId, session, guestProfileId, router]);
 
   if (!advisorState || !profileId) {
     return <div className="min-h-screen bg-slate-900" />;
@@ -87,13 +99,22 @@ export default function AdvisorPageInner() {
     completeAndAdvance({ direction: r, chosenPath: path });
   const onCV = (r: CVReview) => completeAndAdvance({ cvReview: r });
   const onCVSkip = () => completeAndAdvance({ cvSkipped: true });
-  const onLinkedin = (r: LinkedInProfile) => completeAndAdvance({ linkedin: r });
-  const onLinkedinSkip = () => completeAndAdvance({ linkedinSkipped: true });
   const onStrategy = (r: SearchStrategy) => completeAndAdvance({ strategy: r });
   const onInterview = (r: MockInterview) => persist({ ...advisorState, mockInterview: r });
 
+  const onUnlock = (_plan: UnlockPlan) => {
+    persist({ ...advisorState, isPremium: true });
+  };
+
+  const wrap = (content: React.ReactNode) => (
+    <>
+      {content}
+      <AdvisorHomeButton />
+    </>
+  );
+
   if (!advisorState.introDismissed) {
-    return (
+    return wrap(
       <PreJourneyIntro
         onStart={() => persist({ ...advisorState, introDismissed: true })}
         onExit={handleExit}
@@ -102,7 +123,7 @@ export default function AdvisorPageInner() {
   }
 
   if (!advisorState.selfIntroCompleted) {
-    return (
+    return wrap(
       <SelfIntro
         advisorState={advisorState}
         onBack={handleExit}
@@ -114,11 +135,14 @@ export default function AdvisorPageInner() {
   }
 
   if (view === "chat") {
-    return <AdvisorChat advisorState={advisorState} onBack={backToMap} onUpdate={persist} />;
+    return wrap(<AdvisorChat advisorState={advisorState} onBack={backToMap} onUpdate={persist} />);
   }
 
   if (view === "summary") {
-    return (
+    if (!advisorState.isPremium) {
+      return wrap(<SummaryGate onUnlock={onUnlock} onBack={backToMap} />);
+    }
+    return wrap(
       <SummaryView
         advisorState={advisorState}
         onBack={backToMap}
@@ -129,7 +153,7 @@ export default function AdvisorPageInner() {
   }
 
   if (view === "interview") {
-    return (
+    return wrap(
       <MockInterviewTool
         advisorState={advisorState}
         onBack={backToSummary}
@@ -139,11 +163,11 @@ export default function AdvisorPageInner() {
   }
 
   if (view === "diagnosis") {
-    return <DiagnosisTool advisorState={advisorState} onBack={backToMap} onComplete={onDiagnosis} />;
+    return wrap(<DiagnosisTool advisorState={advisorState} onBack={backToMap} onComplete={onDiagnosis} />);
   }
 
   if (view === "direction") {
-    return (
+    return wrap(
       <DirectionTool
         advisorState={advisorState}
         onBack={backToMap}
@@ -153,7 +177,7 @@ export default function AdvisorPageInner() {
   }
 
   if (view === "cv") {
-    return (
+    return wrap(
       <CVReviewTool
         advisorState={advisorState}
         onBack={backToMap}
@@ -163,24 +187,11 @@ export default function AdvisorPageInner() {
     );
   }
 
-  if (view === "linkedin") {
-    return (
-      <LinkedInTool
-        advisorState={advisorState}
-        onBack={backToMap}
-        onComplete={onLinkedin}
-        onSkip={onLinkedinSkip}
-      />
-    );
-  }
-
   if (view === "strategy") {
-    return (
-      <StrategyTool advisorState={advisorState} onBack={backToMap} onComplete={onStrategy} />
-    );
+    return wrap(<StrategyTool advisorState={advisorState} onBack={backToMap} onComplete={onStrategy} />);
   }
 
-  return (
+  return wrap(
     <JourneyMap
       advisorState={advisorState}
       onStartStage={(s) => setView(s as StageView)}

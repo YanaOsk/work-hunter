@@ -16,6 +16,8 @@ export async function POST(request: NextRequest) {
       ? "השב בעברית בלבד."
       : "Respond in English only.";
 
+    const rawIntro = (userProfile as Record<string, unknown>)?.rawText as string | undefined;
+
     const systemWithContext = `${CHAT_SYSTEM_PROMPT}
 
 ${langInstruction}
@@ -23,6 +25,7 @@ ${langInstruction}
 Current user profile (what we know so far):
 ${JSON.stringify(userProfile?.parsedData || {}, null, 2)}
 
+${rawIntro ? `Original intro written by the user:\n"${rawIntro}"\n` : ""}
 Missing information we still need: ${JSON.stringify(userProfile?.missingFields || [])}`;
 
     const history = messages

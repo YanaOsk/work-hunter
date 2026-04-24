@@ -4,8 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
-import PromoBanner from "./PromoBanner";
-import NavBar from "./NavBar";
 
 export default function PricingPage() {
   const { lang } = useLanguage();
@@ -51,9 +49,6 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
-      <PromoBanner />
-      <NavBar />
-
       <div className="max-w-6xl mx-auto p-6 py-10">
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="text-white/50 hover:text-white text-sm">

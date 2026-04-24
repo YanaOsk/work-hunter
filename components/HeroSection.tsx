@@ -41,12 +41,7 @@ export default function HeroSection({ onChoose }: Props) {
             onClick={() => onChoose("advisor")}
             className="w-full sm:w-auto bg-purple-600 hover:bg-purple-500 text-white font-semibold px-8 py-4 rounded-xl transition-all shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105 active:scale-95 group"
           >
-            <span className="inline-flex items-center gap-2">
-              {tx.heroPrimaryCta}
-              <span className="inline-block transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1">
-                →
-              </span>
-            </span>
+            {tx.heroPrimaryCta}
           </button>
           <button
             onClick={() => onChoose("jobs")}

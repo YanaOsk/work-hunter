@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import LanguageToggle from "@/components/LanguageToggle";
+import Providers from "@/components/Providers";
+import PromoBanner from "@/components/PromoBanner";
+import NavBar from "@/components/NavBar";
+import ScrollToTop from "@/components/ScrollToTop";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,10 +34,17 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <LanguageProvider>
-          <LanguageToggle />
-          {children}
-        </LanguageProvider>
+        <Providers>
+          <LanguageProvider>
+            <div className="print:hidden">
+              <PromoBanner />
+              <NavBar />
+            </div>
+            <ScrollToTop />
+            <LanguageToggle />
+            {children}
+          </LanguageProvider>
+        </Providers>
       </body>
     </html>
   );

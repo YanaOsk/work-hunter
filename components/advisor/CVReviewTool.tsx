@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { AdvisorState, CVReview, UserProfile } from "@/lib/types";
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
@@ -154,6 +155,20 @@ export default function CVReviewTool({ advisorState, onBack, onComplete, onSkip 
             >
               {tx.cvReviewSubmit}
             </button>
+
+            <div className="border-t border-white/10 pt-4">
+              <p className="text-white/40 text-xs mb-2">{tx.cvLinkedinOptionalLabel}</p>
+              <Link
+                href="https://www.linkedin.com/profile/edit"
+                target="_blank"
+                className="inline-flex items-center gap-2 text-sky-400 hover:text-sky-300 text-sm transition"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                </svg>
+                {tx.cvLinkedinOptionalLink}
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -176,13 +191,28 @@ export default function CVReviewTool({ advisorState, onBack, onComplete, onSkip 
           <div className="flex flex-col gap-3">
             <button
               onClick={() => setPhase("input")}
-              className="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3.5 rounded-xl transition"
+              className="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3.5 rounded-xl transition flex items-center justify-center gap-2"
             >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
               {tx.yesIHave}
             </button>
+
+            <Link
+              href="/cv-builder"
+              target="_blank"
+              className="w-full bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-semibold py-3.5 rounded-xl transition flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              {tx.cvBuildNew}
+            </Link>
+
             <button
               onClick={onSkip}
-              className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 font-medium py-3.5 rounded-xl transition"
+              className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 font-medium py-3 rounded-xl transition text-sm"
             >
               {tx.noSkip}
             </button>

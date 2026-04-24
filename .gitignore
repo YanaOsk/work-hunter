@@ -45,3 +45,10 @@ next-env.d.ts
 .claude/
 CLAUDE.md
 AGENTS.md
+
+# User data
+/data/
+
+# Office temp files
+*.docx
+*.doc

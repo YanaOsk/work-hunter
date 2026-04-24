@@ -141,7 +141,6 @@ export type AdvisorStage =
   | "diagnosis"
   | "direction"
   | "cv"
-  | "linkedin"
   | "strategy"
   | "done";
 
@@ -149,7 +148,6 @@ export const STAGE_ORDER: AdvisorStage[] = [
   "diagnosis",
   "direction",
   "cv",
-  "linkedin",
   "strategy",
 ];
 
@@ -165,8 +163,6 @@ export interface AdvisorState {
   chosenPath: LifePath | null;
   cvSkipped: boolean;
   cvReview: CVReview | null;
-  linkedinSkipped: boolean;
-  linkedin: LinkedInProfile | null;
   strategy: SearchStrategy | null;
   mockInterview: MockInterview | null;
   chatMessages: ChatMessage[];

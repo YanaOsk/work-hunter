@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import { REVIEWS, Review } from "@/lib/reviews";
-import PromoBanner from "./PromoBanner";
-import NavBar from "./NavBar";
 
 export default function ReviewsPage() {
   const { lang } = useLanguage();
@@ -13,8 +11,6 @@ export default function ReviewsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
-      <PromoBanner />
-      <NavBar />
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-10">
         <Link href="/" className="text-white/50 hover:text-white text-sm mb-8 inline-block">
           ← {tx.newSearch}
@@ -41,7 +37,7 @@ export default function ReviewsPage() {
             href="/#plans"
             className="inline-block bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-3 rounded-xl transition"
           >
-            {tx.landingPlansTitle} →
+            {tx.landingPlansTitle}
           </Link>
         </div>
       </div>

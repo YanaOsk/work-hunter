@@ -16,8 +16,7 @@ export default function PreJourneyIntro({ onStart, onExit }: Props) {
     { num: 1, title: tx.preIntroStage1, desc: tx.preIntroStage1Desc, color: "emerald" },
     { num: 2, title: tx.preIntroStage2, desc: tx.preIntroStage2Desc, color: "purple" },
     { num: 3, title: tx.preIntroStage3, desc: tx.preIntroStage3Desc, color: "blue" },
-    { num: 4, title: tx.preIntroStage4, desc: tx.preIntroStage4Desc, color: "sky" },
-    { num: 5, title: tx.preIntroStage5, desc: tx.preIntroStage5Desc, color: "amber" },
+    { num: 4, title: tx.preIntroStage4, desc: tx.preIntroStage4Desc, color: "amber" },
   ];
 
   const colorMap: Record<string, { dot: string; num: string }> = {
@@ -68,7 +67,7 @@ export default function PreJourneyIntro({ onStart, onExit }: Props) {
             onClick={onStart}
             className="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-4 rounded-xl transition text-lg"
           >
-            {tx.preIntroStart} →
+            {tx.preIntroStart}
           </button>
         </div>
       </div>

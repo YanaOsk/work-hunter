@@ -18,6 +18,7 @@ interface SearchPlan {
   hebrewQueries: string[];
   englishQueries: string[];
   facebookQuery?: string;
+  linkedinQuery?: string;
   isTech: boolean;
   targetTitles: string[];
   searchRationale?: string;
@@ -49,13 +50,16 @@ async function serperSearch(query: string, sites: string, lang: string): Promise
   return data.organic || [];
 }
 
-// Primary job boards — drushim + alljobs are the top Israeli platforms
+// Primary Israeli job boards + LinkedIn
 const PRIMARY_IL_SITES =
-  "site:drushim.co.il OR site:alljobs.co.il OR site:jobmaster.co.il OR site:gotfriends.co.il OR site:comeet.io OR site:linkedin.com/jobs";
+  "site:drushim.co.il OR site:alljobs.co.il OR site:jobmaster.co.il OR site:gotfriends.co.il OR site:comeet.io OR site:linkedin.com/jobs OR site:glassdoor.com/Jobs";
 
-// Facebook-specific — groups AND marketplace jobs AND pages posting jobs
+// Facebook job groups
 const FACEBOOK_SITES =
   "site:facebook.com/groups OR site:facebook.com/marketplace/jobs OR site:facebook.com";
+
+// LinkedIn dedicated search
+const LINKEDIN_SITES = "site:linkedin.com/jobs OR site:linkedin.com/in";
 
 interface TaggedResult extends SerperResult {
   isNonObvious?: boolean;
@@ -67,15 +71,21 @@ async function runSearches(plan: SearchPlan): Promise<TaggedResult[]> {
     ...plan.englishQueries.map((q, i) => ({ q, lang: "en", nonObvious: i === plan.englishQueries.length - 1, sites: PRIMARY_IL_SITES })),
   ];
 
-  // Dedicated Facebook searches: custom query + first Hebrew query as fallback
-  const fbQuery = plan.facebookQuery || plan.hebrewQueries[0];
+  // Facebook: custom query + fallback
+  const fbQuery = plan.facebookQuery || `${plan.hebrewQueries[0]} דרושים`;
   const fbSearches = [
     { q: fbQuery, lang: "iw", nonObvious: false, sites: FACEBOOK_SITES },
-    { q: `${plan.hebrewQueries[0]} דרושים`, lang: "iw", nonObvious: false, sites: FACEBOOK_SITES },
+    { q: `${plan.hebrewQueries[0]} דרושים קבוצה`, lang: "iw", nonObvious: false, sites: FACEBOOK_SITES },
+  ];
+
+  // LinkedIn: dedicated query
+  const liQuery = plan.linkedinQuery || plan.englishQueries[0];
+  const linkedinSearches = [
+    { q: liQuery, lang: "en", nonObvious: false, sites: LINKEDIN_SITES },
   ];
 
   const results = await Promise.all(
-    [...boardQueries, ...fbSearches].map(({ q, lang, nonObvious, sites }) =>
+    [...boardQueries, ...fbSearches, ...linkedinSearches].map(({ q, lang, nonObvious, sites }) =>
       serperSearch(q, sites, lang).then((r) =>
         r.map((item) => ({ ...item, isNonObvious: nonObvious }))
       )
@@ -83,7 +93,7 @@ async function runSearches(plan: SearchPlan): Promise<TaggedResult[]> {
   );
 
   const all = results.flat();
-  return all.filter((r, i, arr) => arr.findIndex((x) => x.link === r.link) === i).slice(0, 15);
+  return all.filter((r, i, arr) => arr.findIndex((x) => x.link === r.link) === i).slice(0, 18);
 }
 
 async function analyzeMatch(profileText: string, job: TaggedResult): Promise<JobResult> {

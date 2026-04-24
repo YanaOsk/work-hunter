@@ -20,6 +20,30 @@ export interface CvEducation {
   description: string;
 }
 
+export type CvTemplate = "slate" | "minimal" | "accent" | "executive" | "tech" | "bold" | "elegant" | "gradient";
+
+export const CV_TEMPLATES: { id: CvTemplate; labelHe: string; labelEn: string }[] = [
+  { id: "slate", labelHe: "מודרני", labelEn: "Modern" },
+  { id: "minimal", labelHe: "מינימלי", labelEn: "Minimal" },
+  { id: "accent", labelHe: "צבעוני", labelEn: "Accent" },
+  { id: "executive", labelHe: "קלאסי", labelEn: "Classic" },
+  { id: "tech", labelHe: "טכנולוגי", labelEn: "Tech" },
+  { id: "bold", labelHe: "נועז", labelEn: "Bold" },
+  { id: "elegant", labelHe: "אלגנטי", labelEn: "Elegant" },
+  { id: "gradient", labelHe: "גרדיאנט", labelEn: "Gradient" },
+];
+
+export const CV_ACCENT_COLORS: { hex: string; labelHe: string; labelEn: string }[] = [
+  { hex: "#7c3aed", labelHe: "סגול", labelEn: "Purple" },
+  { hex: "#2563eb", labelHe: "כחול", labelEn: "Blue" },
+  { hex: "#059669", labelHe: "ירוק", labelEn: "Emerald" },
+  { hex: "#e11d48", labelHe: "אדום", labelEn: "Rose" },
+  { hex: "#d97706", labelHe: "כתום", labelEn: "Amber" },
+  { hex: "#0891b2", labelHe: "ציאן", labelEn: "Cyan" },
+  { hex: "#6366f1", labelHe: "אינדיגו", labelEn: "Indigo" },
+  { hex: "#0f172a", labelHe: "כהה", labelEn: "Slate" },
+];
+
 export interface CvData {
   personal: {
     fullName: string;
@@ -35,6 +59,8 @@ export interface CvData {
   educations: CvEducation[];
   skills: string;
   languages: string;
+  template: CvTemplate;
+  accentColor: string;
 }
 
 export const EMPTY_CV: CvData = {
@@ -52,6 +78,8 @@ export const EMPTY_CV: CvData = {
   educations: [],
   skills: "",
   languages: "",
+  template: "slate",
+  accentColor: "#7c3aed",
 };
 
 const STORAGE_KEY = "work_hunter_cv_builder";
@@ -69,6 +97,8 @@ export function loadCv(): CvData {
       educations: parsed.educations ?? [],
       skills: parsed.skills ?? "",
       languages: parsed.languages ?? "",
+      template: parsed.template ?? "slate",
+      accentColor: parsed.accentColor ?? "#7c3aed",
     };
   } catch {
     return EMPTY_CV;

@@ -83,17 +83,23 @@ ${profile}
 Job: ${jobTitle}
 Description: ${jobDescription}
 
+CRITICAL CONSTRAINT — REMOTE WORK:
+- If the candidate's workPreference is "remote" and the job does NOT appear to be remote/work-from-home, set matchScore to MAX 30 and include "המשרה לא נראית כמרחוק — המועמד/ת דורש/ת עבודה מהבית בלבד" as the first match reason.
+- If the job IS remote and the candidate wants remote, add +15 bonus to score.
+
+CRITICAL CONSTRAINT — CAREER CHANGE:
+- If careerChangeInterest is true and the job is in the candidate's OLD field (the one they want to leave), lower the score by 20 points and note it.
+
 Score this match (0-100) considering:
-- Skills fit (but not the only factor — 40% weight)
+- Remote fit: MANDATORY check first (see above)
+- Skills fit (30% weight)
+- Industry/field fit: does this match the direction they're heading, not where they've been? (20%)
 - Life stage fit: does this role suit their current circumstances? (20%)
-- Growth trajectory: will this move them forward or sideways? (20%)
-- Energy fit: based on what they love, will this role engage or drain them? (20%)
+- Energy fit: based on what they love, will this role engage or drain them? (30%)
 
 Match reasons should be SPECIFIC and HUMAN — not generic.
 Bad: "Your skills match the requirements"
-Good: "The autonomous work style here suits someone who mentioned they need less micromanagement"
-
-If the job is a non-obvious opportunity worth considering, say why in the reasons.
+Good: "The flexible remote arrangement matches your requirement to work from home"
 
 Respond with JSON only:
 {
@@ -104,34 +110,42 @@ Respond with JSON only:
 }`;
 
 export const SEARCH_QUERY_PROMPT = (profile: string) => `
-You are a senior Israeli headhunter building a search strategy. Think like a recruiter, not a keyword matcher.
-
-For this candidate, generate search queries that find:
-1. The obvious fit (their current role equivalents)
-2. The natural next step (one level up or a logical pivot)
-3. The non-obvious opportunity (a role they haven't mentioned but would be good for them, based on their full profile)
-
-Search in BOTH Hebrew AND English on ALL Israeli platforms.
+You are a senior Israeli headhunter building a search strategy for a real job search. Think like a human recruiter who knows the Israeli market deeply.
 
 Profile:
 ${profile}
 
-Rules:
-- hebrewQueries: 3 Hebrew queries covering obvious + non-obvious roles. If profile has "location", include it and nearby areas. If profile has "maxCommuteKm", reflect that (e.g. "אזור תל אביב עד 30 קמ").
-  Examples: "מפתח פול סטאק תל אביב", "מנהל מוצר מרכז הארץ", "Developer Relations ישראל"
-- englishQueries: 3 English queries covering the same range, also including location when known.
-  Examples: "Full Stack Developer Tel Aviv Israel", "Technical Product Manager Israel", "Developer Advocate Israel remote"
-- facebookQuery: ONE Hebrew query optimized for Facebook job-group posts. Keep it short and natural — how someone would post in a WhatsApp/Facebook group. Example: "דרוש מפתח React תל אביב" or "מחפש עבודה כ מנהל מוצר הרצליה"
-- isTech: true if any tech/software role is relevant
-- targetTitles: 3-5 job titles in Hebrew (mix of obvious and non-obvious)
-- searchRationale: one sentence explaining the non-obvious pick
+CRITICAL RULES — read carefully before generating anything:
+
+1. REMOTE / WORK-FROM-HOME CONSTRAINT:
+   - If workPreference is "remote" or "flexible", EVERY query must include "מרחוק" or "remote" or "עבודה מהבית".
+   - Do NOT generate queries for office/onsite roles. Remote is a hard filter, not a preference.
+
+2. CAREER CHANGE:
+   - If careerChangeInterest is true, or if the profile/additionalNotes signal burnout from current field, DO NOT suggest roles in the old field.
+   - Focus queries on the new direction the candidate wants, not their past.
+
+3. ALL INDUSTRIES — NOT JUST TECH:
+   - This system serves people from ALL fields: cooking, culinary arts, fitness, sports coaching, nursing, social work, education, HR, law, real estate, logistics, events, beauty, retail, finance, etc.
+   - Read the profile and generate queries for THEIR industry, not a default tech industry.
+   - isTech should only be true if software/hardware engineering is genuinely relevant.
+
+4. SEARCH COVERAGE — Israel-wide, multiple platforms:
+   - hebrewQueries: 3 queries for Israeli job boards (drushim, alljobs, jobmaster, gotfriends). Cover: (a) obvious match, (b) one step up/pivot, (c) non-obvious opportunity.
+   - englishQueries: 3 English queries for LinkedIn + global platforms. Add "Israel" and "remote" where applicable.
+   - facebookQuery: ONE short natural Hebrew query for Facebook job groups (e.g. "קבוצות דרושים", "דרושים לוח"). Write it as someone would post in a group, not as a Google query.
+   - linkedinQuery: ONE English query optimized for LinkedIn Jobs search bar (shorter, no extra words).
+
+5. NON-OBVIOUS OPPORTUNITY:
+   - Always include one query for a role the candidate hasn't mentioned but would genuinely fit — based on their strengths, personality, and what they said they love.
 
 Respond with JSON only:
 {
   "hebrewQueries": ["שאילתה 1", "שאילתה 2", "שאילתה 3"],
   "englishQueries": ["query 1", "query 2", "query 3"],
   "facebookQuery": "שאילתה קצרה לפייסבוק",
-  "isTech": true,
-  "targetTitles": ["כותרת 1", "כותרת 2", "כותרת 3"],
-  "searchRationale": "one sentence"
+  "linkedinQuery": "short LinkedIn query",
+  "isTech": false,
+  "targetTitles": ["כותרת 1", "כותרת 2", "כותרת 3", "כותרת 4"],
+  "searchRationale": "one sentence explaining the non-obvious pick and why remote/location was handled this way"
 }`;

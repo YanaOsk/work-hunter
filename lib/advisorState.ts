@@ -21,8 +21,6 @@ export function getAdvisorState(profileId: string): AdvisorState | null {
       chosenPath: parsed.chosenPath ?? null,
       cvSkipped: parsed.cvSkipped ?? false,
       cvReview: parsed.cvReview ?? null,
-      linkedinSkipped: parsed.linkedinSkipped ?? false,
-      linkedin: parsed.linkedin ?? null,
       strategy: parsed.strategy ?? null,
       mockInterview: parsed.mockInterview ?? null,
       chatMessages: parsed.chatMessages ?? [],
@@ -49,8 +47,6 @@ export function createInitialAdvisorState(profile: UserProfile): AdvisorState {
     chosenPath: null,
     cvSkipped: false,
     cvReview: null,
-    linkedinSkipped: false,
-    linkedin: null,
     strategy: null,
     mockInterview: null,
     chatMessages: [],
@@ -76,4 +72,15 @@ export function getOrCreateAdvisorState(
 
 export function clearAdvisorState(profileId: string): void {
   localStorage.removeItem(`${STORAGE_KEY}_${profileId}`);
+}
+
+export function migrateGuestToUser(guestId: string, userId: string): void {
+  if (typeof window === "undefined") return;
+  const userKey = `${STORAGE_KEY}_${userId}`;
+  const guestKey = `${STORAGE_KEY}_${guestId}`;
+  if (localStorage.getItem(userKey)) return; // user already has their own state
+  const guestRaw = localStorage.getItem(guestKey);
+  if (!guestRaw) return;
+  localStorage.setItem(userKey, guestRaw);
+  localStorage.removeItem(guestKey);
 }

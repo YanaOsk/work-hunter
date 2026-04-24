@@ -7,39 +7,71 @@ export interface DiagnosisQuestionDef {
 export const DIAGNOSIS_QUESTIONS_HE: DiagnosisQuestionDef[] = [
   {
     id: "energy",
-    question: "מה נותן לך אנרגיה בעבודה?",
-    options: ["לעבוד לבד עם מחשבה עמוקה", "לעבוד עם אנשים ורעיונות", "לשלב בין השניים לפי המשימה"],
+    question: "איזו סביבת עבודה מאפשרת לך להביא את הערך הגבוה ביותר?",
+    options: [
+      "עבודה עצמאית ושקטה (Deep Work)",
+      "עבודה בצוות, תקשורת ורעיונות",
+      "דינמיות, שטח ושינויים מהירים",
+      "סדר, ארגון ותוצאות ברורות",
+      "גם וגם — תלוי בסיטואציה",
+      "אחר...",
+    ],
   },
   {
     id: "decision",
-    question: "איך אתה מקבל החלטות חשובות?",
-    options: ["עם הגיון וניתוח קר", "עם תחושת בטן וערכים", "תלוי בהחלטה — לפעמים ככה ולפעמים ככה"],
+    question: "על מה את/ה נשענ/ת כשאת/ה עומד/ת בפני בחירה משמעותית?",
+    options: [
+      "ניתוח לוגי, נתונים ושיקולים ענייניים",
+      "אינטואיציה, תחושות בטן וערכים אישיים",
+      "התייעצות, שיתוף וקבלת חוות דעת מהסביבה",
+      "שילוב של הכל — תלוי במורכבות ההחלטה",
+      "משהו אחר...",
+    ],
   },
   {
     id: "structure",
-    question: "איזו סביבת עבודה מתאימה לך יותר?",
-    options: ["מסגרת ברורה ותכנון מראש", "גמישות ואלתור", "מבנה רופף עם מטרות ברורות"],
+    question: "איזה מבנה עבודה מוציא ממך את הטוב ביותר?",
+    options: [
+      "מסגרת ברורה, תהליכים מוגדרים ומטרות מדידות",
+      "גמישות מלאה — אני מגדיר/ה את הדרך בעצמי",
+      "אוטונומיה גבוהה עם מטרה ברורה מלמעלה",
+      "שגרה יציבה עם מרחב ליצירתיות",
+      "תלוי בפרויקט ובשלב",
+    ],
   },
   {
     id: "focus",
-    question: "באיזה מצב אתה פורח הכי טוב?",
-    options: ["לשפר משהו קיים", "ליצור משהו חדש מאפס", "לפתור בעיות מורכבות"],
+    question: "באיזו צורת עשייה את/ה בשיאך?",
+    options: [
+      "לייעל ולשפר תהליכים קיימים",
+      "לבנות מאפס — ראייה, יצירה והשקה",
+      "לחקור, לנתח ולפצח בעיות מורכבות",
+      "להנחות, ללמד ולהעצים אנשים",
+      "לנהל, לתאם ולהוביל לתוצאות",
+    ],
   },
   {
     id: "values",
-    question: "מה הכי חשוב לך בעבודה? (אפשר לסמן כמה)",
-    options: ["שכר גבוה", "משמעות ותרומה", "יציבות וביטחון", "למידה וצמיחה", "חופש וגמישות", "השפעה והובלה"],
+    question: "מה מניע אותך הכי עמוק בעבודה? (אפשר לסמן כמה)",
+    options: [
+      "תגמול כלכלי גבוה",
+      "משמעות, השפעה ותרומה לחברה",
+      "יציבות, ביטחון ותנאים טובים",
+      "למידה מתמדת וצמיחה מקצועית",
+      "חופש, גמישות ואוטונומיה",
+      "הובלה, עמדה ויכולת לעצב החלטות",
+    ],
   },
   {
     id: "holland",
-    question: "איך נראה יום עבודה מושלם בעיניך? (אפשר לסמן כמה)",
+    question: "מה נראה לך כמו יום עבודה מספק באמת? (אפשר לסמן כמה)",
     options: [
-      "לבנות או לתקן משהו פיזי",
-      "לחקור ולנתח נתונים",
-      "ליצור, לעצב או לכתוב",
-      "לעזור וללמד אחרים",
-      "להוביל ולשכנע",
-      "לארגן ולנהל תהליכים",
+      "לבנות, להרכיב או לפתח מוצר מוחשי",
+      "לחקור, לנתח נתונים ולהסיק תובנות",
+      "ליצור, לעצב או לכתוב תוכן",
+      "לעזור, לטפל או ללוות אנשים",
+      "להוביל שיחות, לשכנע ולהשפיע",
+      "לארגן, לתכנן ולנהל תהליכים מורכבים",
     ],
   },
 ];
@@ -47,39 +79,71 @@ export const DIAGNOSIS_QUESTIONS_HE: DiagnosisQuestionDef[] = [
 export const DIAGNOSIS_QUESTIONS_EN: DiagnosisQuestionDef[] = [
   {
     id: "energy",
-    question: "What gives you energy at work?",
-    options: ["Working alone with deep focus", "Working with people and ideas", "A mix — depends on the task"],
+    question: "What kind of work environment allows you to bring your highest value?",
+    options: [
+      "Independent, quiet deep work",
+      "Team collaboration, communication and ideas",
+      "Dynamic, fast-paced environments with frequent change",
+      "Structure, organization and clear outcomes",
+      "A mix — depends on the situation",
+      "Other...",
+    ],
   },
   {
     id: "decision",
-    question: "How do you make important decisions?",
-    options: ["Cold logic and analysis", "Gut feeling and values", "Depends on the decision"],
+    question: "What do you lean on when facing a significant decision?",
+    options: [
+      "Logical analysis, data and objective reasoning",
+      "Intuition, gut feeling and personal values",
+      "Consulting others and gathering perspectives",
+      "A combination — depends on the complexity",
+      "Something else...",
+    ],
   },
   {
     id: "structure",
-    question: "Which environment suits you better?",
-    options: ["Clear structure and planning", "Flexibility and improvisation", "Loose structure with clear goals"],
+    question: "What kind of structure brings out your best work?",
+    options: [
+      "Clear frameworks, defined processes and measurable goals",
+      "Full flexibility — I define my own path",
+      "High autonomy with a clear top-level objective",
+      "Stable routine with room for creativity",
+      "Depends on the project and phase",
+    ],
   },
   {
     id: "focus",
-    question: "In what mode do you thrive?",
-    options: ["Improving something that exists", "Creating something new from scratch", "Solving complex problems"],
+    question: "In what mode of doing are you at your peak?",
+    options: [
+      "Optimizing and improving existing systems",
+      "Building from scratch — vision, creation, launch",
+      "Researching, analyzing and solving complex problems",
+      "Mentoring, teaching and empowering people",
+      "Managing, coordinating and driving results",
+    ],
   },
   {
     id: "values",
-    question: "What matters most at work? (pick as many as fit)",
-    options: ["High salary", "Meaning and impact", "Stability and security", "Learning and growth", "Freedom and flexibility", "Leadership and influence"],
+    question: "What drives you most deeply at work? (pick as many as fit)",
+    options: [
+      "High financial reward",
+      "Meaning, impact and social contribution",
+      "Stability, security and good conditions",
+      "Continuous learning and professional growth",
+      "Freedom, flexibility and autonomy",
+      "Leadership, position and shaping decisions",
+    ],
   },
   {
     id: "holland",
-    question: "What does a perfect workday look like to you? (pick as many)",
+    question: "What does a genuinely fulfilling workday look like to you? (pick as many)",
     options: [
-      "Building or fixing physical things",
-      "Researching and analyzing data",
-      "Creating, designing, or writing",
-      "Helping and teaching others",
-      "Leading and persuading",
-      "Organizing and managing processes",
+      "Building, assembling or developing a tangible product",
+      "Researching, analyzing data and drawing insights",
+      "Creating, designing or writing content",
+      "Helping, caring for or guiding people",
+      "Leading conversations, persuading and influencing",
+      "Organizing, planning and managing complex processes",
     ],
   },
 ];
@@ -235,7 +299,9 @@ Respond with JSON only:
   "keywords": ["...", "..."]
 }`;
 
-export const SEARCH_STRATEGY_PROMPT = (profile: string, diagnosis: string, direction: string, userNotes: string) => `You are a senior executive headhunter in Israel. Build a targeted job-search strategy — not a generic "update your CV and apply online" plan.
+export const SEARCH_STRATEGY_PROMPT = (profile: string, diagnosis: string, direction: string, userNotes: string) => `You are a senior executive headhunter in Israel with deep knowledge of ALL job markets — tech, food & beverage, sports, fitness, education, healthcare, logistics, retail, finance, real estate, marketing, law, and more.
+
+Build a hyper-personalized, actionable job-search strategy. NOT generic advice.
 
 Candidate:
 ${profile}
@@ -249,13 +315,40 @@ ${direction}
 What the candidate added:
 ${userNotes || "Nothing extra — infer target from profile."}
 
-Produce:
-- targetCompanies: 6-8 real, named companies (Israeli or global) that fit this specific person. For each: name, reason (why THEM specifically), size (small/mid/large/enterprise).
-- hiddenMarketTips: 4-5 concrete tactics for the hidden job market in Israel (referrals, direct outreach, communities). Be specific — name actual Slack communities, Facebook groups, conferences, or meetups when relevant.
-- networkingPlan: 4-5 specific action items for the next 30 days.
-- outreachTemplate: a short cold message template (3-5 sentences) they can send to a hiring manager on LinkedIn, personalized to their background.
+=== CRITICAL RULES — READ BEFORE GENERATING ===
 
-IF the candidate is Hebrew-native, respond in Hebrew. Otherwise English.
+1. REMOTE / WORK FROM HOME:
+   - If workPreference is "remote" or "flexible", ALL target companies must be remote-friendly or fully remote.
+   - ALL networking tips must focus on remote job channels: remote-first companies, remote job boards, LinkedIn remote filters, Facebook remote jobs groups.
+   - Do NOT suggest going to offices, in-person networking events, or companies known for mandatory presence.
+   - Explicitly name remote-friendly Israeli companies or global companies hiring in Israel with remote options.
+
+2. CAREER CHANGE — RESPECT IT:
+   - If careerChangeInterest is true OR if profile/notes signal the person wants to leave their current field, build the ENTIRE strategy around the NEW direction.
+   - Do not suggest companies or roles in the old field. The strategy should help them break INTO the new field, not stay in the old one.
+   - For career changers: include tips specifically about how to position transferable skills and get your foot in the door in the new industry.
+
+3. ALL INDUSTRIES:
+   - Match the strategy to THEIR actual field/target field. This is NOT a tech-only system.
+   - If someone is a chef, a fitness trainer, a teacher, or works in real estate — the companies, groups, and tips should reflect THEIR industry.
+   - Name REAL Israeli companies, REAL Facebook groups (like "דרושים בתחום X", "קבוצת עבודה ישראל"), REAL industry meetups or conferences relevant to their field.
+
+4. CHANNELS TO INCLUDE:
+   - Israeli job boards: דרושים, AllJobs, JobMaster, GotFriends
+   - Facebook job groups: name specific groups (e.g., "דרושים - מחפשי עבודה ישראל", "עבודות מהבית ישראל", or field-specific groups)
+   - LinkedIn: specific search strategies, who to connect with, how to approach
+   - Direct outreach to companies or managers
+   - Industry-specific communities (Slack groups, WhatsApp groups, professional associations)
+
+=== OUTPUT ===
+
+Produce:
+- targetCompanies: 6-8 real, named companies that fit this specific person. Remote-friendly if required. Relevant to their TARGET field (not their past field if changing). For each: name, reason (why THEM, specifically and personally), size.
+- hiddenMarketTips: 5-6 concrete, platform-specific tactics. Name actual Facebook groups, WhatsApp communities, LinkedIn strategies, and direct outreach targets.
+- networkingPlan: 5 specific action items for the next 30 days — with actual platforms, groups, or people to target.
+- outreachTemplate: a personalized cold message (3-5 sentences) for LinkedIn or email, written in first person, based on their actual background and target role.
+
+IF the candidate is Hebrew-speaking, respond in Hebrew. Otherwise English.
 
 Respond with JSON only:
 {

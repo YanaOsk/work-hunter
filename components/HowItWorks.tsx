@@ -24,11 +24,6 @@ export default function HowItWorks() {
       color: "blue",
     },
     {
-      title: tx.howStep4,
-      icon: "M17 20h5v-2a4 4 0 00-5-3.874M9 20H4v-2a3 3 0 013-3h1m4-4a4 4 0 11-8 0 4 4 0 018 0zm6 3a3 3 0 11-6 0 3 3 0 016 0z",
-      color: "sky",
-    },
-    {
       title: tx.howStep5,
       icon: "M3 7h18M3 12h18M3 17h18",
       color: "amber",
@@ -54,9 +49,9 @@ export default function HowItWorks() {
         </div>
 
         <div className="relative">
-          <div className="hidden md:block absolute top-7 start-[10%] end-[10%] h-0.5 bg-gradient-to-r from-emerald-500/20 via-purple-500/30 to-amber-500/20" />
+          <div className="hidden md:block absolute top-7 start-[12%] end-[12%] h-0.5 bg-gradient-to-r from-emerald-500/20 via-purple-500/30 to-amber-500/20" />
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {steps.map((s, i) => {
               const c = colorMap[s.color];
               return (

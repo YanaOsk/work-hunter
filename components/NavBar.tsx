@@ -5,12 +5,9 @@ import Link from "next/link";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import LogoMark from "./LogoMark";
+import AuthButton from "./AuthButton";
 
-interface Props {
-  onStart?: () => void;
-}
-
-export default function NavBar({ onStart }: Props) {
+export default function NavBar() {
   const { lang } = useLanguage();
   const tx = t[lang];
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -25,7 +22,7 @@ export default function NavBar({ onStart }: Props) {
   return (
     <nav className="sticky top-[32px] md:top-[36px] z-40 bg-slate-900/80 backdrop-blur-lg border-b border-white/5">
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between gap-4">
-        <Link
+        <a
           href="/"
           className="flex items-center gap-2.5 flex-shrink-0 hover:opacity-90 transition"
         >
@@ -33,7 +30,7 @@ export default function NavBar({ onStart }: Props) {
           <span className="text-white font-semibold hidden sm:block tracking-tight">
             Work Hunter
           </span>
-        </Link>
+        </a>
 
         <div className="hidden md:flex items-center gap-6">
           {links.map((l) => (
@@ -48,14 +45,13 @@ export default function NavBar({ onStart }: Props) {
         </div>
 
         <div className="flex items-center gap-2">
-          {onStart && (
-            <button
-              onClick={onStart}
-              className="hidden sm:inline-flex bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
-            >
-              {tx.navStartFree}
-            </button>
-          )}
+          <AuthButton />
+          <Link
+            href="/advisor?profileId=default-advisor"
+            className="hidden sm:inline-flex bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+          >
+            {tx.navStartFree}
+          </Link>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden text-white/70 hover:text-white p-2"
@@ -87,17 +83,13 @@ export default function NavBar({ onStart }: Props) {
                 {l.label}
               </Link>
             ))}
-            {onStart && (
-              <button
-                onClick={() => {
-                  setMobileOpen(false);
-                  onStart();
-                }}
-                className="mt-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-lg transition"
-              >
-                {tx.navStartFree}
-              </button>
-            )}
+            <Link
+              href="/advisor?profileId=default-advisor"
+              onClick={() => setMobileOpen(false)}
+              className="mt-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-lg transition text-center"
+            >
+              {tx.navStartFree}
+            </Link>
           </div>
         </div>
       )}

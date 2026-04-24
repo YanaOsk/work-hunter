@@ -124,7 +124,7 @@ function ServiceCard({ badge, title, intro, steps, bonus, result, cta, onClick, 
         onClick={onClick}
         className={`w-full py-3 rounded-xl font-semibold transition ${styles.cta}`}
       >
-        {cta} →
+        {cta}
       </button>
     </div>
   );

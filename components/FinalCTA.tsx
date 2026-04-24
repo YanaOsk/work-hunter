@@ -26,7 +26,7 @@ export default function FinalCTA({ onChoose }: Props) {
             onClick={() => onChoose("advisor")}
             className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-8 md:px-10 py-4 rounded-xl transition shadow-lg shadow-purple-500/30 text-base md:text-lg"
           >
-            {tx.finalCtaButton} →
+            {tx.finalCtaButton}
           </button>
         </div>
       </div>

@@ -32,16 +32,41 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
     if (initialized.current) return;
     initialized.current = true;
 
-    const rawQ = userProfile.clarifyingQuestions?.[0];
-    const firstQuestion = lang === "he"
-      ? "מה הכי חשוב לך בתפקיד הבא — יציבות, צמיחה, גמישות, או משהו אחר?"
-      : (typeof rawQ === "string" ? rawQ : "What's most important to you in your next role — stability, growth, flexibility, or something else?");
+    const rawText = userProfile.rawText?.trim();
 
-    const greeting = lang === "he"
-      ? `היי! אני Scout, המדריך האישי שלך לקריירה. ניתחתי את הפרופיל שלך ואני מוכן למצוא לך הזדמנויות מעולות.\n\n${firstQuestion}`
-      : `Hi! I'm Scout, your personal career guide. I've analyzed your profile and I'm ready to find great opportunities for you.\n\n${firstQuestion}`;
+    const fallbackGreeting = lang === "he"
+      ? "היי! אני Scout. קראתי את מה שכתבת ואני כאן כדי לעזור לך למצוא את ההזדמנות הנכונה. מה הכי חשוב לך בתפקיד הבא?"
+      : "Hi! I'm Scout. I read your profile and I'm here to help you find the right opportunity. What matters most to you in your next role?";
 
-    addMessage("assistant", greeting);
+    if (rawText) {
+      // Show the user's initial text as their first visible message in the chat
+      const userMsg = addMessage("user", rawText);
+      setLoading(true);
+
+      const initMessages: ChatMessage[] = [
+        { id: userMsg.id, role: "user", content: rawText, timestamp: userMsg.timestamp },
+      ];
+
+      fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: initMessages, userProfile, lang }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          addMessage("assistant", data.message || fallbackGreeting);
+          if (data.readyToSearch) setReadyToSearch(true);
+        })
+        .catch(() => {
+          addMessage("assistant", fallbackGreeting);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      const greeting = lang === "he"
+        ? "היי! אני Scout, המדריך האישי שלך לקריירה. ספר לי על עצמך — מה הרקע שלך ומה אתה מחפש?"
+        : "Hi! I'm Scout, your personal career guide. Tell me about yourself — what's your background and what are you looking for?";
+      addMessage("assistant", greeting);
+    }
   }, []);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, readyToSearch]);

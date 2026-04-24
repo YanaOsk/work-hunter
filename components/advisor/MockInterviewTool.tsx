@@ -28,6 +28,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
   const [sending, setSending] = useState(false);
   const [finished, setFinished] = useState(existing?.finished || false);
   const [error, setError] = useState("");
+  const [localFeedback, setLocalFeedback] = useState<string | null>(existing?.feedback || null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -137,6 +138,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
+      setLocalFeedback(data.feedback);
       persist({ feedback: data.feedback, completedAt: data.completedAt });
       setStage("done");
     } catch (err) {
@@ -152,6 +154,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
     setInput("");
     setFinished(false);
     setError("");
+    setLocalFeedback(null);
     onUpdate({ role: "", messages: [], finished: false, feedback: null, completedAt: null });
   };
 
@@ -220,7 +223,9 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
     );
   }
 
-  if (stage === "done" && existing?.feedback) {
+  const feedbackText = localFeedback ?? existing?.feedback ?? null;
+
+  if (stage === "done" && feedbackText) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-6">
         <div className="max-w-3xl mx-auto">
@@ -231,11 +236,11 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 space-y-5">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-white">{tx.interviewFeedback}</h1>
-              <span className="text-white/50 text-sm">{existing.role}</span>
+              <span className="text-white/50 text-sm">{existing?.role ?? role}</span>
             </div>
 
             <div className="bg-white/5 border border-purple-500/30 rounded-xl p-5 text-white/90 text-sm leading-relaxed whitespace-pre-wrap">
-              {existing.feedback}
+              {feedbackText}
             </div>
 
             <div className="flex flex-col gap-3">
