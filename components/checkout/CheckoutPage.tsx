@@ -70,8 +70,6 @@ export default function CheckoutPage({ planId }: { planId: string }) {
   }
 
   const digits = card.number.replace(/\s/g, "");
-  const cardValid =
-    digits.length >= 13 && card.expiry.length === 5 && card.cvv.length >= 3 && card.name.trim().length > 0;
 
   async function handlePay() {
     setLoading(true);
@@ -310,7 +308,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
         {/* Pay button */}
         <button
           onClick={handlePay}
-          disabled={loading || (method === "card" && !cardValid)}
+          disabled={loading}
           className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-base py-4 rounded-2xl transition shadow-lg shadow-purple-900/40"
         >
           {loading ? (
