@@ -86,6 +86,12 @@ export async function getConversation(userId: string, id: string): Promise<Conve
   };
 }
 
+export async function deleteConversation(userId: string, id: string): Promise<boolean> {
+  const db = sql();
+  const rows = await db`DELETE FROM conversations WHERE id = ${id} AND user_id = ${userId} RETURNING id`;
+  return rows.length > 0;
+}
+
 export async function listConversations(userId: string): Promise<ConversationPreview[]> {
   const db = sql();
   const rows = await db`

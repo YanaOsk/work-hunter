@@ -47,6 +47,6 @@ export async function getAllUsers(): Promise<
 
 export async function deleteUser(id: string): Promise<boolean> {
   const db = sql();
-  const result = await db`DELETE FROM users WHERE id = ${id}`;
-  return (result as unknown as { count: number }).count > 0;
+  const rows = await db`DELETE FROM users WHERE id = ${id} RETURNING id`;
+  return rows.length > 0;
 }

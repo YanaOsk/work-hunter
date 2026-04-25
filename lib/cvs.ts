@@ -98,6 +98,6 @@ export async function updateUserCv(
 
 export async function deleteUserCv(userId: string, cvId: string): Promise<boolean> {
   const db = sql();
-  const result = await db`DELETE FROM cvs WHERE id = ${cvId} AND user_id = ${userId}`;
-  return (result as unknown as { count: number }).count > 0;
+  const rows = await db`DELETE FROM cvs WHERE id = ${cvId} AND user_id = ${userId} RETURNING id`;
+  return rows.length > 0;
 }
