@@ -7,22 +7,22 @@ declare global {
 const opts = {
   serverSelectionTimeoutMS: 5000,
   connectTimeoutMS: 5000,
-  tls: true,
-  tlsAllowInvalidCertificates: false,
 };
 
-function getClientPromise(): Promise<MongoClient> {
+export async function getDb(): Promise<Db> {
   const uri = process.env.MONGODB_URI;
   if (!uri) throw new Error("MONGODB_URI is not defined");
 
-  // Reuse the same connection promise across all invocations (hot or cold)
   if (!global._mongoClientPromise) {
-    global._mongoClientPromise = new MongoClient(uri, opts).connect();
+    global._mongoClientPromise = new MongoClient(uri, opts)
+      .connect()
+      .catch((err) => {
+        // Reset so next request retries instead of reusing a failed promise
+        global._mongoClientPromise = undefined;
+        throw err;
+      });
   }
-  return global._mongoClientPromise;
-}
 
-export async function getDb(): Promise<Db> {
-  const client = await getClientPromise();
+  const client = await global._mongoClientPromise;
   return client.db("work-hunter");
 }
