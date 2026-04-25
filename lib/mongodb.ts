@@ -9,6 +9,7 @@ const opts = {
   connectTimeoutMS: 5000,
   tls: true,
   tlsAllowInvalidCertificates: true,
+  tlsAllowInvalidHostnames: true,
 };
 
 export async function getDb(): Promise<Db> {

@@ -30,6 +30,9 @@
     "react-dom": "19.2.4",
     "uuid": "^14.0.0"
   },
+  "engines": {
+    "node": ">=20.x"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/multer": "^2.1.0",
