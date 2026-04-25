@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { getDb } from "./mongodb";
+import { sql } from "./db";
 import { CvData, EMPTY_CV } from "./cvBuilder";
 
 export interface SavedCv {
@@ -13,26 +13,37 @@ export interface SavedCv {
 
 export type CvMeta = Omit<SavedCv, "data">;
 
-async function col() {
-  const db = await getDb();
-  return db.collection<SavedCv>("cvs");
-}
-
 export async function listUserCvs(userId: string): Promise<CvMeta[]> {
-  const c = await col();
-  return c
-    .find(
-      { userId },
-      { projection: { _id: 0, id: 1, userId: 1, name: 1, createdAt: 1, updatedAt: 1 } },
-    )
-    .sort({ updatedAt: -1 })
-    .toArray() as Promise<CvMeta[]>;
+  const db = sql();
+  const rows = await db`
+    SELECT id, user_id, name, created_at, updated_at
+    FROM cvs WHERE user_id = ${userId} ORDER BY updated_at DESC
+  `;
+  return rows.map((r) => ({
+    id: r.id,
+    userId: r.user_id,
+    name: r.name,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  }));
 }
 
 export async function getUserCv(userId: string, cvId: string): Promise<SavedCv | null> {
-  const c = await col();
-  const doc = await c.findOne({ id: cvId, userId }, { projection: { _id: 0 } });
-  return doc ?? null;
+  const db = sql();
+  const rows = await db`
+    SELECT id, user_id, name, data, created_at, updated_at
+    FROM cvs WHERE id = ${cvId} AND user_id = ${userId}
+  `;
+  if (rows.length === 0) return null;
+  const r = rows[0];
+  return {
+    id: r.id,
+    userId: r.user_id,
+    name: r.name,
+    data: r.data as CvData,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
 }
 
 export async function createUserCv(
@@ -40,7 +51,7 @@ export async function createUserCv(
   name: string,
   data: CvData,
 ): Promise<SavedCv> {
-  const c = await col();
+  const db = sql();
   const now = new Date().toISOString();
   const cv: SavedCv = {
     id: crypto.randomUUID(),
@@ -50,7 +61,10 @@ export async function createUserCv(
     createdAt: now,
     updatedAt: now,
   };
-  await c.insertOne(cv);
+  await db`
+    INSERT INTO cvs (id, user_id, name, data, created_at, updated_at)
+    VALUES (${cv.id}, ${cv.userId}, ${cv.name}, ${JSON.stringify(cv.data)}, ${cv.createdAt}, ${cv.updatedAt})
+  `;
   return cv;
 }
 
@@ -59,18 +73,31 @@ export async function updateUserCv(
   cvId: string,
   updates: { name?: string; data?: CvData },
 ): Promise<SavedCv | null> {
-  const c = await col();
+  const db = sql();
   const now = new Date().toISOString();
-  const result = await c.findOneAndUpdate(
-    { id: cvId, userId },
-    { $set: { ...updates, updatedAt: now } },
-    { returnDocument: "after", projection: { _id: 0 } },
-  );
-  return result ?? null;
+
+  const rows = await db`
+    UPDATE cvs SET
+      name = COALESCE(${updates.name ?? null}, name),
+      data = COALESCE(${updates.data ? JSON.stringify(updates.data) : null}::jsonb, data),
+      updated_at = ${now}
+    WHERE id = ${cvId} AND user_id = ${userId}
+    RETURNING id, user_id, name, data, created_at, updated_at
+  `;
+  if (rows.length === 0) return null;
+  const r = rows[0];
+  return {
+    id: r.id,
+    userId: r.user_id,
+    name: r.name,
+    data: r.data as CvData,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
 }
 
 export async function deleteUserCv(userId: string, cvId: string): Promise<boolean> {
-  const c = await col();
-  const result = await c.deleteOne({ id: cvId, userId });
-  return result.deletedCount > 0;
+  const db = sql();
+  const result = await db`DELETE FROM cvs WHERE id = ${cvId} AND user_id = ${userId}`;
+  return (result as unknown as { count: number }).count > 0;
 }

@@ -36,17 +36,17 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, account, user }) {
       if (account?.provider === "google" && user?.email) {
         try {
-          const { getDb } = await import("./mongodb");
-          const db = await getDb();
+          const { sql } = await import("./db");
+          const db = sql();
           const email = user.email.toLowerCase();
-          const existing = await db.collection("google_accounts").findOne({ email });
-          if (!existing) {
+          const existing = await db`SELECT email FROM google_accounts WHERE email = ${email}`;
+          if (existing.length === 0) {
             token.isNewUser = true;
-            await db.collection("google_accounts").insertOne({
-              email,
-              name: user.name ?? "",
-              createdAt: new Date().toISOString(),
-            });
+            await db`
+              INSERT INTO google_accounts (email, name, created_at)
+              VALUES (${email}, ${user.name ?? ""}, ${new Date().toISOString()})
+              ON CONFLICT (email) DO NOTHING
+            `;
           } else {
             token.isNewUser = false;
           }

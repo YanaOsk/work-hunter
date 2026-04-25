@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { getDb } from "./mongodb";
+import { sql } from "./db";
 import type { JobResult } from "./types";
 
 export interface ConversationMessage {
@@ -52,36 +52,53 @@ export async function saveConversation(
   jobs: JobResult[] = [],
   title?: string
 ): Promise<string> {
-  const db = await getDb();
+  const db = sql();
   const id = crypto.randomUUID();
-  await db.collection("conversations").insertOne({
-    id,
-    userId,
-    createdAt: new Date().toISOString(),
-    messageCount: messages.length,
-    title: title ?? null,
-    messages,
-    searchContext,
-    jobs: jobs.slice(0, 10).map(toJobSnap),
-  });
+  const now = new Date().toISOString();
+  const jobSnaps = jobs.slice(0, 10).map(toJobSnap);
+  await db`
+    INSERT INTO conversations (id, user_id, created_at, message_count, title, messages, search_context, jobs)
+    VALUES (
+      ${id}, ${userId}, ${now}, ${messages.length},
+      ${title ?? null}, ${JSON.stringify(messages)}, ${searchContext ?? null}, ${JSON.stringify(jobSnaps)}
+    )
+  `;
   return id;
 }
 
 export async function getConversation(userId: string, id: string): Promise<ConversationFull | null> {
-  const db = await getDb();
-  const doc = await db
-    .collection("conversations")
-    .findOne({ id, userId }, { projection: { _id: 0 } });
-  return doc as unknown as ConversationFull | null;
+  const db = sql();
+  const rows = await db`
+    SELECT id, user_id, created_at, message_count, title, messages, search_context, jobs
+    FROM conversations WHERE id = ${id} AND user_id = ${userId}
+  `;
+  if (rows.length === 0) return null;
+  const r = rows[0];
+  return {
+    id: r.id,
+    userId: r.user_id,
+    createdAt: r.created_at,
+    messageCount: r.message_count,
+    title: r.title ?? undefined,
+    searchContext: r.search_context ?? undefined,
+    jobs: r.jobs as JobSnap[],
+    messages: r.messages as ConversationMessage[],
+  };
 }
 
 export async function listConversations(userId: string): Promise<ConversationPreview[]> {
-  const db = await getDb();
-  const docs = await db
-    .collection("conversations")
-    .find({ userId }, { projection: { _id: 0, messages: 0, searchContext: 0 } })
-    .sort({ createdAt: -1 })
-    .limit(20)
-    .toArray();
-  return docs as unknown as ConversationPreview[];
+  const db = sql();
+  const rows = await db`
+    SELECT id, user_id, created_at, message_count, title, jobs
+    FROM conversations WHERE user_id = ${userId}
+    ORDER BY created_at DESC LIMIT 20
+  `;
+  return rows.map((r) => ({
+    id: r.id,
+    userId: r.user_id,
+    createdAt: r.created_at,
+    messageCount: r.message_count,
+    title: r.title ?? undefined,
+    jobs: r.jobs as JobSnap[],
+  }));
 }

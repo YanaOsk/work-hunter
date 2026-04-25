@@ -1,4 +1,4 @@
-import { getDb } from "./mongodb";
+import { sql } from "./db";
 
 export interface AnalyticsEvent {
   type: "pageview" | "event";
@@ -15,101 +15,100 @@ export interface AnalyticsEvent {
   isNewSession?: boolean;
 }
 
-async function col() {
-  const db = await getDb();
-  return db.collection<AnalyticsEvent>("analytics");
-}
-
 export async function recordEvent(event: AnalyticsEvent) {
-  const c = await col();
-  await c.insertOne(event);
+  const db = sql();
+  await db`
+    INSERT INTO analytics_events
+      (type, path, event, label, session_id, country, country_code, region, city, referrer, timestamp, is_new_session)
+    VALUES (
+      ${event.type}, ${event.path}, ${event.event ?? null}, ${event.label ?? null},
+      ${event.sessionId}, ${event.country ?? null}, ${event.countryCode ?? null},
+      ${event.region ?? null}, ${event.city ?? null}, ${event.referrer ?? null},
+      ${event.timestamp}, ${event.isNewSession ?? null}
+    )
+  `;
 }
 
 export async function getAnalyticsSummary() {
-  const c = await col();
+  const db = sql();
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const weekAgo = new Date(today.getTime() - 6 * 86_400_000);
+  const todayStr = today.toISOString();
+  const weekAgoStr = weekAgo.toISOString();
 
   const [
-    totalPageviews,
-    allSessions,
-    todaySessions,
-    weekSessions,
-    topPages,
-    topCountries,
-    israelCities,
-    topEvents,
-    dailyStats,
-    topReferrers,
+    totalPageviewsRes,
+    allSessionsRes,
+    todaySessionsRes,
+    weekSessionsRes,
+    topPagesRes,
+    topCountriesRes,
+    israelCitiesRes,
+    topEventsRes,
+    dailyStatsRes,
+    topReferrersRes,
   ] = await Promise.all([
-    c.countDocuments({ type: "pageview" }),
-    c.distinct("sessionId"),
-    c.distinct("sessionId", { type: "pageview", timestamp: { $gte: today.toISOString() } }),
-    c.distinct("sessionId", { type: "pageview", timestamp: { $gte: weekAgo.toISOString() } }),
+    db`SELECT COUNT(*) AS cnt FROM analytics_events WHERE type = 'pageview'`,
 
-    c.aggregate([
-      { $match: { type: "pageview" } },
-      { $group: { _id: "$path", views: { $sum: 1 }, sessions: { $addToSet: "$sessionId" } } },
-      { $project: { path: "$_id", views: 1, visitors: { $size: "$sessions" } } },
-      { $sort: { views: -1 } },
-      { $limit: 12 },
-    ]).toArray(),
+    db`SELECT COUNT(DISTINCT session_id) AS cnt FROM analytics_events`,
 
-    c.aggregate([
-      { $match: { type: "pageview", country: { $exists: true, $nin: [null, "", "Local"] } } },
-      { $group: { _id: "$country", countryCode: { $first: "$countryCode" }, sessions: { $addToSet: "$sessionId" } } },
-      { $project: { country: "$_id", countryCode: 1, visitors: { $size: "$sessions" } } },
-      { $sort: { visitors: -1 } },
-      { $limit: 15 },
-    ]).toArray(),
+    db`SELECT COUNT(DISTINCT session_id) AS cnt FROM analytics_events WHERE type = 'pageview' AND timestamp >= ${todayStr}`,
 
-    c.aggregate([
-      { $match: { type: "pageview", countryCode: "IL", city: { $exists: true, $nin: [null, ""] } } },
-      { $group: { _id: "$city", sessions: { $addToSet: "$sessionId" } } },
-      { $project: { city: "$_id", visitors: { $size: "$sessions" } } },
-      { $sort: { visitors: -1 } },
-      { $limit: 12 },
-    ]).toArray(),
+    db`SELECT COUNT(DISTINCT session_id) AS cnt FROM analytics_events WHERE type = 'pageview' AND timestamp >= ${weekAgoStr}`,
 
-    c.aggregate([
-      { $match: { type: "event" } },
-      { $group: { _id: { event: "$event", label: "$label" }, count: { $sum: 1 } } },
-      { $project: { event: "$_id.event", label: "$_id.label", count: 1 } },
-      { $sort: { count: -1 } },
-      { $limit: 20 },
-    ]).toArray(),
+    db`
+      SELECT path, COUNT(*) AS views, COUNT(DISTINCT session_id) AS visitors
+      FROM analytics_events WHERE type = 'pageview'
+      GROUP BY path ORDER BY views DESC LIMIT 12
+    `,
 
-    c.aggregate([
-      { $match: { type: "pageview", timestamp: { $gte: weekAgo.toISOString() } } },
-      { $group: {
-        _id: { $substr: ["$timestamp", 0, 10] },
-        sessions: { $addToSet: "$sessionId" },
-        views: { $sum: 1 },
-      }},
-      { $project: { date: "$_id", visitors: { $size: "$sessions" }, views: 1 } },
-      { $sort: { date: 1 } },
-    ]).toArray(),
+    db`
+      SELECT country, country_code AS "countryCode", COUNT(DISTINCT session_id) AS visitors
+      FROM analytics_events
+      WHERE type = 'pageview' AND country IS NOT NULL AND country != '' AND country != 'Local'
+      GROUP BY country, country_code ORDER BY visitors DESC LIMIT 15
+    `,
 
-    c.aggregate([
-      { $match: { type: "pageview", referrer: { $exists: true, $nin: [null, ""] } } },
-      { $group: { _id: "$referrer", count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 8 },
-    ]).toArray(),
+    db`
+      SELECT city, COUNT(DISTINCT session_id) AS visitors
+      FROM analytics_events
+      WHERE type = 'pageview' AND country_code = 'IL' AND city IS NOT NULL AND city != ''
+      GROUP BY city ORDER BY visitors DESC LIMIT 12
+    `,
+
+    db`
+      SELECT event, label, COUNT(*) AS count
+      FROM analytics_events WHERE type = 'event'
+      GROUP BY event, label ORDER BY count DESC LIMIT 20
+    `,
+
+    db`
+      SELECT LEFT(timestamp, 10) AS date, COUNT(DISTINCT session_id) AS visitors, COUNT(*) AS views
+      FROM analytics_events
+      WHERE type = 'pageview' AND timestamp >= ${weekAgoStr}
+      GROUP BY LEFT(timestamp, 10) ORDER BY date ASC
+    `,
+
+    db`
+      SELECT referrer AS "_id", COUNT(*) AS count
+      FROM analytics_events
+      WHERE type = 'pageview' AND referrer IS NOT NULL AND referrer != ''
+      GROUP BY referrer ORDER BY count DESC LIMIT 8
+    `,
   ]);
 
   return {
-    totalPageviews,
-    totalSessions: allSessions.length,
-    todaySessions: todaySessions.length,
-    weekSessions: weekSessions.length,
-    topPages,
-    topCountries,
-    israelCities,
-    topEvents,
-    dailyStats,
-    topReferrers,
+    totalPageviews: Number(totalPageviewsRes[0]?.cnt ?? 0),
+    totalSessions: Number(allSessionsRes[0]?.cnt ?? 0),
+    todaySessions: Number(todaySessionsRes[0]?.cnt ?? 0),
+    weekSessions: Number(weekSessionsRes[0]?.cnt ?? 0),
+    topPages: topPagesRes,
+    topCountries: topCountriesRes,
+    israelCities: israelCitiesRes,
+    topEvents: topEventsRes,
+    dailyStats: dailyStatsRes,
+    topReferrers: topReferrersRes,
   };
 }

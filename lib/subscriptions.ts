@@ -1,4 +1,4 @@
-import { getDb } from "./mongodb";
+import { sql } from "./db";
 
 export interface SavedCard {
   last4: string;
@@ -14,23 +14,28 @@ export interface Subscription {
   savedCard?: SavedCard;
 }
 
-async function col() {
-  const db = await getDb();
-  return db.collection<Subscription>("subscriptions");
-}
-
 export async function getSubscription(userEmail: string): Promise<Subscription | null> {
-  const c = await col();
-  const doc = await c.findOne(
-    { userEmail: userEmail.toLowerCase() },
-    { projection: { _id: 0 } },
-  );
-  return doc as unknown as Subscription | null;
+  const db = sql();
+  const rows = await db`
+    SELECT user_email, user_name, plan, purchased_at, card_last4, card_expiry, card_brand
+    FROM subscriptions WHERE user_email = ${userEmail.toLowerCase()}
+  `;
+  if (rows.length === 0) return null;
+  const r = rows[0];
+  return {
+    userEmail: r.user_email,
+    userName: r.user_name,
+    plan: r.plan,
+    purchasedAt: r.purchased_at,
+    savedCard: r.card_last4
+      ? { last4: r.card_last4, expiry: r.card_expiry ?? "", brand: r.card_brand ?? "Visa" }
+      : undefined,
+  };
 }
 
 export async function cancelSubscription(userEmail: string): Promise<void> {
-  const c = await col();
-  await c.deleteOne({ userEmail: userEmail.toLowerCase() });
+  const db = sql();
+  await db`DELETE FROM subscriptions WHERE user_email = ${userEmail.toLowerCase()}`;
 }
 
 export async function saveSubscription(
@@ -39,17 +44,20 @@ export async function saveSubscription(
   plan: string,
   savedCard?: SavedCard,
 ): Promise<void> {
-  const c = await col();
-  const $set: Record<string, unknown> = {
-    userEmail: userEmail.toLowerCase(),
-    userName,
-    plan,
-    purchasedAt: new Date().toISOString(),
-  };
-  if (savedCard) $set.savedCard = savedCard;
-  await c.updateOne(
-    { userEmail: userEmail.toLowerCase() },
-    { $set },
-    { upsert: true },
-  );
+  const db = sql();
+  const lowerEmail = userEmail.toLowerCase();
+  await db`
+    INSERT INTO subscriptions (user_email, user_name, plan, purchased_at, card_last4, card_expiry, card_brand)
+    VALUES (
+      ${lowerEmail}, ${userName}, ${plan}, ${new Date().toISOString()},
+      ${savedCard?.last4 ?? null}, ${savedCard?.expiry ?? null}, ${savedCard?.brand ?? null}
+    )
+    ON CONFLICT (user_email) DO UPDATE SET
+      user_name = EXCLUDED.user_name,
+      plan = EXCLUDED.plan,
+      purchased_at = EXCLUDED.purchased_at,
+      card_last4 = EXCLUDED.card_last4,
+      card_expiry = EXCLUDED.card_expiry,
+      card_brand = EXCLUDED.card_brand
+  `;
 }
