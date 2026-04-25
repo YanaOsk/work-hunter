@@ -1,3 +1,4 @@
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { geminiAnalyze as geminiGenerate } from "@/lib/gemini";
 import { DIAGNOSIS_ANALYSIS_PROMPT } from "@/lib/advisorPrompts";

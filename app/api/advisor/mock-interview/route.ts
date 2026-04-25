@@ -1,3 +1,4 @@
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { geminiGenerate } from "@/lib/gemini";
 import { MOCK_INTERVIEW_SYSTEM_PROMPT } from "@/lib/advisorPrompts";
