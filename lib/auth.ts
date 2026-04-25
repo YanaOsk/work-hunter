@@ -35,18 +35,23 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, account, user }) {
       if (account?.provider === "google" && user?.email) {
-        const { getDb } = await import("./mongodb");
-        const db = await getDb();
-        const email = user.email.toLowerCase();
-        const existing = await db.collection("google_accounts").findOne({ email });
-        if (!existing) {
-          token.isNewUser = true;
-          await db.collection("google_accounts").insertOne({
-            email,
-            name: user.name ?? "",
-            createdAt: new Date().toISOString(),
-          });
-        } else {
+        try {
+          const { getDb } = await import("./mongodb");
+          const db = await getDb();
+          const email = user.email.toLowerCase();
+          const existing = await db.collection("google_accounts").findOne({ email });
+          if (!existing) {
+            token.isNewUser = true;
+            await db.collection("google_accounts").insertOne({
+              email,
+              name: user.name ?? "",
+              createdAt: new Date().toISOString(),
+            });
+          } else {
+            token.isNewUser = false;
+          }
+        } catch {
+          // DB unavailable — treat as returning user, send to profile
           token.isNewUser = false;
         }
       }
