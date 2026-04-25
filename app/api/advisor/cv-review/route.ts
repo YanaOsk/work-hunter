@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { geminiGenerate } from "@/lib/gemini";
+import { geminiAnalyze as geminiGenerate } from "@/lib/gemini";
 import { CV_REVIEW_PROMPT } from "@/lib/advisorPrompts";
 import { DiagnosisResult, UserProfile } from "@/lib/types";
 import { langInstruction } from "@/lib/langInstruction";

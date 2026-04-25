@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { t } from "@/lib/i18n";
+import WelcomeModal from "@/components/WelcomeModal";
 
 type Tab = "signin" | "register";
 
@@ -19,8 +19,6 @@ const GoogleIcon = () => (
 );
 
 function SignInContent() {
-  const params = useSearchParams();
-  const callbackUrl = params.get("callbackUrl") || "/";
   const { lang } = useLanguage();
   const tx = t[lang];
 
@@ -30,18 +28,18 @@ function SignInContent() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeName, setWelcomeName] = useState("");
+  const [welcomeEmail, setWelcomeEmail] = useState("");
 
   const switchTab = (next: Tab) => {
     setTab(next);
     setError("");
-    setSuccess("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
     setLoading(true);
 
     try {
@@ -57,32 +55,23 @@ function SignInContent() {
           setLoading(false);
           return;
         }
-        // Auto sign-in after registration
-        const signInResult = await signIn("credentials", {
-          email,
-          password,
-          callbackUrl,
-          redirect: false,
-        });
+        const signInResult = await signIn("credentials", { email, password, redirect: false });
         if (signInResult?.error) {
           setError(tx.authInvalidCreds);
           setLoading(false);
           return;
         }
-        window.location.href = callbackUrl;
+        setWelcomeName(name);
+        setWelcomeEmail(email);
+        setShowWelcome(true);
       } else {
-        const result = await signIn("credentials", {
-          email,
-          password,
-          callbackUrl,
-          redirect: false,
-        });
+        const result = await signIn("credentials", { email, password, redirect: false });
         if (result?.error) {
           setError(tx.authInvalidCreds);
           setLoading(false);
           return;
         }
-        window.location.href = callbackUrl;
+        window.location.href = "/profile";
       }
     } catch {
       setError(tx.authInvalidCreds);
@@ -99,6 +88,10 @@ function SignInContent() {
       : lang === "he"
       ? "הצטרפות ל-Work Hunter"
       : "Join Work Hunter";
+
+  if (showWelcome) {
+    return <WelcomeModal userName={welcomeName} userEmail={welcomeEmail} />;
+  }
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-14">
@@ -141,7 +134,7 @@ function SignInContent() {
 
           {/* Google OAuth */}
           <button
-            onClick={() => signIn("google", { callbackUrl })}
+            onClick={() => signIn("google", { callbackUrl: "/auth/welcome" })}
             className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-900 font-semibold px-5 py-3.5 rounded-xl transition shadow-sm"
           >
             <GoogleIcon />
@@ -188,7 +181,6 @@ function SignInContent() {
             />
 
             {error && <p className="text-red-400 text-sm px-1">{error}</p>}
-            {success && <p className="text-emerald-400 text-sm px-1">{success}</p>}
 
             <button
               type="submit"

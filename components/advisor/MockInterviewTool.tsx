@@ -175,7 +175,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-6">
         <div className="max-w-2xl mx-auto">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">
-            ← {tx.backToAdvisor}
+            {tx.backToAdvisor}
           </button>
 
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 space-y-6">
@@ -230,7 +230,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-6">
         <div className="max-w-3xl mx-auto">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">
-            ← {tx.backToAdvisor}
+            {tx.backToAdvisor}
           </button>
 
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 space-y-5">
@@ -248,7 +248,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
                 onClick={onBack}
                 className="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 rounded-xl transition"
               >
-                ← {tx.backToAdvisor}
+                {tx.backToAdvisor}
               </button>
               <button
                 onClick={restart}
@@ -268,7 +268,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
       <div className="p-6 border-b border-white/10">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm">
-            ← {tx.backToAdvisor}
+            {tx.backToAdvisor}
           </button>
           <div className="text-center">
             <h1 className="text-base font-semibold text-white">{tx.toolInterview}</h1>

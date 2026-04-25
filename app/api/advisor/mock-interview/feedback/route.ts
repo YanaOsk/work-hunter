@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { geminiGenerate } from "@/lib/gemini";
+import { geminiAnalyze as geminiGenerate } from "@/lib/gemini";
 import { MOCK_INTERVIEW_FEEDBACK_PROMPT } from "@/lib/advisorPrompts";
 import { ChatMessage, UserProfile } from "@/lib/types";
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { geminiGenerate } from "@/lib/gemini";
+import { geminiAnalyze as geminiGenerate } from "@/lib/gemini";
 import { SEARCH_QUERY_PROMPT, MATCH_ANALYSIS_PROMPT } from "@/lib/prompts";
 import { JobResult } from "@/lib/types";
 
@@ -44,6 +44,7 @@ async function serperSearch(query: string, sites: string, lang: string): Promise
       gl: "il",
       hl: lang,
       num: 6,
+      tbs: "qdr:m",
     }),
   });
 

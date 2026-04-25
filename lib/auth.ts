@@ -33,9 +33,31 @@ export const authOptions: NextAuthOptions = {
     error: "/auth/error",
   },
   callbacks: {
+    async jwt({ token, account, user }) {
+      if (account?.provider === "google" && user?.email) {
+        const { getDb } = await import("./mongodb");
+        const db = await getDb();
+        const email = user.email.toLowerCase();
+        const existing = await db.collection("google_accounts").findOne({ email });
+        if (!existing) {
+          token.isNewUser = true;
+          await db.collection("google_accounts").insertOne({
+            email,
+            name: user.name ?? "",
+            createdAt: new Date().toISOString(),
+          });
+        } else {
+          token.isNewUser = false;
+        }
+      }
+      return token;
+    },
     session({ session, token }) {
       if (session.user && token.sub) {
-        (session.user as { id?: string }).id = token.sub;
+        session.user.id = token.sub;
+      }
+      if (typeof token.isNewUser === "boolean") {
+        session.user.isNewUser = token.isNewUser;
       }
       return session;
     },

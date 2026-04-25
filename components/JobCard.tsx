@@ -23,8 +23,8 @@ export default function JobCard({ job, rank }: Props) {
   const tx = t[lang];
 
   return (
-    <div className="group bg-white/5 hover:bg-white/8 border border-white/10 hover:border-purple-500/40 rounded-2xl p-5 transition-all duration-200">
-      <div className="flex items-start justify-between gap-4 mb-3">
+    <div className="group bg-white/5 hover:bg-white/8 border border-white/10 hover:border-purple-500/40 rounded-2xl p-4 sm:p-5 transition-all duration-200">
+      <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             {job.isNonObvious && (
@@ -43,7 +43,7 @@ export default function JobCard({ job, rank }: Props) {
               </span>
             )}
           </div>
-          <h3 className="text-white font-semibold text-lg leading-tight">{job.title}</h3>
+          <h3 className="text-white font-semibold text-base sm:text-lg leading-tight">{job.title}</h3>
           <p className="text-purple-300 text-sm mt-0.5">{job.company}</p>
         </div>
         <ScoreBadge score={job.matchScore} />

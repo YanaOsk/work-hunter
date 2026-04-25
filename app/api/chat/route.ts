@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { geminiGenerate } from "@/lib/gemini";
+import { geminiChat } from "@/lib/gemini";
 import { CHAT_SYSTEM_PROMPT } from "@/lib/prompts";
 import { ChatMessage } from "@/lib/types";
 
@@ -41,7 +41,7 @@ Missing information we still need: ${JSON.stringify(userProfile?.missingFields |
 
     const prompt = `${history}\n\nScout:`;
 
-    const assistantMessage = await geminiGenerate(prompt, systemWithContext, 800);
+    const assistantMessage = await geminiChat(prompt, systemWithContext, 800);
     const readyToSearch = assistantMessage.includes("[READY_TO_SEARCH]");
     const cleanMessage = assistantMessage.replace("[READY_TO_SEARCH]", "").trim();
 

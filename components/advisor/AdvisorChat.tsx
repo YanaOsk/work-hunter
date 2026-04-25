@@ -87,7 +87,7 @@ export default function AdvisorChat({ advisorState, onBack, onUpdate }: Props) {
       <div className="p-6 border-b border-white/10">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm">
-            ← {tx.backToAdvisor}
+            {tx.backToAdvisor}
           </button>
           <h1 className="text-lg font-semibold text-white">{tx.advisorTitle}</h1>
           <div className="w-24" />

@@ -79,7 +79,7 @@ export default function JobMarketFacts() {
     <section className="py-16 md:py-20 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">{tx.factsTitle}</h2>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">{tx.factsTitle}</h2>
           <p className="text-white/60 text-sm md:text-base">{tx.factsSubtitle}</p>
         </div>
 
@@ -98,8 +98,8 @@ export default function JobMarketFacts() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={f.icon} />
                   </svg>
                 </div>
-                <div className={`text-lg md:text-2xl font-bold ${c.value} mb-1`}>{f.value}</div>
-                <div className="text-white text-xs md:text-sm font-semibold mb-1">{f.title}</div>
+                <div className={`text-base md:text-2xl font-bold ${c.value} mb-1`}>{f.value}</div>
+                <div className="text-white text-xs font-semibold mb-1 leading-tight">{f.title}</div>
                 <p className="text-white/50 text-xs leading-relaxed">{f.desc}</p>
               </div>
             );

@@ -54,7 +54,7 @@ export default function LinkedInTool({ advisorState, onBack, onComplete, onSkip 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-6">
         <div className="max-w-2xl mx-auto">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">
-            ← {tx.backToAdvisor}
+            {tx.backToAdvisor}
           </button>
 
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 space-y-6">
@@ -115,7 +115,7 @@ export default function LinkedInTool({ advisorState, onBack, onComplete, onSkip 
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-6">
       <div className="max-w-2xl mx-auto">
         <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">
-          ← {tx.backToAdvisor}
+          {tx.backToAdvisor}
         </button>
 
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 space-y-6">

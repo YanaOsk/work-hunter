@@ -125,7 +125,7 @@ export default function JourneyMap({
         {/* Top bar */}
         <div className="flex items-center justify-between mb-8">
           <button onClick={onExit} className="text-white/40 hover:text-white text-sm transition">
-            ← {tx.newSearch}
+            {tx.newSearch}
           </button>
           <button
             onClick={onOpenChat}
@@ -272,10 +272,6 @@ export default function JourneyMap({
                       {isCurrent && (
                         <div className={`mt-3 inline-flex items-center gap-1.5 text-sm font-semibold ${cfg.color.icon.split(" ")[0]}`}>
                           {tx.startStage}
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                              d={lang === "he" ? "M11 17l-5-5m0 0l5-5m-5 5h12" : "M13 7l5 5m0 0l-5 5m5-5H6"} />
-                          </svg>
                         </div>
                       )}
                     </div>

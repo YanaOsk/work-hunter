@@ -25,20 +25,20 @@ export default function AllFields() {
   return (
     <section className="py-16 md:py-20 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-10 leading-tight">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-6 md:mb-10 leading-tight">
           {tx.allFieldsTitle}
         </h2>
 
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 mb-8">
           {fields.map((f) => (
             <div
               key={f.labelKey}
-              className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 md:p-5 text-center hover:bg-white/10 hover:border-purple-400/40 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 cursor-default"
+              className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3 sm:p-4 md:p-5 text-center hover:bg-white/10 hover:border-purple-400/40 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 cursor-default"
             >
-              <div className="text-2xl md:text-3xl mb-2 transition-transform duration-300 group-hover:scale-125 group-hover:-rotate-6">
+              <div className="text-2xl md:text-3xl mb-1.5 sm:mb-2 transition-transform duration-300 group-hover:scale-125 group-hover:-rotate-6">
                 {f.emoji}
               </div>
-              <div className="text-white/80 text-xs md:text-sm font-medium">{tx[f.labelKey]}</div>
+              <div className="text-white/80 text-xs font-medium leading-tight">{tx[f.labelKey]}</div>
             </div>
           ))}
         </div>

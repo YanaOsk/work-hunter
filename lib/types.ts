@@ -65,6 +65,8 @@ export interface DiagnosisAnswer {
 export interface DiagnosisResult {
   mbtiType?: string;
   hollandCode?: string;
+  topMessage?: string;
+  topRoles?: string[];
   strengths: string[];
   workEnvironmentFit: string[];
   careerDirections: string[];
@@ -82,6 +84,8 @@ export interface PathOption {
   cons: string[];
   firstSteps: string[];
   fitScore: number;
+  earningPotential?: number;
+  qualityOfLife?: number;
 }
 
 export interface DirectionResult {
@@ -121,11 +125,22 @@ export interface TargetCompany {
   size: string;
 }
 
+export interface HotJob {
+  title: string;
+  company: string;
+  source: string;
+  description: string;
+}
+
 export interface SearchStrategy {
   targetCompanies: TargetCompany[];
   hiddenMarketTips: string[];
   networkingPlan: string[];
   outreachTemplate: string;
+  hotJobs?: HotJob[];
+  thirtyDayPlan?: string[];
+  facebookGroups?: string[];
+  topLine?: string;
   completedAt: string;
 }
 

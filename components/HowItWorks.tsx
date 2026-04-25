@@ -42,16 +42,16 @@ export default function HowItWorks() {
     <section className="py-16 md:py-20 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
             {tx.howItWorksTitle}
           </h2>
-          <p className="text-white/60 text-base md:text-lg">{tx.howItWorksSubtitle}</p>
+          <p className="text-white/60 text-sm sm:text-base md:text-lg">{tx.howItWorksSubtitle}</p>
         </div>
 
         <div className="relative">
           <div className="hidden md:block absolute top-7 start-[12%] end-[12%] h-0.5 bg-gradient-to-r from-emerald-500/20 via-purple-500/30 to-amber-500/20" />
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {steps.map((s, i) => {
               const c = colorMap[s.color];
               return (

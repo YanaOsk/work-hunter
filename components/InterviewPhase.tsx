@@ -85,12 +85,22 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
         body: JSON.stringify({ messages: history, userProfile, lang }),
       });
       const data = await res.json();
-      addMessage("assistant", data.message);
-      const updated = [...messages, userMsg, { id: "tmp2", role: "assistant" as const, content: data.message, timestamp: new Date() }];
-      setAllMessages(updated);
-      if (data.readyToSearch) setReadyToSearch(true);
+      if (!res.ok || data.error || !data.message) {
+        const errMsg = lang === "he"
+          ? "שגיאה זמנית — אנא נסה שוב עוד כמה שניות."
+          : "Temporary error — please try again in a moment.";
+        addMessage("assistant", errMsg);
+      } else {
+        addMessage("assistant", data.message);
+        const updated = [...messages, userMsg, { id: "tmp2", role: "assistant" as const, content: data.message, timestamp: new Date() }];
+        setAllMessages(updated);
+        if (data.readyToSearch) setReadyToSearch(true);
+      }
     } catch {
-      addMessage("assistant", "Sorry, I had trouble connecting. Please try again.");
+      const errMsg = lang === "he"
+        ? "שגיאה בחיבור — אנא נסה שוב."
+        : "Connection error — please try again.";
+      addMessage("assistant", errMsg);
     } finally {
       setLoading(false);
     }
@@ -111,7 +121,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex flex-col">
-      <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm px-6 py-4">
+      <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm px-3 sm:px-6 py-3">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -155,7 +165,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
                   <span className="text-white text-xs font-bold">S</span>
                 </div>
               )}
-              <div className={`max-w-lg rounded-2xl px-4 py-3 ${
+              <div className={`max-w-[85vw] sm:max-w-lg rounded-2xl px-4 py-3 ${
                 msg.role === "user"
                   ? "bg-purple-600 text-white rounded-ee-sm"
                   : "bg-white/10 text-white/90 rounded-es-sm border border-white/10"

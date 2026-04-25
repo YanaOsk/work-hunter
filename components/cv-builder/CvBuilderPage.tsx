@@ -24,11 +24,12 @@ type View = "list" | "editor";
 export default function CvBuilderPage() {
   const { lang } = useLanguage();
   const tx = t[lang];
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const isLoggedIn = !!session?.user?.email;
 
   const [view, setView] = useState<View>("list");
   const [cvList, setCvList] = useState<CvMeta[]>([]);
+  const [listLoading, setListLoading] = useState(true);
   const [activeCvId, setActiveCvId] = useState<string | null>(null);
   const [cvName, setCvName] = useState("");
   const [data, setData] = useState<CvData>(EMPTY_CV);
@@ -41,15 +42,18 @@ export default function CvBuilderPage() {
 
   // Load CV list on mount (authenticated) or localStorage (guest)
   useEffect(() => {
+    if (status === "loading") return;
     if (isLoggedIn) {
       fetchList();
     } else {
       // Guest: load from localStorage, go straight to editor
+      setListLoading(false);
       setData(loadCv());
       setLoaded(true);
       setView("editor");
     }
-  }, [isLoggedIn]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoggedIn, status]);
 
   // Guest autosave
   useEffect(() => {
@@ -57,6 +61,7 @@ export default function CvBuilderPage() {
   }, [data, loaded, isLoggedIn]);
 
   const fetchList = async () => {
+    setListLoading(true);
     try {
       const res = await fetch("/api/cvs");
       if (res.ok) {
@@ -65,6 +70,8 @@ export default function CvBuilderPage() {
       }
     } catch {
       // silently fail
+    } finally {
+      setListLoading(false);
     }
   };
 
@@ -216,6 +223,11 @@ export default function CvBuilderPage() {
     });
   };
 
+  // ---------- SESSION LOADING ----------
+  if (status === "loading") {
+    return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
+  }
+
   // ---------- LIST VIEW ----------
   if (isLoggedIn && view === "list") {
     return (
@@ -237,7 +249,14 @@ export default function CvBuilderPage() {
             </button>
           </div>
 
-          {cvList.length === 0 ? (
+          {listLoading ? (
+            <div className="flex justify-center py-20">
+              <svg className="animate-spin w-8 h-8 text-white/30" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            </div>
+          ) : cvList.length === 0 ? (
             <div className="text-center py-20">
               <svg className="w-14 h-14 text-white/20 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -306,12 +325,10 @@ export default function CvBuilderPage() {
                 {isLoggedIn && (
                   <button
                     onClick={handleBackToList}
-                    className="text-white/50 hover:text-white transition flex-shrink-0"
+                    className="text-white/50 hover:text-white transition flex-shrink-0 text-sm"
                     title={tx.cvBackToList}
                   >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "he" ? "M9 5l7 7-7 7" : "M15 19l-7-7 7-7"} />
-                    </svg>
+                    {tx.cvBackToList}
                   </button>
                 )}
                 {isLoggedIn ? (

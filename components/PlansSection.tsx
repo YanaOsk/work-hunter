@@ -1,19 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 
+const PLAN_IDS: Record<string, string> = {
+  free: "free",
+  weekly: "weekly",
+  popular: "one-time",
+  pro: "pro",
+};
+
 export default function PlansSection() {
   const { lang } = useLanguage();
   const tx = t[lang];
-  const [toast, setToast] = useState<string | null>(null);
-
-  const showToast = () => {
-    setToast(tx.pricingDemoBtn);
-    setTimeout(() => setToast(null), 2400);
-  };
+  const router = useRouter();
 
   const plans = [
     {
@@ -98,12 +100,12 @@ export default function PlansSection() {
     <section id="plans" className="py-16 md:py-20 px-4 md:px-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">{tx.landingPlansTitle}</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">{tx.landingPlansTitle}</h2>
           <p className="text-white/60">{tx.landingPlansSubtitle}</p>
         </div>
 
-        <div className="max-w-2xl mx-auto bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-10 text-center">
-          <p className="text-white/75 text-sm md:text-base leading-relaxed">
+        <div className="mx-auto bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-8 text-center max-w-2xl">
+          <p className="text-white/75 text-xs sm:text-sm md:text-base leading-relaxed">
             {tx.pricingComparisonLine}
           </p>
         </div>
@@ -141,7 +143,7 @@ export default function PlansSection() {
                 </div>
 
                 <button
-                  onClick={showToast}
+                  onClick={() => router.push(`/checkout?plan=${PLAN_IDS[p.variant]}`)}
                   className={`w-full py-3 rounded-xl font-semibold transition mb-6 ${c.cta}`}
                 >
                   {p.cta}
@@ -176,11 +178,6 @@ export default function PlansSection() {
           </Link>
         </div>
 
-        {toast && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50">
-            {toast}
-          </div>
-        )}
       </div>
     </section>
   );

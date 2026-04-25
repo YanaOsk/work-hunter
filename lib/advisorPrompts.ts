@@ -7,25 +7,23 @@ export interface DiagnosisQuestionDef {
 export const DIAGNOSIS_QUESTIONS_HE: DiagnosisQuestionDef[] = [
   {
     id: "energy",
-    question: "איזו סביבת עבודה מאפשרת לך להביא את הערך הגבוה ביותר?",
+    question: "מהו ה-Setup שבו אתם הכי אפקטיביים?",
     options: [
-      "עבודה עצמאית ושקטה (Deep Work)",
-      "עבודה בצוות, תקשורת ורעיונות",
-      "דינמיות, שטח ושינויים מהירים",
-      "סדר, ארגון ותוצאות ברורות",
-      "גם וגם — תלוי בסיטואציה",
-      "אחר...",
+      "מיקוד עמוק ועצמאי — Deep Work",
+      "הפריה הדדית — שיתוף פעולה ורעיונות",
+      "קצב גבוה — שטח ודינמיות",
+      "וודאות ומבנה — תוצאות מדידות",
+      "גמישות אדפטיבית — מתאמים לסיטואציה",
     ],
   },
   {
     id: "decision",
-    question: "על מה את/ה נשענ/ת כשאת/ה עומד/ת בפני בחירה משמעותית?",
+    question: "כשניצבים בפני בחירה משמעותית — מה מנחה אתכם?",
     options: [
-      "ניתוח לוגי, נתונים ושיקולים ענייניים",
-      "אינטואיציה, תחושות בטן וערכים אישיים",
-      "התייעצות, שיתוף וקבלת חוות דעת מהסביבה",
-      "שילוב של הכל — תלוי במורכבות ההחלטה",
-      "משהו אחר...",
+      "נתונים ורציונליות",
+      "אינטואיציה וערכים",
+      "חוכמת הסביבה — שיתוף והתייעצות",
+      "גמישות מחשבתית — שילוב כלים",
     ],
   },
   {
@@ -148,7 +146,7 @@ export const DIAGNOSIS_QUESTIONS_EN: DiagnosisQuestionDef[] = [
   },
 ];
 
-export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string) => `You are a senior career counselor in Israel, certified in MBTI and Holland Code (RIASEC). A client just completed a short diagnosis.
+export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string) => `You are a senior career counselor and strategist in Israel, certified in MBTI and Holland Code (RIASEC). A client just completed a short career diagnosis.
 
 Candidate profile:
 ${profile}
@@ -156,22 +154,30 @@ ${profile}
 Their answers:
 ${answers}
 
-Based on these answers + profile, produce a personality-career analysis.
+Produce a deep, personal career analysis. Follow these rules strictly:
 
-Guidelines:
-- Estimate an MBTI type (4 letters, e.g. "ENTP") — your best guess, not a guarantee
-- Estimate a Holland Code (3 letters from RIASEC, e.g. "IAS")
-- Identify 3-5 real strengths (specific, not generic)
-- Describe 3 work environments that would suit them
-- Suggest 4-6 specific career directions that match both personality AND their existing experience
-- Write a warm, human 2-3 sentence summary
+1. DIRECT ADDRESS: Write the summary and all narrative text in SECOND PERSON — speak TO them, not ABOUT them. If a name appears in the profile, use it. Open the summary with their name if available, otherwise with "הפרופיל שלך" / "Your profile".
 
-IF THE USER WROTE IN HEBREW, respond in Hebrew. Otherwise English.
+2. INSIGHT OVER DESCRIPTION: Don't say "you are organized." Explain the STRATEGIC VALUE — "Your ability to turn ambiguity into structured processes is exactly what scaling companies pay senior money for right now." Every strength must answer: HOW does this make them valuable in the market?
+
+3. topMessage: A single electric, memorable sentence that distills their professional identity. This is their personal brand statement — it should feel powerful, specific, and impossible to forget. NOT generic. Bad: "You are a creative thinker." Good: "You are the person who makes complex systems feel simple — and in an era of product overload, that is a rare and highly paid skill."
+
+4. topRoles: The 2 most specific "right for them RIGHT NOW" roles. Include company type and seniority. Not a category — a real title like "Operations Lead at a B2B SaaS startup" or "Senior Product Manager, Health-Tech scale-up". Should feel like a real LinkedIn job title someone would search for.
+
+5. strengths: 3-5 strengths. Each is a short phrase FOLLOWED by a colon and a 1-sentence explanation of its market value. Example: "מיפוי תהליכים: החברות שגדלות הכי מהר בישראל הן אלה שמתאגרות בכאוס — וזו בדיוק היכולת שלך."
+
+6. workEnvironmentFit: 3 specific, vivid workplace scenarios — not abstract types, but real descriptions (e.g., "A 40-person Series B startup where you'd be the go-to person for turning founder chaos into scalable process").
+
+7. Estimate MBTI type (4 letters) and Holland Code (3 letters from RIASEC) as best-guess.
+
+IF THE USER'S PROFILE IS IN HEBREW, respond ENTIRELY in Hebrew (including topMessage and topRoles). Otherwise English.
 
 Respond with JSON only:
 {
   "mbtiType": "XXXX",
   "hollandCode": "XXX",
+  "topMessage": "...",
+  "topRoles": ["...", "..."],
   "strengths": ["...", "..."],
   "workEnvironmentFit": ["...", "...", "..."],
   "careerDirections": ["...", "...", "...", "..."],
@@ -199,7 +205,13 @@ For each path:
 - firstSteps: 3-5 actionable steps they could take this month if they chose this path
 - fitScore: 0-100, how well this path fits them based on profile + diagnosis
 
-Then pick a recommendedPath (the one with the highest genuine fit, not necessarily highest score) and write a 2-3 sentence rationale explaining WHY — referencing their specific profile and answers.
+Then pick a recommendedPath (the one with the highest genuine fit, not necessarily highest score) and write a 2-3 sentence rationale explaining WHY — referencing their specific profile and answers. Use second person, direct address.
+
+For each path, also provide:
+- earningPotential: 0-100 score representing the realistic earning ceiling for THIS PERSON on THIS PATH in Israel within 3-5 years (based on their background, not generic). Consider: market rates, their current level, career trajectory, field.
+- qualityOfLife: 0-100 score for overall life quality (work-life balance, flexibility, autonomy, stress level, geographic freedom). 100 = dream lifestyle, 0 = burnout machine.
+
+These scores should differ meaningfully between paths — don't make them all similar.
 
 IF THE USER WROTE IN HEBREW, respond in Hebrew. Otherwise English.
 
@@ -215,7 +227,9 @@ Respond with JSON only:
       "pros": ["...", "..."],
       "cons": ["...", "..."],
       "firstSteps": ["...", "..."],
-      "fitScore": 85
+      "fitScore": 85,
+      "earningPotential": 72,
+      "qualityOfLife": 65
     },
     {
       "path": "entrepreneur",
@@ -224,7 +238,9 @@ Respond with JSON only:
       "pros": ["...", "..."],
       "cons": ["...", "..."],
       "firstSteps": ["...", "..."],
-      "fitScore": 60
+      "fitScore": 60,
+      "earningPotential": 88,
+      "qualityOfLife": 55
     },
     {
       "path": "studies",
@@ -233,7 +249,9 @@ Respond with JSON only:
       "pros": ["...", "..."],
       "cons": ["...", "..."],
       "firstSteps": ["...", "..."],
-      "fitScore": 40
+      "fitScore": 40,
+      "earningPotential": 60,
+      "qualityOfLife": 78
     }
   ]
 }`;
@@ -301,7 +319,7 @@ Respond with JSON only:
 
 export const SEARCH_STRATEGY_PROMPT = (profile: string, diagnosis: string, direction: string, userNotes: string) => `You are a senior executive headhunter in Israel with deep knowledge of ALL job markets — tech, food & beverage, sports, fitness, education, healthcare, logistics, retail, finance, real estate, marketing, law, and more.
 
-Build a hyper-personalized, actionable job-search strategy. NOT generic advice.
+Build a hyper-personalized, actionable job-search strategy. NOT generic advice — every sentence should be written as if you've known this person for years.
 
 Candidate:
 ${profile}
@@ -331,24 +349,43 @@ ${userNotes || "Nothing extra — infer target from profile."}
 3. ALL INDUSTRIES:
    - Match the strategy to THEIR actual field/target field. This is NOT a tech-only system.
    - If someone is a chef, a fitness trainer, a teacher, or works in real estate — the companies, groups, and tips should reflect THEIR industry.
-   - Name REAL Israeli companies, REAL Facebook groups (like "דרושים בתחום X", "קבוצת עבודה ישראל"), REAL industry meetups or conferences relevant to their field.
+   - Name REAL Israeli companies, REAL Facebook groups, REAL industry meetups or conferences relevant to their field.
 
-4. CHANNELS TO INCLUDE:
-   - Israeli job boards: דרושים, AllJobs, JobMaster, GotFriends
-   - Facebook job groups: name specific groups (e.g., "דרושים - מחפשי עבודה ישראל", "עבודות מהבית ישראל", or field-specific groups)
-   - LinkedIn: specific search strategies, who to connect with, how to approach
-   - Direct outreach to companies or managers
-   - Industry-specific communities (Slack groups, WhatsApp groups, professional associations)
+=== OUTPUT — ALL FIELDS REQUIRED ===
 
-=== OUTPUT ===
+targetCompanies: 6-8 real, named companies. Remote-friendly if required. For each: name, reason (personalized — WHY them specifically, reference their background), size.
 
-Produce:
-- targetCompanies: 6-8 real, named companies that fit this specific person. Remote-friendly if required. Relevant to their TARGET field (not their past field if changing). For each: name, reason (why THEM, specifically and personally), size.
-- hiddenMarketTips: 5-6 concrete, platform-specific tactics. Name actual Facebook groups, WhatsApp communities, LinkedIn strategies, and direct outreach targets.
-- networkingPlan: 5 specific action items for the next 30 days — with actual platforms, groups, or people to target.
-- outreachTemplate: a personalized cold message (3-5 sentences) for LinkedIn or email, written in first person, based on their actual background and target role.
+hiddenMarketTips: 5-6 concrete, platform-specific tactics. Name actual Facebook groups, WhatsApp communities, LinkedIn strategies.
 
-IF the candidate is Hebrew-speaking, respond in Hebrew. Otherwise English.
+networkingPlan: 5 specific action items — keep these for the general networking approach (who to connect with, warm intro strategy, etc.)
+
+outreachTemplate (ELEVATOR PITCH — not a form letter):
+Write a genuine cold message / pitch they can send on LinkedIn or by email. Rules:
+- First person, 3-5 sentences max
+- Sentence 1: A hook — something specific about THEM or the company that shows you did your homework (not "I saw you're hiring")
+- Sentence 2: Who I am — ONE strong sentence with a concrete achievement or differentiator
+- Sentence 3: The ask — specific and direct, not "I'd love to connect"
+- Should feel like it was written personally, not from a template
+- Must NOT include placeholder brackets like [Company Name] or [Role] — write it as if sending it today
+
+hotJobs (Simulated real job listings):
+Generate 4-5 simulated open positions that look like real listings in the Israeli market right now. Based on your knowledge of the market, write listings that would genuinely exist for this type of profile. Each must have:
+- title: specific job title (not vague, e.g., "Senior Operations Manager" not "Manager")
+- company: a real Israeli or global company known to hire in this field in Israel
+- source: where this listing would realistically be found — one of: "LinkedIn" | "GotFriends" | "דרושים" | "AllJobs" | "Comeet" | "JobMaster" | "Glassdoor"
+- description: 2 sentences — (1) what the role is about, (2) why it's specifically relevant to this candidate's background
+
+facebookGroups: 3-5 specific Facebook group names relevant to this person's field and job search. Use real-sounding Israeli Facebook group names (based on your knowledge of the Israeli job market). Field-specific is better than generic. Examples of format: "דרושים בהייטק ישראל", "משרות שיווק ותקשורת בין חברים", "עולם הפינטק הישראלי", "מנהלים ומנהלות בישראל".
+
+thirtyDayPlan: 5-7 specific, calendar-ready action items for the next 30 days. NOT generic ("update LinkedIn") but HYPER-SPECIFIC:
+- Name actual companies, groups, or people types to target
+- Include the exact action (send a connection request, post content about X, attend Y event, reach out to Z type of person)
+- Make each item feel like something they can do THIS WEEK, not "eventually"
+- Sequence them logically (build presence → warm up → reach out → follow up)
+
+topLine: The single sharpest, most memorable sentence of the entire career plan. It should crystallize their unique competitive advantage AND the #1 thing they should do first. This is the sentence they'll still remember when they wake up on Monday morning. It should feel personal — not like a motivational poster. Think: "שילוב הניסיון שלך בX עם Y הוא בדיוק מה שחברות Z מחפשות עכשיו — פנה ישירות למנהלי X בלינקדאין השבוע."
+
+IF the candidate is Hebrew-speaking, respond ENTIRELY in Hebrew. Otherwise English.
 
 Respond with JSON only:
 {
@@ -357,7 +394,13 @@ Respond with JSON only:
   ],
   "hiddenMarketTips": ["...", "..."],
   "networkingPlan": ["...", "..."],
-  "outreachTemplate": "..."
+  "outreachTemplate": "...",
+  "hotJobs": [
+    {"title": "...", "company": "...", "source": "...", "description": "..."}
+  ],
+  "thirtyDayPlan": ["...", "...", "...", "...", "..."],
+  "facebookGroups": ["...", "...", "..."],
+  "topLine": "..."
 }`;
 
 export const MOCK_INTERVIEW_SYSTEM_PROMPT = (

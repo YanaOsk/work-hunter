@@ -37,15 +37,15 @@ export default function ResultsPhase({ jobs, userProfile, demoMode, isSubscribed
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900">
       <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-white font-bold text-lg">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-white font-bold text-sm sm:text-lg truncate">
               {filtered.length} {tx.jobsFound}
-              {profile?.name && <span className="text-purple-400"> — {profile.name}</span>}
+              {profile?.name && <span className="text-purple-400 hidden sm:inline"> — {profile.name}</span>}
             </h1>
             <p className="text-white/40 text-xs">{tx.rankedBy}</p>
           </div>
-          <button onClick={onReset} className="text-white/60 hover:text-white text-sm flex items-center gap-1 transition">
+          <button onClick={onReset} className="text-white/60 hover:text-white text-xs sm:text-sm flex items-center gap-1 transition flex-shrink-0">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>

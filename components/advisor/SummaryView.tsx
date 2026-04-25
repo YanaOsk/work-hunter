@@ -21,21 +21,20 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
   const otherOptions = direction?.options?.filter((o) => o.path !== chosenPath) ?? [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-4 md:p-6">
       <div className="max-w-4xl mx-auto">
+        {/* Nav */}
         <div className="flex items-center justify-between mb-8">
-          <button onClick={onBack} className="text-white/50 hover:text-white text-sm">
-            ← {tx.backToMap}
+          <button onClick={onBack} className="text-white/50 hover:text-white text-sm transition">
+            {tx.backToMap}
           </button>
-          <button
-            onClick={onExit}
-            className="text-white/50 hover:text-white text-sm"
-          >
+          <button onClick={onExit} className="text-white/50 hover:text-white text-sm transition">
             {tx.newSearch}
           </button>
         </div>
 
-        <div className="text-center mb-10">
+        {/* Header */}
+        <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-emerald-500 mb-4">
             <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -48,9 +47,22 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </p>
         </div>
 
+        {/* Top Message — personal brand statement */}
+        {diagnosis?.topMessage && (
+          <div className="relative mb-8 px-8 py-6 bg-gradient-to-br from-purple-600/15 via-emerald-600/10 to-purple-600/15 border border-purple-500/25 rounded-2xl overflow-hidden text-center">
+            <div className="absolute top-3 start-5 text-5xl leading-none text-purple-500/20 select-none">"</div>
+            <p className="text-lg md:text-xl font-semibold text-white/95 leading-relaxed relative z-10">
+              {diagnosis.topMessage}
+            </p>
+            <div className="absolute bottom-1 end-5 text-5xl leading-none text-purple-500/20 select-none">"</div>
+          </div>
+        )}
+
+        {/* Section 1: Professional DNA */}
         {diagnosis && (
           <Section title={tx.summarySection1}>
-            <div className="flex items-center gap-2 mb-3">
+            {/* MBTI + Holland */}
+            <div className="flex items-center gap-2 mb-4">
               {diagnosis.mbtiType && (
                 <span className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-sm font-mono">
                   {diagnosis.mbtiType}
@@ -62,23 +74,40 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
                 </span>
               )}
             </div>
-            <p className="text-white/85 leading-relaxed mb-4">{diagnosis.summary}</p>
+
+            {/* Summary — personal address */}
+            <p className="text-white/85 leading-relaxed mb-5">{diagnosis.summary}</p>
+
+            {/* Top 2 roles */}
+            {diagnosis.topRoles && diagnosis.topRoles.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-emerald-300 text-xs font-semibold mb-2.5 uppercase tracking-wide">
+                  {tx.summaryTopRoles}
+                </h4>
+                <div className="flex flex-col gap-2">
+                  {diagnosis.topRoles.map((role, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-2.5"
+                    >
+                      <span className="text-emerald-400 text-xs font-bold tabular-nums">#{i + 1}</span>
+                      <span className="text-white font-medium text-sm">{role}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Strengths / environments / directions */}
             <div className="grid md:grid-cols-3 gap-4">
               <MiniList title={tx.diagnosisStrengths} items={diagnosis.strengths} color="emerald" />
-              <MiniList
-                title={tx.diagnosisEnvironments}
-                items={diagnosis.workEnvironmentFit}
-                color="purple"
-              />
-              <MiniList
-                title={tx.diagnosisDirections}
-                items={diagnosis.careerDirections}
-                color="blue"
-              />
+              <MiniList title={tx.diagnosisEnvironments} items={diagnosis.workEnvironmentFit} color="purple" />
+              <MiniList title={tx.diagnosisDirections} items={diagnosis.careerDirections} color="blue" />
             </div>
           </Section>
         )}
 
+        {/* Section 2: Chosen path */}
         {chosenOption && (
           <Section title={tx.summarySection2}>
             <div className="flex items-center justify-between mb-2">
@@ -91,6 +120,45 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               <p className="text-white/75 italic text-sm mb-4">{direction.rationale}</p>
             )}
             <p className="text-white/85 leading-relaxed mb-4">{chosenOption.summary}</p>
+
+            {/* Earning potential vs quality of life bars */}
+            {(chosenOption.earningPotential !== undefined || chosenOption.qualityOfLife !== undefined) && (
+              <div className="mb-4 space-y-2.5 bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3">
+                {chosenOption.earningPotential !== undefined && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-white/50 text-xs w-32 flex-shrink-0 text-end">
+                      {tx.summaryEarningPotential}
+                    </span>
+                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-emerald-500 rounded-full transition-all duration-700"
+                        style={{ width: `${chosenOption.earningPotential}%` }}
+                      />
+                    </div>
+                    <span className="text-emerald-400 text-xs font-mono w-7 text-end">
+                      {chosenOption.earningPotential}
+                    </span>
+                  </div>
+                )}
+                {chosenOption.qualityOfLife !== undefined && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-white/50 text-xs w-32 flex-shrink-0 text-end">
+                      {tx.summaryQualityOfLife}
+                    </span>
+                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-purple-500 rounded-full transition-all duration-700"
+                        style={{ width: `${chosenOption.qualityOfLife}%` }}
+                      />
+                    </div>
+                    <span className="text-purple-400 text-xs font-mono w-7 text-end">
+                      {chosenOption.qualityOfLife}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="grid md:grid-cols-3 gap-4">
               <MiniList title={tx.pros} items={chosenOption.pros} color="emerald" />
               <MiniList title={tx.cons} items={chosenOption.cons} color="rose" />
@@ -99,6 +167,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </Section>
         )}
 
+        {/* Section 2b: Other paths comparison */}
         {otherOptions.length > 0 && (
           <Section title={tx.summaryAllPaths}>
             <div className="grid md:grid-cols-2 gap-3">
@@ -109,6 +178,35 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
                     <span className="text-xs text-white/40">{opt.fitScore}/100</span>
                   </div>
                   <p className="text-white/70 text-sm mb-3">{opt.summary}</p>
+
+                  {/* Compact bars for other options */}
+                  {(opt.earningPotential !== undefined || opt.qualityOfLife !== undefined) && (
+                    <div className="space-y-1.5 mb-3">
+                      {opt.earningPotential !== undefined && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-white/35 text-[10px] w-24 text-end flex-shrink-0">
+                            {tx.summaryEarningPotential}
+                          </span>
+                          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-emerald-500/70 rounded-full" style={{ width: `${opt.earningPotential}%` }} />
+                          </div>
+                          <span className="text-white/40 text-[10px] w-5 text-end">{opt.earningPotential}</span>
+                        </div>
+                      )}
+                      {opt.qualityOfLife !== undefined && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-white/35 text-[10px] w-24 text-end flex-shrink-0">
+                            {tx.summaryQualityOfLife}
+                          </span>
+                          <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-purple-500/70 rounded-full" style={{ width: `${opt.qualityOfLife}%` }} />
+                          </div>
+                          <span className="text-white/40 text-[10px] w-5 text-end">{opt.qualityOfLife}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <MiniList title={tx.pros} items={opt.pros.slice(0, 2)} color="emerald" small />
                     <MiniList title={tx.cons} items={opt.cons.slice(0, 2)} color="rose" small />
@@ -119,6 +217,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </Section>
         )}
 
+        {/* Section 3: CV Review */}
         {cvReview && (
           <Section title={tx.summarySection3}>
             <div className="flex items-center justify-between mb-4">
@@ -135,9 +234,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
                 <div className="space-y-2">
                   {cvReview.improvements.map((imp, i) => (
                     <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 text-sm">
-                      <div className="text-blue-300 text-xs font-semibold mb-1 uppercase">
-                        {imp.section}
-                      </div>
+                      <div className="text-blue-300 text-xs font-semibold mb-1 uppercase">{imp.section}</div>
                       <div className="text-white/60 mb-1">❌ {imp.issue}</div>
                       <div className="text-white/90">✓ {imp.suggestion}</div>
                     </div>
@@ -154,9 +251,11 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </Section>
         )}
 
+        {/* Section 4: Search Strategy */}
         {strategy && (
           <Section title={tx.summarySection5}>
-            <div className="mb-4">
+            {/* Target companies */}
+            <div className="mb-5">
               <h4 className="text-purple-300 text-sm font-semibold mb-2">{tx.strategyCompanies}</h4>
               <div className="grid md:grid-cols-2 gap-2">
                 {strategy.targetCompanies.map((c, i) => (
@@ -170,20 +269,105 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
                 ))}
               </div>
             </div>
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
+
+            {/* Hot Jobs Radar */}
+            {strategy.hotJobs && strategy.hotJobs.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-emerald-300 text-sm font-semibold mb-2">{tx.summaryHotJobs}</h4>
+                <div className="grid md:grid-cols-2 gap-2">
+                  {strategy.hotJobs.map((job, i) => (
+                    <div
+                      key={i}
+                      className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-3.5"
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <div className="min-w-0">
+                          <p className="text-white font-semibold text-sm leading-tight">{job.title}</p>
+                          <p className="text-white/50 text-xs mt-0.5">{job.company}</p>
+                        </div>
+                        <span className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
+                          {job.source}
+                        </span>
+                      </div>
+                      <p className="text-white/65 text-xs leading-relaxed">{job.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Facebook Groups */}
+            {strategy.facebookGroups && strategy.facebookGroups.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-blue-300 text-sm font-semibold mb-2">{tx.summaryFacebookGroups}</h4>
+                <div className="flex flex-wrap gap-2">
+                  {strategy.facebookGroups.map((group, i) => (
+                    <span
+                      key={i}
+                      className="bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5"
+                    >
+                      <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                      </svg>
+                      {group}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Hidden market + networking (existing) */}
+            <div className="grid md:grid-cols-2 gap-4 mb-5">
               <MiniList title={tx.strategyHidden} items={strategy.hiddenMarketTips} color="emerald" />
               <MiniList title={tx.strategyNetwork} items={strategy.networkingPlan} color="blue" />
             </div>
+
+            {/* 30-Day Attack Plan */}
+            {strategy.thirtyDayPlan && strategy.thirtyDayPlan.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-amber-300 text-sm font-semibold mb-2">{tx.summaryThirtyDayPlan}</h4>
+                <div className="space-y-2">
+                  {strategy.thirtyDayPlan.map((step, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-3 bg-amber-500/5 border border-amber-500/15 rounded-xl px-3.5 py-2.5"
+                    >
+                      <span className="text-amber-400 text-xs font-bold flex-shrink-0 mt-0.5 tabular-nums">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="text-white/80 text-sm leading-relaxed">{step}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Elevator Pitch */}
             <div>
-              <h4 className="text-purple-300 text-sm font-semibold mb-2">{tx.strategyTemplate}</h4>
-              <div className="bg-white/5 border border-purple-500/30 rounded-lg p-3 text-white/90 text-sm leading-relaxed whitespace-pre-wrap">
+              <h4 className="text-purple-300 text-sm font-semibold mb-2">{tx.summaryOutreachPitch}</h4>
+              <div className="bg-white/5 border border-purple-500/30 rounded-lg p-4 text-white/90 text-sm leading-relaxed whitespace-pre-wrap">
                 {strategy.outreachTemplate}
               </div>
             </div>
           </Section>
         )}
 
-        <div className="mt-10 bg-gradient-to-br from-rose-600/20 to-amber-600/20 border border-rose-500/30 rounded-3xl p-8">
+        {/* Top Line closing quote */}
+        {strategy?.topLine && (
+          <div className="relative mb-6 px-8 py-6 bg-gradient-to-br from-amber-600/10 via-purple-600/10 to-emerald-600/10 border border-white/10 rounded-2xl text-center overflow-hidden">
+            <div className="absolute top-3 start-5 text-4xl leading-none text-white/10 select-none">"</div>
+            <h4 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-2">
+              {tx.summaryTopLine}
+            </h4>
+            <p className="text-base md:text-lg font-bold text-white/95 leading-relaxed relative z-10">
+              {strategy.topLine}
+            </p>
+            <div className="absolute bottom-1 end-5 text-4xl leading-none text-white/10 select-none">"</div>
+          </div>
+        )}
+
+        {/* Interview CTA */}
+        <div className="mt-4 bg-gradient-to-br from-rose-600/20 to-amber-600/20 border border-rose-500/30 rounded-3xl p-8">
           <div className="flex items-start gap-4 mb-4">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-rose-500/20 flex-shrink-0">
               <svg className="w-6 h-6 text-rose-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -248,49 +432,6 @@ function MiniList({
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-function LinkedInBlock({ label, text, multiline }: { label: string; text: string; multiline?: boolean }) {
-  return (
-    <div className="mb-4">
-      <h4 className="text-purple-300 text-sm font-semibold mb-2">{label}</h4>
-      <div
-        className={`bg-white/5 border border-white/10 rounded-lg p-3 text-white/90 text-sm leading-relaxed ${
-          multiline ? "whitespace-pre-wrap" : ""
-        }`}
-      >
-        {text}
-      </div>
-    </div>
-  );
-}
-
-const PILL_COLORS = {
-  emerald: "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
-  purple: "bg-purple-500/10 text-purple-300 border-purple-500/20",
-} as const;
-
-function Pills({
-  label,
-  items,
-  color,
-}: {
-  label: string;
-  items: string[];
-  color: keyof typeof PILL_COLORS;
-}) {
-  return (
-    <div>
-      <h4 className="text-white/60 text-xs font-semibold mb-2">{label}</h4>
-      <div className="flex flex-wrap gap-1.5">
-        {items.map((it, i) => (
-          <span key={i} className={`px-2 py-0.5 rounded-full text-xs border ${PILL_COLORS[color]}`}>
-            {it}
-          </span>
-        ))}
-      </div>
     </div>
   );
 }

@@ -23,7 +23,13 @@ export interface ConversationPreview {
   userId: string;
   createdAt: string;
   messageCount: number;
+  title?: string;
+  searchContext?: string;
   jobs: JobSnap[];
+}
+
+export interface ConversationFull extends ConversationPreview {
+  messages: ConversationMessage[];
 }
 
 function toJobSnap(j: JobResult): JobSnap {
@@ -43,7 +49,8 @@ export async function saveConversation(
   userId: string,
   messages: ConversationMessage[],
   searchContext: string,
-  jobs: JobResult[] = []
+  jobs: JobResult[] = [],
+  title?: string
 ): Promise<string> {
   const db = await getDb();
   const id = crypto.randomUUID();
@@ -52,11 +59,20 @@ export async function saveConversation(
     userId,
     createdAt: new Date().toISOString(),
     messageCount: messages.length,
+    title: title ?? null,
     messages,
     searchContext,
     jobs: jobs.slice(0, 10).map(toJobSnap),
   });
   return id;
+}
+
+export async function getConversation(userId: string, id: string): Promise<ConversationFull | null> {
+  const db = await getDb();
+  const doc = await db
+    .collection("conversations")
+    .findOne({ id, userId }, { projection: { _id: 0 } });
+  return doc as unknown as ConversationFull | null;
 }
 
 export async function listConversations(userId: string): Promise<ConversationPreview[]> {

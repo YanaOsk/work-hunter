@@ -17,10 +17,10 @@ export default function LogoMark({ size = "md", animate = false }: Props) {
       }`}
     >
       <svg
-        className={`${iconDims} text-white`}
+        className={iconDims}
         viewBox="0 0 24 24"
         fill="none"
-        stroke="currentColor"
+        stroke="white"
       >
         <path
           d="M4 18 L10 12 L14 15 L20 8"
@@ -28,10 +28,10 @@ export default function LogoMark({ size = "md", animate = false }: Props) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle cx="4" cy="18" r="1.6" fill="currentColor" stroke="none" />
-        <circle cx="10" cy="12" r="1.4" fill="currentColor" stroke="none" />
-        <circle cx="14" cy="15" r="1.4" fill="currentColor" stroke="none" />
-        <circle cx="20" cy="8" r="2.2" fill="currentColor" stroke="none" />
+        <circle cx="4" cy="18" r="1.6" fill="white" stroke="none" />
+        <circle cx="10" cy="12" r="1.4" fill="white" stroke="none" />
+        <circle cx="14" cy="15" r="1.4" fill="white" stroke="none" />
+        <circle cx="20" cy="8" r="2.2" fill="white" stroke="none" />
       </svg>
     </div>
   );

@@ -13,7 +13,7 @@ export default function ReviewsPage() {
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-10">
         <Link href="/" className="text-white/50 hover:text-white text-sm mb-8 inline-block">
-          ← {tx.newSearch}
+          {tx.newSearch}
         </Link>
 
         <div className="text-center mb-10">

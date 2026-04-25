@@ -15,11 +15,11 @@ export default function HighlightedReviews() {
   return (
     <section className="py-16 md:py-20 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-10 leading-tight">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-6 md:mb-10 leading-tight">
           {tx.reviewsHomeTitle}
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
           {featured.map((r) => {
             const name = lang === "he" ? r.nameHe : r.nameEn;
             const city = lang === "he" ? r.cityHe : r.cityEn;

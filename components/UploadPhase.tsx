@@ -4,7 +4,7 @@ import { useState, useRef, DragEvent } from "react";
 import { UserProfile } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
-import SavedProfiles from "./SavedProfiles";
+import LogoMark from "./LogoMark";
 
 interface Props {
   onComplete: (profile: UserProfile) => void;
@@ -50,15 +50,12 @@ export default function UploadPhase({ onComplete }: Props) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
-        <SavedProfiles onSelect={onComplete} />
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-600 mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2" />
-            </svg>
+          <div className="inline-flex mb-4">
+            <LogoMark size="lg" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">{tx.appName}</h1>
-          <p className="text-purple-300 text-lg">{tx.appTagline}</p>
+          <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">{tx.appName}</h1>
+          <p className="text-purple-300 text-sm sm:text-lg">{tx.appTagline}</p>
         </div>
 
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 space-y-6">
@@ -122,14 +119,7 @@ export default function UploadPhase({ onComplete }: Props) {
                 </svg>
                 {tx.analyzing}
               </>
-            ) : (
-              <>
-                {tx.startSearch}
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "he" ? "M11 17l-5-5m0 0l5-5m-5 5h12" : "M13 7l5 5m0 0l-5 5m5-5H6"} />
-                </svg>
-              </>
-            )}
+            ) : tx.startSearch}
           </button>
 
           <p className="text-center text-white/20 text-xs">{tx.privacy}</p>

@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Groq from "groq-sdk";
-
-function getGroq() {
-  return new Groq({ apiKey: process.env.GROQ_API_KEY });
-}
+import { geminiAnalyze } from "@/lib/gemini";
 
 export async function POST(req: NextRequest) {
   const { summary, name, title, lang } = (await req.json()) as {
@@ -33,14 +29,7 @@ Current summary:
 ${summary}`;
 
   try {
-    const groq = getGroq();
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      max_tokens: 300,
-    });
-    const improved = completion.choices[0]?.message?.content?.trim() ?? "";
+    const improved = (await geminiAnalyze(prompt, undefined, 300)).trim();
     return NextResponse.json({ improved });
   } catch (err) {
     console.error("[improve-summary]", err);

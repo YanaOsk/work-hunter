@@ -12,6 +12,7 @@ import {
   LifePath,
   MockInterview,
   SearchStrategy,
+  STAGE_ORDER,
   UserProfile,
 } from "@/lib/types";
 import {
@@ -68,6 +69,25 @@ export default function AdvisorPageInner() {
     if (state.currentStage === "done") setView("summary");
   }, [profileId, session, guestProfileId, router]);
 
+  // Sync isPremium with real subscription so paywall respects purchased plan
+  useEffect(() => {
+    if (!session?.user?.email || !profileId) return;
+    fetch("/api/subscription")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.plan && d.plan !== "free") {
+          setAdvisorState((prev) => {
+            if (!prev || prev.isPremium) return prev;
+            const updated = { ...prev, isPremium: true };
+            saveAdvisorState(profileId, updated);
+            return updated;
+          });
+        }
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.email, profileId]);
+
   if (!advisorState || !profileId) {
     return <div className="min-h-screen bg-slate-900" />;
   }
@@ -75,6 +95,20 @@ export default function AdvisorPageInner() {
   const persist = (next: AdvisorState) => {
     setAdvisorState(next);
     saveAdvisorState(profileId, next);
+    if (session?.user?.email) {
+      const completedCount =
+        next.currentStage === "done"
+          ? STAGE_ORDER.length
+          : STAGE_ORDER.indexOf(next.currentStage as AdvisorStage);
+      fetch("/api/user-meta", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          advisorCurrentStage: next.currentStage,
+          advisorCompletedCount: completedCount,
+        }),
+      }).catch(() => {});
+    }
   };
 
   const backToMap = () => setView("map");

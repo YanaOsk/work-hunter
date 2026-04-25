@@ -6,6 +6,7 @@ import Providers from "@/components/Providers";
 import NavBarWrapper from "@/components/NavBarWrapper";
 import ScrollToTop from "@/components/ScrollToTop";
 import AdminFab from "@/components/AdminFab";
+import TrackingProvider from "@/components/TrackingProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,10 +33,20 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Restore theme before first paint — prevents flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('wh-theme');if(t==='light')document.documentElement.classList.add('light');}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <Providers>
           <LanguageProvider>
+            <TrackingProvider />
             <NavBarWrapper />
             <ScrollToTop />
             <AdminFab />
