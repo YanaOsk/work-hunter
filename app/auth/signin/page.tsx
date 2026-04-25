@@ -112,6 +112,22 @@ function SignInContent() {
         </div>
 
         <div className="bg-white/5 border border-white/10 rounded-3xl p-7 backdrop-blur-sm shadow-2xl shadow-black/30">
+          {/* Google OAuth — always first, works for both sign in and register */}
+          <button
+            onClick={() => signIn("google", { callbackUrl: "/auth/welcome" })}
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-900 font-semibold px-5 py-3.5 rounded-xl transition shadow-sm mb-5"
+          >
+            <GoogleIcon />
+            {lang === "he" ? "המשך עם Google" : "Continue with Google"}
+          </button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-white/30 text-xs">{tx.authOrEmail}</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
           {/* Tabs */}
           <div className="flex bg-white/5 rounded-xl p-1 mb-6 gap-1">
             <button
@@ -130,22 +146,6 @@ function SignInContent() {
             >
               {tx.authRegisterTab}
             </button>
-          </div>
-
-          {/* Google OAuth */}
-          <button
-            onClick={() => signIn("google", { callbackUrl: "/auth/welcome" })}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-900 font-semibold px-5 py-3.5 rounded-xl transition shadow-sm"
-          >
-            <GoogleIcon />
-            {tab === "signin" ? tx.signInGoogle : tx.signInGoogleRegister}
-          </button>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-white/30 text-xs">{tx.authOrEmail}</span>
-            <div className="flex-1 h-px bg-white/10" />
           </div>
 
           {/* Email / Password form */}
