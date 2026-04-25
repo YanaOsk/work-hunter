@@ -7,6 +7,8 @@ declare global {
 const opts = {
   serverSelectionTimeoutMS: 5000,
   connectTimeoutMS: 5000,
+  tls: true,
+  tlsAllowInvalidCertificates: true,
 };
 
 export async function getDb(): Promise<Db> {
