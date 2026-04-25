@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { PLANS, type PlanId, type Plan } from "@/lib/plans";
@@ -39,6 +39,9 @@ export default function CheckoutPage({ planId }: { planId: string }) {
 
   const method: PayMethod = "card";
   const [card, setCard] = useState<CardState>({ number: "", expiry: "", cvv: "", name: "" });
+  const expiryRef = useRef<HTMLInputElement>(null);
+  const cvvRef    = useRef<HTMLInputElement>(null);
+  const nameRef   = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -231,7 +234,11 @@ export default function CheckoutPage({ planId }: { planId: string }) {
                     inputMode="numeric"
                     placeholder="0000 0000 0000 0000"
                     value={card.number}
-                    onChange={(e) => setCard((c) => ({ ...c, number: formatCardNumber(e.target.value) }))}
+                    onChange={(e) => {
+                      const formatted = formatCardNumber(e.target.value);
+                      setCard((c) => ({ ...c, number: formatted }));
+                      if (formatted.replace(/\s/g, "").length === 16) expiryRef.current?.focus();
+                    }}
                     className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm focus:outline-none focus:border-purple-500/60 transition"
                   />
                   {card.number && (
@@ -250,7 +257,12 @@ export default function CheckoutPage({ planId }: { planId: string }) {
                     inputMode="numeric"
                     placeholder="MM/YY"
                     value={card.expiry}
-                    onChange={(e) => setCard((c) => ({ ...c, expiry: formatExpiry(e.target.value) }))}
+                    ref={expiryRef}
+                    onChange={(e) => {
+                      const formatted = formatExpiry(e.target.value);
+                      setCard((c) => ({ ...c, expiry: formatted }));
+                      if (formatted.length === 5) cvvRef.current?.focus();
+                    }}
                     className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm focus:outline-none focus:border-purple-500/60 transition"
                   />
                 </div>
@@ -262,7 +274,12 @@ export default function CheckoutPage({ planId }: { planId: string }) {
                     placeholder="123"
                     maxLength={4}
                     value={card.cvv}
-                    onChange={(e) => setCard((c) => ({ ...c, cvv: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
+                    ref={cvvRef}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                      setCard((c) => ({ ...c, cvv: val }));
+                      if (val.length === 3) nameRef.current?.focus();
+                    }}
                     className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm focus:outline-none focus:border-purple-500/60 transition"
                   />
                 </div>
@@ -274,6 +291,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
                   type="text"
                   placeholder="ישראל ישראלי"
                   value={card.name}
+                  ref={nameRef}
                   onChange={(e) => setCard((c) => ({ ...c, name: e.target.value }))}
                   className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm focus:outline-none focus:border-purple-500/60 transition"
                 />
