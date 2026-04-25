@@ -26,12 +26,15 @@ export async function POST(req: NextRequest) {
         : undefined;
 
     // Save subscription — must succeed for checkout to complete
-    await saveSubscription(
-      session.user.email,
-      session.user.name ?? "",
-      planId,
-      savedCard,
-    );
+    // (skipped in local dev when DATABASE_URL is absent — demo mode)
+    if (process.env.DATABASE_URL) {
+      await saveSubscription(
+        session.user.email,
+        session.user.name ?? "",
+        planId,
+        savedCard,
+      );
+    }
 
     // Send confirmation email — non-fatal
     try {
