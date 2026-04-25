@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { PLANS, type PlanId, type Plan } from "@/lib/plans";
 import { queueAutoStart } from "@/lib/autoStart";
 
-type PayMethod = "google" | "card";
+type PayMethod = "card";
 
 interface CardState {
   number: string;
@@ -37,7 +37,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
 
   const plan: Plan | null = PLANS[planId as PlanId] ?? null;
 
-  const [method, setMethod] = useState<PayMethod>("card");
+  const method: PayMethod = "card";
   const [card, setCard] = useState<CardState>({ number: "", expiry: "", cvv: "", name: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -68,8 +68,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
 
   const digits = card.number.replace(/\s/g, "");
   const cardValid =
-    method !== "card" ||
-    (digits.length >= 13 && card.expiry.length === 5 && card.cvv.length >= 3 && card.name.trim().length > 0);
+    digits.length >= 13 && card.expiry.length === 5 && card.cvv.length >= 3 && card.name.trim().length > 0;
 
   async function handlePay() {
     setLoading(true);
@@ -175,32 +174,6 @@ export default function CheckoutPage({ planId }: { planId: string }) {
       ? "חינם"
       : `${plan.displayPrice}${plan.per ? ` ${plan.per}` : ""}`;
 
-  const methods: { id: PayMethod; label: string; icon: React.ReactNode }[] = [
-    {
-      id: "google",
-      label: "Google Pay",
-      icon: (
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 10.2v3.6h5.03c-.21 1.17-.86 2.16-1.84 2.82l2.97 2.31C19.9 17.09 21 14.69 21 12c0-.63-.06-1.24-.16-1.8H12z" fill="#4285F4"/>
-          <path d="M5.28 14.29C5.1 13.73 5 13.13 5 12.5s.1-1.23.28-1.79L2.25 8.4C1.46 9.92 1 11.66 1 13.5s.46 3.58 1.25 5.1l3.03-2.31z" fill="#FBBC05"/>
-          <path d="M12 21c2.42 0 4.44-.8 5.92-2.17l-2.97-2.31A6.97 6.97 0 0 1 12 17.5c-3.47 0-6.4-2.34-7.44-5.5L1.53 14.31A11 11 0 0 0 12 21z" fill="#34A853"/>
-          <path d="M12 6c1.62 0 3.06.56 4.21 1.64l3.15-3.15A10.97 10.97 0 0 0 12 2 11 11 0 0 0 1.53 8.69L4.56 11C5.6 7.84 8.53 6 12 6z" fill="#EA4335"/>
-        </svg>
-      ),
-    },
-    {
-      id: "card",
-      label: "כרטיס אשראי",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-        </svg>
-      ),
-    },
-  ];
-
-  const isInstantMethod = method === "google";
-
   return (
     <div className="min-h-screen bg-[#0f0e1a] py-10 px-4" dir="rtl">
       <div className="max-w-lg mx-auto space-y-5">
@@ -243,45 +216,13 @@ export default function CheckoutPage({ planId }: { planId: string }) {
           </div>
         </div>
 
-        {/* Payment method tabs */}
+        {/* Credit card form */}
         <div className="bg-[#1a1730] border border-white/8 rounded-2xl overflow-hidden">
           <div className="p-5 border-b border-white/8">
-            <p className="text-white/50 text-xs uppercase tracking-wider mb-3">אמצעי תשלום</p>
-            <div className="grid grid-cols-2 gap-2">
-              {methods.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => setMethod(m.id)}
-                  className={`flex items-center gap-2.5 px-4 py-3 rounded-xl border text-sm font-medium transition ${
-                    method === m.id
-                      ? "bg-purple-600/20 border-purple-500/60 text-white"
-                      : "bg-white/3 border-white/10 text-white/50 hover:border-white/20 hover:text-white/70"
-                  }`}
-                >
-                  <span className={method === m.id ? "text-purple-300" : "text-white/40"}>{m.icon}</span>
-                  {m.label}
-                </button>
-              ))}
-            </div>
+            <p className="text-white/50 text-xs uppercase tracking-wider">כרטיס אשראי</p>
           </div>
 
-          {/* Google Pay — one-tap simulation */}
-          {isInstantMethod && (
-            <div className="p-5">
-              <div className="bg-white/4 border border-white/8 rounded-xl px-5 py-6 text-center mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/8 flex items-center justify-center mx-auto mb-3 text-white/60">
-                  {methods.find((m) => m.id === method)?.icon}
-                </div>
-                <p className="text-white/60 text-sm">
-                  לחצי על הכפתור להשלמת התשלום דרך Google Pay
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Credit Card form */}
-          {method === "card" && (
-            <div className="p-5 space-y-4">
+          <div className="p-5 space-y-4">
               <div>
                 <label className="text-white/50 text-xs block mb-1.5">מספר כרטיס</label>
                 <div className="relative">
@@ -347,8 +288,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
                   <p className="text-white/35 text-xs mt-0.5">4 ספרות אחרונות בלבד — לא מאוחסן מידע רגיש</p>
                 </div>
               </div>
-            </div>
-          )}
+          </div>
         </div>
 
         {/* Error */}

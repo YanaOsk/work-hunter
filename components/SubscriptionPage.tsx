@@ -39,6 +39,8 @@ export default function SubscriptionPage() {
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [confirmRemoveCard, setConfirmRemoveCard] = useState(false);
+  const [removingCard, setRemovingCard] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
@@ -54,6 +56,22 @@ export default function SubscriptionPage() {
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(null), 3500);
+  }
+
+  async function handleRemoveCard() {
+    setRemovingCard(true);
+    try {
+      const res = await fetch("/api/subscription", { method: "PATCH" });
+      if (res.ok) {
+        setSub((prev) => prev ? { ...prev, savedCard: undefined } : prev);
+        setConfirmRemoveCard(false);
+        showToast(he ? "הכרטיס הוסר — המנוי לא יתחדש אוטומטית" : "Card removed — subscription won't auto-renew");
+      }
+    } catch {
+      showToast(he ? "שגיאה — נסה שוב" : "Error — try again");
+    } finally {
+      setRemovingCard(false);
+    }
   }
 
   async function handleCancel() {
@@ -165,15 +183,34 @@ export default function SubscriptionPage() {
                     : `Auto-renews on ${formatDate(sub.expiryDate, he)}`}
                 </div>
               ) : null}
-              {sub.savedCard && (
-                <div className="flex items-center gap-3 text-sm text-white/60">
-                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                  {sub.savedCard.brand} ****{sub.savedCard.last4}
-                  {sub.savedCard.expiry && <span className="text-white/30">· {he ? "תוקף" : "exp"} {sub.savedCard.expiry}</span>}
+              {sub.savedCard ? (
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 text-sm text-white/60">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    {sub.savedCard.brand} ****{sub.savedCard.last4}
+                    {sub.savedCard.expiry && (
+                      <span className="text-white/30">· {he ? "תוקף" : "exp"} {sub.savedCard.expiry}</span>
+                    )}
+                  </div>
+                  {!sub.isLifetime && (
+                    <button
+                      onClick={() => setConfirmRemoveCard(true)}
+                      className="text-xs text-red-400/70 hover:text-red-300 transition shrink-0"
+                    >
+                      {he ? "הסר כרטיס" : "Remove card"}
+                    </button>
+                  )}
                 </div>
-              )}
+              ) : !sub.isLifetime ? (
+                <div className="flex items-center gap-3 text-sm text-amber-400/80">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>{he ? "אין כרטיס שמור — המנוי לא יתחדש" : "No saved card — won't auto-renew"}</span>
+                </div>
+              ) : null}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -223,6 +260,37 @@ export default function SubscriptionPage() {
                 className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition disabled:opacity-60"
               >
                 {cancelling ? "..." : (he ? "כן, בטל" : "Yes, cancel")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove card modal */}
+      {confirmRemoveCard && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <h3 className="text-white font-semibold text-lg mb-2">
+              {he ? "להסיר את הכרטיס?" : "Remove saved card?"}
+            </h3>
+            <p className="text-white/60 text-sm mb-5">
+              {he
+                ? "הכרטיס יוסר מהמערכת. המנוי יישאר פעיל עד סוף התקופה הנוכחית, אך לא יתחדש אוטומטית."
+                : "The card will be removed. Your subscription stays active until the end of the current period, but won't auto-renew."}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmRemoveCard(false)}
+                className="flex-1 py-2.5 rounded-xl border border-white/20 text-white/70 hover:text-white text-sm transition"
+              >
+                {he ? "ביטול" : "Cancel"}
+              </button>
+              <button
+                onClick={handleRemoveCard}
+                disabled={removingCard}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition disabled:opacity-60"
+              >
+                {removingCard ? "..." : (he ? "הסר כרטיס" : "Remove card")}
               </button>
             </div>
           </div>

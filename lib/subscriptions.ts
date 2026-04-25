@@ -83,6 +83,16 @@ export async function cancelSubscription(userEmail: string): Promise<void> {
   await db`DELETE FROM subscriptions WHERE user_email = ${userEmail.toLowerCase()}`;
 }
 
+/** Remove saved card only — subscription stays active until expiry, won't auto-renew */
+export async function removeCard(userEmail: string): Promise<void> {
+  const db = sql();
+  await db`
+    UPDATE subscriptions
+    SET card_last4 = NULL, card_expiry = NULL, card_brand = NULL
+    WHERE user_email = ${userEmail.toLowerCase()}
+  `;
+}
+
 export async function saveSubscription(
   userEmail: string,
   userName: string,
