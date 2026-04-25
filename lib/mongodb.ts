@@ -1,32 +1,23 @@
 import { MongoClient, Db } from "mongodb";
 
 declare global {
-  var _mongoClient: MongoClient | undefined;
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-function getClient(): MongoClient {
+const opts = { serverSelectionTimeoutMS: 5000, connectTimeoutMS: 5000 };
+
+function getClientPromise(): Promise<MongoClient> {
   const uri = process.env.MONGODB_URI;
   if (!uri) throw new Error("MONGODB_URI is not defined");
 
-  const opts = { serverSelectionTimeoutMS: 5000, connectTimeoutMS: 5000 };
-
-  if (process.env.NODE_ENV === "development") {
-    if (!global._mongoClient) {
-      global._mongoClient = new MongoClient(uri, opts);
-    }
-    return global._mongoClient;
+  // Reuse the same connection promise across all invocations (hot or cold)
+  if (!global._mongoClientPromise) {
+    global._mongoClientPromise = new MongoClient(uri, opts).connect();
   }
-
-  return new MongoClient(uri, opts);
+  return global._mongoClientPromise;
 }
 
-let _db: Db | null = null;
-
 export async function getDb(): Promise<Db> {
-  if (!_db) {
-    const client = getClient();
-    await client.connect();
-    _db = client.db("work-hunter");
-  }
-  return _db;
+  const client = await getClientPromise();
+  return client.db("work-hunter");
 }
