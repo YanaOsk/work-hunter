@@ -4,7 +4,12 @@ declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-const opts = { serverSelectionTimeoutMS: 5000, connectTimeoutMS: 5000 };
+const opts = {
+  serverSelectionTimeoutMS: 5000,
+  connectTimeoutMS: 5000,
+  tls: true,
+  tlsAllowInvalidCertificates: false,
+};
 
 function getClientPromise(): Promise<MongoClient> {
   const uri = process.env.MONGODB_URI;
