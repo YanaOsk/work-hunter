@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLanguage } from "@/components/LanguageProvider";
 import { t } from "@/lib/i18n";
 import WelcomeModal from "@/components/WelcomeModal";
@@ -21,6 +22,9 @@ const GoogleIcon = () => (
 function SignInContent() {
   const { lang } = useLanguage();
   const tx = t[lang];
+  const searchParams = useSearchParams();
+  // callbackUrl is set by NextAuth middleware when redirecting unauthenticated users
+  const callbackUrl = searchParams.get("callbackUrl") ?? undefined;
 
   const [tab, setTab] = useState<Tab>("signin");
   const [name, setName] = useState("");
@@ -71,7 +75,7 @@ function SignInContent() {
           setLoading(false);
           return;
         }
-        window.location.href = "/profile";
+        window.location.href = callbackUrl ?? "/profile";
       }
     } catch {
       setError(tx.authInvalidCreds);
@@ -114,7 +118,7 @@ function SignInContent() {
         <div className="bg-white/5 border border-white/10 rounded-3xl p-7 backdrop-blur-sm shadow-2xl shadow-black/30">
           {/* Google OAuth — always first, works for both sign in and register */}
           <button
-            onClick={() => signIn("google", { callbackUrl: "/auth/welcome" })}
+            onClick={() => signIn("google", { callbackUrl: callbackUrl ?? "/auth/welcome" })}
             className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-900 font-semibold px-5 py-3.5 rounded-xl transition shadow-sm mb-5"
           >
             <GoogleIcon />
