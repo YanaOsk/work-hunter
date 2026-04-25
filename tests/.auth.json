@@ -1,0 +1,53 @@
+{
+  "cookies": [
+    {
+      "name": "__Host-next-auth.csrf-token",
+      "value": "96fc8cbbaba6260a9f708814f9e24caffa65ca36367afcb0a30e0491b62d6bd8%7C80dcd2d5711259531a0e0ddbbdf45cf10532874ab85a33be10266cc5d3e62bfc",
+      "domain": "work-hunter-five.vercel.app",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__Secure-next-auth.callback-url",
+      "value": "https%3A%2F%2Fwork-hunter-five.vercel.app%2Fauth%2Fsignin",
+      "domain": "work-hunter-five.vercel.app",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__Secure-next-auth.session-token",
+      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..MGPztX0TP4bDTqiI.fp5VxhmHBzTXHTnKtY3e3Zl9jsndLmBoPX8uEJhTZQGeXW3g2IELg8gI_5HBd9PGFHqy1nO-CpV8stgyVkdONowL8-AHCJLaQFR9KNd7Czbxd2uOfvb1c-9J90D9C5tsrQj4Ksqt7SfgPtpA0QIg-NNhRfJ_Q_TTdY8Q4KMXHqPrn7Ans97FC2gSwRP1Mwx9dX0tKfdru12tGGO6jd-InLQ0en1Eu8CwSP8AyPp_kD9vDo-7KWpKDFM.k1HSqWDojhT7QGZpk8p3MQ",
+      "domain": "work-hunter-five.vercel.app",
+      "path": "/",
+      "expires": 1779721293.977572,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://work-hunter-five.vercel.app",
+      "localStorage": [
+        {
+          "name": "nextauth.message",
+          "value": "{\"event\":\"session\",\"data\":{\"trigger\":\"getSession\"},\"timestamp\":1777129291}"
+        },
+        {
+          "name": "wh_sess_ts",
+          "value": "1777129294163"
+        },
+        {
+          "name": "wh_sid",
+          "value": "216eb8bc-0894-44a4-bd76-9e96c9549af4"
+        }
+      ]
+    }
+  ]
+}

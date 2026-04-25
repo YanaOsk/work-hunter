@@ -23,6 +23,12 @@ function timeAgo(iso: string, he: boolean): string {
   return he ? `לפני ${Math.floor(days / 30)} חודשים` : `${Math.floor(days / 30)} months ago`;
 }
 
+function formatDate(iso: string, he: boolean): string {
+  return new Date(iso).toLocaleDateString(he ? "he-IL" : "en-US", {
+    day: "numeric", month: "long", year: "numeric",
+  });
+}
+
 export default function SubscriptionPage() {
   const { lang } = useLanguage();
   const he = lang === "he";
@@ -118,9 +124,16 @@ export default function SubscriptionPage() {
                 <p className={`text-2xl font-bold ${planMeta.iconCls}`}>
                   {he ? planMeta.nameHe : planMeta.nameEn}
                 </p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <div className="w-2 h-2 rounded-full bg-green-400" />
-                  <span className="text-green-400 text-sm font-medium">{he ? "פעיל" : "Active"}</span>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-green-400" />
+                    <span className="text-green-400 text-sm font-medium">{he ? "פעיל" : "Active"}</span>
+                  </div>
+                  {sub.isLifetime && (
+                    <span className="bg-purple-500/20 text-purple-300 text-xs font-semibold px-2 py-0.5 rounded-full border border-purple-500/30">
+                      {he ? "גישה לכל החיים" : "Lifetime"}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -131,9 +144,27 @@ export default function SubscriptionPage() {
                   <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  {he ? `פעיל מאז ${timeAgo(sub.purchasedAt, he)}` : `Active since ${timeAgo(sub.purchasedAt, he)}`}
+                  {he ? `נרכש ${timeAgo(sub.purchasedAt, he)}` : `Purchased ${timeAgo(sub.purchasedAt, he)}`}
                 </div>
               )}
+              {/* Renewal / Expiry info */}
+              {sub.isLifetime ? (
+                <div className="flex items-center gap-3 text-sm text-white/60">
+                  <svg className="w-4 h-4 flex-shrink-0 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-emerald-300">{he ? "לא פג תוקף — תשלום חד-פעמי" : "Never expires — one-time payment"}</span>
+                </div>
+              ) : sub.expiryDate ? (
+                <div className="flex items-center gap-3 text-sm text-white/60">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  {he
+                    ? `מתחדש אוטומטית ב-${formatDate(sub.expiryDate, he)}`
+                    : `Auto-renews on ${formatDate(sub.expiryDate, he)}`}
+                </div>
+              ) : null}
               {sub.savedCard && (
                 <div className="flex items-center gap-3 text-sm text-white/60">
                   <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,18 +177,22 @@ export default function SubscriptionPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/pricing"
-                className="flex-1 text-center py-2.5 rounded-xl border border-white/20 text-white/80 hover:text-white hover:border-white/40 text-sm font-medium transition"
-              >
-                {he ? "שנה תוכנית" : "Change plan"}
-              </Link>
-              <button
-                onClick={() => setConfirmCancel(true)}
-                className="flex-1 py-2.5 rounded-xl border border-red-500/30 text-red-400/80 hover:text-red-300 hover:border-red-500/50 hover:bg-red-500/5 text-sm font-medium transition"
-              >
-                {he ? "בטל מנוי" : "Cancel subscription"}
-              </button>
+              {!sub.isLifetime && (
+                <Link
+                  href="/pricing"
+                  className="flex-1 text-center py-2.5 rounded-xl border border-white/20 text-white/80 hover:text-white hover:border-white/40 text-sm font-medium transition"
+                >
+                  {he ? "שנה תוכנית" : "Change plan"}
+                </Link>
+              )}
+              {!sub.isLifetime && (
+                <button
+                  onClick={() => setConfirmCancel(true)}
+                  className="flex-1 py-2.5 rounded-xl border border-red-500/30 text-red-400/80 hover:text-red-300 hover:border-red-500/50 hover:bg-red-500/5 text-sm font-medium transition"
+                >
+                  {he ? "בטל חידוש אוטומטי" : "Cancel auto-renewal"}
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -168,12 +203,12 @@ export default function SubscriptionPage() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-slate-800 border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
             <h3 className="text-white font-semibold text-lg mb-2">
-              {he ? "לבטל את המנוי?" : "Cancel subscription?"}
+              {he ? "לבטל חידוש אוטומטי?" : "Cancel auto-renewal?"}
             </h3>
             <p className="text-white/60 text-sm mb-5">
               {he
-                ? "תאבד גישה לכל הפיצ'רים בתשלום. הביטול יכנס לתוקף מיד."
-                : "You'll lose access to all paid features immediately."}
+                ? "החידוש האוטומטי יבוטל. תשמור על הגישה עד סוף תקופת המנוי הנוכחית."
+                : "Auto-renewal will be cancelled. You keep access until the current period ends."}
             </p>
             <div className="flex gap-3">
               <button

@@ -9,6 +9,8 @@ export interface Plan {
   per?: string;
   featuresHe: string[];
   color: "slate" | "sky" | "purple" | "amber";
+  /** Days until renewal. null = lifetime (one-time purchase). undefined = free (no subscription). */
+  renewalDays?: number | null;
 }
 
 export const PLANS: Record<PlanId, Plan> = {
@@ -30,9 +32,10 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "weekly",
     nameEn: "Weekly",
     nameHe: "שבועי",
-    price: 49,
-    displayPrice: "₪49",
+    price: 25,
+    displayPrice: "₪25",
     per: "/ שבוע",
+    renewalDays: 7,
     featuresHe: [
       "שיחות יועץ AI ללא הגבלה",
       "בניית קורות חיים מלאה",
@@ -45,9 +48,10 @@ export const PLANS: Record<PlanId, Plan> = {
   "one-time": {
     id: "one-time",
     nameEn: "Career Boost",
-    nameHe: "Career Boost",
+    nameHe: "המסע המלא",
     price: 99,
     displayPrice: "₪99",
+    renewalDays: null, // lifetime — never expires
     featuresHe: [
       "ייעוץ קריירה מקיף וממוקד",
       "כתיבה מחדש של קורות חיים",
@@ -64,11 +68,12 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "pro",
     nameEn: "Pro",
     nameHe: "Pro",
-    price: 149,
-    displayPrice: "₪149",
+    price: 39,
+    displayPrice: "₪39",
     per: "/ חודש",
+    renewalDays: 90, // auto-renews every 3 months
     featuresHe: [
-      "כל מה שב-Career Boost",
+      "כל מה שב-המסע המלא",
       "התאמות משרה ללא הגבלה",
       "צ'ק-אין שבועי עם יועץ AI",
       "ראיונות מדומים ללא הגבלה",

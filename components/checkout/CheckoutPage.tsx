@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { PLANS, type PlanId, type Plan } from "@/lib/plans";
 import { queueAutoStart } from "@/lib/autoStart";
 
-type PayMethod = "apple" | "google" | "bit" | "card";
+type PayMethod = "google" | "card";
 
 interface CardState {
   number: string;
@@ -39,7 +39,6 @@ export default function CheckoutPage({ planId }: { planId: string }) {
 
   const [method, setMethod] = useState<PayMethod>("card");
   const [card, setCard] = useState<CardState>({ number: "", expiry: "", cvv: "", name: "" });
-  const [saveCard, setSaveCard] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -77,7 +76,8 @@ export default function CheckoutPage({ planId }: { planId: string }) {
     setError("");
     try {
       const body: Record<string, unknown> = { planId };
-      if (method === "card" && saveCard) {
+      // Always save card details when paying by card
+      if (method === "card" && digits.length >= 13) {
         body.saveCard = true;
         body.cardLast4 = digits.slice(-4);
         body.cardExpiry = card.expiry;
@@ -177,15 +177,6 @@ export default function CheckoutPage({ planId }: { planId: string }) {
 
   const methods: { id: PayMethod; label: string; icon: React.ReactNode }[] = [
     {
-      id: "apple",
-      label: "Apple Pay",
-      icon: (
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-        </svg>
-      ),
-    },
-    {
       id: "google",
       label: "Google Pay",
       icon: (
@@ -195,13 +186,6 @@ export default function CheckoutPage({ planId }: { planId: string }) {
           <path d="M12 21c2.42 0 4.44-.8 5.92-2.17l-2.97-2.31A6.97 6.97 0 0 1 12 17.5c-3.47 0-6.4-2.34-7.44-5.5L1.53 14.31A11 11 0 0 0 12 21z" fill="#34A853"/>
           <path d="M12 6c1.62 0 3.06.56 4.21 1.64l3.15-3.15A10.97 10.97 0 0 0 12 2 11 11 0 0 0 1.53 8.69L4.56 11C5.6 7.84 8.53 6 12 6z" fill="#EA4335"/>
         </svg>
-      ),
-    },
-    {
-      id: "bit",
-      label: "Bit",
-      icon: (
-        <span className="font-bold text-base leading-none">₿it</span>
       ),
     },
     {
@@ -215,7 +199,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
     },
   ];
 
-  const isInstantMethod = method === "apple" || method === "google" || method === "bit";
+  const isInstantMethod = method === "google";
 
   return (
     <div className="min-h-screen bg-[#0f0e1a] py-10 px-4" dir="rtl">
@@ -281,7 +265,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
             </div>
           </div>
 
-          {/* Apple / Google / Bit — one-tap simulation */}
+          {/* Google Pay — one-tap simulation */}
           {isInstantMethod && (
             <div className="p-5">
               <div className="bg-white/4 border border-white/8 rounded-xl px-5 py-6 text-center mb-4">
@@ -289,9 +273,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
                   {methods.find((m) => m.id === method)?.icon}
                 </div>
                 <p className="text-white/60 text-sm">
-                  {method === "apple" && "לחצי על הכפתור להשלמת התשלום דרך Apple Pay"}
-                  {method === "google" && "לחצי על הכפתור להשלמת התשלום דרך Google Pay"}
-                  {method === "bit" && "לחצי על הכפתור לפתיחת אפליקציית Bit לאישור התשלום"}
+                  לחצי על הכפתור להשלמת התשלום דרך Google Pay
                 </p>
               </div>
             </div>
@@ -356,24 +338,15 @@ export default function CheckoutPage({ planId }: { planId: string }) {
                 />
               </div>
 
-              <label className="flex items-start gap-3 cursor-pointer group">
-                <div
-                  onClick={() => setSaveCard((v) => !v)}
-                  className={`w-5 h-5 rounded-md border flex-shrink-0 mt-0.5 flex items-center justify-center transition ${
-                    saveCard ? "bg-purple-600 border-purple-600" : "border-white/20 bg-white/5 group-hover:border-white/40"
-                  }`}
-                >
-                  {saveCard && (
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </div>
-                <div onClick={() => setSaveCard((v) => !v)}>
-                  <p className="text-white/70 text-sm">שמור כרטיס לרכישות עתידיות</p>
+              <div className="flex items-start gap-3 bg-white/3 border border-white/8 rounded-xl px-4 py-3">
+                <svg className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <div>
+                  <p className="text-white/70 text-sm">הכרטיס נשמר לחידוש אוטומטי</p>
                   <p className="text-white/35 text-xs mt-0.5">4 ספרות אחרונות בלבד — לא מאוחסן מידע רגיש</p>
                 </div>
-              </label>
+              </div>
             </div>
           )}
         </div>

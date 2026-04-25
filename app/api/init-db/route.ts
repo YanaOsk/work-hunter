@@ -32,11 +32,14 @@ export async function GET() {
         user_name TEXT NOT NULL,
         plan TEXT NOT NULL,
         purchased_at TEXT NOT NULL,
+        expiry_date TEXT,
         card_last4 TEXT,
         card_expiry TEXT,
         card_brand TEXT
       )
     `;
+    // Migration: add expiry_date to existing tables that don't have it yet
+    await db`ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS expiry_date TEXT`;
 
     await db`
       CREATE TABLE IF NOT EXISTS analytics_events (
