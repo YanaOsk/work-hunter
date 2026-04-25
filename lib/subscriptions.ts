@@ -27,6 +27,8 @@ function calcExpiryDate(plan: string, from: Date): Date | null {
 
 export async function getSubscription(userEmail: string): Promise<Subscription | null> {
   const db = sql();
+  // Ensure expiry_date column exists (no-op if already present)
+  await db`ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS expiry_date TEXT`;
   const rows = await db`
     SELECT user_email, user_name, plan, purchased_at, expiry_date, card_last4, card_expiry, card_brand
     FROM subscriptions WHERE user_email = ${userEmail.toLowerCase()}
@@ -103,6 +105,9 @@ export async function saveSubscription(
   const lowerEmail = userEmail.toLowerCase();
   const now = new Date();
   const expiryDate = calcExpiryDate(plan, now);
+
+  // Ensure expiry_date column exists (no-op if already present)
+  await db`ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS expiry_date TEXT`;
 
   await db`
     INSERT INTO subscriptions

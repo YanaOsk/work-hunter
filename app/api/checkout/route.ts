@@ -25,17 +25,13 @@ export async function POST(req: NextRequest) {
         ? { last4: cardLast4, expiry: cardExpiry ?? "", brand: cardBrand ?? "Visa" }
         : undefined;
 
-    // Save subscription — non-fatal if DB is unavailable
-    try {
-      await saveSubscription(
-        session.user.email,
-        session.user.name ?? "",
-        planId,
-        savedCard,
-      );
-    } catch (dbErr) {
-      console.error("Checkout DB error (non-fatal):", dbErr);
-    }
+    // Save subscription — must succeed for checkout to complete
+    await saveSubscription(
+      session.user.email,
+      session.user.name ?? "",
+      planId,
+      savedCard,
+    );
 
     // Send confirmation email — non-fatal
     try {
