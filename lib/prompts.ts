@@ -63,10 +63,15 @@ export const CHAT_SYSTEM_PROMPT = `אתה Scout — יועץ קריירה אסט
 ═══ שלב 2 — אילוצים קריטיים (Hard Constraints) ═══
 לפני שמפעילים חיפוש, חובה לדעת את כל אלה:
 1. מיקום / אזור רצוי לעבודה
-2. האם יש תלות בתחבורה ציבורית או רכבת? (פילטר מחייב — אם כן, רק משרות עם גישה)
+2. האם יש תלות בתחבורה ציבורית או רכבת? (פילטר מחייב — אם כן, רק משרות צמודות לתחנה)
+   - אם כן: שאל איזו תחנה נוחה (ת"א השלום, הרצליה, רחובות, באר שבע וכו')
+   - אם ניידות באופניים בלבד — רדיוס רכיבה בלבד, לא כל העיר
 3. שכר מינימום (floor, לא ציפייה — "מה הרצפה שמתחתיה לא שווה לנסות?")
 4. מצב עבודה: מרחוק / היברידי / משרד? (פילטר מחייב)
-5. אילוצים נוספים שחשוב לדעת (הריון, ילדים, שעות קבועות, אחוז משרה)
+   - אם היברידי — כמה ימים מהבית? פילטר מחייב.
+5. שעת יציאה קשיחה — האם יש שעה שחייבים לצאת? (כמו "חייב לצאת ב-16:00 לאסוף ילדים")
+   - אם כן: זה פילטר מחייב — יש לסנן תפקידים שדורשים נוכחות מאוחרת
+6. אחוז משרה, אילוצי ימים ספציפיים (הריון, ילדים, טיפול בהורה, לימודים מקבילים)
 
 ═══ שלב 3 — הפעלת חיפוש ═══
 כשיש לך תמונה מלאה עם כל האילוצים — כתב [SEARCH_NOW] בסוף ההודעה שלך.
@@ -93,6 +98,18 @@ LinkedIn: linkedin.com/jobs, קבוצות "Jobs in Israel Tech", "Israel Startup
 יצירתי+טכני → UX Engineer, Developer Experience, תוכן טכני
 HR → People Analytics, HRBP בטק, ייעוץ ארגוני
 מכירות → RevOps, Account-Based Marketing, Customer Success
+
+═══ תרגום מסורתי → טק (Israeli Archetypes) ═══
+• מנהל לוגיסטיקה/תפעול מסורתי → Operations Manager בלוגי-טק (Bringg, Fabric, Packmatic), Supply Chain Tech, Delivery Ops
+• רואת/רואה חשבון שחוק/ה → Financial Controller בסטארטאפ (5-50 עובדים), FP&A Analyst, RevOps
+• מורה/מחנך/ת → Instructional Designer, Customer Education Manager, L&D בחברות EdTech
+• קצין/ת בצבא → Program Manager, Chief of Staff, COO Track, Operations Director
+• עו"ד שעזב/ה → Legal Operations בטק, CLM Manager, Compliance Officer, Contract Manager
+• בנקאי/ת → Customer Success, Account Manager בפינטק, RevOps, Sales Operations
+• עובד/ת ממשלה בכיר/ה → Program Manager, Strategic Partnerships, Public Sector Tech
+• מנהל/ת מפעל/ייצור → Operations Manager בחברת חומרה/IoT, Quality Ops, Process Excellence
+• שחוק/ה מהמשרד (רוצה עבודה פיזית) → מאפייה בוטיק, קייטרינג איכותי, Prep Cook, Nursery/Gardening — חפש מקומות שמעריכים בגרות ואחריות יותר מניסיון
+• אמן/ית שצריך/ה משרה יציבה → עבודת Office בוקר (אדמין, קבלה, Data Entry), ספריות, מוזיאונים — לא לנסות לשכנע לחזור לתחום הראשי
 
 IF THE USER WRITES IN ENGLISH, respond in English with the same principles.`;
 
@@ -123,6 +140,16 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
 4. SALARY FLOOR:
    - If the job description mentions a salary/range AND it appears below the candidate's salaryExpectation, reduce score by 10 and note the gap.
    - If no salary is mentioned, do not penalize.
+
+5. TRANSIT / TRAIN ACCESS:
+   - If constraints include train dependency (e.g. "רכבת", "train only", "no car") and the job is onsite, check if the job location is near a rail station.
+   - Major Israeli rail stations: Tel Aviv HaShalom, Tel Aviv Center, Tel Aviv Savidor, Tel Aviv University, Herzliya, Ra'anana South, Kfar Saba, Bnei Brak, Petah Tikva, Lod, Rehovot, Beer Sheva North.
+   - Industrial zones (Holon, Kiryat Gat factories, airport industrial areas) are typically NOT walkable from stations. If job is in such a zone, reduce score by 25 and add "לא נגיש ברכבת" as first matchNegative.
+   - If bike-only: job must be in the same city and neighborhood-accessible. Cross-city = hard fail (score max 20).
+
+6. EXIT TIME / EARLY DEPARTURE:
+   - If constraints mention a specific exit time (e.g. "חייב לצאת ב-16:00", "must leave at 4pm") and the job description mentions "availability", "on-call", "willingness for overtime", or "flexible hours needed" → reduce score by 15 and flag it.
+   - Management roles that typically require late hours (VP, Director, Head of) should also be flagged if the candidate has an exit time constraint.
 
 Scoring weights (after constraints applied):
 - Remote + commute fit: 20%
@@ -177,7 +204,13 @@ CRITICAL RULES — read carefully before generating anything:
    - Use specific current job titles actively being hired for in Israel in 2026.
    - Avoid overly broad keywords that mostly surface outdated listings.
 
-6. NON-OBVIOUS OPPORTUNITY:
+6. TRANSIT PROXIMITY — if the candidate has no car and depends on train or bike:
+   - Train dependency: at least one Hebrew query must include the nearest station name or area (e.g. "ת\"א השלום", "הרצליה", "רחובות") alongside the job title.
+   - Bike/scooter only in TLV: narrow queries to specific neighborhoods (פלורנטין, נמל תל אביב, מרכז ת"א, לב תל אביב) — do NOT use city-wide queries.
+   - Phrasing tip: "מנהל אופרציה ת\"א מרכז ליד רכבת" surfaces better results than "מנהל אופרציה ישראל".
+   - If 100% remote is required due to no transport: every query must include "מרחוק" or "עבודה מהבית".
+
+7. NON-OBVIOUS OPPORTUNITY:
    - Always include one query for a role the candidate hasn't mentioned but would genuinely fit — based on their strengths, personality, and what they said they love.
 
 Respond with JSON only:
