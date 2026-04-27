@@ -230,6 +230,27 @@ export default function Home() {
     let streamStarted = false;
     const capturedProfile = state.userProfile;
 
+    // Enrich profile from Scout conversation in parallel with job search
+    (async () => {
+      try {
+        const fd = new FormData();
+        fd.append("freeText", context);
+        const res = await fetch("/api/parse-cv", { method: "POST", body: fd });
+        if (!res.ok) return;
+        const parsed = await res.json();
+        if (parsed?.parsedData && Object.keys(parsed.parsedData).length > 0) {
+          const enriched: UserProfile = {
+            rawText: context,
+            parsedData: { ...(capturedProfile?.parsedData ?? {}), ...parsed.parsedData },
+            missingFields: parsed.missingFields ?? capturedProfile?.missingFields ?? [],
+            clarifyingQuestions: parsed.clarifyingQuestions ?? capturedProfile?.clarifyingQuestions ?? [],
+          };
+          setState((s) => ({ ...s, userProfile: enriched }));
+          saveProfile(enriched);
+        }
+      } catch {}
+    })();
+
     try {
       const res = await fetch("/api/search-jobs", {
         method: "POST",
