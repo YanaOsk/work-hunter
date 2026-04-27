@@ -311,7 +311,7 @@ export default function Home() {
       return (
         <InterviewPhase
           userProfile={state.userProfile!}
-          onComplete={(ctx, msgs, convId) => handleInterviewComplete(ctx, msgs, convId)}
+          onComplete={(ctx: string, msgs: Array<{ role: "user" | "assistant"; content: string }>, convId?: string) => handleInterviewComplete(ctx, msgs, convId)}
           onBack={() => {
             setState((s) => ({ ...s, phase: "upload", userProfile: null }));
             setResumeConv(null);
