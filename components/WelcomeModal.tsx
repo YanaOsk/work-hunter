@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useLanguage } from "./LanguageProvider";
 import { getOrCreateAdvisorState, DEFAULT_ADVISOR_ID } from "@/lib/advisorState";
+import { queueAutoStart } from "@/lib/autoStart";
 import type { AppMode } from "@/lib/types";
 
 interface Props {
@@ -27,12 +28,13 @@ export default function WelcomeModal({ userName, userEmail }: Props) {
       getOrCreateAdvisorState(DEFAULT_ADVISOR_ID, emptyProfile);
       router.push(`/advisor?profileId=${DEFAULT_ADVISOR_ID}`);
     } else {
+      queueAutoStart("jobs");
       router.push("/");
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0a091a]/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
 
         {/* Header */}

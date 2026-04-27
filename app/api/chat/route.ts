@@ -51,12 +51,13 @@ export async function POST(request: NextRequest) {
       ? `חוקי שפה — חובה לקיים:
 1. עברית יומיומית בלבד — כמו הודעת WhatsApp, לא מכתב.
 2. תגובה קצרה: 1-3 משפטים. שאלה אחת בסוף, לא יותר.
-3. מילים אסורות: "בהחלט", "כמובן", "אשמח", "בוודאי", "על מנת ל", "כמו כן", "יש לציין", "הינו", "בהתאם ל", "לאור האמור".
+3. מילים אסורות: "בהחלט", "כמובן", "אשמח", "בוודאי", "על מנת ל", "כמו כן", "יש לציין", "הינו", "בהתאם ל", "לאור האמור", "נשמע".
 4. ${genderRule}
-5. ניסוחים מותרים: "אוקיי", "נשמע", "מעניין", "אז", "רגע" — עברית חיה.
+5. אסור להתחיל תשובה במילה "נשמע" — זה נשמע רובוטי ושחוק. תגיב ישירות לתוכן.
+   ניסוחים מותרים לפתיחה: "אוקיי", "מעניין", "אז", "רגע", "הבנתי", "יופי" — אבל עדיף לפתוח ישר בתגובה.
 
-דוגמה טובה: "נשמע. Full Stack עם ניסיון בענן — מעניין. ${searchExample}"
-דוגמה רעה: "בהחלט! לאור המידע שסיפרת אשמח לדעת מה האזור הגיאוגרפי המועדף עליך לעבודה?"`
+דוגמה טובה: "Full Stack עם ניסיון בענן — מעניין. ${searchExample}"
+דוגמה רעה: "נשמע! לאור המידע שסיפרת אשמח לדעת מה האזור הגיאוגרפי המועדף עליך לעבודה?"`
       : "Respond in English only. Keep answers short — 1-3 sentences. One question at a time.";
 
     const rawIntro = (userProfile as Record<string, unknown>)?.rawText as string | undefined;
@@ -83,6 +84,10 @@ Missing information: ${JSON.stringify(userProfile?.missingFields || [])}`;
     const cleanMessage = agentResponse
       .replace("[SEARCH_NOW]", "")
       .replace("[READY_TO_SEARCH]", "")
+      .trim()
+      // Strip leading "נשמע" openers that Gemini insists on adding
+      .replace(/^נשמע[.,!،]?\s*/u, "")
+      .replace(/^נשמע\s+/u, "")
       .trim();
 
     return NextResponse.json({ message: cleanMessage, readyToSearch: shouldSearch });
