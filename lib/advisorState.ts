@@ -74,6 +74,42 @@ export function clearAdvisorState(profileId: string): void {
   localStorage.removeItem(`${STORAGE_KEY}_${profileId}`);
 }
 
+// ── Archive ──────────────────────────────────────────────────────────────────
+
+export interface ArchivedAdvisorSession {
+  id: string;
+  archivedAt: string;
+  snapshot: AdvisorState;
+}
+
+const ARCHIVE_KEY = "work_hunter_advisor_archive";
+
+export function getAdvisorArchive(profileId: string): ArchivedAdvisorSession[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(`${ARCHIVE_KEY}_${profileId}`);
+    if (!raw) return [];
+    return JSON.parse(raw) as ArchivedAdvisorSession[];
+  } catch {
+    return [];
+  }
+}
+
+export function archiveAdvisorState(profileId: string): void {
+  if (typeof window === "undefined") return;
+  const current = getAdvisorState(profileId);
+  if (!current) return;
+  const archive = getAdvisorArchive(profileId);
+  archive.unshift({
+    id: `${Date.now()}`,
+    archivedAt: new Date().toISOString(),
+    snapshot: current,
+  });
+  // Keep at most 10 past sessions
+  localStorage.setItem(`${ARCHIVE_KEY}_${profileId}`, JSON.stringify(archive.slice(0, 10)));
+  clearAdvisorState(profileId);
+}
+
 export function migrateGuestToUser(guestId: string, userId: string): void {
   if (typeof window === "undefined") return;
   const userKey = `${STORAGE_KEY}_${userId}`;
