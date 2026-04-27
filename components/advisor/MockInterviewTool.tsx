@@ -172,7 +172,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
 
   if (stage === "role") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-6">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 p-6">
         <div className="max-w-2xl mx-auto">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">
             {tx.backToAdvisor}
@@ -211,7 +211,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
 
   if (stage === "fetching-feedback") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center p-6">
         <div className="text-center">
           <svg className="animate-spin w-10 h-10 text-purple-400 mx-auto mb-4" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -227,7 +227,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
 
   if (stage === "done" && feedbackText) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-6">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 p-6">
         <div className="max-w-3xl mx-auto">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">
             {tx.backToAdvisor}
@@ -264,7 +264,7 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex flex-col">
       <div className="p-6 border-b border-white/10">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm">

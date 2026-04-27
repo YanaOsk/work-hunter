@@ -5,26 +5,17 @@ import { authOptions } from "@/lib/auth";
 import { geminiChat } from "@/lib/gemini";
 import { CHAT_SYSTEM_PROMPT } from "@/lib/prompts";
 import { ChatMessage } from "@/lib/types";
-import { runJobSearch, generateHiddenMarket } from "@/lib/jobSearch";
 
-// Build a compact profile summary from conversation history for the search engine
-function buildProfileFromConversation(
-  messages: ChatMessage[],
-  userProfile: Record<string, unknown>
-): string {
-  const parsedData = (userProfile?.parsedData as Record<string, unknown>) ?? {};
-  const rawText = (userProfile?.rawText as string) ?? "";
-
-  const conversationSummary = messages
-    .slice(-12) // last 12 messages — enough context, not too much
-    .map((m) => `${m.role === "user" ? "מועמד" : "Scout"}: ${m.content}`)
-    .join("\n");
-
-  return JSON.stringify({
-    ...parsedData,
-    rawIntro: rawText,
-    conversationContext: conversationSummary,
-  });
+function detectGender(messages: ChatMessage[], parsedData: Record<string, unknown>): "female" | "male" | "unknown" {
+  if (parsedData.pregnancyWeek) return "female";
+  const userText = messages
+    .filter((m) => m.role === "user")
+    .map((m) => m.content)
+    .join(" ");
+  if (/\bאני (מחפשת|עובדת|מנהלת|גרה|נשואה|גרושה|רווקה|אמא|עצמאית|פרילנסרית|מועמדת)\b/.test(userText)) return "female";
+  if (/\bבהריון\b/.test(userText)) return "female";
+  if (/\bאני (מחפש|עובד|מנהל|גר|נשוי|גרוש|רווק|אבא|עצמאי|פרילנסר|מועמד)\b/.test(userText)) return "male";
+  return "unknown";
 }
 
 export async function POST(request: NextRequest) {
@@ -41,9 +32,32 @@ export async function POST(request: NextRequest) {
       lang?: string;
     };
 
+    const parsedData = (userProfile?.parsedData as Record<string, unknown>) || {};
+    const gender = detectGender(messages, parsedData);
+
+    const genderRule = gender === "female"
+      ? 'פנה למשתמש בלשון נקבה: "את", "שלך", "אותך", "את מחפשת", "מה מדליק אותך".'
+      : gender === "male"
+      ? 'פנה למשתמש בלשון זכר: "אתה", "שלך", "אותך", "אתה מחפש", "מה מדליק אותך".'
+      : 'פנה בלשון רבים ניטרלית: "אתכם", "שלכם", "מה מדליק אתכם" — אסור לוכסנים ("בחר/י", "את/ה").';
+
+    const searchExample = gender === "female"
+      ? "לאיזה אזור את מחפשת?"
+      : gender === "male"
+      ? "לאיזה אזור אתה מחפש?"
+      : "לאיזה אזור אתם מחפשים?";
+
     const langInstruction = lang === "he"
-      ? "השב בעברית בלבד. אל תשתמש בלוכסנים (כגון בחר/י) — השתמש בניסוחים ניטרליים."
-      : "Respond in English only.";
+      ? `חוקי שפה — חובה לקיים:
+1. עברית יומיומית בלבד — כמו הודעת WhatsApp, לא מכתב.
+2. תגובה קצרה: 1-3 משפטים. שאלה אחת בסוף, לא יותר.
+3. מילים אסורות: "בהחלט", "כמובן", "אשמח", "בוודאי", "על מנת ל", "כמו כן", "יש לציין", "הינו", "בהתאם ל", "לאור האמור".
+4. ${genderRule}
+5. ניסוחים מותרים: "אוקיי", "נשמע", "מעניין", "אז", "רגע" — עברית חיה.
+
+דוגמה טובה: "נשמע. Full Stack עם ניסיון בענן — מעניין. ${searchExample}"
+דוגמה רעה: "בהחלט! לאור המידע שסיפרת אשמח לדעת מה האזור הגיאוגרפי המועדף עליך לעבודה?"`
+      : "Respond in English only. Keep answers short — 1-3 sentences. One question at a time.";
 
     const rawIntro = (userProfile as Record<string, unknown>)?.rawText as string | undefined;
 
@@ -52,61 +66,28 @@ export async function POST(request: NextRequest) {
 ${langInstruction}
 
 Current user profile (what we know so far):
-${JSON.stringify(userProfile?.parsedData || {}, null, 2)}
+${JSON.stringify(parsedData, null, 2)}
 
 ${rawIntro ? `Original intro from the user:\n"${rawIntro}"\n` : ""}
 Missing information: ${JSON.stringify(userProfile?.missingFields || [])}`;
 
     const history = messages
-      .map((m) => `${m.role === "user" ? "User" : "Scout"}: ${m.content}`)
+      .map((m) => `${m.role === "user" ? "משתמש" : "Scout"}: ${m.content}`)
       .join("\n\n");
 
     const prompt = `${history}\n\nScout:`;
 
     const agentResponse = await geminiChat(prompt, systemWithContext, 1200);
 
-    // Detect search signal
     const shouldSearch = agentResponse.includes("[SEARCH_NOW]") || agentResponse.includes("[READY_TO_SEARCH]");
     const cleanMessage = agentResponse
       .replace("[SEARCH_NOW]", "")
       .replace("[READY_TO_SEARCH]", "")
       .trim();
 
-    if (!shouldSearch) {
-      return NextResponse.json({ message: cleanMessage, readyToSearch: false });
-    }
-
-    // Build full profile from conversation and run the search
-    const profileText = buildProfileFromConversation(messages, userProfile);
-
-    let jobs = [];
-    let demoMode = false;
-    let hiddenMarket = null;
-
-    try {
-      const result = await runJobSearch(profileText);
-      jobs = result.jobs;
-      demoMode = result.demoMode;
-
-      // If fewer than 3 good matches (score ≥ 60), supplement with hidden market strategy
-      const goodMatches = jobs.filter((j) => j.matchScore >= 60);
-      if (goodMatches.length < 3) {
-        hiddenMarket = await generateHiddenMarket(profileText, lang ?? "he");
-      }
-    } catch {
-      // Search failed — still return the message, no jobs
-      return NextResponse.json({ message: cleanMessage, readyToSearch: true, jobs: [], demoMode: false, hiddenMarket: null });
-    }
-
-    return NextResponse.json({
-      message: cleanMessage,
-      readyToSearch: true,
-      jobs,
-      demoMode,
-      hiddenMarket,
-    });
+    return NextResponse.json({ message: cleanMessage, readyToSearch: shouldSearch });
   } catch (error) {
     console.error("chat error:", error);
-    return NextResponse.json({ error: "Chat failed. Check your GROQ_API_KEY." }, { status: 500 });
+    return NextResponse.json({ error: "Chat failed. Check your GEMINI_API_KEY." }, { status: 500 });
   }
 }

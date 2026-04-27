@@ -22,7 +22,7 @@ export default function SearchingPhase() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center">
       <div className="text-center max-w-md px-4">
         <div className="relative w-24 h-24 mx-auto mb-10">
           <div className="absolute inset-0 rounded-full bg-purple-600 animate-ping opacity-20" />

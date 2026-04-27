@@ -32,7 +32,7 @@ You should see your files on github.com now.
 2. Click "Import Git Repository" and pick `work-hunter`
 3. Vercel auto-detects it as a Next.js project. Leave the defaults.
 4. Open **"Environment Variables"** and add:
-   - `GROQ_API_KEY` = your Groq key (copy from your local `.env.local`)
+   - `GEMINI_API_KEY` = your Gemini key (copy from your local `.env.local`)
    - `SERPER_API_KEY` = your Serper key (copy from your local `.env.local`)
 5. Click **Deploy**. Takes about 60–90 seconds.
 

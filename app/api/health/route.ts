@@ -10,7 +10,7 @@ export async function GET() {
   checks.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET ? "✅" : "❌ missing";
   checks.GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ? "✅" : "❌ missing";
   checks.GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ? "✅" : "❌ missing";
-  checks.GROQ_API_KEY = process.env.GROQ_API_KEY ? "✅" : "❌ missing";
+  checks.GEMINI_API_KEY = process.env.GEMINI_API_KEY ? "✅" : "❌ missing";
   checks.SERPER_API_KEY = process.env.SERPER_API_KEY ? "✅" : "❌ missing (demo mode)";
   checks.DATABASE_URL = process.env.DATABASE_URL ? "✅" : "❌ missing";
   checks.NODE_ENV = process.env.NODE_ENV ?? "unknown";
@@ -28,15 +28,15 @@ export async function GET() {
     checks.postgres = `❌ ${e instanceof Error ? e.message.slice(0, 120) : "failed"}`;
   }
 
-  // Groq test
+  // Gemini test
   try {
-    if (!process.env.GROQ_API_KEY) throw new Error("no key");
-    const res = await fetch("https://api.groq.com/openai/v1/models", {
-      headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
-    });
-    checks.groq = res.ok ? "✅ reachable" : `❌ status ${res.status}`;
+    if (!process.env.GEMINI_API_KEY) throw new Error("no key");
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`
+    );
+    checks.gemini = res.ok ? "✅ reachable" : `❌ status ${res.status}`;
   } catch (e: unknown) {
-    checks.groq = `❌ ${e instanceof Error ? e.message : "failed"}`;
+    checks.gemini = `❌ ${e instanceof Error ? e.message : "failed"}`;
   }
 
   return NextResponse.json(checks, { status: 200 });

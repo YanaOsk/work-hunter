@@ -92,6 +92,66 @@ export async function deleteConversation(userId: string, id: string): Promise<bo
   return rows.length > 0;
 }
 
+export async function updateConversation(
+  userId: string,
+  id: string,
+  messages: ConversationMessage[],
+  jobs: JobResult[] = [],
+  searchContext?: string,
+  title?: string
+): Promise<void> {
+  const db = sql();
+  const jobSnaps = jobs.slice(0, 10).map(toJobSnap);
+  await db`
+    UPDATE conversations
+    SET
+      message_count = ${messages.length},
+      messages      = ${JSON.stringify(messages)},
+      jobs          = ${JSON.stringify(jobSnaps)},
+      search_context = COALESCE(${searchContext ?? null}, search_context),
+      title          = COALESCE(${title ?? null}, title)
+    WHERE id = ${id} AND user_id = ${userId}
+  `;
+}
+
+export async function generateConversationTitle(
+  messages: ConversationMessage[],
+  jobs: { title: string }[],
+  searchContext: string
+): Promise<string> {
+  try {
+    const { geminiGenerate } = await import("@/lib/gemini");
+
+    const contextSnippet = searchContext
+      ? searchContext.slice(0, 1200)
+      : messages
+          .slice(0, 8)
+          .map((m) => `${m.role === "user" ? "משתמש" : "Scout"}: ${m.content.slice(0, 200)}`)
+          .join("\n");
+
+    const topJobs = jobs.slice(0, 3).map((j) => j.title).join(", ");
+
+    const prompt = `כתוב כותרת קצרה בעברית (3-6 מילים) לשיחת חיפוש עבודה זו.
+
+שיחה:
+${contextSnippet}
+
+משרות שנמצאו: ${topJobs || "לא נמצאו"}
+
+כתוב רק את הכותרת, בלי הסבר ובלי מירכאות. למשל: "מפתח Full Stack תל אביב", "מנהלת מוצר היברידי".`;
+
+    const title = (await geminiGenerate(prompt, undefined, 30)).trim().replace(/^["'״]|["'״]$/g, "");
+    if (title && title.length <= 80) return title;
+  } catch {
+    // fall through
+  }
+
+  if (jobs.length > 0) return jobs.slice(0, 2).map((j) => j.title).join(" · ");
+  const roleMatch = searchContext?.match(/(?:role|תפקיד|עובד כ|אני )[\s:]*([\w\s]{3,25})/i);
+  if (roleMatch) return roleMatch[1].trim();
+  return "שיחה עם Scout";
+}
+
 export async function listConversations(userId: string): Promise<ConversationPreview[]> {
   const db = sql();
   const rows = await db`

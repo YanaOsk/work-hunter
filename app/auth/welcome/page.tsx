@@ -42,14 +42,14 @@ export default function WelcomePage() {
 
   if (state === "loading" || state === "redirecting") {
     return (
-      <div className="min-h-screen bg-[#0f0e1a] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0e1a]">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
       <WelcomeModal
         userName={session?.user?.name ?? ""}
         userEmail={session?.user?.email ?? ""}

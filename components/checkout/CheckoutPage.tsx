@@ -52,7 +52,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
 
   if (status === "loading" || !session) {
     return (
-      <div className="min-h-screen bg-[#0f0e1a] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -60,7 +60,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
 
   if (!plan) {
     return (
-      <div className="min-h-screen bg-[#0f0e1a] flex flex-col items-center justify-center gap-4 text-white">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex flex-col items-center justify-center gap-4 text-white">
         <p className="text-lg">מסלול לא נמצא</p>
         <button onClick={() => router.push("/pricing")} className="text-purple-400 hover:text-purple-300 transition">
           חזרה לתמחור
@@ -104,7 +104,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#0f0e1a] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center px-4">
         <div className="max-w-lg w-full text-center">
           {/* Confirmation badge */}
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-green-400 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30">
@@ -176,7 +176,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
       : `${plan.displayPrice}${plan.per ? ` ${plan.per}` : ""}`;
 
   return (
-    <div className="min-h-screen bg-[#0f0e1a] py-10 px-4" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 py-10 px-4" dir="rtl">
       <div className="max-w-lg mx-auto space-y-5">
 
         {/* Header */}
@@ -290,7 +290,10 @@ export default function CheckoutPage({ planId }: { planId: string }) {
                   placeholder="ישראל ישראלי"
                   value={card.name}
                   ref={nameRef}
-                  onChange={(e) => setCard((c) => ({ ...c, name: e.target.value }))}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^a-zA-Zא-ת\s'-]/g, "");
+                    setCard((c) => ({ ...c, name: val }));
+                  }}
                   className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-3 text-white placeholder-white/20 text-sm focus:outline-none focus:border-purple-500/60 transition"
                 />
               </div>

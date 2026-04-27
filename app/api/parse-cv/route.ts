@@ -53,8 +53,7 @@ export async function POST(request: NextRequest) {
       true
     );
 
-    const clean = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    const parsed = JSON.parse(clean);
+    const parsed = JSON.parse(responseText);
 
     // Ensure array fields are always real arrays of primitives
     if (Array.isArray(parsed.clarifyingQuestions)) {

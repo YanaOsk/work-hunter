@@ -120,7 +120,7 @@ export default function JourneyMap({
   const progressPct = isDone ? 100 : Math.round((completedCount / STAGE_ORDER.length) * 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950/60 to-slate-900 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 p-4 md:p-6">
       <div className="max-w-3xl mx-auto">
         {/* Top bar */}
         <div className="flex items-center justify-between mb-8">

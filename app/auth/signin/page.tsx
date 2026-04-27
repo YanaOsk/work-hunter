@@ -41,9 +41,21 @@ function SignInContent() {
     setError("");
   };
 
+  const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!EMAIL_RE.test(email)) {
+      setError(lang === "he" ? "כתובת מייל לא תקינה" : "Invalid email address");
+      return;
+    }
+    if (tab === "register" && password.length < 8) {
+      setError(lang === "he" ? "הסיסמה חייבת להכיל לפחות 8 תווים" : "Password must be at least 8 characters");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -167,7 +179,7 @@ function SignInContent() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setError(""); }}
               placeholder={tx.authEmailPh}
               required
               autoComplete={tab === "register" ? "email" : "username"}
@@ -176,10 +188,10 @@ function SignInContent() {
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); setError(""); }}
               placeholder={tab === "register" ? tx.authPasswordRegPh : tx.authPasswordPh}
               required
-              minLength={6}
+              minLength={tab === "register" ? 8 : 1}
               autoComplete={tab === "register" ? "new-password" : "current-password"}
               className="w-full bg-white/5 border border-white/15 focus:border-purple-500 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none text-sm transition"
             />

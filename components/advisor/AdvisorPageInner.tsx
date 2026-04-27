@@ -89,7 +89,7 @@ export default function AdvisorPageInner() {
   }, [session?.user?.email, profileId]);
 
   if (!advisorState || !profileId) {
-    return <div className="min-h-screen bg-slate-900" />;
+    return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
   }
 
   const persist = (next: AdvisorState) => {

@@ -83,7 +83,7 @@ export default function AdvisorChat({ advisorState, onBack, onUpdate }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex flex-col">
       <div className="p-6 border-b border-white/10">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm">

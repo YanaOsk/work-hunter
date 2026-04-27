@@ -1,8 +1,11 @@
 "use client";
 
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AdvisorState, LifePath } from "@/lib/types";
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
+import { queueAutoStart, queueAdvisorScoutContext } from "@/lib/autoStart";
 
 interface Props {
   advisorState: AdvisorState;
@@ -13,24 +16,106 @@ interface Props {
 
 export default function SummaryView({ advisorState, onBack, onOpenInterview, onExit }: Props) {
   const { lang } = useLanguage();
+  const router = useRouter();
   const tx = t[lang];
   const { diagnosis, direction, cvReview, strategy, chosenPath, userProfile } = advisorState;
   const name = userProfile.parsedData?.name || "";
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    const wrapper = contentRef.current;
+    if (!wrapper || downloading) return;
+    setDownloading(true);
+    try {
+      const { toCanvas } = await import("html-to-image");
+      const { jsPDF } = await import("jspdf");
+
+      const hidden = Array.from(wrapper.querySelectorAll<HTMLElement>("[data-no-pdf]"));
+      hidden.forEach((el) => (el.style.display = "none"));
+
+      const canvas = await toCanvas(wrapper, {
+        pixelRatio: 2,
+        backgroundColor: "#0f172a",
+        skipFonts: false,
+      });
+
+      hidden.forEach((el) => el.style.removeProperty("display"));
+
+      if (canvas.width === 0 || canvas.height === 0) throw new Error("Canvas is empty");
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+      const pageW = 210;
+      const pageH = 297;
+      const ratio = pageW / canvas.width;
+      const totalH = canvas.height * ratio;
+
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      let yOffset = 0;
+      let remaining = totalH;
+      while (remaining > 0) {
+        pdf.addImage(imgData, "JPEG", 0, -yOffset, pageW, totalH);
+        remaining -= pageH;
+        if (remaining > 0) { pdf.addPage(); yOffset += pageH; }
+      }
+
+      pdf.save(`career-summary-${name || "advisor"}.pdf`);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleSendToScout = () => {
+    const lines: string[] = [];
+    if (diagnosis?.topRoles?.length)
+      lines.push(`תפקידים שמתאימים לי: ${diagnosis.topRoles.join(", ")}`);
+    if (strategy?.targetCompanies?.length)
+      lines.push(`חברות יעד: ${strategy.targetCompanies.map((c) => c.name).join(", ")}`);
+    if (chosenPath)
+      lines.push(`מסלול: ${pathLabel(chosenPath, tx)}`);
+    if (diagnosis?.strengths?.length)
+      lines.push(`חוזקות: ${diagnosis.strengths.slice(0, 3).join(", ")}`);
+    queueAdvisorScoutContext(lines.join("\n"));
+    queueAutoStart("jobs");
+    router.push("/");
+  };
 
   const chosenOption = direction?.options?.find((o) => o.path === chosenPath);
   const otherOptions = direction?.options?.filter((o) => o.path !== chosenPath) ?? [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 p-4 md:p-6">
+      <div className="max-w-4xl mx-auto" ref={contentRef}>
         {/* Nav */}
         <div className="flex items-center justify-between mb-8">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm transition">
             {tx.backToMap}
           </button>
-          <button onClick={onExit} className="text-white/50 hover:text-white text-sm transition">
-            {tx.newSearch}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleDownloadPDF}
+              disabled={downloading}
+              className="flex items-center gap-1.5 text-white/40 hover:text-white/80 disabled:opacity-50 text-sm border border-white/10 hover:border-white/30 px-3 py-1.5 rounded-xl transition"
+              title={lang === "he" ? "הורד כ-PDF" : "Download as PDF"}
+            >
+              {downloading ? (
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              )}
+              {downloading ? (lang === "he" ? "מכין..." : "Preparing...") : "PDF"}
+            </button>
+            <button onClick={onExit} className="text-white/50 hover:text-white text-sm transition">
+              {tx.newSearch}
+            </button>
+          </div>
         </div>
 
         {/* Header */}
@@ -208,8 +293,8 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
                   )}
 
                   <div className="grid grid-cols-2 gap-3 text-xs">
-                    <MiniList title={tx.pros} items={opt.pros.slice(0, 2)} color="emerald" small />
-                    <MiniList title={tx.cons} items={opt.cons.slice(0, 2)} color="rose" small />
+                    <MiniList title={tx.pros} items={(opt.pros ?? []).slice(0, 2)} color="emerald" small />
+                    <MiniList title={tx.cons} items={(opt.cons ?? []).slice(0, 2)} color="rose" small />
                   </div>
                 </div>
               ))}
@@ -228,11 +313,11 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               <MiniList title={tx.cvStrengths} items={cvReview.strengths} color="emerald" />
               <MiniList title={tx.cvWeaknesses} items={cvReview.weaknesses} color="rose" />
             </div>
-            {cvReview.improvements.length > 0 && (
+            {(cvReview.improvements ?? []).length > 0 && (
               <div className="mb-4">
                 <h4 className="text-blue-300 text-sm font-semibold mb-2">{tx.cvImprovements}</h4>
                 <div className="space-y-2">
-                  {cvReview.improvements.map((imp, i) => (
+                  {(cvReview.improvements ?? []).map((imp, i) => (
                     <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 text-sm">
                       <div className="text-blue-300 text-xs font-semibold mb-1 uppercase">{imp.section}</div>
                       <div className="text-white/60 mb-1">❌ {imp.issue}</div>
@@ -258,7 +343,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
             <div className="mb-5">
               <h4 className="text-purple-300 text-sm font-semibold mb-2">{tx.strategyCompanies}</h4>
               <div className="grid md:grid-cols-2 gap-2">
-                {strategy.targetCompanies.map((c, i) => (
+                {(strategy.targetCompanies ?? []).map((c, i) => (
                   <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
                       <h5 className="font-semibold text-white text-sm">{c.name}</h5>
@@ -366,8 +451,35 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </div>
         )}
 
+        {/* Scout CTA */}
+        <div data-no-pdf className="mt-4 bg-gradient-to-br from-purple-600/20 to-emerald-600/20 border border-purple-500/30 rounded-3xl p-8">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-purple-500/20 flex-shrink-0">
+              <svg className="w-6 h-6 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                {lang === "he" ? "עכשיו Scout ימצא לך משרות" : "Now let Scout find your jobs"}
+              </h3>
+              <p className="text-white/70 text-sm leading-relaxed">
+                {lang === "he"
+                  ? "Scout יקבל את הכיוונים שלך מהייעוץ וימצא עבורך משרות שמתאימות בדיוק לפרופיל."
+                  : "Scout will receive your career direction and find jobs that match your profile precisely."}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleSendToScout}
+            className="w-full bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white font-bold py-3.5 rounded-xl transition text-base"
+          >
+            {lang === "he" ? "שלח ל-Scout — מצא לי משרות" : "Send to Scout — Find my jobs"}
+          </button>
+        </div>
+
         {/* Interview CTA */}
-        <div className="mt-4 bg-gradient-to-br from-rose-600/20 to-amber-600/20 border border-rose-500/30 rounded-3xl p-8">
+        <div data-no-pdf className="mt-4 bg-gradient-to-br from-rose-600/20 to-amber-600/20 border border-rose-500/30 rounded-3xl p-8">
           <div className="flex items-start gap-4 mb-4">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-rose-500/20 flex-shrink-0">
               <svg className="w-6 h-6 text-rose-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -414,18 +526,19 @@ function MiniList({
   small = false,
 }: {
   title: string;
-  items: string[];
+  items: string[] | undefined | null;
   color: keyof typeof MINI_COLORS;
   small?: boolean;
 }) {
   const c = MINI_COLORS[color];
+  const safeItems = items ?? [];
   return (
     <div>
       <h4 className={`${c.title} ${small ? "text-[10px]" : "text-xs"} font-semibold mb-2 uppercase tracking-wide`}>
         {title}
       </h4>
       <ul className="space-y-1">
-        {items.map((it, i) => (
+        {safeItems.map((it, i) => (
           <li key={i} className={`text-white/80 ${small ? "text-xs" : "text-sm"} flex gap-1.5`}>
             <span className={c.bullet}>•</span>
             <span>{it}</span>

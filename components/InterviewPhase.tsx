@@ -5,6 +5,7 @@ import { ChatMessage, UserProfile, JobResult } from "@/lib/types";
 import { HiddenMarketResult } from "@/lib/jobSearch";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
+import ScoutRobot from "./ScoutRobot";
 
 interface EnrichedMessage extends ChatMessage {
   jobs?: JobResult[];
@@ -14,8 +15,10 @@ interface EnrichedMessage extends ChatMessage {
 
 interface Props {
   userProfile: UserProfile;
-  onComplete: (context: string, messages: Array<{ role: "user" | "assistant"; content: string }>) => void;
+  onComplete: (context: string, messages: Array<{ role: "user" | "assistant"; content: string }>, convId?: string) => void;
   onBack: () => void;
+  initialMessages?: Array<{ role: "user" | "assistant"; content: string }>;
+  initialConvId?: string;
 }
 
 function ScoreBadge({ score }: { score: number }) {
@@ -155,15 +158,39 @@ function HiddenMarketCard({ data, lang }: { data: HiddenMarketResult; lang: stri
   );
 }
 
-export default function InterviewPhase({ userProfile, onComplete, onBack }: Props) {
+export default function InterviewPhase({ userProfile, onComplete, onBack, initialMessages, initialConvId }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
   const [messages, setMessages] = useState<EnrichedMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [searchDone, setSearchDone] = useState(false);
+  const [readyToSearch, setReadyToSearch] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+  const convIdRef = useRef<string | null>(null);
+
+  const autoSave = async (plainMessages: Array<{ role: "user" | "assistant"; content: string }>) => {
+    if (!convIdRef.current) {
+      try {
+        const res = await fetch("/api/conversations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: plainMessages, skipTitle: true }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          convIdRef.current = data.id;
+          sessionStorage.setItem("wh_conv_id", data.id);
+        }
+      } catch {}
+    } else {
+      fetch(`/api/conversations/${convIdRef.current}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: plainMessages }),
+      }).catch(() => {});
+    }
+  };
 
   const addMessage = (role: "user" | "assistant", content: string, extras?: Partial<EnrichedMessage>): EnrichedMessage => {
     const msg: EnrichedMessage = {
@@ -181,9 +208,22 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
     if (initialized.current) return;
     initialized.current = true;
 
+    // Resuming an existing conversation
+    if (initialMessages && initialMessages.length > 0) {
+      const enriched: EnrichedMessage[] = initialMessages.map((m) => ({
+        id: Math.random().toString(36).substr(2, 9),
+        role: m.role,
+        content: m.content,
+        timestamp: new Date(),
+      }));
+      setMessages(enriched);
+      if (initialConvId) convIdRef.current = initialConvId;
+      return;
+    }
+
     const rawText = userProfile.rawText?.trim();
     const fallbackGreeting = lang === "he"
-      ? "היי! אני Scout. קראתי את מה שכתבת ואני כאן כדי לעזור לך למצוא את ההזדמנות הנכונה. מה הכי חשוב לך בתפקיד הבא?"
+      ? "היי! אני Scout. קראתי את מה שכתבתם ואני כאן כדי לעזור לכם למצוא את ההזדמנות הנכונה. מה הכי חשוב לכם בתפקיד הבא?"
       : "Hi! I'm Scout. I read your profile and I'm here to help you find the right opportunity. What matters most to you in your next role?";
 
     if (rawText) {
@@ -201,22 +241,21 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
       })
         .then((res) => res.json())
         .then((data) => {
-          const extras: Partial<EnrichedMessage> = {};
-          if (data.readyToSearch) {
-            extras.jobs = data.jobs ?? [];
-            extras.hiddenMarket = data.hiddenMarket ?? null;
-            extras.demoMode = data.demoMode ?? false;
-            setSearchDone(true);
-          }
-          addMessage("assistant", data.message || fallbackGreeting, extras);
+          if (data.readyToSearch) setReadyToSearch(true);
+          addMessage("assistant", data.message || fallbackGreeting);
+          autoSave([
+            { role: "user", content: rawText },
+            { role: "assistant", content: data.message || fallbackGreeting },
+          ]);
         })
         .catch(() => addMessage("assistant", fallbackGreeting))
         .finally(() => setLoading(false));
     } else {
       const greeting = lang === "he"
-        ? "היי! אני Scout, המדריך האישי שלך לקריירה. ספר לי על עצמך — מה הרקע שלך ומה אתה מחפש?"
+        ? "היי! אני Scout, המלווה הקריירי שלכם. ספרו לי על עצמכם — מה הרקע שלכם ומה אתם מחפשים?"
         : "Hi! I'm Scout, your personal career guide. Tell me about yourself — what's your background and what are you looking for?";
       addMessage("assistant", greeting);
+      autoSave([{ role: "assistant", content: greeting }]);
     }
   }, []);
 
@@ -242,21 +281,21 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
       const data = await res.json();
       if (!res.ok || data.error || !data.message) {
         addMessage("assistant", lang === "he"
-          ? "שגיאה זמנית — אנא נסה שוב עוד כמה שניות."
+          ? "שגיאה זמנית — אנא נסו שוב עוד כמה שניות."
           : "Temporary error — please try again in a moment.");
       } else {
-        const extras: Partial<EnrichedMessage> = {};
-        if (data.readyToSearch) {
-          extras.jobs = data.jobs ?? [];
-          extras.hiddenMarket = data.hiddenMarket ?? null;
-          extras.demoMode = data.demoMode ?? false;
-          setSearchDone(true);
-        }
-        addMessage("assistant", data.message, extras);
+        if (data.readyToSearch) setReadyToSearch(true);
+        addMessage("assistant", data.message);
+        const allPlain = [
+          ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+          { role: "user" as const, content: userText },
+          { role: "assistant" as const, content: data.message },
+        ];
+        autoSave(allPlain);
       }
     } catch {
       addMessage("assistant", lang === "he"
-        ? "שגיאה בחיבור — אנא נסה שוב."
+        ? "שגיאה בחיבור — אנא נסו שוב."
         : "Connection error — please try again.");
     } finally {
       setLoading(false);
@@ -264,13 +303,21 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    if (e.key === "Enter" && !e.shiftKey && !readyToSearch) { e.preventDefault(); sendMessage(); }
+  };
+
+  const handleStartSearch = () => {
+    const context = messages
+      .slice(-12)
+      .map((m) => `${m.role === "user" ? "מועמד" : "Scout"}: ${m.content}`)
+      .join("\n");
+    onComplete(context, messages.map((m) => ({ role: m.role, content: m.content })), convIdRef.current ?? undefined);
   };
 
   const profileData = userProfile.parsedData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex flex-col">
       {/* Header */}
       <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm px-3 sm:px-6 py-3">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
@@ -308,8 +355,21 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
       </div>
 
       {/* Chat area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="max-w-3xl mx-auto space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-6 relative">
+
+        {/* Robot — always visible, big when empty, small corner when chatting */}
+        <div className={`pointer-events-none select-none flex flex-col items-center transition-all duration-700 ${
+          messages.length === 0
+            ? "justify-center opacity-40 py-6"
+            : "absolute bottom-4 end-3 opacity-15 w-16"
+        }`}>
+          <ScoutRobot className={messages.length === 0 ? "w-32" : "w-full"} />
+          {messages.length === 0 && (
+            <p className="text-purple-400/60 text-sm mt-2 font-medium tracking-wide">Scout</p>
+          )}
+        </div>
+
+        <div className="max-w-3xl mx-auto space-y-4 relative z-10">
           {messages.map((msg) => (
             <div key={msg.id}>
               <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -327,34 +387,6 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
                 </div>
               </div>
 
-              {/* Inline job results */}
-              {msg.role === "assistant" && msg.jobs && msg.jobs.length > 0 && (
-                <div className="ms-11 mt-3 space-y-3">
-                  {msg.demoMode && (
-                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2 text-amber-300 text-xs">
-                      {lang === "he"
-                        ? "⚠️ מצב הדגמה — הוסף SERPER_API_KEY לחיפוש אמיתי"
-                        : "⚠️ Demo mode — add SERPER_API_KEY for live search"}
-                    </div>
-                  )}
-                  <p className="text-white/40 text-xs uppercase tracking-wide font-semibold">
-                    {lang === "he" ? `${msg.jobs.length} משרות שנמצאו` : `${msg.jobs.length} matches found`}
-                  </p>
-                  {msg.jobs.map((job) => (
-                    <InlineJobCard key={job.id} job={job} lang={lang} />
-                  ))}
-                  {msg.hiddenMarket && (
-                    <HiddenMarketCard data={msg.hiddenMarket} lang={lang} />
-                  )}
-                </div>
-              )}
-
-              {/* Hidden market only (no jobs) */}
-              {msg.role === "assistant" && (!msg.jobs || msg.jobs.length === 0) && msg.hiddenMarket && (
-                <div className="ms-11 mt-3">
-                  <HiddenMarketCard data={msg.hiddenMarket} lang={lang} />
-                </div>
-              )}
             </div>
           ))}
 
@@ -373,6 +405,17 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
             </div>
           )}
 
+          {readyToSearch && !loading && (
+            <div className="flex justify-center pt-2 pb-4">
+              <button
+                onClick={handleStartSearch}
+                className="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold px-8 py-4 rounded-2xl text-base sm:text-lg transition-all shadow-lg shadow-emerald-900/40 animate-pulse hover:animate-none"
+              >
+                {lang === "he" ? "הבנתי הכל! בואו נתחיל בחיפוש 🚀" : "Got everything! Let's start searching 🚀"}
+              </button>
+            </div>
+          )}
+
           <div ref={bottomRef} />
         </div>
       </div>
@@ -384,16 +427,17 @@ export default function InterviewPhase({ userProfile, onComplete, onBack }: Prop
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={searchDone
-              ? (lang === "he" ? "אפשר לשאול שאלות נוספות או לצמצם את החיפוש..." : "Ask follow-up questions or refine the search...")
+            disabled={readyToSearch}
+            placeholder={readyToSearch
+              ? (lang === "he" ? "לחצו על הכפתור הירוק למעלה כדי להתחיל בחיפוש" : "Click the green button above to start searching")
               : tx.typeAnswer
             }
             rows={1}
-            className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-500 resize-none transition"
+            className={`flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-500 resize-none transition ${readyToSearch ? "opacity-40 cursor-not-allowed" : ""}`}
           />
           <button
             onClick={sendMessage}
-            disabled={loading || !input.trim()}
+            disabled={loading || !input.trim() || readyToSearch}
             className="bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white px-4 py-3 rounded-xl transition-all flex items-center justify-center"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
