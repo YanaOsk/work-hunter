@@ -38,6 +38,7 @@ export interface JobResult {
   description: string;
   matchScore: number;
   matchReasons: string[];
+  matchNegatives?: string[];
   isRemote: boolean;
   salaryRange?: string;
   postedDate?: string;

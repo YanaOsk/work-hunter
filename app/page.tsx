@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { AppState, AppMode, UserProfile } from "@/lib/types";
+import { AppState, AppMode, UserProfile, JobResult } from "@/lib/types";
 import { saveProfile } from "@/lib/profiles";
 import { DEFAULT_ADVISOR_ID, getOrCreateAdvisorState } from "@/lib/advisorState";
-import { consumeAutoStart } from "@/lib/autoStart";
+import { consumeAutoStart, consumeAdvisorScoutContext } from "@/lib/autoStart";
 import HomeLanding from "@/components/HomeLanding";
 import UploadPhase from "@/components/UploadPhase";
 import InterviewPhase from "@/components/InterviewPhase";
@@ -29,15 +29,49 @@ const emptyProfile: UserProfile = {
   clarifyingQuestions: [],
 };
 
+async function readSearchStream(
+  res: Response,
+  onJob: (job: JobResult) => void,
+  onDone: (demoMode: boolean) => void
+) {
+  if (!res.body) return;
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop() ?? "";
+      for (const part of parts) {
+        const line = part.trim();
+        if (!line.startsWith("data: ")) continue;
+        try {
+          const data = JSON.parse(line.slice(6));
+          if (data.type === "job") onJob(data.job);
+          else if (data.type === "done") onDone(data.demoMode ?? false);
+        } catch {}
+      }
+    }
+  } finally {
+    try { reader.releaseLock(); } catch {}
+  }
+}
+
 export default function Home() {
   const router = useRouter();
   const { status } = useSession();
   const [mode, setMode] = useState<AppMode | null>(null);
   const [state, setState] = useState<AppState>(initialState);
   const [demoMode, setDemoMode] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  // Read module-level queued start (set by in-app links) before first render to avoid flash.
-  // Falls back to URL ?start= param for external/direct navigation.
+  const [resumeConv, setResumeConv] = useState<{
+    id: string;
+    messages: Array<{ role: "user" | "assistant"; content: string }>;
+  } | null>(null);
   const [pendingAutoMode, setPendingAutoMode] = useState<AppMode | null>(() => {
     const queued = consumeAutoStart();
     if (queued) return queued;
@@ -48,23 +82,46 @@ export default function Home() {
     return null;
   });
 
-  // Clean up URL param if present
   useEffect(() => {
-    if (window.location.search) window.history.replaceState({}, "", "/");
+    if (!window.location.search) return;
+    const params = new URLSearchParams(window.location.search);
+    const continueId = params.get("continueConv");
+    window.history.replaceState({}, "", "/");
+    if (!continueId) return;
+    fetch(`/api/conversations/${continueId}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((conv) => {
+        if (!conv || conv.error || !Array.isArray(conv.messages)) return;
+        setResumeConv({ id: conv.id, messages: conv.messages });
+        setState((s) => ({ ...s, phase: "interview", userProfile: emptyProfile }));
+        setMode("jobs");
+      })
+      .catch(() => {});
   }, []);
 
-  // Restore jobs mode only on browser refresh (not in-app navigation)
   useEffect(() => {
     if (status === "authenticated" && mode === null && !pendingAutoMode) {
       const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
       if (nav?.type === "reload") {
         const saved = sessionStorage.getItem("wh_mode");
-        if (saved === "jobs") setMode("jobs");
+        if (saved === "jobs") {
+          setMode("jobs");
+          const savedConvId = sessionStorage.getItem("wh_conv_id");
+          if (savedConvId) {
+            fetch(`/api/conversations/${savedConvId}`)
+              .then((r) => (r.ok ? r.json() : null))
+              .then((conv) => {
+                if (!conv || conv.error || !Array.isArray(conv.messages) || conv.messages.length === 0) return;
+                setResumeConv({ id: conv.id, messages: conv.messages });
+                setState((s) => ({ ...s, phase: "interview", userProfile: emptyProfile }));
+              })
+              .catch(() => {});
+          }
+        }
       }
     }
   }, [status, mode, pendingAutoMode]);
 
-  // Fetch subscription status once authenticated
   useEffect(() => {
     if (status !== "authenticated") return;
     fetch("/api/subscription")
@@ -92,6 +149,67 @@ export default function Home() {
       return;
     }
     sessionStorage.setItem("wh_mode", chosen);
+    const advisorCtx = consumeAdvisorScoutContext();
+    if (advisorCtx) {
+      setMode(chosen);
+      setState({ ...initialState, phase: "searching" });
+      setIsStreaming(true);
+      const searchMsgs: Array<{ role: "user" | "assistant"; content: string }> = [
+        { role: "user", content: advisorCtx },
+      ];
+      const collectedJobs: JobResult[] = [];
+      let streamStarted = false;
+
+      (async () => {
+        try {
+          const res = await fetch("/api/search-jobs", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userProfile: emptyProfile, chatContext: advisorCtx }),
+          });
+          if (!res.ok) throw new Error("failed");
+          await readSearchStream(
+            res,
+            (job) => {
+              collectedJobs.push(job);
+              if (!streamStarted) {
+                streamStarted = true;
+                setState({
+                  ...initialState,
+                  phase: "results",
+                  jobResults: [job],
+                  userProfile: emptyProfile,
+                });
+              } else {
+                setState((s) => ({
+                  ...s,
+                  jobResults: [...s.jobResults, job].sort((a, b) => b.matchScore - a.matchScore),
+                }));
+              }
+            },
+            (demo) => {
+              setDemoMode(demo);
+              setState((s) => ({
+                ...s,
+                jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore),
+              }));
+            }
+          );
+        } catch {
+          if (!streamStarted) {
+            setState({ ...initialState, phase: "results", jobResults: [], userProfile: emptyProfile });
+          }
+        } finally {
+          setIsStreaming(false);
+          fetch("/api/conversations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ messages: searchMsgs, searchContext: advisorCtx, jobs: collectedJobs }),
+          }).catch(() => {});
+        }
+      })();
+      return;
+    }
     setMode(chosen);
   };
 
@@ -101,52 +219,87 @@ export default function Home() {
 
   const handleInterviewComplete = async (
     context: string,
-    convMessages: Array<{ role: "user" | "assistant"; content: string }>
+    convMessages: Array<{ role: "user" | "assistant"; content: string }>,
+    existingConvId?: string
   ) => {
     if (state.userProfile) saveProfile(state.userProfile);
     setState((s) => ({ ...s, phase: "searching" }));
+    setIsStreaming(true);
 
-    let jobs: import("@/lib/types").JobResult[] = [];
+    const collectedJobs: JobResult[] = [];
+    let streamStarted = false;
+    const capturedProfile = state.userProfile;
+
     try {
       const res = await fetch("/api/search-jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userProfile: state.userProfile,
-          chatContext: context,
-        }),
+        body: JSON.stringify({ userProfile: capturedProfile, chatContext: context }),
       });
-      const data = await res.json();
-      jobs = data.jobs || [];
-      setDemoMode(data.demoMode || false);
-      setState((s) => ({ ...s, phase: "results", jobResults: jobs }));
+      if (!res.ok) throw new Error("Search failed");
+
+      await readSearchStream(
+        res,
+        (job) => {
+          collectedJobs.push(job);
+          if (!streamStarted) {
+            streamStarted = true;
+            setState((s) => ({ ...s, phase: "results", jobResults: [job] }));
+          } else {
+            setState((s) => ({
+              ...s,
+              jobResults: [...s.jobResults, job].sort((a, b) => b.matchScore - a.matchScore),
+            }));
+          }
+        },
+        (demo) => {
+          setDemoMode(demo);
+          setState((s) => ({
+            ...s,
+            jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore),
+          }));
+        }
+      );
     } catch {
-      setState((s) => ({
-        ...s,
-        phase: "results",
-        jobResults: [],
-        error: "Search failed. Check your API keys.",
-      }));
+      if (!streamStarted) {
+        setState((s) => ({
+          ...s,
+          phase: "results",
+          jobResults: [],
+          error: "Search failed. Check your API keys.",
+        }));
+      }
+    } finally {
+      setIsStreaming(false);
     }
 
-    // Save conversation regardless of search outcome — server checks auth
-    fetch("/api/conversations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: convMessages, searchContext: context, jobs }),
-    }).catch(() => {});
+    if (existingConvId) {
+      fetch(`/api/conversations/${existingConvId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: convMessages, searchContext: context, jobs: collectedJobs }),
+      }).catch(() => {});
+    } else {
+      fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: convMessages, searchContext: context, jobs: collectedJobs }),
+      }).catch(() => {});
+    }
   };
 
   const handleReset = () => {
     setState(initialState);
     setDemoMode(false);
+    setIsStreaming(false);
     setMode(null);
     sessionStorage.removeItem("wh_mode");
+    sessionStorage.removeItem("wh_conv_id");
   };
 
   if (mode === null) {
     if (pendingAutoMode) {
-      return <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900" />;
+      return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
     }
     return <HomeLanding onChoose={handleModeChoice} />;
   }
@@ -158,8 +311,14 @@ export default function Home() {
       return (
         <InterviewPhase
           userProfile={state.userProfile!}
-          onComplete={(ctx, msgs) => handleInterviewComplete(ctx, msgs)}
-          onBack={() => setState((s) => ({ ...s, phase: "upload", userProfile: null }))}
+          onComplete={(ctx, msgs, convId) => handleInterviewComplete(ctx, msgs, convId)}
+          onBack={() => {
+            setState((s) => ({ ...s, phase: "upload", userProfile: null }));
+            setResumeConv(null);
+            sessionStorage.removeItem("wh_conv_id");
+          }}
+          initialMessages={resumeConv?.messages}
+          initialConvId={resumeConv?.id}
         />
       );
     case "searching":
@@ -171,6 +330,7 @@ export default function Home() {
           userProfile={state.userProfile!}
           demoMode={demoMode}
           isSubscribed={isSubscribed}
+          isStreaming={isStreaming}
           onReset={handleReset}
         />
       );

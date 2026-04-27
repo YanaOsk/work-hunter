@@ -1,24 +1,95 @@
 "use client";
 
+import { useState } from "react";
 import { JobResult } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 
-interface Props { job: JobResult; rank: number; }
+interface Props {
+  job: JobResult;
+  rank: number;
+  saved?: boolean;
+  onToggleSave?: () => void;
+}
 
-function ScoreBadge({ score }: { score: number }) {
+function ScoreBadge({
+  score,
+  positives,
+  negatives,
+  lang,
+}: {
+  score: number;
+  positives: string[];
+  negatives: string[];
+  lang: string;
+}) {
+  const [open, setOpen] = useState(false);
   const color = score >= 85 ? "bg-green-500/20 border-green-500/40 text-green-300"
     : score >= 70 ? "bg-yellow-500/20 border-yellow-500/40 text-yellow-300"
     : "bg-red-500/20 border-red-500/40 text-red-300";
+  const hasReasons = positives.length > 0 || negatives.length > 0;
+
   return (
-    <div className={`flex items-center gap-1.5 border rounded-full px-3 py-1 ${color}`}>
-      <span className="text-sm font-bold">{score}%</span>
-      <span className="text-xs opacity-70">match</span>
+    <div className="relative flex-shrink-0" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <div className={`flex items-center gap-1.5 border rounded-full px-3 py-1 cursor-default select-none ${color}`}>
+        <span className="text-sm font-bold">{score}%</span>
+        <span className="text-xs opacity-70">match</span>
+        {hasReasons && (
+          <svg className="w-3 h-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        )}
+      </div>
+
+      {open && hasReasons && (
+        <div
+          className="absolute top-full mt-2 end-0 z-50 w-72 bg-slate-900 border border-white/15 rounded-2xl shadow-2xl p-3 text-xs"
+          style={{ direction: lang === "he" ? "rtl" : "ltr" }}
+        >
+          <div className="absolute -top-1.5 end-4 w-3 h-3 bg-slate-900 border-t border-e border-white/15 rotate-[-45deg]" />
+
+          {positives.length > 0 && (
+            <div className="mb-2.5">
+              <p className="text-emerald-400 font-semibold uppercase tracking-wide text-[10px] mb-1.5">
+                {lang === "he" ? "למה כן" : "Why it fits"}
+              </p>
+              <div className="space-y-1">
+                {positives.map((r, i) => (
+                  <div key={i} className="flex items-start gap-1.5">
+                    <svg className="w-3 h-3 text-emerald-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-white/80 leading-relaxed">{r}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {negatives.length > 0 && (
+            <div>
+              <p className="text-rose-400 font-semibold uppercase tracking-wide text-[10px] mb-1.5">
+                {lang === "he" ? "למה פחות" : "Potential gaps"}
+              </p>
+              <div className="space-y-1">
+                {negatives.map((r, i) => (
+                  <div key={i} className="flex items-start gap-1.5">
+                    <svg className="w-3 h-3 text-rose-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <span className="text-white/70 leading-relaxed">{r}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-export default function JobCard({ job, rank }: Props) {
+export default function JobCard({ job, rank, saved = false, onToggleSave }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
 
@@ -46,7 +117,23 @@ export default function JobCard({ job, rank }: Props) {
           <h3 className="text-white font-semibold text-base sm:text-lg leading-tight">{job.title}</h3>
           <p className="text-purple-300 text-sm mt-0.5">{job.company}</p>
         </div>
-        <ScoreBadge score={job.matchScore} />
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <ScoreBadge score={job.matchScore} positives={job.matchReasons ?? []} negatives={job.matchNegatives ?? []} lang={lang} />
+          {onToggleSave && (
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleSave(); }}
+              className={`p-1.5 rounded-xl transition-all ${
+                saved
+                  ? "text-amber-400 bg-amber-500/20 hover:bg-amber-500/30"
+                  : "text-white/30 hover:text-white/60 hover:bg-white/10"
+              }`}
+            >
+              <svg className="w-4 h-4" fill={saved ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-4 text-white/50 text-xs mb-3 flex-wrap">

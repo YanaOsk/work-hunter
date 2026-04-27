@@ -190,7 +190,7 @@ export const t = {
     preIntroStage3Desc: "Got a CV? Paste it and I'll give specific improvements. If not, you can skip this step.",
     preIntroStage4: "Job-search strategy",
     preIntroStage4Desc: "Based on everything, I'll build a targeted search plan — companies, hidden market, and a cold outreach template.",
-    preIntroAfter: "At the end, you'll get a full summary of your career plan. And there's a bonus waiting for you after that 😉",
+    preIntroAfter: "At the end you'll receive a full career plan summary — and if you'd like, you can also practice a mock interview to prepare.",
 
     // Journey
     journeyTitle: "Your career journey",
@@ -592,6 +592,11 @@ export const t = {
     paywallPerk3: "Unlimited job searches",
     paywallCta: "Get full access",
 
+    filterSaved: "Saved",
+    saveJob: "Save",
+    savedJob: "Saved",
+    streamingResults: "Finding matches...",
+
     // Lang toggle
     switchLang: "עברית",
   },
@@ -610,8 +615,8 @@ export const t = {
 
     // Interview
     interviewTitle: "ראיון קריירה",
-    interviewSubtitle: "Scout לומד/ת עליך",
-    typeAnswer: "הקלד/י את תשובתך...",
+    interviewSubtitle: "Scout לומד עליכם",
+    typeAnswer: "כתבו את תשובתכם...",
     keepRefining: "המשך/י לדייק או לחץ/י על חיפוש משרות עכשיו...",
     readyTitle: "יש לי את כל מה שצריך!",
     readySubtitle: "ניתן להמשיך לדייק או להתחיל בחיפוש.",
@@ -784,7 +789,7 @@ export const t = {
     preIntroStage3Desc: "יש לכם קורות חיים? נעבור עליהם, נזהה מה עובד ומה פחות, ונקבל גרסה משוכתבת ומדויקת. אין קורות חיים — פשוט מדלגים.",
     preIntroStage4: "אסטרטגיית חיפוש עבודה",
     preIntroStage4Desc: "מפת דרכים אישית: חברות יעד, פעולות בשוק הנסתר, ותבנית פנייה ישירה לשיחות שמייצרות הזדמנויות.",
-    preIntroAfter: "בסוף המסע מחכה לכם סיכום מלא של תכנית הקריירה — ויש גם הפתעה קטנה 😉",
+    preIntroAfter: "בסוף המסע מחכה לכם סיכום מלא של תכנית הקריירה — ואם תרצו, תוכלו גם לתרגל ראיון דמה כדי להתאמן לפני ההגשות.",
 
     // Journey
     journeyTitle: "מסע הקריירה שלך",
@@ -1185,6 +1190,11 @@ export const t = {
     paywallPerk2: "הגש מועמדות ישירות עם ה-CV שלך",
     paywallPerk3: "חיפושי משרות ללא הגבלה",
     paywallCta: "לגישה מלאה",
+
+    filterSaved: "שמורים",
+    saveJob: "שמור",
+    savedJob: "נשמר",
+    streamingResults: "מחפש התאמות...",
 
     // Lang toggle
     switchLang: "English",

@@ -38,10 +38,14 @@ Respond ONLY with valid JSON:
 export const CHAT_SYSTEM_PROMPT = `אתה Scout — יועץ קריירה אסטרטגי. אתה לא בוט, אתה לא ממלא טפסים. אתה מנהל שיחה חכמה.
 
 ═══ הפילוסופיה שלך ═══
-• רק שאלה אחת בכל פעם, ממוקדת, עם כוונה
-• אילוצים = פילטרים מחייבים, לא העדפות. "חייבת ליד רכבת" — אין להציג משרות ללא גישה לרכבת
-• שפה: עברית טבעית, ניסוחים ניטרליים (לא "בחר/י", אלא "אפשר לבחור" / "כדאי לבחור")
-• טון: מקצועי, חד, מעצים — לא רובוטי, לא פורמלי מדי
+• שאלה אחת בכל פעם, ממוקדת, עם כוונה
+• אילוצים = פילטרים מחייבים, לא העדפות. "חייבים ליד רכבת" — אין להציג משרות ללא גישה לרכבת
+• שפה: עברית קלה ויומיומית כמו WhatsApp עם חבר שמכיר שוק עבודה
+  - אין מילים פורמליות: לא "הינו", לא "יש לציין", לא "על מנת ל", לא "בהתאם ל", לא "כמו כן"
+  - אין לוכסנים בכלל: לא "בחר/י", לא "מחפש/ת", לא "מועמד/ת"
+  - כתוב בלשון רבים ניטרלית: "מה אתם מחפשים", "אפשר לבחור", "מה מדליק אתכם"
+  - קצר וישיר — משפט אחד עדיף על שלושה
+• טון: חם, חד, מעצים — כמו חבר שמבין את השוק, לא יועץ ממשרד
 
 ═══ שלב 1 — אפיון (Intake) ═══
 מטרה: להבין תמונה מלאה ב-3-4 שאלות מכוונות. אל תשאל שאלות ברשימה.
@@ -92,38 +96,52 @@ IF THE USER WRITES IN ENGLISH, respond in English with the same principles.`;
 
 
 export const MATCH_ANALYSIS_PROMPT = (profile: string, jobTitle: string, jobDescription: string) => `
-You are a senior recruiter evaluating a job match. Think beyond skill-matching.
+You are a senior recruiter evaluating a job match. You have the full job description available — use it deeply, not just the title.
 
 Candidate Profile:
 ${profile}
 
 Job: ${jobTitle}
-Description: ${jobDescription}
+Full Description:
+${jobDescription}
 
-CRITICAL CONSTRAINT — REMOTE WORK:
-- If the candidate's workPreference is "remote" and the job does NOT appear to be remote/work-from-home, set matchScore to MAX 30 and include "המשרה לא נראית כמרחוק — המועמד/ת דורש/ת עבודה מהבית בלבד" as the first match reason.
-- If the job IS remote and the candidate wants remote, add +15 bonus to score.
+CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
 
-CRITICAL CONSTRAINT — CAREER CHANGE:
-- If careerChangeInterest is true and the job is in the candidate's OLD field (the one they want to leave), lower the score by 20 points and note it.
+1. REMOTE WORK:
+   - If workPreference is "remote" and the job does NOT appear to be remote/work-from-home, set matchScore to MAX 30 and note it as first matchNegative.
+   - If the job IS remote and the candidate wants remote, add +15 to score.
 
-Score this match (0-100) considering:
-- Remote fit: MANDATORY check first (see above)
-- Skills fit (30% weight)
-- Industry/field fit: does this match the direction they're heading, not where they've been? (20%)
-- Life stage fit: does this role suit their current circumstances? (20%)
-- Energy fit: based on what they love, will this role engage or drain them? (30%)
+2. CAREER CHANGE:
+   - If careerChangeInterest is true and the job is in the candidate's OLD field, lower the score by 20 and note it.
 
-Match reasons should be SPECIFIC and HUMAN — not generic.
+3. COMMUTE:
+   - If maxCommuteKm is set (e.g. 30) and the job is onsite in a different city far from candidate's location, reduce score by 15 and add a commute concern to matchNegatives.
+   - If the job is remote or location is unclear, ignore this constraint.
+
+4. SALARY FLOOR:
+   - If the job description mentions a salary/range AND it appears below the candidate's salaryExpectation, reduce score by 10 and note the gap.
+   - If no salary is mentioned, do not penalize.
+
+Scoring weights (after constraints applied):
+- Remote + commute fit: 20%
+- Skills fit — how well do their actual skills match the description's requirements: 25%
+- Field/direction fit — match where they're heading, not where they've been: 20%
+- Life stage fit — does this role suit their current circumstances: 15%
+- Energy fit — will this role engage or drain them based on what they love: 20%
+
+Match reasons must be SPECIFIC to this candidate + this job description. Never generic.
 Bad: "Your skills match the requirements"
-Good: "The flexible remote arrangement matches your requirement to work from home"
+Good: "The role's focus on customer onboarding aligns with your stated love for user-facing work"
+
+Include 1-2 honest matchNegatives — specific gaps or concerns. Brief and direct.
 
 Respond with JSON only:
 {
   "matchScore": <0-100>,
-  "matchReasons": ["specific human reason 1", "specific human reason 2", "specific human reason 3"],
+  "matchReasons": ["specific reason 1", "specific reason 2", "specific reason 3"],
+  "matchNegatives": ["specific concern 1"],
   "isRemote": <boolean>,
-  "salaryRange": "<if mentioned in description, else null>"
+  "salaryRange": "<salary range if mentioned in description, else null>"
 }`;
 
 export const SEARCH_QUERY_PROMPT = (profile: string) => `
@@ -148,12 +166,16 @@ CRITICAL RULES — read carefully before generating anything:
    - isTech should only be true if software/hardware engineering is genuinely relevant.
 
 4. SEARCH COVERAGE — Israel-wide, multiple platforms:
-   - hebrewQueries: 3 queries for Israeli job boards (drushim, alljobs, jobmaster, gotfriends). Cover: (a) obvious match, (b) one step up/pivot, (c) non-obvious opportunity.
-   - englishQueries: 3 English queries for LinkedIn + global platforms. Add "Israel" and "remote" where applicable.
-   - facebookQuery: ONE short natural Hebrew query for Facebook job groups (e.g. "קבוצות דרושים", "דרושים לוח"). Write it as someone would post in a group, not as a Google query.
-   - linkedinQuery: ONE English query optimized for LinkedIn Jobs search bar (shorter, no extra words).
+   - hebrewQueries: 3 queries for Israeli job boards. Target sites include: drushim.co.il, alljobs.co.il, jobmaster.co.il, gotfriends.co.il, sahbak.co.il, mploy.co.il, jobnet.co.il, comeet.io, nisha.co.il, seev.co.il, goozali.com. Cover: (a) obvious match, (b) one step up/pivot, (c) non-obvious opportunity.
+   - englishQueries: 3 English queries. Add "Israel" and "remote" where applicable.
+   - facebookQuery: ONE short natural Hebrew query for Facebook job groups — write as if posting in a group, not a Google query.
+   - linkedinQuery: ONE English query optimized for LinkedIn Jobs. IMPORTANT: LinkedIn is relevant ONLY for tech/software/product/marketing roles. If the candidate's field is NOT one of those, set linkedinQuery to null and isTech to false.
 
-5. NON-OBVIOUS OPPORTUNITY:
+5. RECENCY — active listings only:
+   - Use specific current job titles actively being hired for in Israel in 2026.
+   - Avoid overly broad keywords that mostly surface outdated listings.
+
+6. NON-OBVIOUS OPPORTUNITY:
    - Always include one query for a role the candidate hasn't mentioned but would genuinely fit — based on their strengths, personality, and what they said they love.
 
 Respond with JSON only:
@@ -176,10 +198,35 @@ ${profileText}
 Language: ${lang === "he" ? "Hebrew" : "English"}
 
 Rules:
-- facebookGroups: 3-5 real Israeli Facebook groups specific to their field/constraints. Each needs a "why" — what makes this group the right place.
+- facebookGroups: 5-8 real Israeli Facebook groups specific to their field/constraints. Each needs a "why" — what makes this group the right place.
 - outreachTemplate: a genuine, non-generic direct message to a hiring manager. Write in first person, casual-professional tone, max 3 sentences. Should reference the candidate's actual background.
 - linkedinTip: one specific, actionable LinkedIn search tactic (hashtag, boolean search, filter combination) relevant to their field.
 - intro: 1-2 sentences that acknowledge the constraint challenge but frame it as manageable — empowering, not apologetic.
+
+REFERENCE — Real Israeli Facebook groups by field (pick the most relevant for this candidate):
+General: "משרות מפייסבוק לאוזן", "דנה ונועה תעשו לי קריירה", "בורסת משרות ישראל", "לוח דרושים - ישראל", "עבודה בישראל - ניהול קריירה", "משרות בישראל"
+Tech/Hi-tech: "משרות הייטק", "QA Israel - Jobs", "DevOps Israel", "Data Science Israel Jobs", "Frontend Jobs Israel", "R&D ישראל", "Tech Jobs Israel"
+Marketing/Digital: "שיווק דיגיטלי - דרושים", "מנהלי סושיאל - דרושים", "Content & Copywriting Jobs Israel", "דיגיטל ושיווק - משרות"
+HR/People: "דרושים HR", "HR Jobs Israel", "גיוס וגיוס - קהילת HR ישראל", "People & Talent Israel"
+Finance/Accounting: "דרושים פיננסים וחשבונאות", "CPA Israel", "Finance Jobs Israel", "רואי חשבון - דרושים"
+Education: "דרושים בחינוך", "מורים ומחנכים - משרות", "חינוך - הזדמנויות תעסוקה"
+Healthcare/Medical: "דרושים בתחום הרפואה", "סיעוד ובריאות - משרות", "Healthcare Jobs Israel"
+Law/Legal: "עורכי דין - משרות", "Legal Jobs Israel", "משפטנים - הזדמנויות עבודה"
+Social work/NGO: "משרות חברתיות", "עבודה סוציאלית - דרושים", "עמותות - הזדמנויות תעסוקה"
+Real estate: "תיווך ונדל\"ן - דרושים", "Real Estate Jobs Israel"
+Events/Hospitality: "אירועים - משרות", "תיירות ואוכל - משרות", "הוטל ורסטורן - דרושים"
+Creative/Design: "עיצוב וקריאייטיב - דרושים", "UX/UI Jobs Israel", "Creative Jobs Israel"
+Logistics/Supply chain: "לוגיסטיקה ושינוע - דרושים", "Supply Chain Israel Jobs"
+Retail/Customer service: "דרושים בקמעונאות", "שירות לקוחות - דרושים"
+Construction/Engineering: "דרושים בבנייה ובתשתיות", "הנדסה - הזדמנויות תעסוקה"
+Food/Culinary: "דרושים בתחום המזון והקולינריה", "שפים ובתי קפה - משרות"
+Fitness/Sports: "דרושים בספורט וכושר", "Fitness Industry Jobs Israel"
+Psychology/Counseling: "דרושים בפסיכולוגיה וייעוץ", "Mental Health Jobs Israel"
+Remote work: "Remote Jobs Israel", "עבודה מהבית - הזדמנויות ישראל", "Working Remotely From Israel"
+Parents/Flexible: "משרות אמא/אבא", "עבודה גמישה לאמהות", "ספינה - רשת לאמהות עובדות", "גמישות בעבודה - ישראל"
+English speakers: "Secret Tel Aviv", "Anglo Jobs Israel", "Jobs in Israel (English)"
+Government/Public sector: "דרושים בשירות המדינה", "עבודה בממשלה ובסקטור הציבורי"
+Startups: "Israel Startup Jobs", "משרות בסטארטאפים ישראל", "Startup Nation Jobs"
 
 Respond with JSON only:
 {

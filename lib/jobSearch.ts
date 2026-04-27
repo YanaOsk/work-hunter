@@ -30,11 +30,27 @@ interface SearchPlan {
   searchRationale?: string;
 }
 
-const PRIMARY_IL_SITES =
-  "site:drushim.co.il OR site:alljobs.co.il OR site:jobmaster.co.il OR site:gotfriends.co.il OR site:comeet.io OR site:linkedin.com/jobs OR site:glassdoor.com/Jobs";
-const FACEBOOK_SITES =
-  "site:facebook.com/groups OR site:facebook.com/marketplace/jobs OR site:facebook.com";
-const LINKEDIN_SITES = "site:linkedin.com/jobs OR site:linkedin.com/in";
+const MAIN_IL_SITES =
+  "site:drushim.co.il OR site:alljobs.co.il OR site:jobmaster.co.il OR site:gotfriends.co.il OR site:sahbak.co.il OR site:mploy.co.il";
+const SECONDARY_IL_SITES =
+  "site:jobnet.co.il OR site:joba.co.il OR site:comeet.io OR site:nisha.co.il OR site:seev.co.il OR site:urbanrecruits.co.il OR site:goozali.com OR site:karyera.org.il OR site:govo.co.il";
+const FACEBOOK_SITES = "site:facebook.com/groups";
+const LINKEDIN_SITES = "site:linkedin.com/jobs";
+
+const INACTIVE_MARKERS = [
+  "המשרה אינה פעילה", "משרה זו נסגרה", "המשרה הוסרה", "המשרה כבר אוישה",
+  "המשרה אינה זמינה", "המשרה פגה", "המשרה הסתיימה", "הגשת מועמדות אינה אפשרית",
+  "לא ניתן להגיש מועמדות", "פרסום זה פג תוקפו", "סליחה אך דף זה כבר לא קיים",
+  "המשרה נמחקה", "המשרה כבר לא קיימת", "משרה לא פעילה", "המשרה הוסרה מהאתר",
+  "no longer available", "position has been filled", "listing has expired",
+  "no longer accepting applications", "position closed",
+  "job posting is no longer active", "this job is no longer", "job expired",
+];
+
+function isExpiredListing(result: SerperResult): boolean {
+  const text = `${result.title} ${result.snippet}`.toLowerCase();
+  return INACTIVE_MARKERS.some((m) => text.includes(m.toLowerCase()));
+}
 
 async function generateSearchPlan(profileText: string): Promise<SearchPlan> {
   const text = await geminiAnalyze(SEARCH_QUERY_PROMPT(profileText), undefined, 1024, true);
@@ -61,29 +77,89 @@ async function serperSearch(query: string, sites: string, lang: string): Promise
 
 async function runSearches(plan: SearchPlan): Promise<TaggedResult[]> {
   const boardQueries = [
-    ...plan.hebrewQueries.map((q, i) => ({ q, lang: "iw", nonObvious: i === plan.hebrewQueries.length - 1, sites: PRIMARY_IL_SITES })),
-    ...plan.englishQueries.map((q, i) => ({ q, lang: "en", nonObvious: i === plan.englishQueries.length - 1, sites: PRIMARY_IL_SITES })),
+    ...plan.hebrewQueries.map((q, i) => ({
+      q, lang: "iw",
+      nonObvious: i === plan.hebrewQueries.length - 1,
+      sites: i % 2 === 0 ? MAIN_IL_SITES : SECONDARY_IL_SITES,
+    })),
+    ...plan.englishQueries.map((q, i) => ({
+      q, lang: "en",
+      nonObvious: i === plan.englishQueries.length - 1,
+      sites: MAIN_IL_SITES,
+    })),
   ];
+
   const fbQuery = plan.facebookQuery || `${plan.hebrewQueries[0]} דרושים`;
   const fbSearches = [
     { q: fbQuery, lang: "iw", nonObvious: false, sites: FACEBOOK_SITES },
     { q: `${plan.hebrewQueries[0]} דרושים קבוצה`, lang: "iw", nonObvious: false, sites: FACEBOOK_SITES },
   ];
-  const liQuery = plan.linkedinQuery || plan.englishQueries[0];
-  const linkedinSearches = [{ q: liQuery, lang: "en", nonObvious: false, sites: LINKEDIN_SITES }];
 
+  const liQuery = plan.linkedinQuery || plan.englishQueries[0];
+  const linkedinSearches = plan.isTech
+    ? [{ q: liQuery, lang: "en", nonObvious: false, sites: LINKEDIN_SITES }]
+    : [];
+
+  const allSearches = [...boardQueries, ...fbSearches, ...linkedinSearches];
   const results = await Promise.all(
-    [...boardQueries, ...fbSearches, ...linkedinSearches].map(({ q, lang, nonObvious, sites }) =>
+    allSearches.map(({ q, lang, nonObvious, sites }) =>
       serperSearch(q, sites, lang).then((r) => r.map((item) => ({ ...item, isNonObvious: nonObvious })))
     )
   );
+
   const all = results.flat();
-  return all.filter((r, i, arr) => arr.findIndex((x) => x.link === r.link) === i).slice(0, 18);
+  const deduped = all.filter((r, i, arr) => arr.findIndex((x) => x.link === r.link) === i);
+  const active = deduped.filter((r) => !isExpiredListing(r));
+  return active.slice(0, 18);
+}
+
+// Fetch full job page content for richer match analysis
+async function fetchJobContent(url: string): Promise<string | null> {
+  // Skip sites that require auth or JS rendering
+  if (url.includes("linkedin.com") || url.includes("facebook.com")) return null;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml",
+      },
+    });
+    clearTimeout(timeout);
+    if (!response.ok) return null;
+    const html = await response.text();
+    const text = html
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/\s+/g, " ")
+      .trim();
+    return text.length > 300 ? text.slice(0, 3000) : null;
+  } catch {
+    return null;
+  }
 }
 
 async function analyzeMatch(profileText: string, job: TaggedResult): Promise<JobResult> {
+  const fullContent = await fetchJobContent(job.link);
+  // Use full page content only when it's substantially richer than the snippet
+  const description =
+    fullContent && fullContent.length > job.snippet.length * 2 ? fullContent : job.snippet;
+
   try {
-    const text = await geminiAnalyze(MATCH_ANALYSIS_PROMPT(profileText, job.title, job.snippet), undefined, 512, true);
+    const text = await geminiAnalyze(
+      MATCH_ANALYSIS_PROMPT(profileText, job.title, description),
+      undefined,
+      512,
+      true
+    );
     const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     const analysis = JSON.parse(clean);
     return {
@@ -95,6 +171,7 @@ async function analyzeMatch(profileText: string, job: TaggedResult): Promise<Job
       description: job.snippet,
       matchScore: analysis.matchScore || 70,
       matchReasons: analysis.matchReasons || [],
+      matchNegatives: analysis.matchNegatives || [],
       isRemote: analysis.isRemote || false,
       salaryRange: analysis.salaryRange || undefined,
       postedDate: job.date,
@@ -111,6 +188,7 @@ async function analyzeMatch(profileText: string, job: TaggedResult): Promise<Job
       description: job.snippet,
       matchScore: 65,
       matchReasons: ["מתאים לפרופיל שלך"],
+      matchNegatives: [],
       isRemote: false,
       postedDate: job.date,
       source: getDomain(job.link),
@@ -135,7 +213,17 @@ function getDomain(url: string): string {
     if (domain.includes("alljobs")) return "AllJobs";
     if (domain.includes("jobmaster")) return "JobMaster";
     if (domain.includes("gotfriends")) return "GotFriends";
+    if (domain.includes("sahbak")) return "סחבק";
+    if (domain.includes("mploy")) return "Mploy";
     if (domain.includes("comeet")) return "Comeet";
+    if (domain.includes("jobnet")) return "JobNet";
+    if (domain.includes("joba")) return "Joba";
+    if (domain.includes("nisha")) return "נישה";
+    if (domain.includes("seev")) return "Seev";
+    if (domain.includes("urbanrecruits")) return "UrbanRecruits";
+    if (domain.includes("goozali")) return "Goozali";
+    if (domain.includes("karyera")) return "Karyera";
+    if (domain.includes("govo")) return "GOVO";
     return domain;
   } catch {
     return "לוח דרושים";
@@ -143,7 +231,10 @@ function getDomain(url: string): string {
 }
 
 function getMockJobs(profileText: string): JobResult[] {
-  const isRemote = profileText.includes("remote") || profileText.includes("מרחוק") || profileText.includes("היברידי");
+  const isRemote =
+    profileText.includes("remote") ||
+    profileText.includes("מרחוק") ||
+    profileText.includes("היברידי");
   return [
     {
       id: "mock1",
@@ -154,6 +245,7 @@ function getMockJobs(profileText: string): JobResult[] {
       description: "ניהול פרויקטים טכנולוגיים, עבודה מול לקוחות ומפתחים.",
       matchScore: 85,
       matchReasons: ["מתאים לרקע שלך", isRemote ? "עבודה מהבית" : "מיקום מרכזי", "הזדמנות צמיחה"],
+      matchNegatives: [],
       isRemote,
       source: "דרושים",
     },
@@ -166,45 +258,64 @@ function getMockJobs(profileText: string): JobResult[] {
       description: "ליווי לקוחות, העצמה ושימור. דורש אמפתיה ויכולת טכנית.",
       matchScore: 78,
       matchReasons: ["מתאים לכישורי התקשורת שלך", "גמישות גבוהה", "שכר תחרותי"],
+      matchNegatives: [],
       isRemote: true,
       source: "LinkedIn",
     },
   ];
 }
 
-export async function runJobSearch(profileText: string): Promise<{ jobs: JobResult[]; demoMode: boolean }> {
+export async function runJobSearch(
+  profileText: string,
+  onJob?: (job: JobResult) => void
+): Promise<{ jobs: JobResult[]; demoMode: boolean }> {
   const serperKey = process.env.SERPER_API_KEY;
   const hasRealSearch = serperKey && serperKey !== "your_serper_api_key_here";
 
-  let jobs: JobResult[];
   if (hasRealSearch) {
     const plan = await generateSearchPlan(profileText);
     const results = await runSearches(plan);
-    jobs = await Promise.all(results.map((r) => analyzeMatch(profileText, r)));
+    const jobs: JobResult[] = [];
+    await Promise.all(
+      results.map(async (r) => {
+        const job = await analyzeMatch(profileText, r);
+        jobs.push(job);
+        onJob?.(job);
+      })
+    );
+    jobs.sort((a, b) => b.matchScore - a.matchScore);
+    return { jobs, demoMode: false };
   } else {
-    jobs = getMockJobs(profileText);
+    const jobs = getMockJobs(profileText);
+    for (const job of jobs) {
+      onJob?.(job);
+    }
+    return { jobs, demoMode: true };
   }
-
-  jobs.sort((a, b) => b.matchScore - a.matchScore);
-  return { jobs, demoMode: !hasRealSearch };
 }
 
-export async function generateHiddenMarket(profileText: string, lang: string): Promise<HiddenMarketResult> {
+export async function generateHiddenMarket(
+  profileText: string,
+  lang: string
+): Promise<HiddenMarketResult> {
   try {
     const text = await geminiAnalyze(HIDDEN_MARKET_PROMPT(profileText, lang), undefined, 800, true);
     const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     return JSON.parse(clean);
   } catch {
     return {
-      intro: lang === "he"
-        ? "לא מצאנו משרות שעונות בדיוק על כל האילוצים שלך — אבל יש מסלול חלופי שעובד."
-        : "We didn't find exact matches — but here's a path that works.",
+      intro:
+        lang === "he"
+          ? "לא מצאנו משרות שעונות בדיוק על כל האילוצים שלך — אבל יש מסלול חלופי שעובד."
+          : "We didn't find exact matches — but here's a path that works.",
       facebookGroups: [
         { name: "משרות מפייסבוק לאוזן", why: "הגדולה ביותר בישראל — עשרות פוסטים ביום" },
         { name: "דנה ונועה תעשו לי קריירה", why: "קהילה תומכת, הרבה הפניות ישירות" },
       ],
-      outreachTemplate: "שלום [שם], ראיתי את הפעילות שלך ב[חברה] ואני מרשים/ה מהגישה שלכם. אני [תפקיד] עם ניסיון ב[תחום] ומחפש/ת את האתגר הבא — האם תהיה פתוחות לשיחה קצרה?",
-      linkedinTip: 'חפשו "#hiring Israel" ו-"We\'re hiring" + התחום שלכם — מנהלי גיוס מפרסמים שם לפני שמעלים למשרות',
+      outreachTemplate:
+        "שלום [שם], ראיתי את הפעילות שלך ב[חברה] ואני מרשים/ה מהגישה שלכם. אני [תפקיד] עם ניסיון ב[תחום] ומחפש/ת את האתגר הבא — האם תהיה פתוחות לשיחה קצרה?",
+      linkedinTip:
+        'חפשו "#hiring Israel" ו-"We\'re hiring" + התחום שלכם — מנהלי גיוס מפרסמים שם לפני שמעלים למשרות',
     };
   }
 }
