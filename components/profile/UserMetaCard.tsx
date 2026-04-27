@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useRef, KeyboardEvent } from "react";
-import { useRouter } from "next/navigation";
 import type { UserMeta, Availability, WorkPref } from "@/lib/userMeta";
 import type { UserProfile } from "@/lib/types";
-import { queueAutoStart } from "@/lib/autoStart";
 
 type ParsedData = UserProfile["parsedData"];
 
@@ -57,7 +55,6 @@ function mergeArr(userArr: string[] | undefined, scoutArr: string[] | undefined)
 }
 
 export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
-  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -176,12 +173,6 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
               {he ? "עדיין אין מידע — " : "No data yet — "}
               <button onClick={startEdit} className="text-purple-400 hover:text-purple-300 transition">
                 {he ? "הוסף פה" : "add here"}
-              </button>
-              {he ? " או " : " or "}
-              <button
-                onClick={() => { queueAutoStart("jobs"); router.push("/"); }}
-                className="text-purple-400 hover:text-purple-300 transition">
-                {he ? "צאי לחיפוש עם Scout" : "search with Scout"}
               </button>
             </p>
           </div>
