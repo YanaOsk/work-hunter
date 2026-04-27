@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  let body: { userProfile?: Record<string, unknown>; chatContext?: string };
+  let body: { userProfile?: { parsedData?: Record<string, unknown> }; chatContext?: string };
   try {
     body = await request.json();
   } catch {
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
   const { userProfile, chatContext } = body;
   const profileText = JSON.stringify({
-    ...(userProfile as Record<string, unknown> | undefined)?.parsedData,
+    ...(userProfile?.parsedData ?? {}),
     additionalContext: chatContext,
   });
 
