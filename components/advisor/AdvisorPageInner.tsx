@@ -39,6 +39,37 @@ import AdvisorHomeButton from "./AdvisorHomeButton";
 type StageView = Exclude<AdvisorStage, "done">;
 type View = "map" | "chat" | "summary" | "interview" | StageView;
 
+function mergeIntoProfile(
+  profile: UserProfile,
+  patch: {
+    targetRoles?: string[];
+    skills?: string[];
+    additionalNotes?: string;
+    workPreference?: UserProfile["parsedData"]["workPreference"];
+    careerChangeInterest?: boolean;
+  }
+): UserProfile {
+  const existing = profile.parsedData;
+  const merged = { ...existing };
+  if (patch.targetRoles?.length) {
+    merged.targetRoles = [...new Set([...(existing.targetRoles ?? []), ...patch.targetRoles])];
+  }
+  if (patch.skills?.length) {
+    merged.skills = [...new Set([...(existing.skills ?? []), ...patch.skills])];
+  }
+  if (patch.additionalNotes) {
+    merged.additionalNotes = [existing.additionalNotes, patch.additionalNotes]
+      .filter(Boolean).join("\n\n");
+  }
+  if (patch.workPreference && !existing.workPreference) {
+    merged.workPreference = patch.workPreference;
+  }
+  if (patch.careerChangeInterest !== undefined && existing.careerChangeInterest === undefined) {
+    merged.careerChangeInterest = patch.careerChangeInterest;
+  }
+  return { ...profile, parsedData: merged };
+}
+
 export default function AdvisorPageInner() {
   const router = useRouter();
   const params = useSearchParams();
@@ -128,12 +159,46 @@ export default function AdvisorPageInner() {
     else setView("map");
   };
 
-  const onDiagnosis = (r: DiagnosisResult) => completeAndAdvance({ diagnosis: r });
-  const onDirection = (r: DirectionResult, path: LifePath) =>
-    completeAndAdvance({ direction: r, chosenPath: path });
+  const onDiagnosis = (r: DiagnosisResult) => {
+    const enriched = mergeIntoProfile(advisorState.userProfile, {
+      targetRoles: r.topRoles,
+      skills: r.strengths,
+      additionalNotes: [
+        r.topMessage ?? r.summary,
+        r.mbtiType && `סוג אישיות: ${r.mbtiType}`,
+        r.hollandCode && `Holland: ${r.hollandCode}`,
+        r.workEnvironmentFit?.length && `סביבת עבודה מתאימה: ${r.workEnvironmentFit.join(", ")}`,
+      ].filter(Boolean).join(" | "),
+    });
+    completeAndAdvance({ diagnosis: r, userProfile: enriched });
+  };
+
+  const onDirection = (r: DirectionResult, path: LifePath) => {
+    const chosenOption = r.options.find((o) => o.path === path);
+    const enriched = mergeIntoProfile(advisorState.userProfile, {
+      careerChangeInterest: path !== "employee",
+      additionalNotes: [
+        `נתיב נבחר: ${path}`,
+        r.rationale,
+        chosenOption?.firstSteps?.length
+          ? `צעדים ראשונים: ${chosenOption.firstSteps.slice(0, 3).join(" | ")}`
+          : undefined,
+      ].filter(Boolean).join("\n"),
+    });
+    completeAndAdvance({ direction: r, chosenPath: path, userProfile: enriched });
+  };
+
   const onCV = (r: CVReview) => completeAndAdvance({ cvReview: r });
   const onCVSkip = () => completeAndAdvance({ cvSkipped: true });
-  const onStrategy = (r: SearchStrategy) => completeAndAdvance({ strategy: r });
+
+  const onStrategy = (r: SearchStrategy) => {
+    const hotRoles = (r.hotJobs ?? []).map((j) => j.title).filter(Boolean);
+    const enriched = mergeIntoProfile(advisorState.userProfile, {
+      targetRoles: hotRoles,
+      additionalNotes: r.topLine,
+    });
+    completeAndAdvance({ strategy: r, userProfile: enriched });
+  };
   const onInterview = (r: MockInterview) => persist({ ...advisorState, mockInterview: r });
 
   const onUnlock = (_plan: UnlockPlan) => {
