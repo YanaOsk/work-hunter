@@ -38,11 +38,25 @@ export async function verifyUser(
 }
 
 export async function getAllUsers(): Promise<
-  { id: string; name: string; email: string; createdAt: string }[]
+  { id: string; name: string; email: string; createdAt: string; provider: string }[]
 > {
   const db = sql();
-  const rows = await db`SELECT id, name, email, created_at FROM users ORDER BY created_at DESC`;
-  return rows.map((r) => ({ id: r.id, name: r.name, email: r.email, createdAt: r.created_at }));
+  const [emailRows, googleRows] = await Promise.all([
+    db`SELECT id, name, email, created_at FROM users ORDER BY created_at DESC`,
+    db`SELECT email AS id, name, email, created_at FROM google_accounts ORDER BY created_at DESC`,
+  ]);
+
+  const seen = new Set<string>();
+  const merged = [
+    ...emailRows.map((r) => ({ id: r.id, name: r.name, email: r.email, createdAt: r.created_at, provider: "email" })),
+    ...googleRows.map((r) => ({ id: r.id, name: r.name, email: r.email, createdAt: r.created_at, provider: "google" })),
+  ].filter((u) => {
+    if (seen.has(u.email)) return false;
+    seen.add(u.email);
+    return true;
+  });
+
+  return merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 export async function deleteUser(id: string): Promise<boolean> {

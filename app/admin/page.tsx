@@ -15,6 +15,7 @@ interface User {
   name: string;
   email: string;
   createdAt: string;
+  provider: string;
 }
 
 interface AnalyticsData {
@@ -348,6 +349,7 @@ function UsersTab() {
                 <th className="text-left px-5 py-3 font-medium">#</th>
                 <th className="text-left px-5 py-3 font-medium">Name</th>
                 <th className="text-left px-5 py-3 font-medium">Email</th>
+                <th className="text-left px-5 py-3 font-medium">Provider</th>
                 <th className="text-left px-5 py-3 font-medium">Joined</th>
                 <th className="px-5 py-3 font-medium text-right">Actions</th>
               </tr>
@@ -358,6 +360,11 @@ function UsersTab() {
                   <td className="px-5 py-3.5 text-white/25">{idx + 1}</td>
                   <td className="px-5 py-3.5 font-medium text-white">{user.name}</td>
                   <td className="px-5 py-3.5 text-white/50">{ltrSpan(user.email)}</td>
+                  <td className="px-5 py-3.5">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${user.provider === "google" ? "bg-blue-500/15 text-blue-400" : "bg-white/10 text-white/50"}`}>
+                      {user.provider === "google" ? "Google" : "Email"}
+                    </span>
+                  </td>
                   <td className="px-5 py-3.5 text-white/40">
                     {new Date(user.createdAt).toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric" })}
                   </td>
