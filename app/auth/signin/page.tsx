@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useLanguage } from "@/components/LanguageProvider";
 import { t } from "@/lib/i18n";
 import WelcomeModal from "@/components/WelcomeModal";
@@ -23,8 +23,16 @@ function SignInContent() {
   const { lang } = useLanguage();
   const tx = t[lang];
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { status } = useSession();
   // callbackUrl is set by NextAuth middleware when redirecting unauthenticated users
-  const callbackUrl = searchParams.get("callbackUrl") ?? undefined;
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace(callbackUrl);
+    }
+  }, [status, router, callbackUrl]);
 
   const [tab, setTab] = useState<Tab>("signin");
   const [name, setName] = useState("");
