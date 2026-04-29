@@ -21,14 +21,24 @@ function containsHebrew(text: string): boolean {
 }
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+  let parsedText = "";
   try {
-    const text = await extractWithPdfParse(buffer);
-    if (isUsableText(text)) {
-      if (containsHebrew(text)) return extractPdfTextWithVision(buffer);
-      return text;
-    }
-  } catch { /* fall through */ }
-  return extractPdfTextWithVision(buffer);
+    parsedText = await extractWithPdfParse(buffer);
+  } catch { /* ignore */ }
+
+  // Non-Hebrew text that parsed fine — use it directly
+  if (isUsableText(parsedText) && !containsHebrew(parsedText)) return parsedText;
+
+  // Hebrew or unreadable — try OpenAI Vision if key is available
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      return await extractPdfTextWithVision(buffer);
+    } catch { /* fall through */ }
+  }
+
+  // Fallback: use whatever pdf-parse returned (may be imperfect for Hebrew)
+  if (isUsableText(parsedText)) return parsedText;
+  return "";
 }
 
 export interface CvUpgradeResult {

@@ -68,6 +68,29 @@ export default function CvUpgrader({ onScoutCta, onClose }: Props) {
     setTimeout(() => setCopiedIdx(null), 2000);
   };
 
+  const downloadImproved = (r: CvUpgradeResult) => {
+    const lines: string[] = [];
+    lines.push(isRtl ? "קורות חיים — גרסה משופרת עם AI" : "CV — AI-Improved Version");
+    lines.push("=".repeat(50));
+    r.upgrades.forEach((u) => {
+      lines.push("");
+      lines.push(`[${u.section}]`);
+      lines.push(u.after);
+    });
+    if (r.strategicTips.length > 0) {
+      lines.push("");
+      lines.push(isRtl ? "טיפים אסטרטגיים:" : "Strategic Tips:");
+      r.strategicTips.forEach((tip, i) => lines.push(`${i + 1}. ${tip}`));
+    }
+    const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = isRtl ? "קורות_חיים_משופרים.txt" : "improved_cv.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const buildScoutSummary = (r: CvUpgradeResult) => {
     const skills = r.profile.topSkills.slice(0, 5).join(", ");
     return `${r.profile.currentRole}, ${r.profile.yearsExperience} ניסיון, כישורים: ${skills}`;
@@ -293,8 +316,19 @@ export default function CvUpgrader({ onScoutCta, onClose }: Props) {
             </div>
           )}
 
-          {/* Scout CTA + Redo */}
+          {/* Download improved + Scout CTA + Redo */}
           <div className="flex flex-col sm:flex-row gap-3 pt-1">
+            {result.upgrades.length > 0 && (
+              <button
+                onClick={() => downloadImproved(result)}
+                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99]"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                {lang === "he" ? "הורד עם שיפורי AI" : "Download with AI improvements"}
+              </button>
+            )}
             {onScoutCta && (
               <button
                 onClick={() => onScoutCta(buildScoutSummary(result))}
