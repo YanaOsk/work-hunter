@@ -18,6 +18,7 @@ export default function PricingPage() {
   const tx = t[lang];
   const router = useRouter();
   const [toast, setToast] = useState<string | null>(null);
+  const [openFeature, setOpenFeature] = useState<number | null>(null);
 
   const weeklyFeatures = [tx.planWeekly1, tx.planWeekly2, tx.planWeekly3, tx.planWeekly4, tx.planWeekly5];
   const quarterlyFeatures = [tx.planQuarterly1, tx.planQuarterly2, tx.planQuarterly3, tx.planQuarterly4, tx.planQuarterly5];
@@ -50,8 +51,8 @@ export default function PricingPage() {
         </div>
 
         {/* ── What's included in every plan ── */}
-        <div className="mb-10 md:mb-14">
-          <div className="text-center mb-5">
+        <div className="mb-12 max-w-3xl mx-auto">
+          <div className="text-center mb-6">
             <p className="text-purple-400/70 text-xs font-bold uppercase tracking-widest mb-2">
               {lang === "he" ? "מה כלול בכל מנוי" : "Included in every plan"}
             </p>
@@ -60,60 +61,117 @@ export default function PricingPage() {
                 ? "כלים מקצועיים שישנו את חיפוש העבודה שלך"
                 : "Professional tools that transform your job search"}
             </h2>
-            <p className="text-white/50 text-sm mt-2 max-w-xl mx-auto">
-              {lang === "he"
-                ? "בניגוד ליועצי קריירה שגובים 400–800 ₪ לפגישה, כל הכלים שלנו זמינים לך 24/7 — בלי תורים, בלי להמתין."
-                : "Unlike career advisors charging 400–800 ₪ per session, all our tools are available 24/7 — no queues, no waiting."}
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div
+            className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden"
+            dir={lang === "he" ? "rtl" : "ltr"}
+          >
             {([
               {
-                icon: "🚀",
-                titleHe: "קורות חיים ATS-Ready",
-                titleEn: "ATS-Ready CV Builder",
-                descHe: "מותאם לממשקי גיוס של חברות מובילות. תמיכה מלאה ב-Word ו-PDF.",
-                descEn: "Built for top ATS systems. Full Word & PDF upload support.",
-              },
-              {
-                icon: "💎",
-                titleHe: "שדרוג AI אסטרטגי",
-                titleEn: "AI Strategic Upgrade",
-                descHe: "הפוך ניסיון להישגים שמושכים מגייסים ומנהלים.",
-                descEn: "Turn your experience into achievements that attract recruiters.",
-              },
-              {
-                icon: "🌍",
-                titleHe: "תרגום חכם לאנגלית",
-                titleEn: "Smart Translation",
-                descHe: "התאמה מלאה לאנגלית עסקית, כולל רקע צבאי וניהולי.",
-                descEn: "Full adaptation to business English, incl. military & management.",
-              },
-              {
                 icon: "🧠",
-                titleHe: "ייעוץ קריירה 24/7",
-                titleEn: "Career Coaching 24/7",
-                descHe: "ניתוח אישיות, כיוון קריירה, וסימולציות ראיון — ללא הגבלה.",
-                descEn: "Personality analysis, career direction & mock interviews — unlimited.",
+                titleHe: "ייעוץ תעסוקתי אסטרטגי וניתוח אישיות",
+                titleEn: "Strategic Career Consulting & Personality Analysis",
+                descHe: "ניתוח אישיות עמוק, הכוונה למסלולי קריירה מותאמים וסימולציות ראיון עד להצלחה. זמין 24/7.",
+                descEn: "Deep personality analysis, tailored career path guidance, and interview simulations until success. Available 24/7.",
+                bulletsHe: [
+                  { title: "אבחון DNA מקצועי", desc: "ניתוח מעמיק של חוזקות, כישורים וסגנון עבודה (כגון ENFP) ליצירת התאמה מדויקת לשוק העבודה." },
+                  { title: "הכוונה למסלולי קריירה", desc: "זיהוי תפקידים אופטימליים (כמו ניהול יצירתי או יזמות) על בסיס שילוב בין כישורים לשאיפות אישיות." },
+                  { title: "ניתוח כדאיות (שכיר vs עצמאי)", desc: "השוואה כמותית של פוטנציאל השתכרות ואיכות חיים בין מסלולי תעסוקה שונים." },
+                  { title: "מיפוי חברות ואסטרטגיית חיפוש", desc: "בניית רשימת חברות יעד (Target Companies) ותוכנית נטוורקינג אופרטיבית ל-30 יום." },
+                  { title: "סימולציית ראיונות ומיתוג אישי", desc: 'הכנה לראיונות עבודה מותאמים אישית וגיבוש ה-"Pitch" המקצועי שלך למול מעסיקים.' },
+                ],
+                bulletsEn: [
+                  { title: "Professional DNA Diagnosis", desc: "In-depth analysis of strengths, skills, and work style (e.g. ENFP) to create a precise match with the job market." },
+                  { title: "Career Path Guidance", desc: "Identifying optimal roles (e.g. creative management or entrepreneurship) based on the combination of skills and personal aspirations." },
+                  { title: "Feasibility Analysis (Employee vs. Self-Employed)", desc: "Quantitative comparison of earning potential and quality of life across different employment paths." },
+                  { title: "Company Mapping & Search Strategy", desc: "Building a Target Companies list and an operational 30-day networking plan." },
+                  { title: "Interview Simulation & Personal Branding", desc: 'Personalized interview preparation and crafting your professional "Pitch" for employers.' },
+                ],
               },
               {
                 icon: "🤖",
-                titleHe: "הסקאוט — חיפוש עבודה",
-                titleEn: "The Scout — Job Search",
-                descHe: "הצייד האישי שלך שמוצא רק תפקידים שמתאימים לאילוצים שלך.",
-                descEn: "Your personal job hunter surfacing only roles that fit your constraints.",
+                titleHe: "הסקאוט — צייד המשרות האישי שלך",
+                titleEn: "The Scout — Your Personal Job Hunter",
+                descHe: "סריקה אקטיבית של השוק למציאת משרות שמתאימות בדיוק לפרופיל שלך ולאילוצים האישיים שלך.",
+                descEn: "Active market scanning to find positions that exactly match your profile and personal constraints.",
+                bulletsHe: [
+                  { title: "חיפוש חכם ללא הגבלה", desc: "סריקה אקטיבית של השוק למציאת משרות התואמות בדיוק את פרופיל הייעוץ שנבנה עבורך." },
+                  { title: "התאמה לאילוצים אישיים", desc: "איתור משרות המתחשבות בצרכים ספציפיים כגון שירות מילואים, הריון, הורות ודרישות גמישות (היברידי/מרחוק)." },
+                  { title: "גישה לשוק הנסתר", desc: "חשיפת הזדמנויות תעסוקתיות בחברות רלוונטיות עוד לפני שהן מתפרסמות בערוצים הרגילים." },
+                ],
+                bulletsEn: [
+                  { title: "Smart Unlimited Search", desc: "Active market scanning to find positions that exactly match the career profile built for you." },
+                  { title: "Adaptation to Personal Constraints", desc: "Finding positions that account for specific needs such as military reserve duty, pregnancy, parenthood, and flexibility (hybrid/remote)." },
+                  { title: "Access to the Hidden Market", desc: "Uncovering employment opportunities at relevant companies before they're published through regular channels." },
+                ],
               },
-            ] as const).map((item) => (
-              <div
-                key={item.titleEn}
-                className="group bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-2 hover:bg-white/8 hover:border-purple-500/40 hover:-translate-y-0.5 transition-all duration-200 cursor-default"
-              >
-                <span className="text-2xl">{item.icon}</span>
-                <p className="text-white font-semibold text-sm">{lang === "he" ? item.titleHe : item.titleEn}</p>
-                <p className="text-white/50 text-xs leading-relaxed">{lang === "he" ? item.descHe : item.descEn}</p>
-              </div>
-            ))}
+              {
+                icon: "🚀",
+                titleHe: "בניית ושדרוג קורות חיים עם AI",
+                titleEn: "CV Building & AI-Powered Optimization",
+                descHe: "יצירת קורות חיים מנצחים מ-0 או שדרוג קיימים — מותאמים ל-ATS ולדרישות המשרה.",
+                descEn: "Build a winning CV from scratch or upgrade an existing one — tailored to ATS systems and job requirements.",
+                bulletsHe: [
+                  { title: "יצירה מ-0 בסטנדרט גלובלי", desc: "בניית מסמך מקצועי ומנצח בעברית או באנגלית המותאם למערכות הסינון (ATS)." },
+                  { title: "שינוי תבניות (Formatting)", desc: "אפשרות להעלאת קובץ קיים והלבשתו על תבניות עיצוב מודרניות ומרשימות בלחיצת כפתור." },
+                  { title: "אופטימיזציה של התוכן", desc: "הפיכת רשימת מטלות יבשה לתיאור הישגים מדידים ומרשימים (Impact-driven)." },
+                  { title: "דיוק מילות מפתח", desc: "התאמת הניסיון התעסוקתי לדרישות המשרה כדי למשוך את תשומת לב המגייסים." },
+                  { title: "סיכום מקצועי מנצח", desc: 'כתיבת פסקת פתיחה ("Summary") המזקקת את הערך המוסף הייחודי שלך.' },
+                ],
+                bulletsEn: [
+                  { title: "Built from Scratch, Global Standard", desc: "Creating a professional, winning document in Hebrew or English, tailored to ATS filtering systems." },
+                  { title: "Template Formatting", desc: "Option to upload an existing file and apply modern, impressive design templates with one click." },
+                  { title: "Content Optimization", desc: "Transforming a dry task list into descriptions of measurable, impressive achievements (Impact-driven)." },
+                  { title: "Keyword Precision", desc: "Matching work experience to job requirements to attract recruiter attention." },
+                  { title: "Winning Professional Summary", desc: 'Writing an opening paragraph ("Summary") that distills your unique added value.' },
+                ],
+              },
+            ] as const).map((item, i, arr) => {
+              const isOpen = openFeature === i;
+              const bullets = lang === "he" ? item.bulletsHe : item.bulletsEn;
+              return (
+                <div key={item.titleEn} className={i < arr.length - 1 ? "border-b border-white/10" : ""}>
+                  <button
+                    onClick={() => setOpenFeature(isOpen ? null : i)}
+                    className="w-full flex items-start gap-4 px-6 py-5 text-start hover:bg-white/5 transition-colors"
+                  >
+                    <span className="text-3xl flex-shrink-0 mt-0.5">{item.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-bold text-sm mb-1">
+                        {lang === "he" ? item.titleHe : item.titleEn}
+                      </p>
+                      <p className="text-white/60 text-sm leading-relaxed">
+                        {lang === "he" ? item.descHe : item.descEn}
+                      </p>
+                    </div>
+                    <svg
+                      className={`w-4 h-4 text-white/40 flex-shrink-0 mt-1.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {isOpen && (
+                    <div className="px-6 pb-5 border-t border-white/10 bg-white/3">
+                      <ul className="mt-4 space-y-3">
+                        {bullets.map((b, j) => (
+                          <li key={j} className="flex items-start gap-2.5 text-sm">
+                            <svg className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-white/75 leading-relaxed">
+                              <span className="text-white font-semibold">{b.title}</span>
+                              {b.desc ? `: ${b.desc}` : ""}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -128,7 +186,7 @@ export default function PricingPage() {
             price={tx.planWeeklyPrice}
             per={tx.planWeeklyPer}
             tagline={tx.planWeeklyTagline}
-            features={weeklyFeatures}
+            features={[]}
             cta={tx.planWeeklyCta}
             onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["weekly"]}`)}
             variant="weekly"
@@ -139,7 +197,7 @@ export default function PricingPage() {
             price={tx.planQuarterlyPrice}
             per={tx.planQuarterlyPer}
             tagline={tx.planQuarterlyTagline}
-            features={quarterlyFeatures}
+            features={[]}
             cta={tx.planQuarterlyCta}
             onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["popular"]}`)}
             variant="popular"
@@ -150,7 +208,7 @@ export default function PricingPage() {
             oldPrice={tx.planLifetimeOld}
             price={tx.planLifetimePrice}
             tagline={tx.planLifetimeTagline}
-            features={lifetimeFeatures}
+            features={[]}
             cta={tx.planLifetimeCta}
             onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["pro"]}`)}
             variant="pro"

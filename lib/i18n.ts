@@ -559,7 +559,7 @@ export const t = {
     // Pricing
     pricingLink: "Plans",
     pricingTitle: "Your career, at a fair price",
-    pricingSubtitle: "A human career advisor in Israel charges 400–800 ₪ per session. We packed it all into one AI journey.",
+    pricingSubtitle: "Why pay 800 ₪ per session? Get a full AI career package — for the price of one meal.",
     promoBanner: "🔥 Launch special — up to 33% off. Ends April 30.",
     planFreeName: "Explorer",
     planFreePrice: "Free",
@@ -1207,7 +1207,7 @@ export const t = {
     // Pricing
     pricingLink: "מסלולים",
     pricingTitle: "הקריירה שלך, במחיר הוגן",
-    pricingSubtitle: "יועץ תעסוקתי אנושי בישראל גובה 400–800 ₪ לפגישה. ארזנו הכול למסע AI אחד.",
+    pricingSubtitle: "למה לשלם 800 ₪ לפגישה? קבלו מעטפת קריירה מלאה ב-AI, במחיר של ארוחה אחת.",
     promoBanner: "🔥 מבצע השקה — עד 33% הנחה. מסתיים ב-30 באפריל.",
     planFreeName: "Explorer",
     planFreePrice: "חינם",
