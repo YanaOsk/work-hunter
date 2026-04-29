@@ -47,6 +47,15 @@ export const authOptions: NextAuthOptions = {
               VALUES (${email}, ${user.name ?? ""}, ${new Date().toISOString()})
               ON CONFLICT (email) DO NOTHING
             `;
+            try {
+              const { sendWelcomeEmail, sendAdminNotificationEmail } = await import("./email");
+              await Promise.all([
+                sendWelcomeEmail(user.name ?? "", email),
+                sendAdminNotificationEmail(user.name ?? "", email),
+              ]);
+            } catch (emailErr) {
+              console.error("[auth] email send failed:", emailErr);
+            }
           } else {
             token.isNewUser = false;
           }
