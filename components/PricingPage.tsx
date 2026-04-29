@@ -44,11 +44,83 @@ export default function PricingPage() {
           </div>
         </div>
 
-        <div className="text-center mb-8 md:mb-12 max-w-2xl mx-auto">
+        <div className="text-center mb-8 md:mb-10 max-w-2xl mx-auto">
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">{tx.pricingTitle}</h1>
           <p className="text-white/70 text-sm sm:text-base md:text-lg leading-relaxed">{tx.pricingSubtitle}</p>
         </div>
 
+        {/* ── What's included in every plan ── */}
+        <div className="mb-10 md:mb-14">
+          <div className="text-center mb-5">
+            <p className="text-purple-400/70 text-xs font-bold uppercase tracking-widest mb-2">
+              {lang === "he" ? "מה כלול בכל מנוי" : "Included in every plan"}
+            </p>
+            <h2 className="text-xl sm:text-2xl font-bold text-white">
+              {lang === "he"
+                ? "כלים מקצועיים שישנו את חיפוש העבודה שלך"
+                : "Professional tools that transform your job search"}
+            </h2>
+            <p className="text-white/50 text-sm mt-2 max-w-xl mx-auto">
+              {lang === "he"
+                ? "בניגוד ליועצי קריירה שגובים 400–800 ₪ לפגישה, כל הכלים שלנו זמינים לך 24/7 — בלי תורים, בלי להמתין."
+                : "Unlike career advisors charging 400–800 ₪ per session, all our tools are available 24/7 — no queues, no waiting."}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {([
+              {
+                icon: "🚀",
+                titleHe: "קורות חיים ATS-Ready",
+                titleEn: "ATS-Ready CV Builder",
+                descHe: "מותאם לממשקי גיוס של חברות מובילות. תמיכה מלאה ב-Word ו-PDF.",
+                descEn: "Built for top ATS systems. Full Word & PDF upload support.",
+              },
+              {
+                icon: "💎",
+                titleHe: "שדרוג AI אסטרטגי",
+                titleEn: "AI Strategic Upgrade",
+                descHe: "הפוך ניסיון להישגים שמושכים מגייסים ומנהלים.",
+                descEn: "Turn your experience into achievements that attract recruiters.",
+              },
+              {
+                icon: "🌍",
+                titleHe: "תרגום חכם לאנגלית",
+                titleEn: "Smart Translation",
+                descHe: "התאמה מלאה לאנגלית עסקית, כולל רקע צבאי וניהולי.",
+                descEn: "Full adaptation to business English, incl. military & management.",
+              },
+              {
+                icon: "🧠",
+                titleHe: "ייעוץ קריירה 24/7",
+                titleEn: "Career Coaching 24/7",
+                descHe: "ניתוח אישיות, כיוון קריירה, וסימולציות ראיון — ללא הגבלה.",
+                descEn: "Personality analysis, career direction & mock interviews — unlimited.",
+              },
+              {
+                icon: "🤖",
+                titleHe: "הסקאוט — חיפוש עבודה",
+                titleEn: "The Scout — Job Search",
+                descHe: "הצייד האישי שלך שמוצא רק תפקידים שמתאימים לאילוצים שלך.",
+                descEn: "Your personal job hunter surfacing only roles that fit your constraints.",
+              },
+            ] as const).map((item) => (
+              <div
+                key={item.titleEn}
+                className="group bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-2 hover:bg-white/8 hover:border-purple-500/40 hover:-translate-y-0.5 transition-all duration-200 cursor-default"
+              >
+                <span className="text-2xl">{item.icon}</span>
+                <p className="text-white font-semibold text-sm">{lang === "he" ? item.titleHe : item.titleEn}</p>
+                <p className="text-white/50 text-xs leading-relaxed">{lang === "he" ? item.descHe : item.descEn}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Plan cards ── */}
+        <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-5 text-center">
+          {lang === "he" ? "בחרו את המסלול שמתאים לכם" : "Choose the plan that fits you"}
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <PlanCard
             name={tx.planWeeklyName}

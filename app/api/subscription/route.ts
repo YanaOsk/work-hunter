@@ -13,7 +13,7 @@ export async function GET() {
     }
 
     if (session.user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-      return NextResponse.json({ plan: "pro", isAdmin: true });
+      return NextResponse.json({ plan: "lifetime", isAdmin: true });
     }
 
     const sub = await getSubscription(session.user.email);
