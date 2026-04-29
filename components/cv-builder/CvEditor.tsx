@@ -102,8 +102,8 @@ export default function CvEditor({ data, onChange }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label={tx.cvFieldName} value={data.personal.fullName} onChange={(v) => setPersonal("fullName", v)} />
           <Field label={tx.cvFieldTitle} value={data.personal.title} onChange={(v) => setPersonal("title", v)} />
-          <Field label={tx.cvFieldEmail} value={data.personal.email} onChange={(v) => setPersonal("email", v)} type="email" />
-          <Field label={tx.cvFieldPhone} value={data.personal.phone} onChange={(v) => setPersonal("phone", v)} />
+          <Field label={tx.cvFieldEmail} value={data.personal.email} onChange={(v) => setPersonal("email", v)} type="email" dir="ltr" />
+          <Field label={tx.cvFieldPhone} value={data.personal.phone} onChange={(v) => setPersonal("phone", v)} dir="ltr" />
           <Field label={tx.cvFieldLocation} value={data.personal.location} onChange={(v) => setPersonal("location", v)} />
           <Field label={tx.cvFieldLinkedin} value={data.personal.linkedin} onChange={(v) => setPersonal("linkedin", v)} dir="ltr" />
           <Field label={tx.cvFieldWebsite} value={data.personal.website} onChange={(v) => setPersonal("website", v)} dir="ltr" className="sm:col-span-2" />

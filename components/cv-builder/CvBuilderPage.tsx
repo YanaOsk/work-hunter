@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
 import SiteFooter from "../SiteFooter";
 import CvEditor from "./CvEditor";
 import CvPreview from "./CvPreview";
+import CvUpgrader from "./CvUpgrader";
+import CvTranslator from "./CvTranslator";
 import {
   CV_ACCENT_COLORS,
   CV_TEMPLATES,
@@ -26,6 +29,10 @@ export default function CvBuilderPage() {
   const tx = t[lang];
   const { data: session, status } = useSession();
   const isLoggedIn = !!session?.user?.email;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromUrl = searchParams.get("from");
+  const cvIdParam = searchParams.get("cvId");
 
   const [view, setView] = useState<View>("list");
   const [cvList, setCvList] = useState<CvMeta[]>([]);
@@ -38,6 +45,14 @@ export default function CvBuilderPage() {
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [downloading, setDownloading] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showTranslateModal, setShowTranslateModal] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState("");
+  const [importDragging, setImportDragging] = useState(false);
+  const importInputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
   // Load CV list on mount (authenticated) or localStorage (guest)
@@ -59,6 +74,14 @@ export default function CvBuilderPage() {
   useEffect(() => {
     if (!isLoggedIn && loaded) saveCv(data);
   }, [data, loaded, isLoggedIn]);
+
+  // Auto-open a specific CV when cvId is in the URL
+  useEffect(() => {
+    if (!cvIdParam || view === "editor" || cvList.length === 0) return;
+    const meta = cvList.find((c) => c.id === cvIdParam);
+    if (meta) openExisting(meta);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cvList, cvIdParam]);
 
   const fetchList = async () => {
     setListLoading(true);
@@ -150,8 +173,12 @@ export default function CvBuilderPage() {
   };
 
   const handleBackToList = () => {
-    setView("list");
-    fetchList();
+    if (fromUrl) {
+      router.push(fromUrl);
+    } else {
+      setView("list");
+      fetchList();
+    }
   };
 
   const handleDownload = async () => {
@@ -214,6 +241,47 @@ export default function CvBuilderPage() {
     setShowResetModal(false);
   };
 
+  const handleImport = async () => {
+    if (!importFile || importing) return;
+    setImporting(true);
+    setImportError("");
+    try {
+      const formData = new FormData();
+      formData.append("file", importFile);
+      formData.append("lang", lang);
+      const res = await fetch("/api/import-cv", { method: "POST", body: formData });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Import failed");
+      }
+      const cvData: CvData = await res.json();
+      setActiveCvId(null);
+      setCvName(cvData.personal.fullName
+        ? (lang === "he" ? `קורות חיים — ${cvData.personal.fullName}` : `Resume — ${cvData.personal.fullName}`)
+        : tx.cvUntitled);
+      setData(cvData);
+      setLoaded(true);
+      setSaveStatus("idle");
+      setShowImportModal(false);
+      setImportFile(null);
+      setView("editor");
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : tx.cvImportError);
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const handleTranslateDone = (translatedData: CvData, newName: string) => {
+    setActiveCvId(null);
+    setCvName(newName);
+    setData(translatedData);
+    setLoaded(true);
+    setSaveStatus("idle");
+    setShowTranslateModal(false);
+    setView("editor");
+  };
+
   const formatDate = (iso: string) => {
     const d = new Date(iso);
     return d.toLocaleDateString(lang === "he" ? "he-IL" : "en-GB", {
@@ -235,19 +303,154 @@ export default function CvBuilderPage() {
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-10">
           <div className="flex items-center justify-between mb-8">
             <div>
+              {fromUrl && (
+                <button
+                  onClick={() => router.push(fromUrl)}
+                  className="flex items-center gap-1.5 text-white/40 hover:text-white/80 text-sm mb-2 transition"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  {lang === "he" ? "חזור" : "Back"}
+                </button>
+              )}
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{tx.cvMyCvs}</h1>
               <p className="text-white/50 text-sm">{cvList.length} {lang === "he" ? "קורות חיים" : "resume(s)"}</p>
             </div>
-            <button
-              onClick={openNew}
-              className="bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/20"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-              </svg>
-              {tx.cvNewCv}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowUpgradeModal(true)}
+                className="border border-white/20 hover:border-amber-500/60 bg-white/5 hover:bg-amber-500/10 text-white/70 hover:text-white font-medium px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                {tx.cvUpgradeBtn}
+              </button>
+              <button
+                onClick={() => { setShowImportModal(true); setImportFile(null); setImportError(""); }}
+                className="border border-white/20 hover:border-purple-500/60 bg-white/5 hover:bg-purple-500/10 text-white/70 hover:text-white font-medium px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                {tx.cvImportCv}
+              </button>
+              <button
+                onClick={openNew}
+                className="bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/20"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                </svg>
+                {tx.cvNewCv}
+              </button>
+            </div>
           </div>
+
+          {/* Upgrade modal */}
+          {showUpgradeModal && (
+            <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+              <div className="bg-slate-900 border border-white/15 rounded-2xl p-6 w-full max-w-2xl shadow-2xl my-8">
+                <CvUpgrader onClose={() => setShowUpgradeModal(false)} />
+              </div>
+            </div>
+          )}
+
+          {/* Import modal */}
+          {showImportModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+              <div className="bg-slate-900 border border-white/15 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h2 className="text-white font-bold text-lg">{tx.cvImportTitle}</h2>
+                    <p className="text-white/50 text-sm mt-1">{tx.cvImportSubtitle}</p>
+                  </div>
+                  <button
+                    onClick={() => setShowImportModal(false)}
+                    className="text-white/30 hover:text-white/70 transition ml-4 mt-0.5"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Drop zone */}
+                <div
+                  onClick={() => !importing && importInputRef.current?.click()}
+                  onDragOver={(e) => { e.preventDefault(); setImportDragging(true); }}
+                  onDragLeave={() => setImportDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setImportDragging(false);
+                    const f = e.dataTransfer.files?.[0];
+                    if (f?.type === "application/pdf") { setImportFile(f); setImportError(""); }
+                  }}
+                  className={`group border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all mb-4 ${
+                    importDragging
+                      ? "border-purple-400 bg-purple-500/10"
+                      : importFile
+                      ? "border-emerald-500/60 bg-emerald-500/5"
+                      : "border-white/20 hover:border-purple-500 hover:bg-purple-500/8"
+                  }`}
+                >
+                  <input
+                    ref={importInputRef}
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) { setImportFile(f); setImportError(""); }
+                    }}
+                  />
+                  {importFile ? (
+                    <div className="flex items-center justify-center gap-2 text-emerald-400">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium truncate max-w-[200px]">{importFile.name}</span>
+                    </div>
+                  ) : (
+                    <>
+                      <svg className="w-8 h-8 mx-auto mb-2 text-white/30 group-hover:text-purple-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                      <p className="text-white/50 text-sm group-hover:text-white/80 transition-colors">{tx.cvImportDrop}</p>
+                    </>
+                  )}
+                </div>
+
+                {importError && (
+                  <p className="text-rose-400 text-xs mb-3 text-center">{importError}</p>
+                )}
+
+                <button
+                  onClick={handleImport}
+                  disabled={!importFile || importing}
+                  className="w-full bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-700 hover:to-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white hover:text-white/80 font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-purple-900/30"
+                >
+                  {importing ? (
+                    <>
+                      <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      {tx.cvImporting}
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l14 9-14 9V3z" />
+                      </svg>
+                      {tx.cvImportStart}
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
 
           {listLoading ? (
             <div className="flex justify-center py-20">
@@ -325,10 +528,13 @@ export default function CvBuilderPage() {
                 {isLoggedIn && (
                   <button
                     onClick={handleBackToList}
-                    className="text-white/50 hover:text-white transition flex-shrink-0 text-sm"
-                    title={tx.cvBackToList}
+                    className="flex items-center gap-1 text-white/50 hover:text-white transition flex-shrink-0 text-sm"
+                    title={fromUrl ? (lang === "he" ? "חזור" : "Back") : tx.cvBackToList}
                   >
-                    {tx.cvBackToList}
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    {fromUrl ? (lang === "he" ? "חזור" : "Back") : tx.cvBackToList}
                   </button>
                 )}
                 {isLoggedIn ? (
@@ -371,6 +577,45 @@ export default function CvBuilderPage() {
                 className="text-white/50 hover:text-white text-sm px-3 py-2 border border-white/10 hover:border-white/20 rounded-lg transition"
               >
                 {tx.cvBuilderReset}
+              </button>
+
+              <div className="relative group/tt">
+                <button
+                  onClick={() => setShowTranslateModal(true)}
+                  className="text-white/60 hover:text-white text-sm px-3 py-2 border border-white/10 hover:border-sky-500/50 rounded-lg transition flex items-center gap-1.5"
+                >
+                  <span className="text-sm leading-none">🌐</span>
+                  <span className="hidden sm:inline">{tx.cvTranslateBtn}</span>
+                </button>
+                <div className={`pointer-events-none absolute top-full ${lang === "he" ? "right-0" : "left-0"} mt-2 w-64 bg-slate-800 border border-white/15 rounded-xl px-3 py-2.5 text-white/75 text-xs leading-relaxed shadow-xl opacity-0 group-hover/tt:opacity-100 transition-opacity duration-150 z-50`}>
+                  {tx.cvTranslateBtnTooltip}
+                </div>
+              </div>
+
+              <div className="relative group/tt2">
+                <button
+                  onClick={() => setShowUpgradeModal(true)}
+                  className="text-white/60 hover:text-white text-sm px-3 py-2 border border-white/10 hover:border-amber-500/50 rounded-lg transition flex items-center gap-1.5"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span className="hidden sm:inline">{tx.cvUpgradeBtn}</span>
+                </button>
+                <div className={`pointer-events-none absolute top-full ${lang === "he" ? "right-0" : "left-0"} mt-2 w-64 bg-slate-800 border border-white/15 rounded-xl px-3 py-2.5 text-white/75 text-xs leading-relaxed shadow-xl opacity-0 group-hover/tt2:opacity-100 transition-opacity duration-150 z-50`}>
+                  {tx.cvUpgradeBtnTooltip}
+                </div>
+              </div>
+
+              <button
+                onClick={() => { setShowImportModal(true); setImportFile(null); setImportError(""); }}
+                className="text-white/60 hover:text-white text-sm px-3 py-2 border border-white/10 hover:border-purple-500/50 rounded-lg transition flex items-center gap-1.5"
+                title={tx.cvImportCv}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span className="hidden sm:inline">{tx.cvImportCv}</span>
               </button>
 
               {isLoggedIn && (
@@ -502,6 +747,123 @@ export default function CvBuilderPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade modal — available from editor view too */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-slate-900 border border-white/15 rounded-2xl p-6 w-full max-w-2xl shadow-2xl my-8">
+            <CvUpgrader onClose={() => setShowUpgradeModal(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* Translate modal */}
+      {showTranslateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-white/15 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <CvTranslator
+              currentData={data}
+              currentName={cvName || tx.cvUntitled}
+              onDone={handleTranslateDone}
+              onClose={() => setShowTranslateModal(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Import modal — available from editor view too */}
+      {showImportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-white/15 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-white font-bold text-lg">{tx.cvImportTitle}</h2>
+                <p className="text-white/50 text-sm mt-1">{tx.cvImportSubtitle}</p>
+              </div>
+              <button
+                onClick={() => setShowImportModal(false)}
+                className="text-white/30 hover:text-white/70 transition ml-4 mt-0.5"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div
+              onClick={() => !importing && importInputRef.current?.click()}
+              onDragOver={(e) => { e.preventDefault(); setImportDragging(true); }}
+              onDragLeave={() => setImportDragging(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setImportDragging(false);
+                const f = e.dataTransfer.files?.[0];
+                if (f?.type === "application/pdf") { setImportFile(f); setImportError(""); }
+              }}
+              className={`group border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all mb-4 ${
+                importDragging
+                  ? "border-purple-400 bg-purple-500/10"
+                  : importFile
+                  ? "border-emerald-500/60 bg-emerald-500/5"
+                  : "border-white/20 hover:border-purple-500 hover:bg-purple-500/10"
+              }`}
+            >
+              <input
+                ref={importInputRef}
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) { setImportFile(f); setImportError(""); }
+                }}
+              />
+              {importFile ? (
+                <div className="flex items-center justify-center gap-2 text-emerald-400">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-sm font-medium truncate max-w-[200px]">{importFile.name}</span>
+                </div>
+              ) : (
+                <>
+                  <svg className="w-8 h-8 mx-auto mb-2 text-white/30 group-hover:text-purple-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <p className="text-white/50 text-sm group-hover:text-white/80 transition-colors">{tx.cvImportDrop}</p>
+                </>
+              )}
+            </div>
+
+            {importError && (
+              <p className="text-rose-400 text-xs mb-3 text-center">{importError}</p>
+            )}
+
+            <button
+              onClick={handleImport}
+              disabled={!importFile || importing}
+              className="w-full bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-700 hover:to-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white hover:text-white/80 font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-purple-900/30"
+            >
+              {importing ? (
+                <>
+                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  {tx.cvImporting}
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l14 9-14 9V3z" />
+                  </svg>
+                  {tx.cvImportStart}
+                </>
+              )}
+            </button>
           </div>
         </div>
       )}

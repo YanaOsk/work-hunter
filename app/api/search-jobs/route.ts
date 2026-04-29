@@ -11,14 +11,14 @@ export async function POST(request: NextRequest) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  let body: { userProfile?: { parsedData?: Record<string, unknown> }; chatContext?: string };
+  let body: { userProfile?: { parsedData?: Record<string, unknown> }; chatContext?: string; lang?: string };
   try {
     body = await request.json();
   } catch {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400 });
   }
 
-  const { userProfile, chatContext } = body;
+  const { userProfile, chatContext, lang = "he" } = body;
   const profileText = JSON.stringify({
     ...(userProfile?.parsedData ?? {}),
     additionalContext: chatContext,
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       try {
         const { demoMode } = await runJobSearch(profileText, (job: JobResult) => {
           send({ type: "job", job });
-        });
+        }, lang);
         send({ type: "done", demoMode });
       } catch (err) {
         console.error("search-jobs stream error:", err);

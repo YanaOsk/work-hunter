@@ -13,6 +13,38 @@ function getOpenAI(): OpenAI {
   return openaiClient;
 }
 
+// Extracts text from a PDF buffer using the OpenAI Responses API (vision-capable).
+// Works for both text-based and image/scanned PDFs.
+export async function extractPdfTextWithVision(pdfBuffer: Buffer): Promise<string> {
+  const base64 = pdfBuffer.toString("base64");
+  const client = getOpenAI();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const response = await (client as any).responses.create({
+    model: "gpt-4o-mini",
+    input: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_file",
+            filename: "cv.pdf",
+            file_data: `data:application/pdf;base64,${base64}`,
+          },
+          {
+            type: "input_text",
+            text: "Extract ALL text from this CV/resume document. Preserve the structure as much as possible — include all sections, names, dates, bullet points, and contact details. Output only the extracted text with no extra commentary.",
+          },
+        ],
+      },
+    ],
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const r = response as any;
+  return r.output_text ?? r.output?.[0]?.content?.[0]?.text ?? "";
+}
+
 function getGroq(): Groq {
   if (!groqClient) {
     const apiKey = process.env.GROQ_API_KEY;

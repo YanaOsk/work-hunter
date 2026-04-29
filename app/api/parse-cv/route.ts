@@ -1,24 +1,67 @@
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
-import { geminiGenerate } from "@/lib/gemini";
+import { geminiGenerate, extractPdfTextWithVision } from "@/lib/gemini";
 import { PARSE_CV_SYSTEM_PROMPT } from "@/lib/prompts";
 
-async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  return new Promise((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const PDFParser = require("pdf2json");
-    const parser = new PDFParser();
+async function extractWithPdfParse(buffer: Buffer): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const pdfParse = require("pdf-parse");
+  const data = await pdfParse(buffer);
+  return data.text ?? "";
+}
 
-    parser.on("pdfParser_dataError", (err: { parserError: Error }) => reject(err.parserError));
-    parser.on("pdfParser_dataReady", (data: { Pages: Array<{ Texts: Array<{ R: Array<{ T: string }> }> }> }) => {
-      const text = data.Pages.flatMap((p) =>
-        p.Texts.flatMap((t) => t.R.map((r) => decodeURIComponent(r.T)))
-      ).join(" ");
-      resolve(text);
-    });
-
-    parser.parseBuffer(buffer);
+async function extractWithPdf2Json(buffer: Buffer): Promise<string> {
+  return new Promise((resolve) => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const PDFParser = require("pdf2json");
+      const parser = new PDFParser();
+      parser.on("pdfParser_dataError", () => resolve(""));
+      parser.on("pdfParser_dataReady", (data: { Pages: Array<{ Texts: Array<{ R: Array<{ T: string }> }> }> }) => {
+        try {
+          const text = data.Pages.flatMap((p) =>
+            p.Texts.flatMap((t) =>
+              t.R.map((r) => {
+                try { return decodeURIComponent(r.T); } catch { return r.T; }
+              })
+            )
+          ).join(" ");
+          resolve(text);
+        } catch {
+          resolve("");
+        }
+      });
+      parser.parseBuffer(buffer);
+    } catch {
+      resolve("");
+    }
   });
+}
+
+async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+  try {
+    const text = await extractWithPdfParse(buffer);
+    if (text.trim().length > 50) return text;
+  } catch {
+    // fall through
+  }
+
+  try {
+    const text = await extractWithPdf2Json(buffer);
+    if (text.trim().length > 50) return text;
+  } catch {
+    // fall through
+  }
+
+  // Vision fallback for scanned/image-based PDFs
+  return extractPdfTextWithVision(buffer);
+}
+
+async function extractTextFromDocx(buffer: Buffer): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mammoth = require("mammoth");
+  const result = await mammoth.extractRawText({ buffer });
+  return result.value ?? "";
 }
 
 export async function POST(request: NextRequest) {
@@ -32,7 +75,8 @@ export async function POST(request: NextRequest) {
     if (file && file.size > 0) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      inputText = await extractTextFromPDF(buffer);
+      const isWord = file.type.includes("word") || /\.(docx?|rtf)$/i.test(file.name);
+      inputText = isWord ? await extractTextFromDocx(buffer) : await extractTextFromPDF(buffer);
     }
 
     if (freeText) {
@@ -44,7 +88,6 @@ export async function POST(request: NextRequest) {
     }
 
     const truncated = inputText.slice(0, 6000);
-    const lang = formData.get("lang") as string | null;
 
     const responseText = await geminiGenerate(
       `Please analyze this CV/bio and extract structured data. Write all clarifyingQuestions in English.\n\n${truncated}`,
@@ -55,7 +98,6 @@ export async function POST(request: NextRequest) {
 
     const parsed = JSON.parse(responseText);
 
-    // Ensure array fields are always real arrays of primitives
     if (Array.isArray(parsed.clarifyingQuestions)) {
       parsed.clarifyingQuestions = parsed.clarifyingQuestions.map((q: unknown) =>
         typeof q === "string" ? q : typeof q === "object" && q !== null ? String(Object.values(q)[0]) : String(q)

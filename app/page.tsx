@@ -12,6 +12,7 @@ import UploadPhase from "@/components/UploadPhase";
 import InterviewPhase from "@/components/InterviewPhase";
 import SearchingPhase from "@/components/SearchingPhase";
 import ResultsPhase from "@/components/ResultsPhase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const initialState: AppState = {
   phase: "upload",
@@ -63,6 +64,7 @@ async function readSearchStream(
 export default function Home() {
   const router = useRouter();
   const { status } = useSession();
+  const { lang } = useLanguage();
   const [mode, setMode] = useState<AppMode | null>(null);
   const [state, setState] = useState<AppState>(initialState);
   const [demoMode, setDemoMode] = useState(false);
@@ -165,7 +167,7 @@ export default function Home() {
           const res = await fetch("/api/search-jobs", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userProfile: emptyProfile, chatContext: advisorCtx }),
+            body: JSON.stringify({ userProfile: emptyProfile, chatContext: advisorCtx, lang }),
           });
           if (!res.ok) throw new Error("failed");
           await readSearchStream(
@@ -255,7 +257,7 @@ export default function Home() {
       const res = await fetch("/api/search-jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userProfile: capturedProfile, chatContext: context }),
+        body: JSON.stringify({ userProfile: capturedProfile, chatContext: context, lang }),
       });
       if (!res.ok) throw new Error("Search failed");
 

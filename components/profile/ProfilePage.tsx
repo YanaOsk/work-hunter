@@ -18,6 +18,7 @@ import { AdvisorState, STAGE_ORDER } from "@/lib/types";
 import type { ConversationPreview, JobSnap } from "@/lib/conversations";
 import type { UserMeta } from "@/lib/userMeta";
 import type { CvMeta } from "@/lib/cvs";
+import { ltrSpan } from "@/lib/rtl";
 import { queueAutoStart, queueAdvisorScoutContext } from "@/lib/autoStart";
 import UserMetaCard from "./UserMetaCard";
 
@@ -37,9 +38,9 @@ const PATH_LABELS: Record<string, { he: string; en: string }> = {
 };
 
 const PLAN_META: Record<string, { he: string; en: string; cls: string }> = {
-  free:       { he: "Explorer · חינמי", en: "Explorer · Free",  cls: "text-white/60 bg-white/10 border-white/20" },
+  free:       { he: "חינמי",             en: "Explorer · Free",  cls: "text-white/60 bg-white/10 border-white/20" },
   weekly:     { he: "שבועי",            en: "Weekly",            cls: "text-blue-300 bg-blue-500/20 border-blue-500/30" },
-  "one-time": { he: "Career Boost",     en: "Career Boost",      cls: "text-purple-300 bg-purple-500/20 border-purple-500/30" },
+  "one-time": { he: "קידום קריירה",     en: "Career Boost",      cls: "text-purple-300 bg-purple-500/20 border-purple-500/30" },
   full:       { he: "מסע מלא",          en: "Full Journey",      cls: "text-purple-300 bg-purple-500/20 border-purple-500/30" },
   pro:        { he: "Pro",              en: "Pro",               cls: "text-amber-300 bg-amber-500/20 border-amber-500/30" },
 };
@@ -600,7 +601,7 @@ export default function ProfilePage() {
 
             {/* Name + email */}
             <p className="text-white text-xl sm:text-2xl font-bold leading-tight">{user?.name || "—"}</p>
-            <p className="text-white/45 text-sm mt-0.5">{user?.email}</p>
+            <p className="text-white/45 text-sm mt-0.5" style={{ textAlign: "right" }}>{user?.email ? ltrSpan(user.email) : null}</p>
           </div>
         </div>
 
@@ -612,13 +613,13 @@ export default function ProfilePage() {
           <SectionCard>
             <div className="flex items-center justify-between mb-4">
               <SectionTitle>{he ? "קורות החיים שלי" : "My CVs"}</SectionTitle>
-              <Link href="/cv-builder" className="text-purple-400 hover:text-purple-300 text-sm transition">
+              <Link href="/cv-builder?from=/profile" className="text-purple-400 hover:text-purple-300 text-sm transition">
                 {he ? "צור חדש" : "Create new"}
               </Link>
             </div>
             <div className="space-y-2">
               {cvs.map((cv) => (
-                <Link key={cv.id} href={`/cv-builder?cvId=${cv.id}`}
+                <Link key={cv.id} href={`/cv-builder?cvId=${cv.id}&from=/profile`}
                   className="flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl px-4 py-3 transition group">
                   <div className="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
                     <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -804,7 +805,7 @@ export default function ProfilePage() {
                   {he ? "נוצר ע\"י יועץ ה-AI שלך" : "Created by your AI advisor"}
                 </p>
               </div>
-              <Link href="/cv-builder"
+              <Link href="/cv-builder?from=/profile"
                 className="flex-shrink-0 text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/30 px-3 py-1.5 rounded-xl transition">
                 {he ? "הוסף ל-CV" : "Add to CV"}
               </Link>

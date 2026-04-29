@@ -52,6 +52,26 @@ function isExpiredListing(result: SerperResult): boolean {
   return INACTIVE_MARKERS.some((m) => text.includes(m.toLowerCase()));
 }
 
+const GENERIC_PAGE_TITLE_PATTERNS = [
+  /^דרושים$/, /^משרות$/, /^jobs?$/i, /^careers?$/i, /^all jobs/i,
+  /כל המשרות/, /לוח דרושים/, /חיפוש משרות/, /job listings/i, /job board/i,
+  /remote jobs/i, /משרות מרחוק$/, /משרות היום/,
+];
+
+const GENERIC_PAGE_URL_PATTERNS = [
+  /\/(jobs|careers|positions|משרות)\/?$/, // bare category pages
+  /\?category=/, /\?type=remote/, /\/tag\//, /\/category\//,
+];
+
+function isGenericLandingPage(result: SerperResult): boolean {
+  const titleLower = result.title.trim().toLowerCase();
+  if (GENERIC_PAGE_TITLE_PATTERNS.some((p) => p.test(titleLower))) return true;
+  if (GENERIC_PAGE_URL_PATTERNS.some((p) => p.test(result.link))) return true;
+  // Very short snippet with no job-specific content is likely a category page
+  if (result.snippet.length < 60 && !/משרה|דרוש|מחפש|דרישות|ניסיון|job|hiring|position/i.test(result.snippet)) return true;
+  return false;
+}
+
 async function generateSearchPlan(profileText: string): Promise<SearchPlan> {
   const text = await geminiAnalyze(SEARCH_QUERY_PROMPT(profileText), undefined, 1024, true);
   const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
@@ -109,7 +129,7 @@ async function runSearches(plan: SearchPlan): Promise<TaggedResult[]> {
 
   const all = results.flat();
   const deduped = all.filter((r, i, arr) => arr.findIndex((x) => x.link === r.link) === i);
-  const active = deduped.filter((r) => !isExpiredListing(r));
+  const active = deduped.filter((r) => !isExpiredListing(r) && !isGenericLandingPage(r));
   return active.slice(0, 18);
 }
 
@@ -147,7 +167,7 @@ async function fetchJobContent(url: string): Promise<string | null> {
   }
 }
 
-async function analyzeMatch(profileText: string, job: TaggedResult): Promise<JobResult> {
+async function analyzeMatch(profileText: string, job: TaggedResult, lang = "he"): Promise<JobResult> {
   const fullContent = await fetchJobContent(job.link);
   // Use full page content only when it's substantially richer than the snippet
   const description =
@@ -155,7 +175,7 @@ async function analyzeMatch(profileText: string, job: TaggedResult): Promise<Job
 
   try {
     const text = await geminiAnalyze(
-      MATCH_ANALYSIS_PROMPT(profileText, job.title, description),
+      MATCH_ANALYSIS_PROMPT(profileText, job.title, description, lang),
       undefined,
       512,
       true
@@ -174,6 +194,7 @@ async function analyzeMatch(profileText: string, job: TaggedResult): Promise<Job
       matchNegatives: analysis.matchNegatives || [],
       isRemote: analysis.isRemote || false,
       salaryRange: analysis.salaryRange || undefined,
+      salaryNote: analysis.salaryNote || undefined,
       postedDate: job.date,
       source: getDomain(job.link),
       isNonObvious: job.isNonObvious,
@@ -267,7 +288,8 @@ function getMockJobs(profileText: string): JobResult[] {
 
 export async function runJobSearch(
   profileText: string,
-  onJob?: (job: JobResult) => void
+  onJob?: (job: JobResult) => void,
+  lang = "he"
 ): Promise<{ jobs: JobResult[]; demoMode: boolean }> {
   const serperKey = process.env.SERPER_API_KEY;
   const hasRealSearch = serperKey && serperKey !== "your_serper_api_key_here";
@@ -278,7 +300,7 @@ export async function runJobSearch(
     const jobs: JobResult[] = [];
     await Promise.all(
       results.map(async (r) => {
-        const job = await analyzeMatch(profileText, r);
+        const job = await analyzeMatch(profileText, r, lang);
         jobs.push(job);
         onJob?.(job);
       })

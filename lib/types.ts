@@ -41,6 +41,7 @@ export interface JobResult {
   matchNegatives?: string[];
   isRemote: boolean;
   salaryRange?: string;
+  salaryNote?: string;
   postedDate?: string;
   source: string;
   isNonObvious?: boolean; // Scout suggested this proactively

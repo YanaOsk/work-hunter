@@ -1,4 +1,4 @@
-export type PlanId = "free" | "weekly" | "one-time" | "pro";
+export type PlanId = "free" | "weekly" | "quarterly" | "lifetime";
 
 export interface Plan {
   id: PlanId;
@@ -9,9 +9,17 @@ export interface Plan {
   per?: string;
   featuresHe: string[];
   color: "slate" | "sky" | "purple" | "amber";
-  /** Days until renewal. null = lifetime (one-time purchase). undefined = free (no subscription). */
+  /** Days until expiry. null = lifetime (never expires). undefined = free (no subscription). */
   renewalDays?: number | null;
 }
+
+const SHARED_FEATURES_HE = [
+  "בניית קורות חיים מקצועית עם AI",
+  "שדרוג וניתוח קורות חיים",
+  "תרגום קורות חיים חכם (עברית ↔ אנגלית)",
+  "יועץ קריירה ללא הגבלה",
+  "סקאוט חיפוש עבודה ללא הגבלה",
+];
 
 export const PLANS: Record<PlanId, Plan> = {
   free: {
@@ -21,10 +29,10 @@ export const PLANS: Record<PlanId, Plan> = {
     price: 0,
     displayPrice: "₪0",
     featuresHe: [
-      "3 שיחות עם יועץ AI",
-      "ניתוח קורות חיים בסיסי",
-      "עד 5 התאמות משרה לחיפוש",
-      "תמיכת קהילה",
+      "אבחון אישיות מלא (MBTI + Holland)",
+      "כיוון חיים — בחירת מסלול",
+      "תצוגה מוגבלת של הסיכום",
+      "צ'אט יועץ מוגבל (10 הודעות ביום)",
     ],
     color: "slate",
   },
@@ -36,50 +44,28 @@ export const PLANS: Record<PlanId, Plan> = {
     displayPrice: "₪25",
     per: "/ שבוע",
     renewalDays: 7,
-    featuresHe: [
-      "שיחות יועץ AI ללא הגבלה",
-      "בניית קורות חיים מלאה",
-      "עד 20 התאמות משרה לחיפוש",
-      "הכנה לראיון מדומה",
-      "תמיכה בעדיפות גבוהה",
-    ],
+    featuresHe: SHARED_FEATURES_HE,
     color: "sky",
   },
-  "one-time": {
-    id: "one-time",
-    nameEn: "Career Boost",
-    nameHe: "המסע המלא",
-    price: 99,
-    displayPrice: "₪99",
-    renewalDays: null, // lifetime — never expires
-    featuresHe: [
-      "ייעוץ קריירה מקיף וממוקד",
-      "כתיבה מחדש של קורות חיים",
-      "30 התאמות משרה מותאמות אישית",
-      "אופטימיזציה לפרופיל LinkedIn",
-      "ראיון מדומה (פגישה אחת)",
-      "תמיכה לחיפוש עבודה 3 חודשים",
-      "מפת דרכים אישית לקריירה",
-      "תמיכה בעדיפות גבוהה",
-    ],
+  quarterly: {
+    id: "quarterly",
+    nameEn: "3 Months",
+    nameHe: "3 חודשים",
+    price: 59,
+    displayPrice: "₪59",
+    per: "/ 3 חודשים",
+    renewalDays: 90,
+    featuresHe: SHARED_FEATURES_HE,
     color: "purple",
   },
-  pro: {
-    id: "pro",
-    nameEn: "Pro",
-    nameHe: "Pro",
-    price: 39,
-    displayPrice: "₪39",
-    per: "/ חודש",
-    renewalDays: 90, // auto-renews every 3 months
-    featuresHe: [
-      "כל מה שב-המסע המלא",
-      "התאמות משרה ללא הגבלה",
-      "צ'ק-אין שבועי עם יועץ AI",
-      "ראיונות מדומים ללא הגבלה",
-      "מעקב הגשות",
-      "תמיכה ייעודית",
-    ],
+  lifetime: {
+    id: "lifetime",
+    nameEn: "Lifetime",
+    nameHe: "לצמיתות",
+    price: 99,
+    displayPrice: "₪99",
+    renewalDays: null,
+    featuresHe: SHARED_FEATURES_HE,
     color: "amber",
   },
 };

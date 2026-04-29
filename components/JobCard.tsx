@@ -33,7 +33,7 @@ function ScoreBadge({
     <div className="relative flex-shrink-0" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <div className={`flex items-center gap-1.5 border rounded-full px-3 py-1 cursor-default select-none ${color}`}>
         <span className="text-sm font-bold">{score}%</span>
-        <span className="text-xs opacity-70">match</span>
+        <span className="text-xs opacity-70">{lang === "he" ? "התאמה" : "match"}</span>
         {hasReasons && (
           <svg className="w-3 h-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -158,6 +158,15 @@ export default function JobCard({ job, rank, saved = false, onToggleSave }: Prop
           {job.source}
         </span>
       </div>
+
+      {job.salaryNote && (
+        <p className="text-amber-400/70 text-xs mb-2 flex items-start gap-1">
+          <svg className="w-3 h-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {job.salaryNote}
+        </p>
+      )}
 
       <p className="text-white/60 text-sm leading-relaxed mb-4 line-clamp-2">{job.description}</p>
 

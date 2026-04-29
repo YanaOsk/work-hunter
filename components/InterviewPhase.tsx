@@ -6,6 +6,7 @@ import { HiddenMarketResult } from "@/lib/jobSearch";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import ScoutRobot from "./ScoutRobot";
+import { renderMixedText } from "@/lib/rtl";
 
 interface EnrichedMessage extends ChatMessage {
   jobs?: JobResult[];
@@ -168,6 +169,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
   const bottomRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
   const convIdRef = useRef<string | null>(null);
+  const messagesRef = useRef<EnrichedMessage[]>([]);
 
   const autoSave = async (plainMessages: Array<{ role: "user" | "assistant"; content: string }>) => {
     if (!convIdRef.current) {
@@ -259,6 +261,8 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
     }
   }, []);
 
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
+
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
 
   const sendMessage = async () => {
@@ -307,11 +311,11 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
   };
 
   const handleStartSearch = () => {
-    const context = messages
+    const context = messagesRef.current
       .slice(-12)
       .map((m) => `${m.role === "user" ? "מועמד" : "Scout"}: ${m.content}`)
       .join("\n");
-    onComplete(context, messages.map((m) => ({ role: m.role, content: m.content })), convIdRef.current ?? undefined);
+    onComplete(context, messagesRef.current.map((m) => ({ role: m.role, content: m.content })), convIdRef.current ?? undefined);
   };
 
   const profileData = userProfile.parsedData;
@@ -383,7 +387,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
                     ? "bg-purple-600 text-white rounded-ee-sm"
                     : "bg-white/10 text-white/90 rounded-es-sm border border-white/10"
                 }`}>
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{renderMixedText(msg.content)}</p>
                 </div>
               </div>
 

@@ -4,12 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
+import { renderMixedText } from "@/lib/rtl";
 
 const PLAN_IDS: Record<string, string> = {
   free: "free",
   weekly: "weekly",
-  popular: "one-time",
-  pro: "pro",
+  popular: "quarterly",
+  pro: "lifetime",
 };
 
 export default function PricingPage() {
@@ -18,10 +19,9 @@ export default function PricingPage() {
   const router = useRouter();
   const [toast, setToast] = useState<string | null>(null);
 
-  const freeFeatures = [tx.planFree1, tx.planFree2, tx.planFree3, tx.planFree4];
   const weeklyFeatures = [tx.planWeekly1, tx.planWeekly2, tx.planWeekly3, tx.planWeekly4, tx.planWeekly5];
-  const oneTimeFeatures = [tx.planOneTime1, tx.planOneTime2, tx.planOneTime3, tx.planOneTime4, tx.planOneTime5, tx.planOneTime6, tx.planOneTime7, tx.planOneTime8];
-  const proFeatures = [tx.planPro1, tx.planPro2, tx.planPro3, tx.planPro4, tx.planPro5, tx.planPro6];
+  const quarterlyFeatures = [tx.planQuarterly1, tx.planQuarterly2, tx.planQuarterly3, tx.planQuarterly4, tx.planQuarterly5];
+  const lifetimeFeatures = [tx.planLifetime1, tx.planLifetime2, tx.planLifetime3, tx.planLifetime4, tx.planLifetime5];
 
   const faqs = [
     { q: tx.faq1Q, a: tx.faq1A },
@@ -49,16 +49,7 @@ export default function PricingPage() {
           <p className="text-white/70 text-sm sm:text-base md:text-lg leading-relaxed">{tx.pricingSubtitle}</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10 md:mb-16">
-          <PlanCard
-            name={tx.planFreeName}
-            price={tx.planFreePrice}
-            tagline={tx.planFreeTagline}
-            features={freeFeatures}
-            cta={tx.planFreeCta}
-            onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["free"]}`)}
-            variant="free"
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <PlanCard
             name={tx.planWeeklyName}
             badge={tx.planWeeklyBadge}
@@ -71,28 +62,47 @@ export default function PricingPage() {
             variant="weekly"
           />
           <PlanCard
-            name={tx.planOneTimeName}
-            badge={tx.planOneTimeBadge}
-            oldPrice={tx.planOneTimeOld}
-            price={tx.planOneTimePrice}
-            tagline={tx.planOneTimeTagline}
-            features={oneTimeFeatures}
-            cta={tx.planOneTimeCta}
+            name={tx.planQuarterlyName}
+            badge={tx.planQuarterlyBadge}
+            price={tx.planQuarterlyPrice}
+            per={tx.planQuarterlyPer}
+            tagline={tx.planQuarterlyTagline}
+            features={quarterlyFeatures}
+            cta={tx.planQuarterlyCta}
             onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["popular"]}`)}
             variant="popular"
           />
           <PlanCard
-            name={tx.planProName}
-            badge={tx.planProBadge}
-            oldPrice={tx.planProOld}
-            price={tx.planProPrice}
-            per={tx.planProPer}
-            tagline={tx.planProTagline}
-            features={proFeatures}
-            cta={tx.planProCta}
+            name={tx.planLifetimeName}
+            badge={tx.planLifetimeBadge}
+            oldPrice={tx.planLifetimeOld}
+            price={tx.planLifetimePrice}
+            tagline={tx.planLifetimeTagline}
+            features={lifetimeFeatures}
+            cta={tx.planLifetimeCta}
             onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["pro"]}`)}
             variant="pro"
           />
+        </div>
+
+        {/* Free CTA */}
+        <div className="flex flex-col items-center gap-3 mt-2 mb-10 md:mb-12">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500 to-emerald-500 blur-md opacity-40 animate-pulse pointer-events-none" />
+            <button
+              onClick={() => router.push("/?start=jobs")}
+              className="relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-white font-bold text-base sm:text-lg bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 transition-all hover:scale-[1.03] shadow-lg shadow-purple-900/30"
+            >
+              {lang === "he" ? "התחילו עכשיו בחינם" : "Start for Free Now"}
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+                  d={lang === "he" ? "M11 17l-5-5m0 0l5-5m-5 5h12" : "M13 7l5 5m0 0l-5 5m5-5H6"} />
+              </svg>
+            </button>
+          </div>
+          <p className="text-white/40 text-xs">
+            {lang === "he" ? "ללא כרטיס אשראי · ללא התחייבות" : "No credit card · No commitment"}
+          </p>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-4 mb-10 md:mb-16">
@@ -181,14 +191,14 @@ function PlanCard({ name, badge, oldPrice, price, per, tagline, features, cta, o
 
       <button
         onClick={onCtaClick}
-        className={`w-full py-3 rounded-xl font-semibold transition mb-6 ${variantClasses.cta}`}
+        className={`w-full py-3 px-2 rounded-xl font-semibold transition mb-6 text-sm sm:text-base truncate ${variantClasses.cta}`}
       >
         {cta}
       </button>
 
       <ul className="space-y-2.5">
         {features.map((f, i) => (
-          <li key={i} className="flex gap-2 text-sm">
+          <li key={i} className="flex items-start gap-2 text-sm">
             <svg
               className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
                 variant === "free" ? "text-white/50"
@@ -200,7 +210,7 @@ function PlanCard({ name, badge, oldPrice, price, per, tagline, features, cta, o
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
-            <span className="text-white/85 leading-relaxed">{f}</span>
+            <span className="text-white/85 leading-relaxed">{renderMixedText(f)}</span>
           </li>
         ))}
       </ul>

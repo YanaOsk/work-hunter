@@ -182,6 +182,8 @@ function SignInContent() {
               onChange={(e) => { setEmail(e.target.value); setError(""); }}
               placeholder={tx.authEmailPh}
               required
+              dir="ltr"
+              style={{ direction: "ltr", unicodeBidi: "bidi-override", textAlign: "right" }}
               autoComplete={tab === "register" ? "email" : "username"}
               className="w-full bg-white/5 border border-white/15 focus:border-purple-500 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none text-sm transition"
             />

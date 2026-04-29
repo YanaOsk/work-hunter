@@ -3,6 +3,7 @@
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
 import { CvData } from "@/lib/cvBuilder";
+import { renderMixedText, ltrSpan } from "@/lib/rtl";
 
 interface Props {
   data: CvData;
@@ -15,10 +16,27 @@ function rgba(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function detectCvDir(data: CvData): "rtl" | "ltr" {
+  // Use content-rich fields only (exclude fullName — stays in original language after translation)
+  const sample = [
+    data.personal.title ?? "",
+    data.summary ?? "",
+    data.experiences[0]?.role ?? "",
+    data.experiences[0]?.description ?? "",
+    data.experiences[1]?.description ?? "",
+  ].join(" ");
+  const hebrew = (sample.match(/[א-ת]/g) ?? []).length;
+  const latin  = (sample.match(/[a-zA-Z]/g) ?? []).length;
+  const total  = hebrew + latin;
+  if (total === 0) return "rtl"; // blank CV — default RTL (Israeli app)
+  return hebrew / total > 0.25 ? "rtl" : "ltr";
+}
+
 export default function CvPreview({ data }: Props) {
   const { lang } = useLanguage();
-  const tx = t[lang];
-  const dir: "rtl" | "ltr" = lang === "he" ? "rtl" : "ltr";
+  const dir = detectCvDir(data);
+  const cvLang = dir === "rtl" ? "he" : "en";
+  const tx = t[cvLang];
   const ac = data.accentColor || "#7c3aed";
 
   const skillsList = data.skills.split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
@@ -64,6 +82,13 @@ const ICON_PHONE    = "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 
 const ICON_LOCATION = "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z";
 const ICON_LINK     = "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1";
 
+// Returns "ltr" when the string contains Latin letters — keeps multi-word Latin
+// names, emails, URLs, and phone numbers in the correct left-to-right order
+// inside an RTL container. Pure Hebrew/Arabic strings return undefined (inherit).
+function latinDir(text: string): "ltr" | undefined {
+  return /[a-zA-Z0-9@._+\-:/]/.test(text) ? "ltr" : undefined;
+}
+
 function CIcon({ d, cls = "w-3 h-3" }: { d: string; cls?: string }) {
   return (
     <svg className={`${cls} flex-shrink-0 opacity-75`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -89,8 +114,8 @@ function NovaTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMi
               {p.title || <span className="opacity-40">{tx.cvPreviewEmptyTitle}</span>}
             </p>
             <div className="flex flex-wrap gap-x-4 gap-y-1.5">
-              {p.email    && <span className="flex items-center gap-1.5 text-white/85 text-[12px]"><CIcon d={ICON_EMAIL} cls="w-3 h-3" />{p.email}</span>}
-              {p.phone    && <span className="flex items-center gap-1.5 text-white/85 text-[12px]"><CIcon d={ICON_PHONE} cls="w-3 h-3" />{p.phone}</span>}
+              {p.email    && <span className="flex items-center gap-1.5 text-white/85 text-[12px]"><CIcon d={ICON_EMAIL} cls="w-3 h-3" />{ltrSpan(p.email)}</span>}
+              {p.phone    && <span className="flex items-center gap-1.5 text-white/85 text-[12px]"><CIcon d={ICON_PHONE} cls="w-3 h-3" />{ltrSpan(p.phone)}</span>}
               {p.location && <span className="flex items-center gap-1.5 text-white/85 text-[12px]"><CIcon d={ICON_LOCATION} cls="w-3 h-3" />{p.location}</span>}
               {p.linkedin && <span className="flex items-center gap-1.5 text-white/85 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3" />{p.linkedin}</span>}
               {p.website  && <span className="flex items-center gap-1.5 text-white/85 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3" />{p.website}</span>}
@@ -124,7 +149,7 @@ function NovaTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMi
                       <h3 className="font-bold text-slate-900 text-[14.5px]">{exp.role || "—"}</h3>
                       {exp.company && (
                         <span className="text-[12.5px] font-semibold" style={{ color: ac }}>
-                          {exp.company}{exp.location ? ` · ${exp.location}` : ""}
+                          {renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}
                         </span>
                       )}
                     </div>
@@ -146,7 +171,7 @@ function NovaTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMi
                 <div key={edu.id} className="flex flex-wrap items-start justify-between gap-x-3 gap-y-0.5">
                   <div>
                     <h3 className="font-bold text-slate-900 text-[14px]">{edu.degree || "—"}</h3>
-                    {edu.school && <span className="text-[12.5px] font-semibold" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</span>}
+                    {edu.school && <span className="text-[12.5px] font-semibold" style={{ color: ac }}>{renderMixedText(edu.school)}{edu.location ? ` · ${edu.location}` : ""}</span>}
                   </div>
                   <span className="text-slate-400 text-[11.5px] font-medium mt-0.5" dir="ltr">
                     {edu.start || "—"} – {edu.current ? tx.cvFieldPresent : edu.end || "—"}
@@ -234,8 +259,8 @@ function NordicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, has
               {p.title || <span className="text-slate-300">{tx.cvPreviewEmptyTitle}</span>}
             </p>
             <div className="flex flex-wrap gap-x-5 gap-y-1.5">
-              {p.email    && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_EMAIL} />{p.email}</span>}
-              {p.phone    && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_PHONE} />{p.phone}</span>}
+              {p.email    && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_EMAIL} />{ltrSpan(p.email)}</span>}
+              {p.phone    && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_PHONE} />{ltrSpan(p.phone)}</span>}
               {p.location && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_LOCATION} />{p.location}</span>}
               {p.linkedin && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} />{p.linkedin}</span>}
               {p.website  && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} />{p.website}</span>}
@@ -314,7 +339,7 @@ function NordicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, has
                     </div>
                     <div className="flex-1 border-s-2 ps-4" style={{ borderColor: rgba(ac, 0.25) }}>
                       <h3 className="font-bold text-slate-900 text-[14px]">{exp.role || "—"}</h3>
-                      {exp.company && <div className="text-[12px] font-semibold mb-1" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                      {exp.company && <div className="text-[12px] font-semibold mb-1" style={{ color: ac }}>{renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}</div>}
                       {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                     </div>
                   </div>
@@ -334,7 +359,7 @@ function NordicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, has
                     </div>
                     <div className="flex-1 border-s-2 ps-4" style={{ borderColor: rgba(ac, 0.25) }}>
                       <h3 className="font-bold text-slate-900 text-[14px]">{edu.degree || "—"}</h3>
-                      {edu.school && <div className="text-[12px] font-semibold" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
+                      {edu.school && <div className="text-[12px] font-semibold" style={{ color: ac }}>{renderMixedText(edu.school)}{edu.location ? ` · ${edu.location}` : ""}</div>}
                     </div>
                   </div>
                 ))}
@@ -391,8 +416,8 @@ function SidebarTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ha
 
           {/* Contact */}
           <div className="space-y-2 mb-7">
-            {p.email    && <div className="flex items-center gap-2 text-white/80 text-[11.5px]"><CIcon d={ICON_EMAIL} cls="w-3 h-3" />{p.email}</div>}
-            {p.phone    && <div className="flex items-center gap-2 text-white/80 text-[11.5px]"><CIcon d={ICON_PHONE} cls="w-3 h-3" />{p.phone}</div>}
+            {p.email    && <div className="flex items-center gap-2 text-white/80 text-[11.5px]"><CIcon d={ICON_EMAIL} cls="w-3 h-3" />{ltrSpan(p.email)}</div>}
+            {p.phone    && <div className="flex items-center gap-2 text-white/80 text-[11.5px]"><CIcon d={ICON_PHONE} cls="w-3 h-3" />{ltrSpan(p.phone)}</div>}
             {p.location && <div className="flex items-center gap-2 text-white/80 text-[11.5px]"><CIcon d={ICON_LOCATION} cls="w-3 h-3" />{p.location}</div>}
             {p.linkedin && <div className="flex items-start gap-2 text-white/80 text-[11.5px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3 mt-0.5" /><span className="break-all">{p.linkedin}</span></div>}
           </div>
@@ -455,7 +480,7 @@ function SidebarTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ha
                         {exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}
                       </span>
                     </div>
-                    {exp.company && <div className="text-[12.5px] font-semibold mb-1.5" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                    {exp.company && <div className="text-[12.5px] font-semibold mb-1.5" style={{ color: ac }}>{renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}</div>}
                     {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                   </div>
                 ))}
@@ -474,7 +499,7 @@ function SidebarTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ha
                         {edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}
                       </span>
                     </div>
-                    {edu.school && <div className="text-[12.5px] font-semibold" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
+                    {edu.school && <div className="text-[12.5px] font-semibold" style={{ color: ac }}>{renderMixedText(edu.school)}{edu.location ? ` · ${edu.location}` : ""}</div>}
                   </div>
                 ))}
               </div>
@@ -519,8 +544,8 @@ function ClassicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ha
           {p.title || <span className="text-slate-300">{tx.cvPreviewEmptyTitle}</span>}
         </p>
         <div className="flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-slate-500 text-[12px]">
-          {p.email    && <span className="flex items-center gap-1.5"><CIcon d={ICON_EMAIL} />{p.email}</span>}
-          {p.phone    && <span className="flex items-center gap-1.5"><CIcon d={ICON_PHONE} />{p.phone}</span>}
+          {p.email    && <span className="flex items-center gap-1.5"><CIcon d={ICON_EMAIL} />{ltrSpan(p.email)}</span>}
+          {p.phone    && <span className="flex items-center gap-1.5"><CIcon d={ICON_PHONE} />{ltrSpan(p.phone)}</span>}
           {p.location && <span className="flex items-center gap-1.5"><CIcon d={ICON_LOCATION} />{p.location}</span>}
           {p.linkedin && <span className="flex items-center gap-1.5" dir="ltr"><CIcon d={ICON_LINK} />{p.linkedin}</span>}
           {p.website  && <span className="flex items-center gap-1.5" dir="ltr"><CIcon d={ICON_LINK} />{p.website}</span>}
@@ -549,7 +574,7 @@ function ClassicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ha
                       {exp.start || "—"} – {exp.current ? tx.cvFieldPresent : exp.end || "—"}
                     </span>
                   </div>
-                  {exp.company && <div className="text-slate-600 text-[13px] font-medium mb-1.5 italic">{exp.company}{exp.location ? `, ${exp.location}` : ""}</div>}
+                  {exp.company && <div className="text-slate-600 text-[13px] font-medium mb-1.5 italic">{renderMixedText(exp.company)}{exp.location ? `, ${exp.location}` : ""}</div>}
                   {exp.description && <p className="text-slate-600 text-[13px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                 </div>
               ))}
@@ -568,7 +593,7 @@ function ClassicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ha
                       {edu.start || "—"} – {edu.current ? tx.cvFieldPresent : edu.end || "—"}
                     </span>
                   </div>
-                  {edu.school && <div className="text-slate-600 text-[13px] italic">{edu.school}{edu.location ? `, ${edu.location}` : ""}</div>}
+                  {edu.school && <div className="text-slate-600 text-[13px] italic">{renderMixedText(edu.school)}{edu.location ? `, ${edu.location}` : ""}</div>}
                 </div>
               ))}
             </div>
@@ -631,8 +656,8 @@ function CodeTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMi
             {p.title && <p className="text-white/80 text-[13.5px] font-normal mt-1">{`> ${p.title}`}</p>}
           </div>
           <div className="text-[11.5px] text-white/75 space-y-0.5 text-start" dir="ltr">
-            {p.email    && <div>@ {p.email}</div>}
-            {p.phone    && <div># {p.phone}</div>}
+            {p.email    && <div>@ {ltrSpan(p.email)}</div>}
+            {p.phone    && <div># {ltrSpan(p.phone)}</div>}
             {p.location && <div>$ {p.location}</div>}
             {p.linkedin && <div>in {p.linkedin}</div>}
           </div>
@@ -658,7 +683,7 @@ function CodeTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMi
                     <span className="text-white font-semibold text-[13.5px]">{exp.role || "—"}</span>
                     <span className="text-gray-500 text-[11.5px]" dir="ltr">{exp.start}{exp.start && (exp.end || exp.current) ? " → " : ""}{exp.current ? "present" : exp.end}</span>
                   </div>
-                  {exp.company && <div className="text-[12px] mb-1.5 font-medium" style={{ color: rgba(ac, 0.9) }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                  {exp.company && <div className="text-[12px] mb-1.5 font-medium" style={{ color: rgba(ac, 0.9) }}>{renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}</div>}
                   {exp.description && <p className="text-gray-400 text-[12px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                 </div>
               ))}
@@ -675,7 +700,7 @@ function CodeTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMi
                     <span className="text-white text-[13.5px] font-semibold">{edu.degree || "—"}</span>
                     <span className="text-gray-500 text-[11px]" dir="ltr">{edu.start}{edu.start && edu.end ? "–" : ""}{edu.end}</span>
                   </div>
-                  {edu.school && <div className="text-gray-400 text-[12px]">{edu.school}{edu.location ? `, ${edu.location}` : ""}</div>}
+                  {edu.school && <div className="text-gray-400 text-[12px]">{renderMixedText(edu.school)}{edu.location ? `, ${edu.location}` : ""}</div>}
                 </div>
               ))}
             </div>
@@ -751,8 +776,8 @@ function ImpactTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, has
             {p.title || <span className="text-slate-400">{tx.cvPreviewEmptyTitle}</span>}
           </p>
           <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-slate-500 text-[12px]">
-            {p.email    && <span className="flex items-center gap-1.5"><CIcon d={ICON_EMAIL} />{p.email}</span>}
-            {p.phone    && <span className="flex items-center gap-1.5"><CIcon d={ICON_PHONE} />{p.phone}</span>}
+            {p.email    && <span className="flex items-center gap-1.5"><CIcon d={ICON_EMAIL} />{ltrSpan(p.email)}</span>}
+            {p.phone    && <span className="flex items-center gap-1.5"><CIcon d={ICON_PHONE} />{ltrSpan(p.phone)}</span>}
             {p.location && <span className="flex items-center gap-1.5"><CIcon d={ICON_LOCATION} />{p.location}</span>}
             {p.linkedin && <span className="flex items-center gap-1.5" dir="ltr"><CIcon d={ICON_LINK} />{p.linkedin}</span>}
           </div>
@@ -779,7 +804,7 @@ function ImpactTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, has
                       {exp.start}{exp.start && (exp.end || exp.current) ? "–" : ""}{exp.current ? tx.cvFieldPresent : exp.end}
                     </span>
                   </div>
-                  {exp.company && <div className="font-bold text-[12.5px] mt-0.5" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                  {exp.company && <div className="font-bold text-[12.5px] mt-0.5" style={{ color: ac }}>{renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}</div>}
                   {exp.description && <p className="text-slate-600 text-[13px] mt-2 leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                 </div>
               ))}
@@ -796,7 +821,7 @@ function ImpactTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, has
                     <h3 className="font-bold text-slate-900 text-[14.5px]">{edu.degree || "—"}</h3>
                     <span className="text-[11px] text-slate-400">{edu.start}{edu.start && edu.end ? "–" : ""}{edu.end}</span>
                   </div>
-                  {edu.school && <div className="text-slate-500 text-[13px] mt-0.5">{edu.school}{edu.location ? `, ${edu.location}` : ""}</div>}
+                  {edu.school && <div className="text-slate-500 text-[13px] mt-0.5">{renderMixedText(edu.school)}{edu.location ? `, ${edu.location}` : ""}</div>}
                 </div>
               ))}
             </div>
@@ -887,8 +912,8 @@ function TimelineTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, h
           </p>
 
           <div className="space-y-2 mb-7">
-            {p.email    && <div className="flex items-center gap-2 text-slate-600 text-[12px]"><CIcon d={ICON_EMAIL} />{p.email}</div>}
-            {p.phone    && <div className="flex items-center gap-2 text-slate-600 text-[12px]"><CIcon d={ICON_PHONE} />{p.phone}</div>}
+            {p.email    && <div className="flex items-center gap-2 text-slate-600 text-[12px]"><CIcon d={ICON_EMAIL} />{ltrSpan(p.email)}</div>}
+            {p.phone    && <div className="flex items-center gap-2 text-slate-600 text-[12px]"><CIcon d={ICON_PHONE} />{ltrSpan(p.phone)}</div>}
             {p.location && <div className="flex items-center gap-2 text-slate-600 text-[12px]"><CIcon d={ICON_LOCATION} />{p.location}</div>}
             {p.linkedin && <div className="flex items-start gap-2 text-slate-600 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3 mt-0.5" /><span className="break-all">{p.linkedin}</span></div>}
             {p.website  && <div className="flex items-start gap-2 text-slate-600 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3 mt-0.5" /><span className="break-all">{p.website}</span></div>}
@@ -954,7 +979,7 @@ function TimelineTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, h
                         {exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}
                       </span>
                     </div>
-                    {exp.company && <div className="text-[12px] font-semibold mb-1.5" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                    {exp.company && <div className="text-[12px] font-semibold mb-1.5" style={{ color: ac }}>{renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}</div>}
                     {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                   </div>
                 ))}
@@ -974,7 +999,7 @@ function TimelineTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, h
                         {edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}
                       </span>
                     </div>
-                    {edu.school && <div className="text-[12px] font-semibold" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
+                    {edu.school && <div className="text-[12px] font-semibold" style={{ color: ac }}>{renderMixedText(edu.school)}{edu.location ? ` · ${edu.location}` : ""}</div>}
                   </div>
                 ))}
               </div>
@@ -1028,8 +1053,8 @@ function PrismTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasM
             {p.title || <span className="opacity-40">{tx.cvPreviewEmptyTitle}</span>}
           </p>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
-            {p.email    && <span className="flex items-center gap-2 text-white/85 text-[12px]"><CIcon d={ICON_EMAIL} cls="w-3.5 h-3.5" />{p.email}</span>}
-            {p.phone    && <span className="flex items-center gap-2 text-white/85 text-[12px]"><CIcon d={ICON_PHONE} cls="w-3.5 h-3.5" />{p.phone}</span>}
+            {p.email    && <span className="flex items-center gap-2 text-white/85 text-[12px]"><CIcon d={ICON_EMAIL} cls="w-3.5 h-3.5" />{ltrSpan(p.email)}</span>}
+            {p.phone    && <span className="flex items-center gap-2 text-white/85 text-[12px]"><CIcon d={ICON_PHONE} cls="w-3.5 h-3.5" />{ltrSpan(p.phone)}</span>}
             {p.location && <span className="flex items-center gap-2 text-white/85 text-[12px]"><CIcon d={ICON_LOCATION} cls="w-3.5 h-3.5" />{p.location}</span>}
             {p.linkedin && <span className="flex items-center gap-2 text-white/85 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3.5 h-3.5" />{p.linkedin}</span>}
             {p.website  && <span className="flex items-center gap-2 text-white/85 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3.5 h-3.5" />{p.website}</span>}
@@ -1057,7 +1082,7 @@ function PrismTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasM
                       {exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}
                     </span>
                   </div>
-                  {exp.company && <div className="font-semibold text-[12.5px] mb-2" style={{ color: ac }}>{exp.company}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                  {exp.company && <div className="font-semibold text-[12.5px] mb-2" style={{ color: ac }}>{renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}</div>}
                   {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
                 </div>
               ))}
@@ -1076,7 +1101,7 @@ function PrismTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasM
                       {edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}
                     </span>
                   </div>
-                  {edu.school && <div className="font-semibold text-[12.5px] mt-0.5" style={{ color: ac }}>{edu.school}{edu.location ? ` · ${edu.location}` : ""}</div>}
+                  {edu.school && <div className="font-semibold text-[12.5px] mt-0.5" style={{ color: ac }}>{renderMixedText(edu.school)}{edu.location ? ` · ${edu.location}` : ""}</div>}
                 </div>
               ))}
             </div>

@@ -27,9 +27,9 @@ const WORK_PREF: Record<WorkPref, { he: string }> = {
 };
 
 function buildAutoSummary({
-  title, yoe, location, workPref, avail, he,
+  title, yoe, workPref, avail, he,
 }: {
-  title?: string; yoe?: number; location?: string; workPref?: WorkPref; avail?: Availability; he: boolean;
+  title?: string; yoe?: number; workPref?: WorkPref; avail?: Availability; he: boolean;
 }): string | null {
   const parts: string[] = [];
   if (title) {
@@ -39,19 +39,38 @@ function buildAutoSummary({
   } else if (yoe !== undefined) {
     parts.push(he ? `${yoe} שנות ניסיון` : `${yoe} yrs experience`);
   }
-  if (location) parts.push(location);
-  if (workPref) parts.push(he ? WORK_PREF[workPref].he : workPref);
+  if (workPref) parts.push(he ? (WORK_PREF[workPref]?.he ?? workPref) : workPref);
   else if (avail === "active") parts.push(he ? "מחפש/ת פעיל/ית" : "actively searching");
   return parts.length ? parts.join(" · ") : null;
 }
 
+const WORK_PREF_NORMALIZE: Record<string, WorkPref> = {
+  "full-time": "onsite", fulltime: "onsite", office: "onsite", "in-office": "onsite",
+  "work from home": "remote", wfh: "remote", "fully remote": "remote",
+  "hybrid work": "hybrid", "partial remote": "hybrid",
+  temporary: "flexible", contract: "flexible", freelance: "flexible", part: "flexible",
+};
+
+function normalizeWorkPref(val: string | undefined): WorkPref | undefined {
+  if (!val) return undefined;
+  const lower = val.toLowerCase().trim();
+  if (lower in WORK_PREF) return lower as WorkPref;
+  return WORK_PREF_NORMALIZE[lower];
+}
+
+function clean<T>(val: T | undefined): T | undefined {
+  if (val === null || val === undefined) return undefined;
+  if (typeof val === "string" && (val.trim() === "" || val.toLowerCase() === "null" || val.toLowerCase() === "undefined")) return undefined;
+  return val;
+}
+
 function merge<T>(userVal: T | undefined, scoutVal: T | undefined): T | undefined {
-  return userVal !== undefined ? userVal : scoutVal;
+  return clean(userVal) ?? clean(scoutVal);
 }
 
 function mergeArr(userArr: string[] | undefined, scoutArr: string[] | undefined): string[] {
   const combined = [...(userArr ?? []), ...(scoutArr ?? [])];
-  return [...new Set(combined)];
+  return [...new Set(combined.filter((s) => s && s.toLowerCase() !== "null" && s.toLowerCase() !== "undefined"))];
 }
 
 export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
@@ -65,7 +84,7 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
   const education     = merge(meta.education, scoutData.education);
   const skills        = mergeArr(meta.skills, scoutData.skills);
   const targetRoles   = mergeArr(meta.targetRoles, scoutData.targetRoles);
-  const workPref      = merge(meta.workPreference, scoutData.workPreference as WorkPref | undefined);
+  const workPref      = merge(meta.workPreference, normalizeWorkPref(scoutData.workPreference as string | undefined));
   const languages     = mergeArr(meta.languages, scoutData.languages);
   const avail         = meta.availability;
   const hasAnyData    = title || location || yoe || education || skills.length || targetRoles.length;
@@ -85,7 +104,7 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
       education:       meta.education ?? scoutData.education ?? "",
       skills:          skills,
       targetRoles:     targetRoles,
-      workPreference:  meta.workPreference ?? (scoutData.workPreference as WorkPref | undefined),
+      workPreference:  meta.workPreference ?? normalizeWorkPref(scoutData.workPreference as string | undefined),
       languages:       languages,
       bio:             meta.bio ?? "",
       linkedin:        meta.linkedin ?? "",
@@ -159,7 +178,7 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
         </div>
 
         {hasAnyData && (() => {
-          const summary = buildAutoSummary({ title, yoe, location, workPref, avail, he });
+          const summary = buildAutoSummary({ title, yoe, workPref, avail, he });
           return summary ? (
             <div className="px-6 pb-2">
               <p className="text-white/50 text-sm leading-relaxed">{summary}</p>
@@ -247,7 +266,7 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
                   <svg className="w-3.5 h-3.5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2" />
                   </svg>
-                  {he ? WORK_PREF[workPref].he : workPref}
+                  {he ? (WORK_PREF[workPref]?.he ?? workPref) : workPref}
                 </span>
               )}
               {languages.length > 0 && (
@@ -397,7 +416,7 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="LinkedIn">
             <input value={(draft.linkedin as string) ?? ""} onChange={(e) => setDraft((d) => ({ ...d, linkedin: e.target.value }))}
-              placeholder="linkedin.com/in/..." className={input} />
+              placeholder="linkedin.com/in/..." className={input} dir="ltr" style={{ direction: "ltr", unicodeBidi: "bidi-override", textAlign: "right" }} />
           </Field>
           <Field label={he ? "שפות" : "Languages"}>
             <input value={(draft.languages as string[] | undefined)?.join(", ") ?? ""}

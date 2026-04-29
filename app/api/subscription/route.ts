@@ -3,11 +3,17 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getSubscription, cancelSubscription, removeCard } from "@/lib/subscriptions";
 
+const ADMIN_EMAIL = "yanaoskin35@gmail.com";
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (session.user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+      return NextResponse.json({ plan: "pro", isAdmin: true });
     }
 
     const sub = await getSubscription(session.user.email);

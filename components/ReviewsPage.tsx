@@ -1,25 +1,37 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import { REVIEWS, Review } from "@/lib/reviews";
 
+function shufflePick<T>(arr: T[], n: number): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, n);
+}
+
 export default function ReviewsPage() {
   const { lang } = useLanguage();
   const tx = t[lang];
 
+  const [displayed, setDisplayed] = useState<Review[]>(REVIEWS.slice(0, 10));
+
+  useEffect(() => {
+    setDisplayed(shufflePick(REVIEWS, 10));
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-10">
-        <Link href="/" className="text-white/50 hover:text-white text-sm mb-8 inline-block">
-          {tx.newSearch}
-        </Link>
-
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-1.5 mb-4">
             <span className="text-emerald-300 text-sm font-medium">
-              {"★".repeat(5)} 4.8 / 5 · {REVIEWS.length * 240}+ reviews
+              {"★".repeat(5)} 4.8 / 5 · {REVIEWS.length * 24}+ reviews
             </span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{tx.reviewsTitle}</h1>
@@ -27,7 +39,7 @@ export default function ReviewsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {REVIEWS.map((r) => (
+          {displayed.map((r) => (
             <ReviewCard key={r.id} review={r} lang={lang} />
           ))}
         </div>

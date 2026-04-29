@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
+import { ltrSpan } from "@/lib/rtl";
 
 const ADMIN_EMAIL = "yanaoskin35@gmail.com";
 
@@ -356,7 +357,7 @@ function UsersTab() {
                 <tr key={user.id} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
                   <td className="px-5 py-3.5 text-white/25">{idx + 1}</td>
                   <td className="px-5 py-3.5 font-medium text-white">{user.name}</td>
-                  <td className="px-5 py-3.5 text-white/50">{user.email}</td>
+                  <td className="px-5 py-3.5 text-white/50">{ltrSpan(user.email)}</td>
                   <td className="px-5 py-3.5 text-white/40">
                     {new Date(user.createdAt).toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric" })}
                   </td>
@@ -439,7 +440,7 @@ export default function AdminPage() {
           </div>
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="text-white/40 text-sm hidden sm:block">{session.user?.email}</span>
+            <span className="text-white/40 text-sm hidden sm:block">{session.user?.email ? ltrSpan(session.user.email) : null}</span>
             <ThemeToggle />
             <a href="/" className="text-white/30 hover:text-white/70 text-sm transition px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
