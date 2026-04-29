@@ -319,15 +319,6 @@ export default function CvBuilderPage() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setShowUpgradeModal(true)}
-                className="border border-white/20 hover:border-amber-500/60 bg-white/5 hover:bg-amber-500/10 text-white/70 hover:text-white font-medium px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                {tx.cvUpgradeBtn}
-              </button>
-              <button
                 onClick={() => { setShowImportModal(true); setImportFile(null); setImportError(""); }}
                 className="border border-white/20 hover:border-purple-500/60 bg-white/5 hover:bg-purple-500/10 text-white/70 hover:text-white font-medium px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all"
               >
@@ -347,15 +338,6 @@ export default function CvBuilderPage() {
               </button>
             </div>
           </div>
-
-          {/* Upgrade modal */}
-          {showUpgradeModal && (
-            <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-              <div className="bg-slate-900 border border-white/15 rounded-2xl p-6 w-full max-w-2xl shadow-2xl my-8">
-                <CvUpgrader onClose={() => setShowUpgradeModal(false)} />
-              </div>
-            </div>
-          )}
 
           {/* Import modal */}
           {showImportModal && (
@@ -751,11 +733,15 @@ export default function CvBuilderPage() {
         </div>
       )}
 
-      {/* Upgrade modal — available from editor view too */}
+      {/* Upgrade modal — available from editor view only */}
       {showUpgradeModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-slate-900 border border-white/15 rounded-2xl p-6 w-full max-w-2xl shadow-2xl my-8">
-            <CvUpgrader onClose={() => setShowUpgradeModal(false)} />
+            <CvUpgrader
+              cvData={data}
+              onApplyChanges={(newData) => setData(newData)}
+              onClose={() => setShowUpgradeModal(false)}
+            />
           </div>
         </div>
       )}

@@ -51,19 +51,32 @@ function containsHebrew(text: string): boolean {
   return /[א-ת]/.test(text);
 }
 
+const hasVision = !!process.env.OPENAI_API_KEY;
+
+async function tryVision(buffer: Buffer): Promise<string> {
+  if (!hasVision) return "";
+  try { return await extractPdfTextWithVision(buffer); } catch { return ""; }
+}
+
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  // 1. pdf-parse — most text-based PDFs
+  let pdfParseText = "";
+  let pdf2JsonText = "";
+
+  // 1. pdf-parse
   try {
     const text = await extractWithPdfParse(buffer);
     if (isUsableText(text)) {
-      // Hebrew PDFs often store text in visual order (reversed) — vision reads correctly
       if (containsHebrew(text)) {
-        console.log("[import-cv] Hebrew detected in pdf-parse output, switching to vision");
-        return extractPdfTextWithVision(buffer);
+        console.log("[import-cv] Hebrew detected in pdf-parse, trying vision");
+        const visionText = await tryVision(buffer);
+        if (isUsableText(visionText)) return visionText;
+        console.log("[import-cv] vision unavailable/failed, using pdf-parse text");
+        return text;
       }
       console.log("[import-cv] extracted via pdf-parse, chars:", text.length);
       return text;
     }
+    pdfParseText = text;
   } catch {
     // fall through
   }
@@ -73,19 +86,27 @@ async function extractTextFromPDF(buffer: Buffer): Promise<string> {
     const text = await extractWithPdf2Json(buffer);
     if (isUsableText(text)) {
       if (containsHebrew(text)) {
-        console.log("[import-cv] Hebrew detected in pdf2json output, switching to vision");
-        return extractPdfTextWithVision(buffer);
+        console.log("[import-cv] Hebrew detected in pdf2json, trying vision");
+        const visionText = await tryVision(buffer);
+        if (isUsableText(visionText)) return visionText;
+        console.log("[import-cv] vision unavailable/failed, using pdf2json text");
+        return text;
       }
       console.log("[import-cv] extracted via pdf2json, chars:", text.length);
       return text;
     }
+    pdf2JsonText = text;
   } catch {
     // fall through
   }
 
-  // 3. Vision — scanned PDFs, image-based, or Hebrew with visual-order text
+  // 3. Vision fallback for scanned/image-based PDFs
   console.log("[import-cv] falling back to vision extraction");
-  return extractPdfTextWithVision(buffer);
+  const visionText = await tryVision(buffer);
+  if (isUsableText(visionText)) return visionText;
+
+  // Last resort: return whatever text we got
+  return pdfParseText || pdf2JsonText || "";
 }
 
 const COMMON_TLDS = ["com", "net", "org", "co", "il", "io", "me", "info", "edu", "gov", "ac"];
