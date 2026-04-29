@@ -3,7 +3,7 @@
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
 
-export type UnlockPlan = "weekly" | "one_time" | "pro";
+export type UnlockPlan = "weekly" | "quarterly" | "lifetime";
 
 interface Props {
   onUnlock: (plan: UnlockPlan) => void;
@@ -81,25 +81,24 @@ export default function SummaryGate({ onUnlock, onBack }: Props) {
               onClick={() => onUnlock("weekly")}
             />
             <PlanCard
-              name={tx.planOneTimeName}
-              badge={tx.planOneTimeBadge}
-              oldPrice={tx.planOneTimeOld}
-              price={tx.planOneTimePrice}
-              tagline={tx.planOneTimeTagline}
+              name={tx.planQuarterlyName}
+              badge={tx.planQuarterlyBadge}
+              price={tx.planQuarterlyPrice}
+              per={tx.planQuarterlyPer}
+              tagline={tx.planQuarterlyTagline}
               cta={tx.gateUnlock}
               variant="popular"
-              onClick={() => onUnlock("one_time")}
+              onClick={() => onUnlock("quarterly")}
             />
             <PlanCard
-              name={tx.planProName}
-              badge={tx.planProBadge}
-              oldPrice={tx.planProOld}
-              price={tx.planProPrice}
-              per={tx.planProPer}
-              tagline={tx.planProTagline}
+              name={tx.planLifetimeName}
+              badge={tx.planLifetimeBadge}
+              oldPrice={tx.planLifetimeOld}
+              price={tx.planLifetimePrice}
+              tagline={tx.planLifetimeTagline}
               cta={tx.gateUnlock}
               variant="pro"
-              onClick={() => onUnlock("pro")}
+              onClick={() => onUnlock("lifetime")}
             />
           </div>
         </div>

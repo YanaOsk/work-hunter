@@ -147,7 +147,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
               )}
               <div className="min-w-0">
                 <p className="text-white text-sm font-semibold truncate">{user.name}</p>
-                <p className="text-white/50 text-xs truncate">{ltrSpan(user.email)}</p>
+                <p className="text-white/50 text-xs truncate">{user.email ? ltrSpan(user.email) : null}</p>
                 {planBadge && (
                   <span className={`inline-flex items-center gap-1 mt-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${planBadge.cls}`}>
                     <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
