@@ -445,11 +445,6 @@ export default function ProfilePage() {
       }).catch(() => {});
     }
 
-    const profiles = getSavedProfiles();
-    if (profiles.length > 0) {
-      setScoutData(profiles[profiles.length - 1].profile.parsedData);
-    }
-
     setArchivedSessions(getAdvisorArchive(profileId));
   }, [session?.user?.id]);
 
@@ -471,13 +466,54 @@ export default function ProfilePage() {
   useEffect(() => {
     fetch("/api/user-meta")
       .then((r) => r.json())
-      .then((d) => { if (d && !d.error) setUserMeta(d as UserMeta); })
+      .then((d) => {
+        if (d && !d.error) {
+          setUserMeta(d as UserMeta);
+
+          // One-time sync: if DB has no profile data, pull from localStorage + advisor
+          const hasDbProfile = d.title || (d.skills?.length ?? 0) > 0 || d.yearsExperience !== undefined;
+          if (!hasDbProfile) {
+            const patch: Record<string, unknown> = {};
+
+            // From Scout localStorage
+            const profiles = getSavedProfiles();
+            if (profiles.length > 0) {
+              const pd = profiles[profiles.length - 1].profile.parsedData;
+              if (pd.currentRole)               patch.title           = pd.currentRole;
+              if (pd.location)                  patch.location        = pd.location;
+              if (pd.yearsExperience !== undefined) patch.yearsExperience = pd.yearsExperience;
+              if (pd.education)                 patch.education       = pd.education;
+              if (pd.skills?.length)            patch.skills          = pd.skills;
+              if (pd.languages?.length)         patch.languages       = pd.languages;
+              if (pd.targetRoles?.length)       patch.targetRoles     = pd.targetRoles;
+            }
+
+            // From Advisor: use rewrittenSummary as bio if no bio yet
+            const pid = session?.user?.id ?? DEFAULT_ADVISOR_ID;
+            const localAdvisor = getAdvisorState(pid);
+            if (!d.bio && !patch.bio && localAdvisor?.cvReview?.rewrittenSummary) {
+              patch.bio = localAdvisor.cvReview.rewrittenSummary;
+            }
+
+            if (Object.keys(patch).length > 0) {
+              fetch("/api/user-meta", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(patch),
+              })
+                .then((r) => r.json())
+                .then(() => setUserMeta((prev) => ({ ...prev, ...(patch as Partial<UserMeta>) })))
+                .catch(() => {});
+            }
+          }
+        }
+      })
       .catch(() => {});
     fetch("/api/cvs")
       .then((r) => r.json())
       .then((d) => { if (Array.isArray(d)) setCvs(d); })
       .catch(() => {});
-  }, []);
+  }, [session?.user?.id]);
 
   async function saveMeta(patch: Partial<UserMeta>) {
     await fetch("/api/user-meta", {

@@ -58,6 +58,26 @@ function normalizeWorkPref(val: string | undefined): WorkPref | undefined {
   return WORK_PREF_NORMALIZE[lower];
 }
 
+function buildSkillsSummary({
+  skills, targetRoles, workPref, he,
+}: {
+  skills: string[]; targetRoles: string[]; workPref?: WorkPref; he: boolean;
+}): string {
+  const parts: string[] = [];
+  if (skills.length > 0) {
+    const top = skills.slice(0, 5).join(", ");
+    parts.push(he ? `מתמחה ב-${top}` : `Skilled in ${top}`);
+  }
+  if (targetRoles.length > 0) {
+    const roles = targetRoles.slice(0, 2).join(" / ");
+    const wp = workPref ? (he ? ` · ${WORK_PREF[workPref]?.he ?? workPref}` : ` · ${workPref}`) : "";
+    parts.push(he ? `מחפש/ת תפקיד ${roles}${wp}` : `Looking for ${roles}${wp}`);
+  } else if (workPref) {
+    parts.push(he ? `מעדיף/ה עבודה ${WORK_PREF[workPref]?.he ?? workPref}` : `Prefers ${workPref} work`);
+  }
+  return parts.join(". ") + (parts.length ? "." : "");
+}
+
 const EDU_LEVELS = [
   "12 שנות לימוד",
   "בגרות חלקית",
@@ -214,15 +234,6 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
           </button>
         </div>
 
-        {hasAnyData && (() => {
-          const summary = buildAutoSummary({ title, yoe, workPref, avail, he });
-          return summary ? (
-            <div className="px-6 pb-2">
-              <p className="text-white/50 text-sm leading-relaxed">{summary}</p>
-            </div>
-          ) : null;
-        })()}
-
         {!hasAnyData ? (
           <div className="px-6 pb-6 py-4 text-center">
             <p className="text-white/40 text-sm">
@@ -233,14 +244,10 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
             </p>
           </div>
         ) : (
-          <div className="px-6 pb-6 space-y-4">
-            {/* Top row: role + location + experience */}
-            <div className="flex flex-wrap items-center gap-3">
-              {title && (
-                <div className="flex items-center gap-2">
-                  <span className="text-white font-semibold text-base">{title}</span>
-                </div>
-              )}
+          <div className="px-6 pb-6 space-y-3">
+            {/* Top row: role + location + experience + availability */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              {title && <span className="text-white font-semibold text-base">{title}</span>}
               {location && (
                 <span className="flex items-center gap-1 text-white/50 text-sm">
                   <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -263,77 +270,47 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
               )}
             </div>
 
-            {/* Bio */}
+            {/* Bio — main summary (user-written or AI-generated) */}
             {meta.bio && (
-              <p className="text-white/60 text-sm leading-relaxed">{meta.bio}</p>
+              <p className="text-white/70 text-sm leading-relaxed">{meta.bio}</p>
+            )}
+
+            {/* Skills + roles readable summary (shown when no bio, or as supplement) */}
+            {(skills.length > 0 || targetRoles.length > 0) && (
+              <p className={`text-sm leading-relaxed ${meta.bio ? "text-white/50" : "text-white/65"}`}>
+                {buildSkillsSummary({ skills, targetRoles, workPref, he })}
+              </p>
             )}
 
             {/* Volunteering */}
             {meta.volunteering && (
-              <div>
-                <p className="text-white/35 text-xs uppercase tracking-wide mb-1">{he ? "התנדבות" : "Volunteering"}</p>
-                <p className="text-white/60 text-sm leading-relaxed">{meta.volunteering}</p>
-              </div>
+              <p className="text-white/55 text-sm leading-relaxed border-s-2 border-purple-500/40 ps-3">
+                {meta.volunteering}
+              </p>
             )}
 
-            {/* Skills */}
-            {skills.length > 0 && (
-              <div>
-                <p className="text-white/35 text-xs uppercase tracking-wide mb-2">{he ? "כישורים" : "Skills"}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {skills.map((s) => (
-                    <span key={s} className="text-xs bg-purple-500/15 border border-purple-500/25 text-purple-200 px-2.5 py-0.5 rounded-full">
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Target roles */}
-            {targetRoles.length > 0 && (
-              <div>
-                <p className="text-white/35 text-xs uppercase tracking-wide mb-2">{he ? "תפקידים מבוקשים" : "Target roles"}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {targetRoles.map((r) => (
-                    <span key={r} className="text-xs bg-emerald-500/12 border border-emerald-500/25 text-emerald-300 px-2.5 py-0.5 rounded-full">
-                      {r}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Bottom row: work pref + languages + education */}
-            <div className="flex flex-wrap gap-x-5 gap-y-2 pt-1">
-              {workPref && (
-                <span className="text-white/45 text-xs flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2" />
-                  </svg>
-                  {he ? (WORK_PREF[workPref]?.he ?? workPref) : workPref}
-                </span>
-              )}
-              {languages.length > 0 && (
-                <span className="text-white/45 text-xs flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                  </svg>
-                  {languages.join(", ")}
-                </span>
-              )}
+            {/* Meta row: education · languages · work pref · linkedin */}
+            <div className="flex flex-wrap gap-x-4 gap-y-1.5 pt-1">
               {education && (
-                <span className="text-white/45 text-xs flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <span className="text-white/40 text-xs flex items-center gap-1">
+                  <svg className="w-3 h-3 text-pink-400/70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                   </svg>
                   {education}
                 </span>
               )}
+              {languages.length > 0 && (
+                <span className="text-white/40 text-xs flex items-center gap-1">
+                  <svg className="w-3 h-3 text-amber-400/70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                  </svg>
+                  {languages.join(", ")}
+                </span>
+              )}
               {meta.linkedin && (
                 <a href={meta.linkedin.startsWith("http") ? meta.linkedin : `https://${meta.linkedin}`} target="_blank" rel="noopener noreferrer"
-                  className="text-sky-400 hover:text-sky-300 text-xs flex items-center gap-1.5 transition">
-                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  className="text-sky-400/80 hover:text-sky-300 text-xs flex items-center gap-1 transition">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                   </svg>
                   LinkedIn
