@@ -13,7 +13,7 @@ export default function FinalCTA({ onChoose }: Props) {
   const tx = t[lang];
 
   return (
-    <section className="py-12 md:py-20 lg:py-28 px-4 md:px-6">
+    <section className="py-10 md:py-20 lg:py-28 px-4 md:px-6">
       <div className="max-w-3xl mx-auto text-center">
         <div className="bg-gradient-to-br from-purple-600/15 via-white/5 to-emerald-600/15 border border-white/10 rounded-3xl p-6 sm:p-8 md:p-12 backdrop-blur-sm">
           <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4 leading-tight tracking-tight">

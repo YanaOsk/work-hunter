@@ -13,7 +13,7 @@ export default function HighlightedReviews() {
   const featured = [REVIEWS[0], REVIEWS[5], REVIEWS[4]];
 
   return (
-    <section className="py-16 md:py-20 px-4 md:px-6">
+    <section className="py-10 md:py-20 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-6 md:mb-10 leading-tight">
           {tx.reviewsHomeTitle}

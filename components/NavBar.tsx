@@ -33,7 +33,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
           className="flex items-center gap-2.5 flex-shrink-0 hover:opacity-90 transition"
         >
           <LogoMark size="sm" />
-          <span className="text-white font-semibold hidden sm:block tracking-tight">
+          <span className="text-white font-semibold tracking-tight">
             Work Hunter
           </span>
         </a>
