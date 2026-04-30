@@ -40,7 +40,7 @@ export default function WelcomeModal({ userName, userEmail }: Props) {
 
         {/* Header */}
         <div className="text-center mb-6 sm:mb-10">
-          <div className="mb-4 sm:mb-5">
+          <div className="flex justify-center mb-4 sm:mb-5">
             <LogoMark size="lg" />
           </div>
           <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-3">
