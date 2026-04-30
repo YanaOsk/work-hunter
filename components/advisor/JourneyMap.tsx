@@ -33,7 +33,7 @@ function getStageStatus(stage: AdvisorStage, state: AdvisorState): StageStatus {
 type TxKey = keyof typeof t.he;
 
 const STAGE_CONFIG: Record<
-  Exclude<AdvisorStage, "done">,
+  Exclude<AdvisorStage, "done" | "strategy">,
   {
     titleKey: TxKey;
     descKey: TxKey;
@@ -83,20 +83,6 @@ const STAGE_CONFIG: Record<
       num: "text-blue-400",
     },
     duration: "~12 min",
-  },
-  strategy: {
-    titleKey: "toolStrategy",
-    descKey: "toolStrategyDesc",
-    icon: "M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7",
-    color: {
-      ring: "ring-amber-500 shadow-amber-500/30",
-      icon: "text-amber-300 bg-amber-500/20",
-      badge: "bg-amber-500/20 text-amber-300",
-      card: "border-amber-500/30 bg-amber-500/5",
-      glow: "from-amber-600/20",
-      num: "text-amber-400",
-    },
-    duration: "~15 min",
   },
 };
 
@@ -165,7 +151,7 @@ export default function JourneyMap({
         <div className="space-y-3 mb-8">
           {STAGE_ORDER.map((stage, i) => {
             const status = getStageStatus(stage, advisorState);
-            const cfg = STAGE_CONFIG[stage as Exclude<AdvisorStage, "done">];
+            const cfg = STAGE_CONFIG[stage as Exclude<AdvisorStage, "done" | "strategy">];
             const isCurrent = status === "current";
             const isDoneSt = status === "done";
             const isSkipped = status === "skipped";

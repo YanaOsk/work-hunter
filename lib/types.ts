@@ -177,7 +177,6 @@ export const STAGE_ORDER: AdvisorStage[] = [
   "diagnosis",
   "direction",
   "cv",
-  "strategy",
 ];
 
 export interface AdvisorState {

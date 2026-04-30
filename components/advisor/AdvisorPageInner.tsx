@@ -11,7 +11,6 @@ import {
   DirectionResult,
   LifePath,
   MockInterview,
-  SearchStrategy,
   STAGE_ORDER,
   UserProfile,
 } from "@/lib/types";
@@ -27,7 +26,6 @@ import JourneyMap from "./JourneyMap";
 import DiagnosisTool from "./DiagnosisTool";
 import DirectionTool from "./DirectionTool";
 import CVReviewTool from "./CVReviewTool";
-import StrategyTool from "./StrategyTool";
 import MockInterviewTool from "./MockInterviewTool";
 import SummaryView from "./SummaryView";
 import SummaryGate, { UnlockPlan } from "./SummaryGate";
@@ -36,7 +34,7 @@ import PreJourneyIntro from "./PreJourneyIntro";
 import SelfIntro from "./SelfIntro";
 import AdvisorHomeButton from "./AdvisorHomeButton";
 
-type StageView = Exclude<AdvisorStage, "done">;
+type StageView = Exclude<AdvisorStage, "done" | "strategy">;
 type View = "map" | "chat" | "summary" | "interview" | StageView;
 
 function mergeIntoProfile(
@@ -70,6 +68,12 @@ function mergeIntoProfile(
   return { ...profile, parsedData: merged };
 }
 
+function normalizeStage(stage: AdvisorStage): AdvisorStage {
+  // Migrate users who completed the old "strategy" stage → treat as "done"
+  if (stage === "strategy") return "done";
+  return stage;
+}
+
 export default function AdvisorPageInner() {
   const router = useRouter();
   const params = useSearchParams();
@@ -86,7 +90,6 @@ export default function AdvisorPageInner() {
     window.history.replaceState({}, "", url.toString());
   };
 
-  // Use Google user ID when logged in, otherwise fall back to URL profileId
   const profileId = session?.user?.id ?? guestProfileId;
 
   useEffect(() => {
@@ -102,12 +105,12 @@ export default function AdvisorPageInner() {
     const localState = getAdvisorState(profileId);
 
     if (localState) {
-      setAdvisorState(localState);
-      if (localState.currentStage === "done") setViewAndUrl("summary");
+      const normalized = { ...localState, currentStage: normalizeStage(localState.currentStage) };
+      setAdvisorState(normalized);
+      if (normalized.currentStage === "done") setViewAndUrl("summary");
       return;
     }
 
-    // No local state — try to restore from server if logged in
     if (session?.user?.email) {
       fetch("/api/user-meta")
         .then((r) => r.json())
@@ -115,9 +118,10 @@ export default function AdvisorPageInner() {
           if (meta?.advisorState) {
             try {
               const serverState = JSON.parse(meta.advisorState) as AdvisorState;
-              saveAdvisorState(profileId, serverState);
-              setAdvisorState(serverState);
-              if (serverState.currentStage === "done") setView("summary");
+              const normalized = { ...serverState, currentStage: normalizeStage(serverState.currentStage) };
+              saveAdvisorState(profileId, normalized);
+              setAdvisorState(normalized);
+              if (normalized.currentStage === "done") setView("summary");
               return;
             } catch { /* fall through */ }
           }
@@ -138,7 +142,6 @@ export default function AdvisorPageInner() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileId, session?.user?.id, guestProfileId]);
 
-  // Sync isPremium with real subscription so paywall respects purchased plan
   useEffect(() => {
     if (!session?.user?.email || !profileId) return;
     fetch("/api/subscription")
@@ -189,7 +192,6 @@ export default function AdvisorPageInner() {
     router.push("/");
   };
 
-  // Atomic: apply patch AND advance stage in one state update to avoid stale-closure stomping.
   const completeAndAdvance = (patch: Partial<AdvisorState>) => {
     const next = advanceStage(advisorState.currentStage);
     const updated: AdvisorState = { ...advisorState, ...patch, currentStage: next };
@@ -229,15 +231,6 @@ export default function AdvisorPageInner() {
 
   const onCV = (r: CVReview) => completeAndAdvance({ cvReview: r });
   const onCVSkip = () => completeAndAdvance({ cvSkipped: true });
-
-  const onStrategy = (r: SearchStrategy) => {
-    const hotRoles = (r.hotJobs ?? []).map((j) => j.title).filter(Boolean);
-    const enriched = mergeIntoProfile(advisorState.userProfile, {
-      targetRoles: hotRoles,
-      additionalNotes: r.topLine,
-    });
-    completeAndAdvance({ strategy: r, userProfile: enriched });
-  };
   const onInterview = (r: MockInterview) => persist({ ...advisorState, mockInterview: r });
 
   const onUnlock = (_plan: UnlockPlan) => {
@@ -323,10 +316,6 @@ export default function AdvisorPageInner() {
         onSkip={onCVSkip}
       />
     );
-  }
-
-  if (view === "strategy") {
-    return wrap(<StrategyTool advisorState={advisorState} onBack={backToMap} onComplete={onStrategy} />);
   }
 
   return wrap(

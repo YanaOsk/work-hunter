@@ -18,7 +18,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
   const { lang } = useLanguage();
   const router = useRouter();
   const tx = t[lang];
-  const { diagnosis, direction, cvReview, strategy, chosenPath, userProfile } = advisorState;
+  const { diagnosis, direction, cvReview, chosenPath, userProfile } = advisorState;
   const name = userProfile.parsedData?.name || "";
   const contentRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
@@ -71,8 +71,6 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
     const lines: string[] = [];
     if (diagnosis?.topRoles?.length)
       lines.push(`תפקידים שמתאימים לי: ${diagnosis.topRoles.join(", ")}`);
-    if (strategy?.targetCompanies?.length)
-      lines.push(`חברות יעד: ${strategy.targetCompanies.map((c) => c.name).join(", ")}`);
     if (chosenPath)
       lines.push(`מסלול: ${pathLabel(chosenPath, tx)}`);
     if (diagnosis?.strengths?.length)
@@ -410,121 +408,6 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               </div>
             </div>
           </Section>
-        )}
-
-        {/* Section 4: Search Strategy */}
-        {strategy && (
-          <Section title={tx.summarySection5}>
-            {/* Target companies */}
-            <div className="mb-5">
-              <h4 className="text-purple-300 text-sm font-semibold mb-2">{tx.strategyCompanies}</h4>
-              <div className="grid md:grid-cols-2 gap-2">
-                {(strategy.targetCompanies ?? []).map((c, i) => (
-                  <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <h5 className="font-semibold text-white text-sm">{c.name}</h5>
-                      <span className="text-xs text-white/40">{c.size}</span>
-                    </div>
-                    <p className="text-white/70 text-xs">{c.reason}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Hot Jobs Radar */}
-            {strategy.hotJobs && strategy.hotJobs.length > 0 && (
-              <div className="mb-5">
-                <h4 className="text-emerald-300 text-sm font-semibold mb-2">{tx.summaryHotJobs}</h4>
-                <div className="grid md:grid-cols-2 gap-2">
-                  {strategy.hotJobs.map((job, i) => (
-                    <div
-                      key={i}
-                      className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-3.5"
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-1.5">
-                        <div className="min-w-0">
-                          <p className="text-white font-semibold text-sm leading-tight">{job.title}</p>
-                          <p className="text-white/50 text-xs mt-0.5">{job.company}</p>
-                        </div>
-                        <span className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
-                          {job.source}
-                        </span>
-                      </div>
-                      <p className="text-white/65 text-xs leading-relaxed">{job.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Facebook Groups */}
-            {strategy.facebookGroups && strategy.facebookGroups.length > 0 && (
-              <div className="mb-5">
-                <h4 className="text-blue-300 text-sm font-semibold mb-2">{tx.summaryFacebookGroups}</h4>
-                <div className="flex flex-wrap gap-2">
-                  {strategy.facebookGroups.map((group, i) => (
-                    <span
-                      key={i}
-                      className="bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5"
-                    >
-                      <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                      </svg>
-                      {group}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Hidden market + networking (existing) */}
-            <div className="grid md:grid-cols-2 gap-4 mb-5">
-              <MiniList title={tx.strategyHidden} items={strategy.hiddenMarketTips} color="emerald" />
-              <MiniList title={tx.strategyNetwork} items={strategy.networkingPlan} color="blue" />
-            </div>
-
-            {/* 30-Day Attack Plan */}
-            {strategy.thirtyDayPlan && strategy.thirtyDayPlan.length > 0 && (
-              <div className="mb-5">
-                <h4 className="text-amber-300 text-sm font-semibold mb-2">{tx.summaryThirtyDayPlan}</h4>
-                <div className="space-y-2">
-                  {strategy.thirtyDayPlan.map((step, i) => (
-                    <div
-                      key={i}
-                      className="flex items-start gap-3 bg-amber-500/5 border border-amber-500/15 rounded-xl px-3.5 py-2.5"
-                    >
-                      <span className="text-amber-400 text-xs font-bold flex-shrink-0 mt-0.5 tabular-nums">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <span className="text-white/80 text-sm leading-relaxed">{step}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Elevator Pitch */}
-            <div>
-              <h4 className="text-purple-300 text-sm font-semibold mb-2">{tx.summaryOutreachPitch}</h4>
-              <div className="bg-white/5 border border-purple-500/30 rounded-lg p-4 text-white/90 text-sm leading-relaxed whitespace-pre-wrap">
-                {strategy.outreachTemplate}
-              </div>
-            </div>
-          </Section>
-        )}
-
-        {/* Top Line closing quote */}
-        {strategy?.topLine && (
-          <div className="relative mb-6 px-8 py-6 bg-gradient-to-br from-amber-600/10 via-purple-600/10 to-emerald-600/10 border border-white/10 rounded-2xl text-center overflow-hidden">
-            <div className="absolute top-3 start-5 text-4xl leading-none text-white/10 select-none">"</div>
-            <h4 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-2">
-              {tx.summaryTopLine}
-            </h4>
-            <p className="text-base md:text-lg font-bold text-white/95 leading-relaxed relative z-10">
-              {strategy.topLine}
-            </p>
-            <div className="absolute bottom-1 end-5 text-4xl leading-none text-white/10 select-none">"</div>
-          </div>
         )}
 
         {/* Scout CTA */}
