@@ -4,6 +4,7 @@ import { useLanguage } from "./LanguageProvider";
 import { getOrCreateAdvisorState, DEFAULT_ADVISOR_ID } from "@/lib/advisorState";
 import { queueAutoStart } from "@/lib/autoStart";
 import type { AppMode } from "@/lib/types";
+import LogoMark from "./LogoMark";
 
 interface Props {
   userName: string;
@@ -39,13 +40,8 @@ export default function WelcomeModal({ userName, userEmail }: Props) {
 
         {/* Header */}
         <div className="text-center mb-6 sm:mb-10">
-          <div
-            className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl mb-4 sm:mb-5 shadow-lg shadow-purple-900/50"
-            style={{ background: "linear-gradient(135deg,#a855f7,#ec4899,#10b981)" }}
-          >
-            <svg className="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2" />
-            </svg>
+          <div className="mb-4 sm:mb-5">
+            <LogoMark size="lg" />
           </div>
           <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-3">
             {firstName
