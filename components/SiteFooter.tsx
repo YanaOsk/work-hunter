@@ -27,9 +27,9 @@ export default function SiteFooter() {
           <Link href="/terms" className="text-white/50 hover:text-white transition">
             {tx.footerTerms}
           </Link>
-          <a href="mailto:yanaoskin35@gmail.com" className="text-white/50 hover:text-white transition">
+          <Link href="/contact" className="text-white/50 hover:text-white transition">
             {tx.footerContact}
-          </a>
+          </Link>
         </nav>
       </div>
 

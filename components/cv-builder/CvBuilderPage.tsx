@@ -44,6 +44,7 @@ export default function CvBuilderPage() {
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [downloading, setDownloading] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -54,6 +55,15 @@ export default function CvBuilderPage() {
   const [importDragging, setImportDragging] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetch("/api/subscription")
+        .then((r) => r.json())
+        .then((d) => { if (d?.plan && d.plan !== "free") setIsSubscribed(true); })
+        .catch(() => {});
+    }
+  }, [status]);
 
   // Load CV list on mount (authenticated) or localStorage (guest)
   useEffect(() => {
@@ -184,6 +194,17 @@ export default function CvBuilderPage() {
   const handleDownload = async () => {
     const wrapper = previewRef.current;
     if (!wrapper || downloading) return;
+
+    if (!data.personal.fullName?.trim()) {
+      alert(lang === "he" ? "נא למלא לפחות שם מלא לפני ההורדה" : "Please add at least your full name before downloading");
+      return;
+    }
+
+    if (isLoggedIn && !isSubscribed) {
+      window.location.href = "/pricing";
+      return;
+    }
+
     setDownloading(true);
 
     try {

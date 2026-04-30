@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import { renderMixedText } from "@/lib/rtl";
@@ -18,8 +19,19 @@ export default function PricingPage() {
   const { lang } = useLanguage();
   const tx = t[lang];
   const router = useRouter();
+  const { status } = useSession();
   const [toast, setToast] = useState<string | null>(null);
   const [openFeature, setOpenFeature] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/auth/signin?callbackUrl=/pricing");
+    }
+  }, [status, router]);
+
+  if (status === "loading" || status === "unauthenticated") {
+    return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
+  }
 
   const weeklyFeatures = [tx.planWeekly1, tx.planWeekly2, tx.planWeekly3, tx.planWeekly4, tx.planWeekly5];
   const quarterlyFeatures = [tx.planQuarterly1, tx.planQuarterly2, tx.planQuarterly3, tx.planQuarterly4, tx.planQuarterly5];
@@ -51,8 +63,9 @@ export default function PricingPage() {
           <p className="text-white/70 text-sm sm:text-base md:text-lg leading-relaxed">{tx.pricingSubtitle}</p>
         </div>
 
-        {/* ── What's included in every plan ── */}
-        <div className="mb-12 max-w-3xl mx-auto">
+        {/* ── Two-column: description left, cards right ── */}
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start mb-10">
+          <div className="flex-1 min-w-0">
           <div className="text-center mb-6">
             <p className="text-purple-400/70 text-xs font-bold uppercase tracking-widest mb-2">
               {lang === "he" ? "מה כלול בכל מנוי" : "Included in every plan"}
@@ -174,46 +187,50 @@ export default function PricingPage() {
               );
             })}
           </div>
-        </div>
 
-        {/* ── Plan cards ── */}
-        <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-5 text-center">
-          {lang === "he" ? "בחרו את המסלול שמתאים לכם" : "Choose the plan that fits you"}
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <PlanCard
-            name={tx.planWeeklyName}
-            badge={tx.planWeeklyBadge}
-            price={tx.planWeeklyPrice}
-            per={tx.planWeeklyPer}
-            tagline={tx.planWeeklyTagline}
-            features={[]}
-            cta={tx.planWeeklyCta}
-            onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["weekly"]}`)}
-            variant="weekly"
-          />
-          <PlanCard
-            name={tx.planQuarterlyName}
-            badge={tx.planQuarterlyBadge}
-            price={tx.planQuarterlyPrice}
-            per={tx.planQuarterlyPer}
-            tagline={tx.planQuarterlyTagline}
-            features={[]}
-            cta={tx.planQuarterlyCta}
-            onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["popular"]}`)}
-            variant="popular"
-          />
-          <PlanCard
-            name={tx.planLifetimeName}
-            badge={tx.planLifetimeBadge}
-            oldPrice={tx.planLifetimeOld}
-            price={tx.planLifetimePrice}
-            tagline={tx.planLifetimeTagline}
-            features={[]}
-            cta={tx.planLifetimeCta}
-            onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["pro"]}`)}
-            variant="pro"
-          />
+          </div>
+
+          {/* Right: Plan cards — sticky on desktop */}
+          <div className="w-full lg:w-80 xl:w-96 flex-shrink-0 lg:sticky lg:top-20">
+            <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-4 text-center">
+              {lang === "he" ? "בחרו את המסלול שמתאים לכם" : "Choose your plan"}
+            </p>
+            <div className="flex flex-col gap-4">
+              <PlanCard
+                name={tx.planWeeklyName}
+                badge={tx.planWeeklyBadge}
+                price={tx.planWeeklyPrice}
+                per={tx.planWeeklyPer}
+                tagline={tx.planWeeklyTagline}
+                features={[]}
+                cta={tx.planWeeklyCta}
+                onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["weekly"]}`)}
+                variant="weekly"
+              />
+              <PlanCard
+                name={tx.planQuarterlyName}
+                badge={tx.planQuarterlyBadge}
+                price={tx.planQuarterlyPrice}
+                per={tx.planQuarterlyPer}
+                tagline={tx.planQuarterlyTagline}
+                features={[]}
+                cta={tx.planQuarterlyCta}
+                onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["popular"]}`)}
+                variant="popular"
+              />
+              <PlanCard
+                name={tx.planLifetimeName}
+                badge={tx.planLifetimeBadge}
+                oldPrice={tx.planLifetimeOld}
+                price={tx.planLifetimePrice}
+                tagline={tx.planLifetimeTagline}
+                features={[]}
+                cta={tx.planLifetimeCta}
+                onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["pro"]}`)}
+                variant="pro"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Free CTA */}
