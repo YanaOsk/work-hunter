@@ -8,6 +8,7 @@ import { saveProfile } from "@/lib/profiles";
 import { DEFAULT_ADVISOR_ID, getOrCreateAdvisorState } from "@/lib/advisorState";
 import { consumeAutoStart, consumeAdvisorScoutContext } from "@/lib/autoStart";
 import HomeLanding from "@/components/HomeLanding";
+import WelcomeModal from "@/components/WelcomeModal";
 import UploadPhase from "@/components/UploadPhase";
 import InterviewPhase from "@/components/InterviewPhase";
 import SearchingPhase from "@/components/SearchingPhase";
@@ -63,10 +64,11 @@ async function readSearchStream(
 
 export default function Home() {
   const router = useRouter();
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const { lang } = useLanguage();
   const [mode, setMode] = useState<AppMode | null>(null);
   const [state, setState] = useState<AppState>(initialState);
+  const [showWelcome, setShowWelcome] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -131,6 +133,15 @@ export default function Home() {
       .then((d) => { if (d?.plan && d.plan !== "free") setIsSubscribed(true); })
       .catch(() => {});
   }, [status]);
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.email && mode === null && !pendingAutoMode) {
+      const key = `wh_welcomed_${session.user.email}`;
+      if (!localStorage.getItem(key)) {
+        setShowWelcome(true);
+      }
+    }
+  }, [status, session?.user?.email, mode, pendingAutoMode]);
 
   useEffect(() => {
     if (pendingAutoMode && status !== "loading" && mode === null) {
@@ -340,6 +351,14 @@ export default function Home() {
   if (mode === null) {
     if (pendingAutoMode) {
       return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
+    }
+    if (showWelcome && session?.user) {
+      return (
+        <WelcomeModal
+          userName={session.user.name ?? ""}
+          userEmail={session.user.email ?? ""}
+        />
+      );
     }
     return <HomeLanding onChoose={handleModeChoice} />;
   }
