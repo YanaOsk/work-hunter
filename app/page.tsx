@@ -109,6 +109,8 @@ export default function Home() {
       if (nav?.type === "reload") {
         const saved = sessionStorage.getItem("wh_mode");
         if (saved === "jobs") {
+          const email = session?.user?.email;
+          if (email && !localStorage.getItem(`wh_welcomed_${email}`)) return;
           setMode("jobs");
           const savedConvId = sessionStorage.getItem("wh_conv_id");
           if (savedConvId) {
@@ -124,7 +126,7 @@ export default function Home() {
         }
       }
     }
-  }, [status, mode, pendingAutoMode]);
+  }, [status, mode, pendingAutoMode, session?.user?.email]);
 
   useEffect(() => {
     if (status !== "authenticated") return;
