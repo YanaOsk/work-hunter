@@ -249,6 +249,23 @@ export default function Home() {
           };
           setState((s) => ({ ...s, userProfile: enriched }));
           saveProfile(enriched);
+          // Persist key profile fields to DB so profile page is populated
+          const pd = enriched.parsedData;
+          const metaPatch: Record<string, unknown> = {};
+          if (pd.currentRole)     metaPatch.title           = pd.currentRole;
+          if (pd.location)        metaPatch.location        = pd.location;
+          if (pd.yearsExperience !== undefined) metaPatch.yearsExperience = pd.yearsExperience;
+          if (pd.education)       metaPatch.education       = pd.education;
+          if (pd.skills?.length)  metaPatch.skills          = pd.skills;
+          if (pd.languages?.length) metaPatch.languages     = pd.languages;
+          if (pd.targetRoles?.length) metaPatch.targetRoles = pd.targetRoles;
+          if (Object.keys(metaPatch).length > 0) {
+            fetch("/api/user-meta", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(metaPatch),
+            }).catch(() => {});
+          }
         }
       } catch {}
     })();

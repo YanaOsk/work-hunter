@@ -99,7 +99,7 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
   const workPref      = merge(meta.workPreference, normalizeWorkPref(scoutData.workPreference as string | undefined));
   const languages     = mergeArr(meta.languages, scoutData.languages);
   const avail         = meta.availability;
-  const hasAnyData    = title || location || yoe || education || skills.length || targetRoles.length;
+  const hasAnyData    = Boolean(title || location || yoe !== undefined || education || skills.length || targetRoles.length);
 
   // Draft state for editing
   const [draft, setDraft] = useState<Partial<UserMeta>>({});
