@@ -28,12 +28,6 @@ function SignInContent() {
   // callbackUrl is set by NextAuth middleware when redirecting unauthenticated users
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
 
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.replace(callbackUrl);
-    }
-  }, [status, router, callbackUrl]);
-
   const [tab, setTab] = useState<Tab>("signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -43,6 +37,12 @@ function SignInContent() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeName, setWelcomeName] = useState("");
   const [welcomeEmail, setWelcomeEmail] = useState("");
+
+  useEffect(() => {
+    if (status === "authenticated" && !showWelcome) {
+      router.replace(callbackUrl);
+    }
+  }, [status, router, callbackUrl, showWelcome]);
 
   const switchTab = (next: Tab) => {
     setTab(next);

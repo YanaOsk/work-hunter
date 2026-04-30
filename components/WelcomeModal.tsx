@@ -20,13 +20,15 @@ export default function WelcomeModal({ userName, userEmail }: Props) {
 
   const firstName = userName?.split(" ")[0] ?? "";
 
-  const handleChoose = (mode: AppMode) => {
+  const handleChoose = (mode: AppMode | "cv") => {
     if (userEmail) {
       localStorage.setItem(`wh_welcomed_${userEmail}`, "1");
     }
     if (mode === "advisor") {
       getOrCreateAdvisorState(DEFAULT_ADVISOR_ID, emptyProfile);
       router.push(`/advisor?profileId=${DEFAULT_ADVISOR_ID}`);
+    } else if (mode === "cv") {
+      router.push("/cv-builder");
     } else {
       queueAutoStart("jobs");
       router.push("/");
@@ -58,7 +60,7 @@ export default function WelcomeModal({ userName, userEmail }: Props) {
         </div>
 
         {/* Choice cards */}
-        <div className="grid sm:grid-cols-2 gap-3 sm:gap-4" dir={he ? "rtl" : "ltr"}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4" dir={he ? "rtl" : "ltr"}>
           <button
             onClick={() => handleChoose("jobs")}
             className="group text-start bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-purple-500/60 rounded-3xl p-5 sm:p-8 transition-all duration-200 hover:shadow-lg hover:shadow-purple-900/20"
@@ -99,6 +101,28 @@ export default function WelcomeModal({ userName, userEmail }: Props) {
                 : "Personal career plan, CV improvement, interview prep & more with AI"}
             </p>
             <div className="mt-5 flex items-center gap-1.5 text-emerald-400 text-sm font-medium group-hover:gap-2.5 transition-all">
+              <span>{he ? "בואו נתחיל" : "Let's go"}</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => handleChoose("cv")}
+            className="group text-start bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-sky-500/60 rounded-3xl p-5 sm:p-8 transition-all duration-200 hover:shadow-lg hover:shadow-sky-900/20"
+          >
+            <div className="w-12 h-12 rounded-xl bg-sky-600/20 group-hover:bg-sky-600 flex items-center justify-center mb-5 transition-colors duration-200">
+              <svg className="w-6 h-6 text-sky-300 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">
+              {he ? "בניית קורות חיים" : "CV Builder"}
+            </h2>
+            <p className="text-white/55 text-sm leading-relaxed">
+              {he
+                ? "בנה קורות חיים מקצועיים בעברית ובאנגלית עם עזרת AI בקלות ובמהירות"
+                : "Build a professional CV in Hebrew or English with AI assistance"}
+            </p>
+            <div className="mt-5 flex items-center gap-1.5 text-sky-400 text-sm font-medium group-hover:gap-2.5 transition-all">
               <span>{he ? "בואו נתחיל" : "Let's go"}</span>
             </div>
           </button>
