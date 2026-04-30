@@ -12,7 +12,6 @@ export default function LanguageToggle() {
       className="fixed bottom-4 end-4 z-[60] flex items-center gap-1.5 bg-slate-900/90 hover:bg-slate-800 border border-white/20 hover:border-purple-400/50 text-white text-sm font-medium px-3.5 py-2 rounded-full backdrop-blur-md shadow-xl shadow-black/20 transition-all duration-200 hover:scale-105"
       aria-label="Switch language"
     >
-      <span className="text-base leading-none">{lang === "he" ? "🇮🇱" : "🇬🇧"}</span>
       <span>{t[lang].switchLang}</span>
     </button>
   );
