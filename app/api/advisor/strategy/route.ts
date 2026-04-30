@@ -1,4 +1,4 @@
-export const maxDuration = 60;
+export const maxDuration = 90;
 import { NextRequest, NextResponse } from "next/server";
 import { geminiAnalyze as geminiGenerate, safeParseJson, truncate } from "@/lib/gemini";
 import { SEARCH_STRATEGY_PROMPT } from "@/lib/advisorPrompts";
@@ -23,7 +23,7 @@ function slimDirection(d: DirectionResult | null): string {
   return JSON.stringify({
     recommendedPath: d.recommendedPath,
     rationale: truncate(d.rationale ?? "", 300),
-    options: d.options.map((o) => ({
+    options: (d.options ?? []).map((o) => ({
       path: o.path,
       title: o.title,
       fitScore: o.fitScore,
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       directionStr,
       notesStr
     )}`;
-    const raw = await geminiGenerate("Build strategy now.", prompt, 3000, true);
+    const raw = await geminiGenerate("Build strategy now.", prompt, 5000, true);
 
     const parsed = safeParseJson<Record<string, unknown>>(raw, "strategy");
     return NextResponse.json({ ...parsed, completedAt: new Date().toISOString() });
