@@ -589,11 +589,6 @@ export default function ProfilePage() {
                     {he ? "פעיל" : "Active"}
                   </span>
                 )}
-                {plan !== "free" && (
-                  <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${planMeta.cls}`}>
-                    {he ? planMeta.he : planMeta.en}
-                  </span>
-                )}
                 {plan === "free" && (
                   <Link href="/pricing" className="text-purple-400 hover:text-purple-300 text-xs transition font-medium">
                     {he ? "שדרג ↑" : "Upgrade ↑"}
