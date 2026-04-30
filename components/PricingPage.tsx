@@ -225,10 +225,6 @@ export default function PricingPage() {
               className="relative inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-white font-bold text-sm sm:text-base md:text-lg bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 transition-all hover:scale-[1.03] active:scale-[0.97] shadow-lg shadow-purple-900/30"
             >
               {lang === "he" ? "התחילו עכשיו בחינם" : "Start for Free Now"}
-              <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
-                  d={lang === "he" ? "M11 17l-5-5m0 0l5-5m-5 5h12" : "M13 7l5 5m0 0l-5 5m5-5H6"} />
-              </svg>
             </button>
           </div>
         </div>

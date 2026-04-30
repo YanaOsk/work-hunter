@@ -301,7 +301,7 @@ export default function CvBuilderPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-10">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
             <div>
               {fromUrl && (
                 <button
@@ -320,18 +320,18 @@ export default function CvBuilderPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => { setShowImportModal(true); setImportFile(null); setImportError(""); }}
-                className="border border-white/20 hover:border-purple-500/60 bg-white/5 hover:bg-purple-500/10 text-white/70 hover:text-white font-medium px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all"
+                className="border border-white/20 hover:border-purple-500/60 bg-white/5 hover:bg-purple-500/10 text-white/70 hover:text-white font-medium px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-all whitespace-nowrap"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
                 {tx.cvImportCv}
               </button>
               <button
                 onClick={openNew}
-                className="bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/20"
+                className="bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white font-semibold px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/20 whitespace-nowrap"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                 </svg>
                 {tx.cvNewCv}

@@ -90,43 +90,41 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
         </div>
       </div>
 
-      {mobileOpen && (
-        <div className="md:hidden bg-slate-900/95 backdrop-blur-2xl border-t border-purple-400/10">
-          <div className="px-4 py-3 flex flex-col gap-1">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={() => setMobileOpen(false)}
-                className="text-white/80 hover:text-white py-3 text-sm border-b border-white/5 last:border-0"
-              >
-                {l.label}
-              </Link>
-            ))}
-            {isAdmin && (
-              <Link
-                href="/admin"
-                onClick={() => setMobileOpen(false)}
-                className="text-purple-400 py-3 text-sm border-b border-white/5 flex items-center gap-2"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
-                Admin
-              </Link>
-            )}
-            {planReady && !hasPaidPlan && (
-              <Link
-                href="/advisor?profileId=default-advisor"
-                onClick={() => setMobileOpen(false)}
-                className="mt-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 rounded-lg transition text-center text-sm"
-              >
-                {tx.navStartFree}
-              </Link>
-            )}
-          </div>
+      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${mobileOpen ? "max-h-[480px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"} bg-slate-900/95 backdrop-blur-2xl border-t border-purple-400/10`}>
+        <div className="px-4 py-3 flex flex-col gap-1">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setMobileOpen(false)}
+              className="text-white/80 hover:text-white py-3 text-sm border-b border-white/5 last:border-0"
+            >
+              {l.label}
+            </Link>
+          ))}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              onClick={() => setMobileOpen(false)}
+              className="text-purple-400 py-3 text-sm border-b border-white/5 flex items-center gap-2"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              Admin
+            </Link>
+          )}
+          {planReady && !hasPaidPlan && (
+            <Link
+              href="/advisor?profileId=default-advisor"
+              onClick={() => setMobileOpen(false)}
+              className="mt-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 rounded-lg transition text-center text-sm"
+            >
+              {tx.navStartFree}
+            </Link>
+          )}
         </div>
-      )}
+      </div>
     </nav>
   );
 }

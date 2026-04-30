@@ -44,7 +44,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
       <div className="flex items-center justify-between gap-3">
         <span className="text-white font-medium text-base">{q}</span>
         <svg
-          className={`w-5 h-5 text-white/50 flex-shrink-0 transition-transform ${
+          className={`w-5 h-5 text-white/50 flex-shrink-0 transition-transform duration-300 ${
             open ? "rotate-180" : ""
           }`}
           fill="none"
@@ -54,7 +54,9 @@ function FaqItem({ q, a }: { q: string; a: string }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </div>
-      {open && <p className="text-white/70 text-sm mt-3 leading-relaxed">{a}</p>}
+      <div className={`overflow-hidden transition-all duration-300 ease-out ${open ? "max-h-96 mt-3" : "max-h-0"}`}>
+        <p className="text-white/70 text-sm leading-relaxed">{a}</p>
+      </div>
     </button>
   );
 }

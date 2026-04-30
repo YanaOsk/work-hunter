@@ -8,6 +8,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import AdminFab from "@/components/AdminFab";
 import TrackingProvider from "@/components/TrackingProvider";
 import InactivityLogout from "@/components/InactivityLogout";
+import SwipeBack from "@/components/SwipeBack";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -49,6 +50,7 @@ export default function RootLayout({
           <LanguageProvider>
             <TrackingProvider />
             <InactivityLogout />
+            <SwipeBack />
             <NavBarWrapper />
             <ScrollToTop />
             <AdminFab />
