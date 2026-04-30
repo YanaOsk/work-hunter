@@ -86,19 +86,49 @@ export default function AdvisorPageInner() {
       router.replace("/");
       return;
     }
-    // If user is logged in, migrate any guest session into their account
     if (session?.user?.id && guestProfileId && guestProfileId !== session.user.id) {
       migrateGuestToUser(guestProfileId, session.user.id);
     }
+
     const emptyProfile: UserProfile = { rawText: "", parsedData: {}, missingFields: [], clarifyingQuestions: [] };
-    let state = getAdvisorState(profileId);
-    if (!state) {
-      state = createInitialAdvisorState(emptyProfile);
-      saveAdvisorState(profileId, state);
+    const localState = getAdvisorState(profileId);
+
+    if (localState) {
+      setAdvisorState(localState);
+      if (localState.currentStage === "done") setView("summary");
+      return;
     }
-    setAdvisorState(state);
-    if (state.currentStage === "done") setView("summary");
-  }, [profileId, session, guestProfileId, router]);
+
+    // No local state — try to restore from server if logged in
+    if (session?.user?.email) {
+      fetch("/api/user-meta")
+        .then((r) => r.json())
+        .then((meta) => {
+          if (meta?.advisorState) {
+            try {
+              const serverState = JSON.parse(meta.advisorState) as AdvisorState;
+              saveAdvisorState(profileId, serverState);
+              setAdvisorState(serverState);
+              if (serverState.currentStage === "done") setView("summary");
+              return;
+            } catch { /* fall through */ }
+          }
+          const fresh = createInitialAdvisorState(emptyProfile);
+          saveAdvisorState(profileId, fresh);
+          setAdvisorState(fresh);
+        })
+        .catch(() => {
+          const fresh = createInitialAdvisorState(emptyProfile);
+          saveAdvisorState(profileId, fresh);
+          setAdvisorState(fresh);
+        });
+    } else {
+      const fresh = createInitialAdvisorState(emptyProfile);
+      saveAdvisorState(profileId, fresh);
+      setAdvisorState(fresh);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileId, session?.user?.id, guestProfileId]);
 
   // Sync isPremium with real subscription so paywall respects purchased plan
   useEffect(() => {
@@ -137,6 +167,7 @@ export default function AdvisorPageInner() {
         body: JSON.stringify({
           advisorCurrentStage: next.currentStage,
           advisorCompletedCount: completedCount,
+          advisorState: JSON.stringify(next),
         }),
       }).catch(() => {});
     }

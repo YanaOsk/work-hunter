@@ -58,6 +58,7 @@ export default function SubscriptionPage() {
   const { data: session, status } = useSession();
 
   const [sub, setSub] = useState<Subscription | null>(null);
+  const [expiredInfo, setExpiredInfo] = useState<{ plan: string; expiryDate: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
@@ -68,7 +69,13 @@ export default function SubscriptionPage() {
     if (!session?.user) return;
     fetch("/api/subscription")
       .then((r) => r.json())
-      .then((d) => { if (d?.plan && d.plan !== "free") setSub(d as Subscription); })
+      .then((d) => {
+        if (d?.isExpired) {
+          setExpiredInfo({ plan: d.expiredPlan ?? d.plan, expiryDate: d.expiryDate ?? null });
+        } else if (d?.plan && d.plan !== "free") {
+          setSub(d as Subscription);
+        }
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [session?.user, status, router]);
@@ -121,8 +128,33 @@ export default function SubscriptionPage() {
           </div>
         )}
 
+        {/* Expired plan */}
+        {!loading && !sub && expiredInfo && (
+          <div className="rounded-3xl bg-amber-500/5 border border-amber-500/30 p-10 text-center max-w-lg mx-auto">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-amber-300 font-semibold text-lg mb-1">
+              {he ? "המנוי שלך פג" : "Your subscription expired"}
+            </p>
+            <p className="text-white/50 text-sm mb-1">
+              {he
+                ? `תוכנית ${PLAN_META[expiredInfo.plan]?.nameHe ?? expiredInfo.plan} — פגה ב-${expiredInfo.expiryDate ? formatDate(expiredInfo.expiryDate, he) : "—"}`
+                : `${PLAN_META[expiredInfo.plan]?.nameEn ?? expiredInfo.plan} plan — expired ${expiredInfo.expiryDate ? formatDate(expiredInfo.expiryDate, he) : "—"}`}
+            </p>
+            <p className="text-white/40 text-xs mb-6">
+              {he ? "המנוי לא חודש כי לא היה כרטיס שמור." : "No saved card — auto-renewal was off."}
+            </p>
+            <Link href="/pricing" className="inline-flex bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition">
+              {he ? "חדש מנוי" : "Renew subscription"}
+            </Link>
+          </div>
+        )}
+
         {/* No paid plan */}
-        {!loading && !sub && (
+        {!loading && !sub && !expiredInfo && (
           <div className="rounded-3xl bg-white/5 border border-white/10 p-12 text-center max-w-lg mx-auto">
             <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -15,6 +15,7 @@ export interface Subscription {
   expiryDate: string | null; // null = lifetime
   savedCard?: SavedCard;
   isLifetime: boolean;
+  isExpired?: boolean;
 }
 
 function calcExpiryDate(plan: string, from: Date): Date | null {
@@ -66,8 +67,19 @@ export async function getSubscription(userEmail: string): Promise<Subscription |
     };
   }
 
-  // Expired with no saved card → treat as free
-  if (isExpired) return null;
+  // Expired with no saved card → return as expired (not null) so UI can show expiry message
+  if (isExpired) {
+    return {
+      userEmail: r.user_email,
+      userName: r.user_name,
+      plan: r.plan,
+      purchasedAt: r.purchased_at,
+      expiryDate: r.expiry_date ?? null,
+      savedCard: undefined,
+      isLifetime: false,
+      isExpired: true,
+    };
+  }
 
   return {
     userEmail: r.user_email,

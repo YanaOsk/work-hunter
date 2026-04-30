@@ -17,7 +17,11 @@ export async function GET() {
     }
 
     const sub = await getSubscription(session.user.email);
-    return NextResponse.json(sub ?? { plan: "free" });
+    if (!sub) return NextResponse.json({ plan: "free" });
+    if (sub.isExpired) {
+      return NextResponse.json({ plan: "free", isExpired: true, expiredPlan: sub.plan, expiryDate: sub.expiryDate });
+    }
+    return NextResponse.json(sub);
   } catch (err) {
     console.error("Subscription fetch error:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
