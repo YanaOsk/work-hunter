@@ -64,6 +64,13 @@ export interface DiagnosisAnswer {
   answer: string;
 }
 
+export interface CareerPath {
+  title: string;
+  domain: string;
+  reasoning: string;
+  matchBridge: string;
+}
+
 export interface DiagnosisResult {
   mbtiType?: string;
   hollandCode?: string;
@@ -74,6 +81,11 @@ export interface DiagnosisResult {
   careerDirections: string[];
   summary: string;
   completedAt: string;
+  // Career advisor fields
+  reflection?: string;
+  careerPaths?: CareerPath[];
+  tomorrowStep?: string;
+  realismNote?: string;
 }
 
 export type LifePath = "employee" | "entrepreneur" | "studies";

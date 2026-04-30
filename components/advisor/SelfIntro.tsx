@@ -18,9 +18,10 @@ interface FormData {
   story: string;
   loves: string;
   dislikes: string;
+  constraints: string;
 }
 
-type StepKey = "name" | "basics" | "story" | "loves" | "dislikes" | "welcome";
+type StepKey = "name" | "basics" | "story" | "loves" | "dislikes" | "constraints" | "welcome";
 
 export default function SelfIntro({ advisorState, onBack, onComplete }: Props) {
   const { lang } = useLanguage();
@@ -34,10 +35,11 @@ export default function SelfIntro({ advisorState, onBack, onComplete }: Props) {
     story: "",
     loves: "",
     dislikes: "",
+    constraints: "",
   });
   const [step, setStep] = useState<StepKey>("name");
 
-  const steps: StepKey[] = ["name", "basics", "story", "loves", "dislikes", "welcome"];
+  const steps: StepKey[] = ["name", "basics", "story", "loves", "dislikes", "constraints", "welcome"];
   const currentIdx = steps.indexOf(step);
   const total = steps.length - 1;
 
@@ -48,13 +50,14 @@ export default function SelfIntro({ advisorState, onBack, onComplete }: Props) {
       data.story && `סיפור: ${data.story}`,
       data.loves && `אוהב/ת: ${data.loves}`,
       data.dislikes && `לא אוהב/ת: ${data.dislikes}`,
+      data.constraints && `מגבלות ואיזורי-אסור: ${data.constraints}`,
     ]
       .filter(Boolean)
       .join("\n");
 
     const updatedProfile: UserProfile = {
       ...advisorState.userProfile,
-      rawText: [data.story, data.loves, data.dislikes].filter(Boolean).join("\n\n"),
+      rawText: [data.story, data.loves, data.dislikes, data.constraints].filter(Boolean).join("\n\n"),
       parsedData: {
         ...existingParsed,
         name: data.name.trim() || existingParsed.name,
@@ -78,6 +81,7 @@ export default function SelfIntro({ advisorState, onBack, onComplete }: Props) {
     story: true,
     loves: true,
     dislikes: true,
+    constraints: true,
     welcome: true,
   };
 
@@ -190,6 +194,23 @@ export default function SelfIntro({ advisorState, onBack, onComplete }: Props) {
                 value={data.dislikes}
                 onChange={(e) => update("dislikes", e.target.value)}
                 placeholder={tx.selfIntroDislikesPh}
+                rows={3}
+                autoFocus
+                className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 resize-none"
+              />
+            </StepLayout>
+          )}
+
+          {step === "constraints" && (
+            <StepLayout
+              emoji="🚧"
+              question={tx.selfIntroConstraintsQ}
+              sub={tx.selfIntroConstraintsSub}
+            >
+              <textarea
+                value={data.constraints}
+                onChange={(e) => update("constraints", e.target.value)}
+                placeholder={tx.selfIntroConstraintsPh}
                 rows={3}
                 autoFocus
                 className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 resize-none"

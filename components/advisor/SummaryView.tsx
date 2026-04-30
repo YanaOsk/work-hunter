@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AdvisorState, LifePath } from "@/lib/types";
+import { AdvisorState, CareerPath, LifePath } from "@/lib/types";
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
 import { queueAutoStart, queueAdvisorScoutContext } from "@/lib/autoStart";
@@ -140,6 +140,82 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               {diagnosis.topMessage}
             </p>
             <div className="absolute bottom-1 end-5 text-5xl leading-none text-purple-500/20 select-none">"</div>
+          </div>
+        )}
+
+        {/* Career Advisory Panel — reflection, 3 paths, tomorrow step, realism */}
+        {diagnosis && (diagnosis.reflection || diagnosis.careerPaths?.length || diagnosis.tomorrowStep) && (
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-5 space-y-6">
+            <h2 className="text-lg font-bold text-white border-b border-white/10 pb-3">
+              {lang === "he" ? "ייעוץ תעסוקתי מותאם אישית" : "Your personalized career advisory"}
+            </h2>
+
+            {/* Reflection */}
+            {diagnosis.reflection && (
+              <div className="bg-blue-500/5 border border-blue-500/15 rounded-2xl px-5 py-4">
+                <h3 className="text-blue-300 text-xs font-semibold uppercase tracking-wide mb-2">
+                  {tx.summaryReflection}
+                </h3>
+                <p className="text-white/85 text-sm leading-relaxed">{diagnosis.reflection}</p>
+              </div>
+            )}
+
+            {/* 3 Career Paths */}
+            {diagnosis.careerPaths && diagnosis.careerPaths.length > 0 && (
+              <div>
+                <h3 className="text-emerald-300 text-xs font-semibold uppercase tracking-wide mb-3">
+                  {tx.summaryCareerPaths}
+                </h3>
+                <div className="grid md:grid-cols-3 gap-3">
+                  {diagnosis.careerPaths.map((path: CareerPath, i: number) => (
+                    <div
+                      key={i}
+                      className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-2"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-emerald-400 text-xs font-bold tabular-nums flex-shrink-0">
+                          #{i + 1}
+                        </span>
+                        <span className="text-[10px] bg-white/5 text-white/40 border border-white/10 px-2 py-0.5 rounded-full">
+                          {path.domain}
+                        </span>
+                      </div>
+                      <p className="text-white font-semibold text-sm">{path.title}</p>
+                      <p className="text-white/65 text-xs leading-relaxed">{path.reasoning}</p>
+                      <div className="mt-auto pt-2 border-t border-white/10">
+                        <span className="text-purple-300 text-[10px] font-semibold uppercase tracking-wide block mb-1">
+                          {tx.summaryMatchBridge}
+                        </span>
+                        <p className="text-white/80 text-xs italic">{path.matchBridge}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tomorrow Step */}
+            {diagnosis.tomorrowStep && (
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl px-5 py-4">
+                <h3 className="text-amber-300 text-xs font-semibold uppercase tracking-wide mb-2">
+                  {tx.summaryTomorrowStep}
+                </h3>
+                <p className="text-white/90 text-sm leading-relaxed font-medium">{diagnosis.tomorrowStep}</p>
+              </div>
+            )}
+
+            {/* Realism Note */}
+            {diagnosis.realismNote && (
+              <div className="flex items-start gap-3 px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl">
+                <span className="text-white/30 text-lg flex-shrink-0 mt-0.5">!</span>
+                <div>
+                  <span className="text-white/40 text-xs font-semibold uppercase tracking-wide block mb-1">
+                    {tx.summaryRealismNote}
+                  </span>
+                  <p className="text-white/70 text-sm leading-relaxed">{diagnosis.realismNote}</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
