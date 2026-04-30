@@ -21,9 +21,15 @@ export default function SiteFooter() {
           <Link href="/pricing" className="text-white/60 hover:text-white transition">
             {tx.pricingLink}
           </Link>
-<span className="text-white/30 cursor-default">{tx.footerPrivacy}</span>
-          <span className="text-white/30 cursor-default">{tx.footerTerms}</span>
-          <span className="text-white/30 cursor-default">{tx.footerContact}</span>
+          <Link href="/privacy" className="text-white/50 hover:text-white transition">
+            {tx.footerPrivacy}
+          </Link>
+          <Link href="/terms" className="text-white/50 hover:text-white transition">
+            {tx.footerTerms}
+          </Link>
+          <a href="mailto:yanaoskin35@gmail.com" className="text-white/50 hover:text-white transition">
+            {tx.footerContact}
+          </a>
         </nav>
       </div>
 

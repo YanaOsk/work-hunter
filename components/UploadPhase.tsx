@@ -61,7 +61,7 @@ export default function UploadPhase({ onComplete }: Props) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center p-4 sm:p-8">
-      <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
+      <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center gap-3 sm:gap-8 lg:gap-16">
 
         {/* ── Left / top: form ── */}
         <div className="w-full lg:flex-1 order-2 lg:order-1">
@@ -177,10 +177,10 @@ export default function UploadPhase({ onComplete }: Props) {
           </div>
         </div>
 
-        {/* ── Right / top on mobile: big robot ── */}
-        <div className="w-56 sm:w-72 lg:w-[360px] xl:w-[420px] order-1 lg:order-2 flex-shrink-0 flex flex-col items-center">
+        {/* ── Right / top on mobile: robot ── */}
+        <div className="w-28 sm:w-52 lg:w-[340px] xl:w-[400px] order-1 lg:order-2 flex-shrink-0 flex flex-col items-center">
           <ScoutRobot className="w-full drop-shadow-[0_0_60px_rgba(124,58,237,0.35)]" />
-          <p className="text-purple-400/70 text-lg font-bold tracking-widest mt-3 select-none">Scout</p>
+          <p className="hidden sm:block text-purple-400/70 text-lg font-bold tracking-widest mt-3 select-none">Scout</p>
         </div>
 
       </div>
