@@ -21,6 +21,7 @@ import type { CvMeta } from "@/lib/cvs";
 import { ltrSpan } from "@/lib/rtl";
 import { queueAutoStart, queueAdvisorScoutContext } from "@/lib/autoStart";
 import UserMetaCard from "./UserMetaCard";
+import SiteFooter from "@/components/SiteFooter";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -118,8 +119,8 @@ function ConvCard({
 
   return (
     <div className="border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-colors">
-      <div className="px-4 py-3.5 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="px-3 sm:px-4 py-3.5 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <div className="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
             <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -158,21 +159,21 @@ function ConvCard({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           {jobs.length > 0 && (
-            <span className="text-xs bg-green-500/20 border border-green-500/30 text-green-400 px-2.5 py-0.5 rounded-full font-medium">
+            <span className="hidden sm:inline-flex text-xs bg-green-500/20 border border-green-500/30 text-green-400 px-2.5 py-0.5 rounded-full font-medium">
               {jobs.length} {he ? "משרות" : "jobs"}
             </span>
           )}
           <button
             onClick={onContinue}
-            className="text-xs text-emerald-400 hover:text-emerald-300 border border-emerald-500/25 hover:border-emerald-400/50 bg-emerald-500/10 px-2.5 py-1 rounded-lg transition"
+            className="text-xs text-emerald-400 hover:text-emerald-300 border border-emerald-500/25 hover:border-emerald-400/50 bg-emerald-500/10 px-2 sm:px-2.5 py-1 rounded-lg transition"
           >
             {he ? "המשך" : "Continue"}
           </button>
           <Link
             href={`/conversations/${conv.id}`}
-            className="text-xs text-purple-400 hover:text-purple-300 border border-purple-500/25 hover:border-purple-400/50 bg-purple-500/10 px-2.5 py-1 rounded-lg transition"
+            className="hidden sm:block text-xs text-purple-400 hover:text-purple-300 border border-purple-500/25 hover:border-purple-400/50 bg-purple-500/10 px-2.5 py-1 rounded-lg transition"
           >
             {he ? "צפה" : "View"}
           </Link>
@@ -520,8 +521,8 @@ export default function ProfilePage() {
   const professionalSummary = advisor?.cvReview?.rewrittenSummary ?? null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 pb-20">
-      <div className="max-w-4xl mx-auto px-4 pt-8 space-y-5">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+      <div className="max-w-4xl mx-auto px-4 pt-8 pb-8 space-y-5">
 
         {/* ── USER HEADER — social profile style ───────────────────────── */}
         <div className="rounded-3xl overflow-hidden border border-white/10 bg-white/5">
@@ -641,7 +642,7 @@ export default function ProfilePage() {
 
         {/* ── ADVISOR JOURNEY ──────────────────────────────────────────── */}
         <SectionCard>
-          <div className="flex items-start justify-between gap-4 mb-5">
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
             <div>
               <SectionTitle>{he ? "מסע הייעוץ התעסוקתי" : "Career Advisor Journey"}</SectionTitle>
               <p className="text-white/40 text-sm">
@@ -652,7 +653,7 @@ export default function ProfilePage() {
                   : (he ? `שלב ${completedCount} מתוך ${STAGE_ORDER.length} הושלמו` : `${completedCount} of ${STAGE_ORDER.length} stages done`)}
               </p>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex flex-wrap items-center gap-2">
               {advisorStarted && (
                 <button
                   onClick={handleNewAdvisorSession}
@@ -895,7 +896,7 @@ export default function ProfilePage() {
 
         {/* ── SCOUT CONVERSATIONS ──────────────────────────────────────── */}
         <SectionCard>
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <div>
               <SectionTitle>{he ? "חיפושי משרות עם Scout" : "Job Searches with Scout"}</SectionTitle>
               <p className="text-white/40 text-sm">{he ? "כל שיחת חיפוש עם התוצאות שלה" : "Every search session with its results"}</p>
@@ -996,6 +997,7 @@ export default function ProfilePage() {
 
 
       </div>
+      <SiteFooter />
     </div>
   );
 }

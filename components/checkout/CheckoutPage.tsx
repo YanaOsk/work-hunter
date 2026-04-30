@@ -312,7 +312,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
         <button
           onClick={handlePay}
           disabled={loading}
-          className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-base py-4 rounded-2xl transition shadow-lg shadow-purple-900/40"
+          className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-base py-4 rounded-2xl transition active:scale-[0.98] shadow-lg shadow-purple-900/40"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">

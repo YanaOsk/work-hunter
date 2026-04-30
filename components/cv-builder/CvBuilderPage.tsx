@@ -502,6 +502,19 @@ export default function CvBuilderPage() {
   // ---------- EDITOR VIEW ----------
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+
+      {/* Mobile desktop-recommendation banner */}
+      <div className="lg:hidden print:hidden bg-amber-500/10 border-b border-amber-500/25 px-4 py-3 flex items-center gap-3 animate-fade-in-down">
+        <svg className="w-5 h-5 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        <p className="text-amber-300 text-sm leading-snug">
+          {lang === "he"
+            ? "לחוויה הטובה ביותר בבניית קורות החיים, מומלץ להשתמש במסך מחשב."
+            : "For the best CV building experience, we recommend using a desktop computer."}
+        </p>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10 print:p-0 print:max-w-none">
         <header className="print:hidden mb-6 md:mb-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-5">
@@ -533,7 +546,7 @@ export default function CvBuilderPage() {
               {tx.cvBuilderSubtitle && <p className="text-white/60 text-sm max-w-2xl">{tx.cvBuilderSubtitle}</p>}
             </div>
 
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex flex-wrap items-center gap-2">
               {!isLoggedIn ? (
                 <span className="text-emerald-400 text-xs flex items-center gap-1.5">
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -682,7 +695,7 @@ export default function CvBuilderPage() {
             <CvEditor data={data} onChange={setData} />
           </div>
 
-          <div className="lg:col-span-3 print:col-span-1">
+          <div className="hidden lg:block lg:col-span-3 print:block print:col-span-1">
             <div ref={previewRef} className="lg:sticky lg:top-[110px] print:static">
               <CvPreview data={data} />
             </div>
@@ -701,7 +714,7 @@ export default function CvBuilderPage() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setShowResetModal(false)}
           />
-          <div className="relative z-10 bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl shadow-black/40">
+          <div className="relative z-10 bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl shadow-black/40 animate-slide-up">
             <div className="flex flex-col items-center text-center">
               <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

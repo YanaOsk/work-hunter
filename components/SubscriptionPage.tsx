@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useLanguage } from "./LanguageProvider";
 import { PLANS } from "@/lib/plans";
 import type { Subscription } from "@/lib/subscriptions";
+import SiteFooter from "./SiteFooter";
 
 const PLAN_META: Record<string, {
   nameHe: string; nameEn: string;
@@ -116,7 +117,7 @@ export default function SubscriptionPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-8 py-12">
 
         <Link href="/profile" className="text-white/50 hover:text-white text-sm mb-8 inline-block transition">
-          {he ? "→ חזרה לפרופיל" : "← Back to profile"}
+          {he ? "חזרה לפרופיל" : "Back to profile"}
         </Link>
 
         <h1 className="text-3xl font-bold text-white mb-8">{he ? "המנוי שלי" : "My Subscription"}</h1>
@@ -296,7 +297,7 @@ export default function SubscriptionPage() {
       {/* Cancel confirmation modal */}
       {confirmCancel && sub?.expiryDate && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl" dir={he ? "rtl" : "ltr"}>
+          <div className="bg-slate-800 border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl animate-slide-up" dir={he ? "rtl" : "ltr"}>
             <h3 className="text-white font-semibold text-lg mb-2">
               {he ? "לבטל את המנוי?" : "Cancel subscription?"}
             </h3>
@@ -324,6 +325,7 @@ export default function SubscriptionPage() {
         </div>
       )}
 
+      <SiteFooter />
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50 text-sm text-center max-w-xs">
           {toast}

@@ -422,8 +422,8 @@ export const t = {
     cvEditBtn: "Edit",
     cvLoginToSave: "Sign in to save multiple resumes",
     cvPreviewTitle: "Live preview",
-    cvPreviewEmptyName: "Your full name",
-    cvPreviewEmptyTitle: "Your title / position",
+    cvPreviewEmptyName: "השם המלא שלך",
+    cvPreviewEmptyTitle: "הכותרת / התפקיד שלך",
     cvDone: "Saved",
     cvPlaceholder: "—",
 

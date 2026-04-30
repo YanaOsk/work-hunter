@@ -120,7 +120,7 @@ export default function PlansSection() {
 
                 <button
                   onClick={() => router.push(`/checkout?plan=${PLAN_IDS[p.variant]}`)}
-                  className={`w-full py-3 px-2 rounded-xl font-semibold transition mb-6 text-sm sm:text-base truncate ${c.cta}`}
+                  className={`w-full py-3 px-2 rounded-xl font-semibold transition mb-6 text-sm sm:text-base truncate active:scale-[0.97] ${c.cta}`}
                 >
                   {p.cta}
                 </button>
@@ -151,7 +151,7 @@ export default function PlansSection() {
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500 to-emerald-500 blur-md opacity-40 animate-pulse pointer-events-none" />
             <button
               onClick={() => router.push("/?start=jobs")}
-              className="relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-white font-bold text-base sm:text-lg bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 transition-all hover:scale-[1.03] shadow-lg shadow-purple-900/30"
+              className="relative inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-white font-bold text-sm sm:text-base md:text-lg bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 transition-all hover:scale-[1.03] active:scale-[0.97] shadow-lg shadow-purple-900/30"
             >
               {he ? "התחילו עכשיו בחינם" : "Start for Free Now"}
               <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -160,9 +160,6 @@ export default function PlansSection() {
               </svg>
             </button>
           </div>
-          <p className="text-white/40 text-xs">
-            {he ? "ללא כרטיס אשראי · ללא התחייבות" : "No credit card · No commitment"}
-          </p>
         </div>
 
         <div className="text-center">

@@ -319,9 +319,9 @@ function UsersTab() {
       )}
 
       <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between gap-4">
-          <h2 className="text-white font-semibold text-sm">
-            Registered Users <span className="text-white/30 font-normal ml-1">({filtered.length})</span>
+        <div className="px-4 sm:px-5 py-4 border-b border-white/10 flex flex-col sm:flex-row sm:items-center gap-3">
+          <h2 className="text-white font-semibold text-sm flex-1">
+            Registered Users <span className="text-white/30 font-normal">({filtered.length})</span>
           </h2>
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -331,7 +331,7 @@ function UsersTab() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search name or email…"
-              className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-purple-500 w-56 transition"
+              className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-purple-500 w-full sm:w-56 transition"
             />
           </div>
         </div>
@@ -343,62 +343,115 @@ function UsersTab() {
             {search ? "No users match your search." : "No users yet."}
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-white/30 text-xs uppercase tracking-wide border-b border-white/6">
-                <th className="text-left px-5 py-3 font-medium">#</th>
-                <th className="text-left px-5 py-3 font-medium">Name</th>
-                <th className="text-left px-5 py-3 font-medium">Email</th>
-                <th className="text-left px-5 py-3 font-medium">Provider</th>
-                <th className="text-left px-5 py-3 font-medium">Joined</th>
-                <th className="px-5 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            {/* Mobile cards */}
+            <div className="md:hidden divide-y divide-white/5">
               {filtered.map((user, idx) => (
-                <tr key={user.id} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
-                  <td className="px-5 py-3.5 text-white/25">{idx + 1}</td>
-                  <td className="px-5 py-3.5 font-medium text-white">{user.name}</td>
-                  <td className="px-5 py-3.5 text-white/50">{ltrSpan(user.email)}</td>
-                  <td className="px-5 py-3.5">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${user.provider === "google" ? "bg-blue-500/15 text-blue-400" : "bg-white/10 text-white/50"}`}>
-                      {user.provider === "google" ? "Google" : "Email"}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5 text-white/40">
-                    {new Date(user.createdAt).toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric" })}
-                  </td>
-                  <td className="px-5 py-3.5 text-right">
-                    {confirmId === user.id ? (
-                      <div className="flex items-center justify-end gap-2">
-                        <span className="text-white/40 text-xs">בטוח?</span>
-                        <button
-                          onClick={() => handleDelete(user.id)}
-                          disabled={!!deleting}
-                          className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition disabled:opacity-50"
-                        >
-                          {deleting === user.id ? "..." : "מחק"}
-                        </button>
-                        <button onClick={() => setConfirmId(null)} className="text-white/40 hover:text-white text-xs px-2 py-1.5 transition">
-                          ביטול
-                        </button>
+                <div key={user.id} className="px-4 py-4 space-y-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                        <span className="text-white/25 text-xs font-mono">#{idx + 1}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${user.provider === "google" ? "bg-blue-500/15 text-blue-400" : "bg-white/10 text-white/50"}`}>
+                          {user.provider === "google" ? "Google" : "Email"}
+                        </span>
                       </div>
-                    ) : (
-                      <button
-                        onClick={() => setConfirmId(user.id)}
-                        className="text-white/25 hover:text-rose-400 transition p-1.5 rounded-lg hover:bg-rose-500/10"
-                        title="Delete user"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    )}
-                  </td>
-                </tr>
+                      <p className="text-white font-semibold text-sm truncate">{user.name}</p>
+                      <p className="text-white/50 text-xs truncate">{ltrSpan(user.email)}</p>
+                      <p className="text-white/30 text-xs mt-1">
+                        {new Date(user.createdAt).toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric" })}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      {confirmId === user.id ? (
+                        <div className="flex flex-col gap-1.5 items-end">
+                          <span className="text-white/40 text-xs">בטוח?</span>
+                          <button
+                            onClick={() => handleDelete(user.id)}
+                            disabled={!!deleting}
+                            className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition disabled:opacity-50"
+                          >
+                            {deleting === user.id ? "..." : "מחק"}
+                          </button>
+                          <button onClick={() => setConfirmId(null)} className="text-white/40 hover:text-white text-xs px-2 py-1 transition">
+                            ביטול
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmId(user.id)}
+                          className="text-white/25 hover:text-rose-400 transition p-2 rounded-xl hover:bg-rose-500/10"
+                          title="Delete user"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+
+            {/* Desktop table */}
+            <table className="w-full text-sm hidden md:table">
+              <thead>
+                <tr className="text-white/30 text-xs uppercase tracking-wide border-b border-white/6">
+                  <th className="text-left px-5 py-3 font-medium">#</th>
+                  <th className="text-left px-5 py-3 font-medium">Name</th>
+                  <th className="text-left px-5 py-3 font-medium">Email</th>
+                  <th className="text-left px-5 py-3 font-medium">Provider</th>
+                  <th className="text-left px-5 py-3 font-medium">Joined</th>
+                  <th className="px-5 py-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((user, idx) => (
+                  <tr key={user.id} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
+                    <td className="px-5 py-3.5 text-white/25">{idx + 1}</td>
+                    <td className="px-5 py-3.5 font-medium text-white">{user.name}</td>
+                    <td className="px-5 py-3.5 text-white/50">{ltrSpan(user.email)}</td>
+                    <td className="px-5 py-3.5">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${user.provider === "google" ? "bg-blue-500/15 text-blue-400" : "bg-white/10 text-white/50"}`}>
+                        {user.provider === "google" ? "Google" : "Email"}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-white/40">
+                      {new Date(user.createdAt).toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric" })}
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      {confirmId === user.id ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-white/40 text-xs">בטוח?</span>
+                          <button
+                            onClick={() => handleDelete(user.id)}
+                            disabled={!!deleting}
+                            className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition disabled:opacity-50"
+                          >
+                            {deleting === user.id ? "..." : "מחק"}
+                          </button>
+                          <button onClick={() => setConfirmId(null)} className="text-white/40 hover:text-white text-xs px-2 py-1.5 transition">
+                            ביטול
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmId(user.id)}
+                          className="text-white/25 hover:text-rose-400 transition p-1.5 rounded-lg hover:bg-rose-500/10"
+                          title="Delete user"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </div>
     </div>
@@ -432,43 +485,42 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 text-white">
       {/* Header */}
-      <div className="border-b border-white/10 bg-slate-900/80 backdrop-blur-sm px-6 py-5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center">
+      <div className="border-b border-white/10 bg-slate-900/80 backdrop-blur-sm px-4 sm:px-6 py-4 sm:py-5">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
               <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
             </div>
-            <div>
-              <h1 className="text-white font-bold text-lg leading-none">Admin Panel</h1>
-              <p className="text-white/30 text-xs mt-0.5">Work Hunter</p>
+            <div className="min-w-0">
+              <h1 className="text-white font-bold text-base sm:text-lg leading-none">Admin Panel</h1>
+              <p className="text-white/30 text-xs mt-0.5 truncate hidden sm:block">{session.user?.email ? ltrSpan(session.user.email) : "Work Hunter"}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="text-white/40 text-sm hidden sm:block">{session.user?.email ? ltrSpan(session.user.email) : null}</span>
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 hidden sm:block" />
             <ThemeToggle />
-            <a href="/" className="text-white/30 hover:text-white/70 text-sm transition px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <a href="/" className="text-white/30 hover:text-white/70 text-sm transition p-2 sm:px-3 sm:py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              בית
+              <span className="hidden sm:inline">בית</span>
             </a>
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="text-white/30 hover:text-rose-400 text-sm transition px-3 py-1.5 rounded-lg hover:bg-rose-500/10 flex items-center gap-1.5"
+              className="text-white/30 hover:text-rose-400 text-sm transition p-2 sm:px-3 sm:py-1.5 rounded-lg hover:bg-rose-500/10 flex items-center gap-1.5"
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              התנתק
+              <span className="hidden sm:inline">התנתק</span>
             </button>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="max-w-6xl mx-auto mt-5 flex items-center gap-1">
+        <div className="max-w-6xl mx-auto mt-4 sm:mt-5 flex items-center gap-1 overflow-x-auto pb-0.5">
           {([
             { id: "analytics", label: "📊 טראפיק ואנליטיקס" },
             { id: "users", label: "👥 משתמשים" },
@@ -488,7 +540,7 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {tab === "analytics" ? <AnalyticsTab /> : <UsersTab />}
       </div>
     </div>

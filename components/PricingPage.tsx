@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import { renderMixedText } from "@/lib/rtl";
+import SiteFooter from "./SiteFooter";
 
 const PLAN_IDS: Record<string, string> = {
   free: "free",
@@ -46,7 +47,7 @@ export default function PricingPage() {
         </div>
 
         <div className="text-center mb-8 md:mb-10 max-w-2xl mx-auto">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4">{tx.pricingTitle}</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4">{tx.pricingTitle}</h1>
           <p className="text-white/70 text-sm sm:text-base md:text-lg leading-relaxed">{tx.pricingSubtitle}</p>
         </div>
 
@@ -221,7 +222,7 @@ export default function PricingPage() {
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500 to-emerald-500 blur-md opacity-40 animate-pulse pointer-events-none" />
             <button
               onClick={() => router.push("/?start=jobs")}
-              className="relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-white font-bold text-base sm:text-lg bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 transition-all hover:scale-[1.03] shadow-lg shadow-purple-900/30"
+              className="relative inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-white font-bold text-sm sm:text-base md:text-lg bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 transition-all hover:scale-[1.03] active:scale-[0.97] shadow-lg shadow-purple-900/30"
             >
               {lang === "he" ? "התחילו עכשיו בחינם" : "Start for Free Now"}
               <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -230,9 +231,6 @@ export default function PricingPage() {
               </svg>
             </button>
           </div>
-          <p className="text-white/40 text-xs">
-            {lang === "he" ? "ללא כרטיס אשראי · ללא התחייבות" : "No credit card · No commitment"}
-          </p>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-4 mb-10 md:mb-16">
@@ -251,6 +249,7 @@ export default function PricingPage() {
         </div>
       </div>
 
+      <SiteFooter />
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50">
           {toast}

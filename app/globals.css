@@ -4,6 +4,12 @@
 html, body {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+/* Better tap highlighting on iOS */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ── DARK (default) ─────────────────────────────────────────────────────── */
@@ -206,6 +212,47 @@ button, [role="button"], a {
 
 button:disabled {
   cursor: not-allowed;
+}
+
+/* ── Mobile touch-press feedback (coarse pointer = touch screen) ─────── */
+@media (pointer: coarse) {
+  button:not(:disabled):active,
+  a:active {
+    transform: scale(0.965);
+    transition: transform 0.08s ease;
+  }
+}
+
+/* ── Smooth modal / card slide-up entrance ──────────────────────────── */
+@keyframes slideUpEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUpEnter 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* ── Smooth fade-in for toasts / banners ────────────────────────────── */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.25s ease both;
 }
 
 .line-clamp-2 {

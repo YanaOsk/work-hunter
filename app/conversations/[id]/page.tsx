@@ -68,7 +68,7 @@ export default function ConversationPage() {
             {conv && <p className="text-white/40 text-xs">{timeStr(conv.createdAt)}</p>}
           </div>
           <Link href="/profile" className="text-purple-400 hover:text-purple-300 text-sm transition flex-shrink-0">
-            {he ? "לפרופיל ←" : "→ Profile"}
+            {he ? "לפרופיל" : "Profile"}
           </Link>
         </div>
       </div>
@@ -90,7 +90,7 @@ export default function ConversationPage() {
           <div className="text-center py-20">
             <p className="text-white/40 text-lg mb-2">{he ? "השיחה לא נמצאה" : "Conversation not found"}</p>
             <Link href="/profile" className="text-purple-400 hover:text-purple-300 text-sm transition">
-              {he ? "חזרה לפרופיל ←" : "Back to profile →"}
+              {he ? "חזרה לפרופיל" : "Back to profile"}
             </Link>
           </div>
         )}
@@ -106,7 +106,7 @@ export default function ConversationPage() {
                       <span className="text-white text-xs font-bold">S</span>
                     </div>
                   )}
-                  <div className={`max-w-lg rounded-2xl px-4 py-3 ${
+                  <div className={`max-w-[85vw] sm:max-w-lg rounded-2xl px-4 py-3 ${
                     msg.role === "user"
                       ? "bg-purple-600 text-white rounded-ee-sm"
                       : "bg-white/10 text-white/90 rounded-es-sm border border-white/10"

@@ -5,6 +5,8 @@ import { UserProfile } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import ScoutRobot from "./ScoutRobot";
+import FaqSection from "./FaqSection";
+import SiteFooter from "./SiteFooter";
 
 interface Props {
   onComplete: (profile: UserProfile) => void;
@@ -60,7 +62,8 @@ export default function UploadPhase({ onComplete }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center p-4 sm:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
       <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center gap-3 sm:gap-8 lg:gap-16">
 
         {/* ── Left / top: form ── */}
@@ -156,7 +159,7 @@ export default function UploadPhase({ onComplete }: Props) {
                 </div>
                 <button onClick={() => onComplete(parsedResult)}
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-purple-900/40">
-                  {he ? "המשיכו לשיחה ←" : "Continue to Chat →"}
+                  {he ? "המשיכו לשיחה" : "Continue to Chat"}
                 </button>
               </div>
             ) : (
@@ -184,6 +187,9 @@ export default function UploadPhase({ onComplete }: Props) {
         </div>
 
       </div>
+      </div>
+      <FaqSection />
+      <SiteFooter />
     </div>
   );
 }

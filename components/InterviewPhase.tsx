@@ -63,7 +63,7 @@ function InlineJobCard({ job, lang }: { job: JobResult; lang: string }) {
           rel="noopener noreferrer"
           className="flex-shrink-0 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition-all"
         >
-          {isHe ? "להגשה ←" : "Apply →"}
+          {isHe ? "להגשה" : "Apply"}
         </a>
       </div>
 

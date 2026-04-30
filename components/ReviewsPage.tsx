@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import { REVIEWS, Review } from "@/lib/reviews";
+import SiteFooter from "./SiteFooter";
 
 function shufflePick<T>(arr: T[], n: number): T[] {
   const copy = [...arr];
@@ -53,6 +54,7 @@ export default function ReviewsPage() {
           </Link>
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }
