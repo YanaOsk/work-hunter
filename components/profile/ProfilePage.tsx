@@ -524,6 +524,8 @@ export default function ProfilePage() {
     setUserMeta((prev) => ({ ...prev, ...patch }));
   }
 
+  const [activeSection, setActiveSection] = useState<"profile" | "advisor" | "searches" | "jobs" | "cvs">("profile");
+
   const router = useRouter();
   const user = session?.user;
   const profileId = user?.id ?? DEFAULT_ADVISOR_ID;
@@ -556,479 +558,380 @@ export default function ProfilePage() {
   const mockDone        = !!advisor?.mockInterview?.finished;
   const professionalSummary = advisor?.cvReview?.rewrittenSummary ?? null;
 
+  const navItems: { id: "profile" | "advisor" | "searches" | "jobs" | "cvs"; labelHe: string; labelEn: string; badge?: number }[] = [
+    { id: "profile",  labelHe: "פרופיל",          labelEn: "Profile",       badge: undefined },
+    { id: "advisor",  labelHe: "ייעוץ תעסוקתי",   labelEn: "Career Advisor", badge: completedCount > 0 ? completedCount : undefined },
+    { id: "searches", labelHe: "חיפושי משרות",     labelEn: "Job Searches",   badge: conversations.length || undefined },
+    { id: "jobs",     labelHe: "המשרות שלי",        labelEn: "My Jobs",        badge: allOfferedJobs.length || undefined },
+    { id: "cvs",      labelHe: "קורות חיים",        labelEn: "My CVs",         badge: cvs.length || undefined },
+  ];
+
+  const navIcons: Record<string, React.ReactNode> = {
+    profile: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
+    advisor: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>,
+    searches: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>,
+    jobs: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2" /></svg>,
+    cvs: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
-      <div className="max-w-4xl mx-auto px-4 pt-8 pb-8 space-y-5">
+      <div className="max-w-6xl mx-auto px-4 pt-6 pb-16">
+        <div className="flex flex-col md:flex-row gap-6 items-start">
 
-        {/* ── USER HEADER — social profile style ───────────────────────── */}
-        <div className="rounded-3xl overflow-hidden border border-white/10 bg-white/5">
-
-          {/* Cover banner */}
-          <div className="relative h-36 sm:h-44 bg-gradient-to-br from-purple-900 via-violet-700/80 to-indigo-900 overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_60%_0%,rgba(168,85,247,0.35),transparent)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_80%_at_10%_100%,rgba(99,102,241,0.25),transparent)]" />
-            <div className="absolute bottom-3 end-4 flex gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-white/20" />
-              <div className="w-2 h-2 rounded-full bg-purple-400/40" />
-              <div className="w-2 h-2 rounded-full bg-violet-400/40" />
-            </div>
-          </div>
-
-          {/* Avatar + info */}
-          <div className="px-5 sm:px-7 pb-6">
-            <div className="flex items-end justify-between -mt-10 sm:-mt-12 mb-4">
-              {/* Avatar */}
-              <div
-                className="flex-shrink-0 relative group cursor-pointer"
-                onClick={() => avatarInputRef.current?.click()}
-              >
-                <input
-                  ref={avatarInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAvatarUpload}
-                />
+          {/* ─── Sidebar ─── */}
+          <aside className="w-full md:w-56 flex-shrink-0 md:sticky md:top-20">
+            {/* User card */}
+            <div className="rounded-2xl p-4 bg-white/5 border border-white/10 mb-3">
+              <div className="relative group cursor-pointer w-14 h-14 mb-3" onClick={() => avatarInputRef.current?.click()}>
+                <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
                 {displayImage ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={displayImage}
-                    alt=""
-                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-4 ring-slate-900"
-                  />
+                  <img src={displayImage} alt="" className="w-14 h-14 rounded-xl object-cover" />
                 ) : (
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-700 flex items-center justify-center text-white text-3xl font-black select-none ring-4 ring-slate-900">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-violet-700 flex items-center justify-center text-white text-xl font-black select-none">
                     {initials}
                   </div>
                 )}
-                {/* Upload overlay */}
-                <div className={`absolute inset-0 rounded-2xl flex items-center justify-center transition-all ${uploadingAvatar ? "bg-black/60" : "bg-black/0 group-hover:bg-black/50"}`}>
+                <div className={`absolute inset-0 rounded-xl flex items-center justify-center transition-all ${uploadingAvatar ? "bg-black/60" : "bg-black/0 group-hover:bg-black/50"}`}>
                   {uploadingAvatar ? (
-                    <svg className="w-5 h-5 text-white animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                    </svg>
+                    <svg className="w-4 h-4 text-white animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
                   ) : (
-                    <svg className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                    <svg className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                   )}
                 </div>
               </div>
-
-              {/* Plan badge — top-right of info row */}
-              <div className="mb-1 flex items-center gap-2">
-                {plan !== "free" && (
-                  <span className="text-emerald-400 text-xs font-medium flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    {he ? "פעיל" : "Active"}
-                  </span>
-                )}
-                {plan === "free" && (
-                  <Link href="/pricing" className="text-purple-400 hover:text-purple-300 text-xs transition font-medium">
-                    {he ? "שדרג ↑" : "Upgrade ↑"}
-                  </Link>
-                )}
-              </div>
-            </div>
-
-            {/* Name + email */}
-            <p className="text-white text-xl sm:text-2xl font-bold leading-tight">{user?.name || "—"}</p>
-            <p className="text-white/45 text-sm mt-0.5" style={{ textAlign: "right" }}>{user?.email ? ltrSpan(user.email) : null}</p>
-          </div>
-        </div>
-
-        {/* ── PROFILE DATA (Scout + editable) ──────────────────────────── */}
-        <UserMetaCard meta={userMeta} scoutData={scoutData} onSave={saveMeta} he={he} />
-
-        {/* ── MY CVs ───────────────────────────────────────────────────── */}
-        {cvs.length > 0 && (
-          <SectionCard>
-            <div className="flex items-center justify-between mb-4">
-              <SectionTitle>{he ? "קורות החיים שלי" : "My CVs"}</SectionTitle>
-              <Link href="/cv-builder?from=/profile" className="text-purple-400 hover:text-purple-300 text-sm transition">
-                {he ? "צור חדש" : "Create new"}
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {cvs.map((cv) => (
-                <Link key={cv.id} href={`/cv-builder?cvId=${cv.id}&from=/profile`}
-                  className="flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl px-4 py-3 transition group">
-                  <div className="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate group-hover:text-purple-300 transition">{cv.name}</p>
-                    <p className="text-white/40 text-xs">{timeAgo(cv.updatedAt, he)}</p>
-                  </div>
-                  <svg className="w-4 h-4 text-white/20 group-hover:text-purple-400 transition flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </Link>
-              ))}
-            </div>
-          </SectionCard>
-        )}
-
-        {/* ── ADVISOR JOURNEY ──────────────────────────────────────────── */}
-        <SectionCard>
-          <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
-            <div>
-              <SectionTitle>{he ? "מסע הייעוץ התעסוקתי" : "Career Advisor Journey"}</SectionTitle>
-              <p className="text-white/40 text-sm">
-                {!advisorStarted
-                  ? (he ? "טרם התחלת את התהליך" : "You haven't started yet")
-                  : advisorDone
-                  ? (he ? "כל השלבים הושלמו!" : "All stages complete!")
-                  : (he ? `שלב ${completedCount} מתוך ${STAGE_ORDER.length} הושלמו` : `${completedCount} of ${STAGE_ORDER.length} stages done`)}
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {advisorStarted && (
-                <button
-                  onClick={handleNewAdvisorSession}
-                  className="text-white/35 hover:text-white/70 text-xs border border-white/10 hover:border-white/25 px-3 py-1.5 rounded-xl transition"
-                >
-                  {he ? "התחל מ-0" : "Start fresh"}
-                </button>
+              <p className="text-white font-semibold text-sm truncate">{user?.name || "—"}</p>
+              <p className="text-white/40 text-xs truncate mt-0.5">{user?.email}</p>
+              {plan === "free" ? (
+                <Link href="/pricing" className="inline-block mt-3 text-purple-400 hover:text-purple-300 text-xs font-medium transition">{he ? "שדרג ↑" : "Upgrade ↑"}</Link>
+              ) : (
+                <span className="inline-flex items-center gap-1 mt-3 text-emerald-400 text-xs"><div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />{he ? "פעיל" : "Active"}</span>
               )}
-            {!advisorDone ? (
-              <Link href={`/advisor?profileId=${profileId}`}
-                className="bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition">
-                {!advisorStarted ? (he ? "התחל" : "Start") : (he ? "המשך" : "Continue")}
-              </Link>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/advisor?profileId=${profileId}`}
-                  className="text-purple-400 hover:text-purple-300 text-sm font-semibold border border-purple-500/30 hover:border-purple-400/60 bg-purple-500/10 px-4 py-2 rounded-xl transition flex items-center gap-1.5"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  {he ? "ראה סיכום" : "View Summary"}
-                </Link>
-                {!mockDone && (
-                  <Link href={`/advisor?profileId=${profileId}`}
-                    className="bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition flex items-center gap-1.5">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                    </svg>
-                    {he ? "ראיון מדומה" : "Mock interview"}
-                  </Link>
-                )}
-                {mockDone && (
-                  <span className="text-green-400 text-sm font-medium flex items-center gap-1.5">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {he ? "הושלם" : "Complete"}
-                  </span>
-                )}
-              </div>
-            )}
             </div>
-          </div>
 
-          {/* Stage tracker */}
-          <div className="flex items-start gap-0 overflow-x-auto pt-2 pb-1">
-            {STAGE_ORDER.map((stage, i) => {
-              const done    = advisorDone || i < completedCount;
-              const current = !advisorDone && i === completedCount;
-              return (
-                <div key={stage} className="flex items-start flex-shrink-0">
-                  <div className="flex flex-col items-center gap-1.5 w-20">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                        done    ? "bg-green-500" :
-                        current ? "bg-purple-600 ring-4 ring-purple-600/30 animate-pulse" :
-                        "bg-white/10 text-white/30"
-                      }`}
-                      style={(done || current) ? { color: "#ffffff" } : undefined}
-                    >
-                      {done ? (
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
+            {/* Desktop nav */}
+            <nav className="hidden md:flex flex-col gap-1">
+              {navItems.map((item) => {
+                const active = activeSection === item.id;
+                return (
+                  <button key={item.id} onClick={() => setActiveSection(item.id)}
+                    className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-start ${active ? "bg-purple-600/20 text-purple-300 border border-purple-500/30" : "text-white/55 hover:text-white hover:bg-white/5"}`}
+                  >
+                    <span className={active ? "text-purple-400" : "text-white/30"}>{navIcons[item.id]}</span>
+                    <span className="flex-1">{he ? item.labelHe : item.labelEn}</span>
+                    {item.badge ? <span className="text-xs bg-white/10 text-white/50 px-1.5 py-0.5 rounded-full min-w-[20px] text-center">{item.badge}</span> : null}
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Mobile horizontal tabs */}
+            <div className="md:hidden flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4 mb-2">
+              {navItems.map((item) => {
+                const active = activeSection === item.id;
+                return (
+                  <button key={item.id} onClick={() => setActiveSection(item.id)}
+                    className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${active ? "bg-purple-600/20 text-purple-300 border border-purple-500/30" : "text-white/50 bg-white/5"}`}
+                  >
+                    <span className={active ? "text-purple-400" : "text-white/30"}>{navIcons[item.id]}</span>
+                    {he ? item.labelHe : item.labelEn}
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+
+          {/* ─── Content ─── */}
+          <main className="flex-1 min-w-0 space-y-5">
+
+            {/* ── PROFILE ── */}
+            {activeSection === "profile" && (
+              <>
+                <UserMetaCard meta={userMeta} scoutData={scoutData} onSave={saveMeta} he={he} />
+                {professionalSummary && (
+                  <SectionCard accent>
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <div>
+                        <SectionTitle>{he ? "הסיכום המקצועי שלך" : "Your Professional Summary"}</SectionTitle>
+                        <p className="text-purple-400 text-xs mt-0.5">{he ? "נוצר ע\"י יועץ ה-AI שלך" : "Created by your AI advisor"}</p>
+                      </div>
+                      <Link href="/cv-builder?from=/profile" className="flex-shrink-0 text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/30 px-3 py-1.5 rounded-xl transition">
+                        {he ? "הוסף ל-CV" : "Add to CV"}
+                      </Link>
+                    </div>
+                    <blockquote className="border-s-2 border-purple-500 ps-4 text-white/80 text-sm leading-relaxed">{professionalSummary}</blockquote>
+                  </SectionCard>
+                )}
+              </>
+            )}
+
+            {/* ── CAREER ADVISOR ── */}
+            {activeSection === "advisor" && (
+              <>
+                <SectionCard>
+                  <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
+                    <div>
+                      <SectionTitle>{he ? "מסע הייעוץ התעסוקתי" : "Career Advisor Journey"}</SectionTitle>
+                      <p className="text-white/40 text-sm">
+                        {!advisorStarted ? (he ? "טרם התחלת את התהליך" : "You haven't started yet")
+                          : advisorDone ? (he ? "כל השלבים הושלמו!" : "All stages complete!")
+                          : (he ? `שלב ${completedCount} מתוך ${STAGE_ORDER.length} הושלמו` : `${completedCount} of ${STAGE_ORDER.length} stages done`)}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {advisorStarted && (
+                        <button onClick={handleNewAdvisorSession} className="text-white/35 hover:text-white/70 text-xs border border-white/10 hover:border-white/25 px-3 py-1.5 rounded-xl transition">
+                          {he ? "התחל מ-0" : "Start fresh"}
+                        </button>
+                      )}
+                      {!advisorDone ? (
+                        <Link href={`/advisor?profileId=${profileId}`} className="bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition">
+                          {!advisorStarted ? (he ? "התחל" : "Start") : (he ? "המשך" : "Continue")}
+                        </Link>
                       ) : (
-                        <span>{i + 1}</span>
+                        <div className="flex items-center gap-2">
+                          <Link href={`/advisor?profileId=${profileId}`} className="text-purple-400 hover:text-purple-300 text-sm font-semibold border border-purple-500/30 hover:border-purple-400/60 bg-purple-500/10 px-4 py-2 rounded-xl transition flex items-center gap-1.5">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            {he ? "ראה סיכום" : "View Summary"}
+                          </Link>
+                          {!mockDone && (
+                            <Link href={`/advisor?profileId=${profileId}`} className="bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition flex items-center gap-1.5">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                              {he ? "ראיון מדומה" : "Mock interview"}
+                            </Link>
+                          )}
+                          {mockDone && (
+                            <span className="text-green-400 text-sm font-medium flex items-center gap-1.5">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                              {he ? "הושלם" : "Complete"}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
-                    <span className={`text-xs text-center leading-tight px-1 ${
-                      done ? "text-green-400" : current ? "text-purple-300" : "text-white/30"
-                    }`}>
-                      {he ? STAGE_LABELS[stage].he : STAGE_LABELS[stage].en}
-                    </span>
                   </div>
-                  {i < STAGE_ORDER.length - 1 && (
-                    <div className={`h-0.5 w-8 mt-4 flex-shrink-0 ${done ? "bg-green-500" : "bg-white/10"}`} />
-                  )}
-                </div>
-              );
-            })}
 
-            {/* Mock interview bonus */}
-            <div className="flex items-start flex-shrink-0">
-              <div className={`h-0.5 w-8 mt-4 flex-shrink-0 ${advisorDone ? "bg-green-500" : "bg-white/10"}`} />
-              <div className="flex flex-col items-center gap-1.5 w-20">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                    mockDone    ? "bg-green-500" :
-                    advisorDone ? "bg-amber-500 ring-4 ring-amber-500/30 animate-pulse" :
-                    "bg-white/10 text-white/30"
-                  }`}
-                  style={(mockDone || advisorDone) ? { color: "#ffffff" } : undefined}
-                >
-                  {mockDone ? (
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                    </svg>
-                  )}
-                </div>
-                <span className={`text-xs text-center leading-tight px-1 ${
-                  mockDone ? "text-green-400" : advisorDone ? "text-amber-400" : "text-white/30"
-                }`}>
-                  {he ? "ראיון מדומה" : "Mock interview"}
-                  {advisorDone && !mockDone && " ★"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {advisor?.chosenPath && (
-            <div className="mt-5 pt-4 border-t border-white/10 flex items-center gap-2 flex-wrap">
-              <span className="text-white/40 text-xs">{he ? "המסלול שנבחר:" : "Chosen path:"}</span>
-              <span className="text-purple-300 text-xs font-medium bg-purple-500/20 border border-purple-500/30 px-2.5 py-1 rounded-full">
-                {he ? PATH_LABELS[advisor.chosenPath].he : PATH_LABELS[advisor.chosenPath].en}
-              </span>
-              {advisor.diagnosis?.strengths.slice(0, 2).map((s) => (
-                <span key={s} className="text-white/40 text-xs bg-white/5 px-2 py-0.5 rounded-full">{s}</span>
-              ))}
-            </div>
-          )}
-
-          {/* ── Past sessions ── */}
-          {archivedSessions.length > 0 && (
-            <div className="mt-5 pt-4 border-t border-white/10">
-              <p className="text-white/35 text-xs font-semibold uppercase tracking-wide mb-3">
-                {he ? `ייעוצים קודמים (${archivedSessions.length})` : `Past sessions (${archivedSessions.length})`}
-              </p>
-              <div className="space-y-2">
-                {archivedSessions.map((s) => (
-                  <ArchivedSessionCard key={s.id} session={s} he={he} />
-                ))}
-              </div>
-            </div>
-          )}
-        </SectionCard>
-
-        {/* ── PROFESSIONAL SUMMARY ─────────────────────────────────────── */}
-        {professionalSummary && (
-          <SectionCard accent>
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <SectionTitle>{he ? "הסיכום המקצועי שלך" : "Your Professional Summary"}</SectionTitle>
-                <p className="text-purple-400 text-xs mt-0.5">
-                  {he ? "נוצר ע\"י יועץ ה-AI שלך" : "Created by your AI advisor"}
-                </p>
-              </div>
-              <Link href="/cv-builder?from=/profile"
-                className="flex-shrink-0 text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/30 px-3 py-1.5 rounded-xl transition">
-                {he ? "הוסף ל-CV" : "Add to CV"}
-              </Link>
-            </div>
-            <blockquote className="border-s-2 border-purple-500 ps-4 text-white/80 text-sm leading-relaxed">
-              {professionalSummary}
-            </blockquote>
-          </SectionCard>
-        )}
-
-        {/* ── ADVISOR INSIGHTS ─────────────────────────────────────────── */}
-        {advisorDone && advisor && (advisor.diagnosis?.topRoles?.length || advisor.strategy?.targetCompanies?.length) && (
-          <SectionCard accent>
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <SectionTitle>{he ? "המלצות הייעוץ שלך" : "Your Career Recommendations"}</SectionTitle>
-                <p className="text-purple-400 text-xs mt-0.5">
-                  {he ? "כיוונים ויעדים שזוהו בתהליך הייעוץ" : "Directions & targets from your advisor session"}
-                </p>
-              </div>
-              <Link
-                href={`/advisor?profileId=${profileId}`}
-                className="flex-shrink-0 text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/30 px-3 py-1.5 rounded-xl transition"
-              >
-                {he ? "סיכום מלא" : "Full summary"}
-              </Link>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4 mb-5">
-              {advisor.diagnosis?.topRoles && advisor.diagnosis.topRoles.length > 0 && (
-                <div>
-                  <p className="text-emerald-300 text-xs font-semibold uppercase tracking-wide mb-2">
-                    {he ? "תפקידים מומלצים" : "Recommended Roles"}
-                  </p>
-                  <div className="flex flex-col gap-1.5">
-                    {advisor.diagnosis.topRoles.map((role, i) => (
-                      <div key={i} className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-3 py-2">
-                        <span className="text-emerald-400 text-xs font-bold">#{i + 1}</span>
-                        <span className="text-white text-sm font-medium">{role}</span>
+                  <div className="flex items-start gap-0 overflow-x-auto pt-2 pb-1">
+                    {STAGE_ORDER.map((stage, i) => {
+                      const done = advisorDone || i < completedCount;
+                      const current = !advisorDone && i === completedCount;
+                      return (
+                        <div key={stage} className="flex items-start flex-shrink-0">
+                          <div className="flex flex-col items-center gap-1.5 w-20">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${done ? "bg-green-500" : current ? "bg-purple-600 ring-4 ring-purple-600/30 animate-pulse" : "bg-white/10 text-white/30"}`} style={(done || current) ? { color: "#ffffff" } : undefined}>
+                              {done ? <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg> : <span>{i + 1}</span>}
+                            </div>
+                            <span className={`text-xs text-center leading-tight px-1 ${done ? "text-green-400" : current ? "text-purple-300" : "text-white/30"}`}>
+                              {he ? STAGE_LABELS[stage].he : STAGE_LABELS[stage].en}
+                            </span>
+                          </div>
+                          {i < STAGE_ORDER.length - 1 && <div className={`h-0.5 w-8 mt-4 flex-shrink-0 ${done ? "bg-green-500" : "bg-white/10"}`} />}
+                        </div>
+                      );
+                    })}
+                    <div className="flex items-start flex-shrink-0">
+                      <div className={`h-0.5 w-8 mt-4 flex-shrink-0 ${advisorDone ? "bg-green-500" : "bg-white/10"}`} />
+                      <div className="flex flex-col items-center gap-1.5 w-20">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${mockDone ? "bg-green-500" : advisorDone ? "bg-amber-500 ring-4 ring-amber-500/30 animate-pulse" : "bg-white/10 text-white/30"}`} style={(mockDone || advisorDone) ? { color: "#ffffff" } : undefined}>
+                          {mockDone ? <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg> : <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>}
+                        </div>
+                        <span className={`text-xs text-center leading-tight px-1 ${mockDone ? "text-green-400" : advisorDone ? "text-amber-400" : "text-white/30"}`}>
+                          {he ? "ראיון מדומה" : "Mock interview"}{advisorDone && !mockDone && " ★"}
+                        </span>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
-              )}
 
-              {advisor.strategy?.targetCompanies && advisor.strategy.targetCompanies.length > 0 && (
-                <div>
-                  <p className="text-purple-300 text-xs font-semibold uppercase tracking-wide mb-2">
-                    {he ? "חברות יעד" : "Target Companies"}
-                  </p>
-                  <div className="flex flex-col gap-1.5">
-                    {advisor.strategy.targetCompanies.slice(0, 4).map((c, i) => (
-                      <div key={i} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl px-3 py-2">
-                        <span className="text-white text-sm font-medium">{c.name}</span>
-                        <span className="text-white/35 text-xs">{c.size}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={() => {
-                const lines: string[] = [];
-                if (advisor.diagnosis?.topRoles?.length)
-                  lines.push(`תפקידים שמתאימים לי: ${advisor.diagnosis.topRoles.join(", ")}`);
-                if (advisor.strategy?.targetCompanies?.length)
-                  lines.push(`חברות יעד: ${advisor.strategy.targetCompanies.map((c) => c.name).join(", ")}`);
-                if (advisor.chosenPath)
-                  lines.push(`מסלול: ${he ? PATH_LABELS[advisor.chosenPath].he : PATH_LABELS[advisor.chosenPath].en}`);
-                if (advisor.diagnosis?.strengths?.length)
-                  lines.push(`חוזקות: ${advisor.diagnosis.strengths.slice(0, 3).join(", ")}`);
-                queueAdvisorScoutContext(lines.join("\n"));
-                queueAutoStart("jobs");
-                router.push("/");
-              }}
-              className="w-full bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              {he ? "שלח ל-Scout — מצא לי משרות לפי הסיכום" : "Send to Scout — Find jobs from my summary"}
-            </button>
-          </SectionCard>
-        )}
-
-        {/* ── SCOUT CONVERSATIONS ──────────────────────────────────────── */}
-        <SectionCard>
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-            <div>
-              <SectionTitle>{he ? "חיפושי משרות עם Scout" : "Job Searches with Scout"}</SectionTitle>
-              <p className="text-white/40 text-sm">{he ? "כל שיחת חיפוש עם התוצאות שלה" : "Every search session with its results"}</p>
-            </div>
-            <button
-              onClick={() => { queueAutoStart("jobs"); router.push("/"); }}
-              className="flex-shrink-0 text-purple-400 hover:text-purple-300 text-sm transition flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              {he ? "חיפוש חדש" : "New search"}
-            </button>
-          </div>
-
-          {loadingConvs ? (
-            <div className="space-y-3">
-              {[0, 1].map((i) => <div key={i} className="h-20 bg-white/5 rounded-2xl animate-pulse" />)}
-            </div>
-          ) : conversations.length === 0 ? (
-            <div className="text-center py-10">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-3">
-                <svg className="w-6 h-6 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <p className="text-white/40 text-sm">{he ? "עדיין לא ביצעת חיפוש משרות" : "No job searches yet"}</p>
-              <button onClick={() => { queueAutoStart("jobs"); router.push("/"); }}
-                className="text-purple-400 hover:text-purple-300 text-sm mt-2 inline-block transition">
-                {he ? "צאי לחיפוש עכשיו" : "Start searching now"}
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {conversations.map((conv) => (
-                <ConvCard
-                  key={conv.id}
-                  conv={conv}
-                  he={he}
-                  onContinue={() => router.push(`/?continueConv=${conv.id}`)}
-                  onDelete={() => setConversations((prev) => prev.filter((c) => c.id !== conv.id))}
-                  onRename={(title) => setConversations((prev) => prev.map((c) => c.id === conv.id ? { ...c, title } : c))}
-                />
-              ))}
-            </div>
-          )}
-        </SectionCard>
-
-        {/* ── MY JOBS ──────────────────────────────────────────────────── */}
-        <SectionCard>
-          <div className="mb-4">
-            <SectionTitle>{he ? "המשרות שלי" : "My Jobs"}</SectionTitle>
-          </div>
-
-          {allOfferedJobs.length === 0 ? (
-            <p className="text-white/40 text-sm py-2">{he ? "עדיין אין לך משרות" : "No jobs yet"}</p>
-          ) : (
-            <div className="space-y-2">
-              {(showAllJobs ? allOfferedJobs : allOfferedJobs.slice(0, 6)).map((job) => (
-                <a
-                  key={job.id}
-                  href={job.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl px-3 py-2.5 transition group"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white/90 text-sm font-medium truncate group-hover:text-purple-300 transition">
-                      {job.title}
-                    </p>
-                    <p className="text-white/40 text-xs truncate">{job.company} · {job.source}</p>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <ScoreChip score={job.matchScore} />
-                    {job.isRemote && (
-                      <span className="text-xs text-blue-400 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 rounded-full">
-                        {he ? "מרחוק" : "Remote"}
+                  {advisor?.chosenPath && (
+                    <div className="mt-5 pt-4 border-t border-white/10 flex items-center gap-2 flex-wrap">
+                      <span className="text-white/40 text-xs">{he ? "המסלול שנבחר:" : "Chosen path:"}</span>
+                      <span className="text-purple-300 text-xs font-medium bg-purple-500/20 border border-purple-500/30 px-2.5 py-1 rounded-full">
+                        {he ? PATH_LABELS[advisor.chosenPath].he : PATH_LABELS[advisor.chosenPath].en}
                       </span>
-                    )}
-                    <svg className="w-3.5 h-3.5 text-white/20 group-hover:text-white/50 transition flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
+                      {advisor.diagnosis?.strengths.slice(0, 2).map((s) => (
+                        <span key={s} className="text-white/40 text-xs bg-white/5 px-2 py-0.5 rounded-full">{s}</span>
+                      ))}
+                    </div>
+                  )}
+
+                  {archivedSessions.length > 0 && (
+                    <div className="mt-5 pt-4 border-t border-white/10">
+                      <p className="text-white/35 text-xs font-semibold uppercase tracking-wide mb-3">
+                        {he ? `ייעוצים קודמים (${archivedSessions.length})` : `Past sessions (${archivedSessions.length})`}
+                      </p>
+                      <div className="space-y-2">
+                        {archivedSessions.map((s) => <ArchivedSessionCard key={s.id} session={s} he={he} />)}
+                      </div>
+                    </div>
+                  )}
+                </SectionCard>
+
+                {advisorDone && advisor && (advisor.diagnosis?.topRoles?.length || advisor.strategy?.targetCompanies?.length) && (
+                  <SectionCard accent>
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <div>
+                        <SectionTitle>{he ? "המלצות הייעוץ שלך" : "Your Career Recommendations"}</SectionTitle>
+                        <p className="text-purple-400 text-xs mt-0.5">{he ? "כיוונים ויעדים שזוהו בתהליך הייעוץ" : "Directions & targets from your advisor session"}</p>
+                      </div>
+                      <Link href={`/advisor?profileId=${profileId}`} className="flex-shrink-0 text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/30 px-3 py-1.5 rounded-xl transition">
+                        {he ? "סיכום מלא" : "Full summary"}
+                      </Link>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4 mb-5">
+                      {advisor.diagnosis?.topRoles && advisor.diagnosis.topRoles.length > 0 && (
+                        <div>
+                          <p className="text-emerald-300 text-xs font-semibold uppercase tracking-wide mb-2">{he ? "תפקידים מומלצים" : "Recommended Roles"}</p>
+                          <div className="flex flex-col gap-1.5">
+                            {advisor.diagnosis.topRoles.map((role, i) => (
+                              <div key={i} className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-3 py-2">
+                                <span className="text-emerald-400 text-xs font-bold">#{i + 1}</span>
+                                <span className="text-white text-sm font-medium">{role}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {advisor.strategy?.targetCompanies && advisor.strategy.targetCompanies.length > 0 && (
+                        <div>
+                          <p className="text-purple-300 text-xs font-semibold uppercase tracking-wide mb-2">{he ? "חברות יעד" : "Target Companies"}</p>
+                          <div className="flex flex-col gap-1.5">
+                            {advisor.strategy.targetCompanies.slice(0, 4).map((c, i) => (
+                              <div key={i} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+                                <span className="text-white text-sm font-medium">{c.name}</span>
+                                <span className="text-white/35 text-xs">{c.size}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => {
+                        const lines: string[] = [];
+                        if (advisor.diagnosis?.topRoles?.length) lines.push(`תפקידים שמתאימים לי: ${advisor.diagnosis.topRoles.join(", ")}`);
+                        if (advisor.strategy?.targetCompanies?.length) lines.push(`חברות יעד: ${advisor.strategy.targetCompanies.map((c) => c.name).join(", ")}`);
+                        if (advisor.chosenPath) lines.push(`מסלול: ${he ? PATH_LABELS[advisor.chosenPath].he : PATH_LABELS[advisor.chosenPath].en}`);
+                        if (advisor.diagnosis?.strengths?.length) lines.push(`חוזקות: ${advisor.diagnosis.strengths.slice(0, 3).join(", ")}`);
+                        queueAdvisorScoutContext(lines.join("\n"));
+                        queueAutoStart("jobs");
+                        router.push("/");
+                      }}
+                      className="w-full bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                      {he ? "שלח ל-Scout — מצא לי משרות לפי הסיכום" : "Send to Scout — Find jobs from my summary"}
+                    </button>
+                  </SectionCard>
+                )}
+              </>
+            )}
+
+            {/* ── JOB SEARCHES ── */}
+            {activeSection === "searches" && (
+              <SectionCard>
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+                  <div>
+                    <SectionTitle>{he ? "חיפושי משרות עם Scout" : "Job Searches with Scout"}</SectionTitle>
+                    <p className="text-white/40 text-sm">{he ? "כל שיחת חיפוש עם התוצאות שלה" : "Every search session with its results"}</p>
                   </div>
-                </a>
-              ))}
-              {allOfferedJobs.length > 6 && (
-                <button
-                  onClick={() => setShowAllJobs((v) => !v)}
-                  className="w-full text-center text-xs text-white/30 hover:text-white/60 transition pt-1"
-                >
-                  {showAllJobs
-                    ? (he ? "הצג פחות" : "Show less")
-                    : `+${allOfferedJobs.length - 6} ${he ? "משרות נוספות" : "more jobs"}`}
-                </button>
-              )}
-            </div>
-          )}
-        </SectionCard>
+                  <button onClick={() => { queueAutoStart("jobs"); router.push("/"); }} className="flex-shrink-0 text-purple-400 hover:text-purple-300 text-sm transition flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                    {he ? "חיפוש חדש" : "New search"}
+                  </button>
+                </div>
+                {loadingConvs ? (
+                  <div className="space-y-3">{[0, 1].map((i) => <div key={i} className="h-20 bg-white/5 rounded-2xl animate-pulse" />)}</div>
+                ) : conversations.length === 0 ? (
+                  <div className="text-center py-10">
+                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-6 h-6 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                    <p className="text-white/40 text-sm">{he ? "עדיין לא ביצעת חיפוש משרות" : "No job searches yet"}</p>
+                    <button onClick={() => { queueAutoStart("jobs"); router.push("/"); }} className="text-purple-400 hover:text-purple-300 text-sm mt-2 inline-block transition">
+                      {he ? "צאי לחיפוש עכשיו" : "Start searching now"}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {conversations.map((conv) => (
+                      <ConvCard key={conv.id} conv={conv} he={he}
+                        onContinue={() => router.push(`/?continueConv=${conv.id}`)}
+                        onDelete={() => setConversations((prev) => prev.filter((c) => c.id !== conv.id))}
+                        onRename={(title) => setConversations((prev) => prev.map((c) => c.id === conv.id ? { ...c, title } : c))}
+                      />
+                    ))}
+                  </div>
+                )}
+              </SectionCard>
+            )}
 
+            {/* ── MY JOBS ── */}
+            {activeSection === "jobs" && (
+              <SectionCard>
+                <div className="mb-4"><SectionTitle>{he ? "המשרות שלי" : "My Jobs"}</SectionTitle></div>
+                {allOfferedJobs.length === 0 ? (
+                  <p className="text-white/40 text-sm py-2">{he ? "עדיין אין לך משרות" : "No jobs yet"}</p>
+                ) : (
+                  <div className="space-y-2">
+                    {(showAllJobs ? allOfferedJobs : allOfferedJobs.slice(0, 6)).map((job) => (
+                      <a key={job.id} href={job.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl px-3 py-2.5 transition group">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white/90 text-sm font-medium truncate group-hover:text-purple-300 transition">{job.title}</p>
+                          <p className="text-white/40 text-xs truncate">{job.company} · {job.source}</p>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <ScoreChip score={job.matchScore} />
+                          {job.isRemote && <span className="text-xs text-blue-400 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 rounded-full">{he ? "מרחוק" : "Remote"}</span>}
+                          <svg className="w-3.5 h-3.5 text-white/20 group-hover:text-white/50 transition flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        </div>
+                      </a>
+                    ))}
+                    {allOfferedJobs.length > 6 && (
+                      <button onClick={() => setShowAllJobs((v) => !v)} className="w-full text-center text-xs text-white/30 hover:text-white/60 transition pt-1">
+                        {showAllJobs ? (he ? "הצג פחות" : "Show less") : `+${allOfferedJobs.length - 6} ${he ? "משרות נוספות" : "more jobs"}`}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </SectionCard>
+            )}
 
+            {/* ── MY CVs ── */}
+            {activeSection === "cvs" && (
+              <SectionCard>
+                <div className="flex items-center justify-between mb-4">
+                  <SectionTitle>{he ? "קורות החיים שלי" : "My CVs"}</SectionTitle>
+                  <Link href="/cv-builder?from=/profile" className="text-purple-400 hover:text-purple-300 text-sm transition">
+                    {he ? "צור חדש" : "Create new"}
+                  </Link>
+                </div>
+                {cvs.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-white/40 text-sm mb-3">{he ? "עדיין לא יצרת קורות חיים" : "No CVs yet"}</p>
+                    <Link href="/cv-builder?from=/profile" className="text-purple-400 hover:text-purple-300 text-sm transition">{he ? "צור קורות חיים" : "Create a CV"}</Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {cvs.map((cv) => (
+                      <Link key={cv.id} href={`/cv-builder?cvId=${cv.id}&from=/profile`} className="flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl px-4 py-3 transition group">
+                        <div className="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                          <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white text-sm font-medium truncate group-hover:text-purple-300 transition">{cv.name}</p>
+                          <p className="text-white/40 text-xs">{timeAgo(cv.updatedAt, he)}</p>
+                        </div>
+                        <svg className="w-4 h-4 text-white/20 group-hover:text-purple-400 transition flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </SectionCard>
+            )}
+
+          </main>
+        </div>
       </div>
       <SiteFooter />
     </div>
