@@ -21,27 +21,37 @@ export default function StrategyTool({ advisorState, onBack, onComplete }: Props
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const callStrategyApi = async () => {
+    const res = await fetch("/api/advisor/strategy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userProfile: advisorState.userProfile,
+        diagnosis: advisorState.diagnosis,
+        direction: advisorState.direction,
+        userNotes: userNotes.trim(),
+        lang,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed");
+    return data as SearchStrategy;
+  };
+
   const submit = async () => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/advisor/strategy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userProfile: advisorState.userProfile,
-          diagnosis: advisorState.diagnosis,
-          direction: advisorState.direction,
-          userNotes: userNotes.trim(),
-          lang,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed");
-      onComplete(data as SearchStrategy);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-      setLoading(false);
+      const data = await callStrategyApi();
+      onComplete(data);
+    } catch {
+      try {
+        const data = await callStrategyApi();
+        onComplete(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+        setLoading(false);
+      }
     }
   };
 
@@ -79,8 +89,18 @@ export default function StrategyTool({ advisorState, onBack, onComplete }: Props
           />
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-300 text-sm">
-              {error}
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 space-y-2">
+              <p className="text-red-300 text-sm font-medium">
+                {lang === "he"
+                  ? "בניית האסטרטגיה נכשלה. נסו שוב — אם זה קורה שוב, קצרו מעט את הטקסט שהכנסתם."
+                  : "Strategy generation failed. Try again — if it keeps failing, shorten your notes a bit."}
+              </p>
+              <button
+                onClick={() => { setError(""); submit(); }}
+                className="text-sm text-red-300 underline underline-offset-2 hover:text-red-200"
+              >
+                {lang === "he" ? "נסה שוב" : "Try again"}
+              </button>
             </div>
           )}
 

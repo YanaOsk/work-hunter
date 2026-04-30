@@ -54,7 +54,26 @@ function getGroq(): Groq {
   return groqClient;
 }
 
-function tryRepairJson(raw: string): string {
+export function truncate(text: string, maxChars: number): string {
+  if (!text || text.length <= maxChars) return text;
+  return text.slice(0, maxChars) + "…";
+}
+
+export function safeParseJson<T = unknown>(raw: string, context?: string): T {
+  const repaired = tryRepairJson(raw);
+  try {
+    return JSON.parse(repaired) as T;
+  } catch (err) {
+    console.error(`[safeParseJson] parse failed${context ? ` (${context})` : ""}`, {
+      rawPreview: raw.slice(0, 300),
+      repairedPreview: repaired.slice(0, 300),
+      error: String(err),
+    });
+    throw new Error("AI returned invalid JSON");
+  }
+}
+
+export function tryRepairJson(raw: string): string {
   let s = raw.trim();
   s = s.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
 

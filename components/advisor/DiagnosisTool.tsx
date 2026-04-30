@@ -60,6 +60,17 @@ export default function DiagnosisTool({ advisorState, onBack, onComplete }: Prop
     setOtherText("");
   };
 
+  const callDiagnosisApi = async (updated: DiagnosisAnswer[]) => {
+    const res = await fetch("/api/advisor/diagnosis", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userProfile: advisorState.userProfile, answers: updated, lang }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed");
+    return data as DiagnosisResult;
+  };
+
   const handleNext = async () => {
     if (!canProceed) return;
     const finalAnswer = buildAnswer();
@@ -75,17 +86,16 @@ export default function DiagnosisTool({ advisorState, onBack, onComplete }: Prop
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/advisor/diagnosis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userProfile: advisorState.userProfile, answers: updated, lang }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed");
-      onComplete(data as DiagnosisResult);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-      setLoading(false);
+      const data = await callDiagnosisApi(updated);
+      onComplete(data);
+    } catch {
+      try {
+        const data = await callDiagnosisApi(updated);
+        onComplete(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+        setLoading(false);
+      }
     }
   };
 
@@ -197,8 +207,18 @@ export default function DiagnosisTool({ advisorState, onBack, onComplete }: Prop
           )}
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-300 text-sm">
-              {error}
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 space-y-2">
+              <p className="text-red-300 text-sm font-medium">
+                {lang === "he"
+                  ? "משהו השתבש בניתוח. נסו שוב — אם זה קורה שוב, קצרו מעט את התשובות."
+                  : "Something went wrong during analysis. Try again — if it keeps failing, shorten your answers a bit."}
+              </p>
+              <button
+                onClick={() => { setError(""); handleNext(); }}
+                className="text-sm text-red-300 underline underline-offset-2 hover:text-red-200"
+              >
+                {lang === "he" ? "נסה שוב" : "Try again"}
+              </button>
             </div>
           )}
 
