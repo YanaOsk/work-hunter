@@ -43,10 +43,9 @@ function MenuItem({
 }
 
 const PLAN_BADGE: Record<string, { label: { he: string; en: string }; cls: string }> = {
-  weekly:     { label: { he: "שבועי",       en: "Weekly"       }, cls: "text-sky-300 bg-sky-500/15 border-sky-500/30" },
-  "one-time": { label: { he: "Career Boost", en: "Career Boost" }, cls: "text-purple-300 bg-purple-500/15 border-purple-500/30" },
-  full:       { label: { he: "מסע מלא",     en: "Full Journey"  }, cls: "text-purple-300 bg-purple-500/15 border-purple-500/30" },
-  pro:        { label: { he: "Pro",          en: "Pro"           }, cls: "text-amber-300 bg-amber-500/15 border-amber-500/30" },
+  weekly:    { label: { he: "שבועי",    en: "Weekly"   }, cls: "text-sky-300 bg-sky-500/15 border-sky-500/30" },
+  quarterly: { label: { he: "3 חודשים", en: "3 Months" }, cls: "text-purple-300 bg-purple-500/15 border-purple-500/30" },
+  lifetime:  { label: { he: "לצמיתות", en: "Lifetime"  }, cls: "text-amber-300 bg-amber-500/15 border-amber-500/30" },
 };
 
 export default function AuthButton({ plan = "free" }: { plan?: string }) {

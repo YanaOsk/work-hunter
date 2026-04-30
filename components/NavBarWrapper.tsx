@@ -20,11 +20,19 @@ export default function NavBarWrapper() {
     }
     if (!session?.user) return;
 
-    fetch("/api/subscription")
-      .then((r) => r.json())
-      .then((d) => { if (d?.plan) setPlan(d.plan); })
-      .catch(() => {})
-      .finally(() => setSubChecked(true));
+    const fetchSub = () =>
+      fetch("/api/subscription")
+        .then((r) => r.json())
+        .then((d) => { if (d?.plan) setPlan(d.plan); })
+        .catch(() => {})
+        .finally(() => setSubChecked(true));
+
+    fetchSub();
+
+    // Re-fetch when user returns to the tab (e.g. after completing checkout)
+    const onVisible = () => { if (document.visibilityState === "visible") fetchSub(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, [session?.user, status]);
 
   if (pathname.startsWith("/admin")) return null;
