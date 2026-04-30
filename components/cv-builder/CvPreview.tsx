@@ -42,6 +42,7 @@ export default function CvPreview({ data }: Props) {
   const skillsList = data.skills.split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
   const languagesList = data.languages.split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
   const hasMilitary = !!(data.military.unit || data.military.role);
+  const hasVolunteering = !!(data.volunteering?.trim());
 
   const isEmpty =
     !data.summary &&
@@ -49,9 +50,10 @@ export default function CvPreview({ data }: Props) {
     data.educations.length === 0 &&
     skillsList.length === 0 &&
     languagesList.length === 0 &&
-    !hasMilitary;
+    !hasMilitary &&
+    !hasVolunteering;
 
-  const props: TemplateProps = { data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac };
+  const props: TemplateProps = { data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac };
 
   switch (data.template) {
     case "minimal":   return <NordicTemplate {...props} />;
@@ -73,6 +75,7 @@ interface TemplateProps {
   languagesList: string[];
   isEmpty: boolean;
   hasMilitary: boolean;
+  hasVolunteering: boolean;
   ac: string;
 }
 
@@ -99,12 +102,12 @@ function CIcon({ d, cls = "w-3 h-3" }: { d: string; cls?: string }) {
 
 // ─── Template 1: Nova (modern photo header) ────────────────────────────────────
 
-function NovaTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+function NovaTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
   const p = data.personal;
   return (
     <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
       {/* Header */}
-      <div className="relative px-8 py-9 text-white" style={{ backgroundColor: ac }}>
+      <div className="relative px-8 py-7 text-white" style={{ backgroundColor: ac }}>
         <div className="flex items-start justify-between gap-6">
           <div className="flex-1 min-w-0">
             <h1 className="text-[32px] font-extrabold leading-tight tracking-tight mb-1 text-white">
@@ -130,7 +133,7 @@ function NovaTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMi
       </div>
 
       {/* Body */}
-      <div className="px-8 py-7">
+      <div className="px-8 py-5">
         {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
 
         {data.summary && (
@@ -224,6 +227,12 @@ function NovaTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMi
             </div>
           </NovaSection>
         )}
+
+        {hasVolunteering && data.volunteering && (
+          <NovaSection title={tx.cvSecVolunteering} ac={ac}>
+            <p className="text-slate-600 leading-relaxed text-[13px] whitespace-pre-wrap">{data.volunteering}</p>
+          </NovaSection>
+        )}
       </div>
     </div>
   );
@@ -231,8 +240,8 @@ function NovaTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMi
 
 function NovaSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
   return (
-    <section className="mb-6 last:mb-0">
-      <div className="flex items-center gap-3 mb-3">
+    <section className="mb-4 last:mb-0">
+      <div className="flex items-center gap-3 mb-2">
         <span className="h-[2px] w-4 rounded-full flex-shrink-0" style={{ backgroundColor: ac }} />
         <h2 className="text-[10.5px] font-black uppercase tracking-[0.12em]" style={{ color: ac }}>{title}</h2>
         <span className="flex-1 h-px" style={{ background: `linear-gradient(to right, ${rgba(ac, 0.2)}, transparent)` }} />
@@ -244,7 +253,7 @@ function NovaSection({ title, children, ac }: { title: string; children: React.R
 
 // ─── Template 2: Nordic (clean two-column with photo) ─────────────────────────
 
-function NordicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+function NordicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
   const p = data.personal;
   return (
     <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
@@ -366,6 +375,12 @@ function NordicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, has
               </div>
             </NordicMainSection>
           )}
+
+          {hasVolunteering && data.volunteering && (
+            <NordicMainSection title={tx.cvSecVolunteering} ac={ac}>
+              <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+            </NordicMainSection>
+          )}
         </div>
       </div>
     </div>
@@ -392,7 +407,7 @@ function NordicMainSection({ title, children, ac }: { title: string; children: R
 
 // ─── Template 3: Sidebar (bold accent sidebar with photo) ─────────────────────
 
-function SidebarTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+function SidebarTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
   const p = data.personal;
   return (
     <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
@@ -505,6 +520,12 @@ function SidebarTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ha
               </div>
             </SidebarMainSection>
           )}
+
+          {hasVolunteering && data.volunteering && (
+            <SidebarMainSection title={tx.cvSecVolunteering} ac={ac}>
+              <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+            </SidebarMainSection>
+          )}
         </div>
       </div>
     </div>
@@ -531,7 +552,7 @@ function SidebarMainSection({ title, children, ac }: { title: string; children: 
 
 // ─── Template 4: Classic (traditional centered) ───────────────────────────────
 
-function ClassicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+function ClassicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
   const p = data.personal;
   return (
     <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
@@ -625,6 +646,11 @@ function ClassicTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, ha
             <p className="text-slate-700 text-[13.5px]">{languagesList.join("  ·  ")}</p>
           </ClassicSection>
         )}
+        {hasVolunteering && data.volunteering && (
+          <ClassicSection title={tx.cvSecVolunteering} ac={ac}>
+            <p className="text-slate-700 text-[13.5px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+          </ClassicSection>
+        )}
       </div>
     </div>
   );
@@ -641,7 +667,7 @@ function ClassicSection({ title, children, ac }: { title: string; children: Reac
 
 // ─── Template 5: Code (dark developer) ────────────────────────────────────────
 
-function CodeTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+function CodeTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
   const p = data.personal;
   return (
     <div className="bg-[#0d1117] text-gray-100 rounded-xl shadow-xl overflow-hidden font-mono" dir={dir} style={{ minHeight: 900 }}>
@@ -742,6 +768,11 @@ function CodeTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMi
               </div>
             </CodeSection>
           )}
+          {hasVolunteering && data.volunteering && (
+            <CodeSection title={tx.cvSecVolunteering} ac={ac}>
+              <p className="text-gray-400 text-[12px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+            </CodeSection>
+          )}
         </div>
       </div>
     </div>
@@ -761,7 +792,7 @@ function CodeSection({ title, children, ac }: { title: string; children: React.R
 
 // ─── Template 6: Impact (bold typography, vertical accent bar) ────────────────
 
-function ImpactTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+function ImpactTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
   const p = data.personal;
   return (
     <div className="bg-white rounded-xl shadow-xl overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
@@ -863,6 +894,11 @@ function ImpactTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, has
               </div>
             </ImpactSection>
           )}
+          {hasVolunteering && data.volunteering && (
+            <ImpactSection title={tx.cvSecVolunteering} ac={ac}>
+              <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+            </ImpactSection>
+          )}
         </div>
       </div>
     </div>
@@ -883,7 +919,7 @@ function ImpactSection({ title, children, ac }: { title: string; children: React
 
 // ─── Template 7: Timeline (elegant centered photo) ────────────────────────────
 
-function TimelineTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+function TimelineTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
   const p = data.personal;
   return (
     <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
@@ -1005,6 +1041,12 @@ function TimelineTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, h
               </div>
             </TimelineMainSection>
           )}
+
+          {hasVolunteering && data.volunteering && (
+            <TimelineMainSection title={tx.cvSecVolunteering} ac={ac}>
+              <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+            </TimelineMainSection>
+          )}
         </div>
       </div>
     </div>
@@ -1034,7 +1076,7 @@ function TimelineMainSection({ title, children, ac }: { title: string; children:
 
 // ─── Template 8: Prism (rich gradient header, card sections) ──────────────────
 
-function PrismTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, ac }: TemplateProps) {
+function PrismTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
   const p = data.personal;
   return (
     <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
@@ -1146,6 +1188,11 @@ function PrismTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasM
                 <div className="space-y-1.5">
                   {languagesList.map((l, i) => <div key={i} className="text-slate-600 text-[13px]">{l}</div>)}
                 </div>
+              </PrismSection>
+            )}
+            {hasVolunteering && data.volunteering && (
+              <PrismSection title={tx.cvSecVolunteering} ac={ac}>
+                <p className="text-slate-600 text-[13px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
               </PrismSection>
             )}
           </div>

@@ -275,7 +275,21 @@ export default function CvEditor({ data, onChange }: Props) {
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Field label={tx.cvFieldDegree} value={edu.degree} onChange={(v) => updateEducation(edu.id, "degree", v)} />
+                <div>
+                  <Field label={tx.cvFieldDegree} value={edu.degree} onChange={(v) => updateEducation(edu.id, "degree", v)} />
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {([tx.cvDegreeHS, tx.cvDegreeHSPartial, tx.cvDegreeHS12] as string[]).map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => updateEducation(edu.id, "degree", preset)}
+                        className="text-[10.5px] px-2 py-0.5 rounded-md bg-white/5 border border-white/15 text-white/50 hover:text-white/80 hover:border-white/30 transition"
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <Field label={tx.cvFieldSchool} value={edu.school} onChange={(v) => updateEducation(edu.id, "school", v)} />
                 <Field label={tx.cvFieldLocation} value={edu.location} onChange={(v) => updateEducation(edu.id, "location", v)} />
                 <div />
@@ -324,6 +338,17 @@ export default function CvEditor({ data, onChange }: Props) {
           onChange={(e) => onChange({ ...data, languages: e.target.value })}
           rows={2}
           placeholder={tx.cvFieldLangsPh}
+          className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 resize-none text-sm"
+        />
+      </Section>
+
+      {/* Volunteering */}
+      <Section title={tx.cvSecVolunteering} icon="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+        <textarea
+          value={data.volunteering ?? ""}
+          onChange={(e) => onChange({ ...data, volunteering: e.target.value })}
+          rows={3}
+          placeholder={tx.cvFieldVolunteeringPh}
           className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 resize-none text-sm"
         />
       </Section>

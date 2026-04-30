@@ -77,6 +77,7 @@ export interface CvData {
   military: CvMilitary;
   skills: string;
   languages: string;
+  volunteering: string;
   template: CvTemplate;
   accentColor: string;
 }
@@ -104,40 +105,46 @@ export const EMPTY_CV: CvData = {
   },
   skills: "",
   languages: "",
+  volunteering: "",
   template: "slate",
   accentColor: "#7c3aed",
 };
 
-const STORAGE_KEY = "work_hunter_cv_builder";
+const STORAGE_KEY = (lang?: string) =>
+  lang === "en" ? "work_hunter_cv_builder_en" : "work_hunter_cv_builder_he";
 
-export function loadCv(): CvData {
+function parseCvData(parsed: Partial<CvData>): CvData {
+  return {
+    personal: { ...EMPTY_CV.personal, ...(parsed.personal || {}) },
+    summary: parsed.summary ?? "",
+    experiences: parsed.experiences ?? [],
+    educations: parsed.educations ?? [],
+    military: { ...EMPTY_CV.military, ...(parsed.military || {}) },
+    skills: parsed.skills ?? "",
+    languages: parsed.languages ?? "",
+    volunteering: parsed.volunteering ?? "",
+    template: parsed.template ?? "slate",
+    accentColor: parsed.accentColor ?? "#7c3aed",
+  };
+}
+
+export function loadCv(lang?: string): CvData {
   if (typeof window === "undefined") return EMPTY_CV;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY(lang));
     if (!raw) return EMPTY_CV;
-    const parsed = JSON.parse(raw) as Partial<CvData>;
-    return {
-      personal: { ...EMPTY_CV.personal, ...(parsed.personal || {}) },
-      summary: parsed.summary ?? "",
-      experiences: parsed.experiences ?? [],
-      educations: parsed.educations ?? [],
-      military: { ...EMPTY_CV.military, ...(parsed.military || {}) },
-      skills: parsed.skills ?? "",
-      languages: parsed.languages ?? "",
-      template: parsed.template ?? "slate",
-      accentColor: parsed.accentColor ?? "#7c3aed",
-    };
+    return parseCvData(JSON.parse(raw) as Partial<CvData>);
   } catch {
     return EMPTY_CV;
   }
 }
 
-export function saveCv(data: CvData): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+export function saveCv(data: CvData, lang?: string): void {
+  localStorage.setItem(STORAGE_KEY(lang), JSON.stringify(data));
 }
 
-export function clearCv(): void {
-  localStorage.removeItem(STORAGE_KEY);
+export function clearCv(lang?: string): void {
+  localStorage.removeItem(STORAGE_KEY(lang));
 }
 
 export function newId(): string {

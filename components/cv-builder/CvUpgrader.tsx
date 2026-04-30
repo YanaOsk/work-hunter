@@ -40,6 +40,7 @@ function cvDataToText(cv: CvData): string {
   }
   if (cv.skills) parts.push(`\nכישורים:\n${cv.skills}`);
   if (cv.languages) parts.push(`\nשפות:\n${cv.languages}`);
+  if (cv.volunteering) parts.push(`\nהתנדבות:\n${cv.volunteering}`);
   return parts.join("\n");
 }
 

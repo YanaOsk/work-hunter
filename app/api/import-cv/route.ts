@@ -187,8 +187,9 @@ function sanitizeCvData(raw: Partial<CvData>): CvData {
       end:         raw.military?.end         ?? "",
       reserveDuty: raw.military?.reserveDuty ?? false,
     },
-    skills:      raw.skills      ?? "",
-    languages:   raw.languages   ?? "",
+    skills:        raw.skills        ?? "",
+    languages:     raw.languages     ?? "",
+    volunteering:  raw.volunteering  ?? "",
     template:    raw.template    ?? base.template,
     accentColor: raw.accentColor ?? base.accentColor,
   };

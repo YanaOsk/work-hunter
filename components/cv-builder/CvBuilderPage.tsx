@@ -63,7 +63,7 @@ export default function CvBuilderPage() {
     } else {
       // Guest: load from localStorage, go straight to editor
       setListLoading(false);
-      setData(loadCv());
+      setData(loadCv(lang));
       setLoaded(true);
       setView("editor");
     }
@@ -72,7 +72,7 @@ export default function CvBuilderPage() {
 
   // Guest autosave
   useEffect(() => {
-    if (!isLoggedIn && loaded) saveCv(data);
+    if (!isLoggedIn && loaded) saveCv(data, lang);
   }, [data, loaded, isLoggedIn]);
 
   // Auto-open a specific CV when cvId is in the URL
@@ -236,7 +236,7 @@ export default function CvBuilderPage() {
   const handleReset = () => setShowResetModal(true);
 
   const confirmReset = () => {
-    if (!isLoggedIn) clearCv();
+    if (!isLoggedIn) clearCv(lang);
     setData(EMPTY_CV);
     setShowResetModal(false);
   };

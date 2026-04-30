@@ -25,6 +25,8 @@ export default function UploadPhase({ onComplete }: Props) {
   const isAccepted = (f: File) =>
     f.type === "application/pdf" ||
     f.type.includes("word") ||
+    f.type === "application/rtf" ||
+    f.type === "text/rtf" ||
     /\.(docx?|rtf|pdf)$/i.test(f.name);
 
   const handleDrop = (e: DragEvent) => {
@@ -35,7 +37,10 @@ export default function UploadPhase({ onComplete }: Props) {
   };
 
   const handleSubmit = async () => {
-    if (!freeText.trim() && !file) { setError(tx.pleaseAdd); return; }
+    if (!freeText.trim() && !file) {
+      setError(tx.pleaseAdd);
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -130,6 +135,8 @@ export default function UploadPhase({ onComplete }: Props) {
               )}
             </div>
 
+            <p className="text-center text-white/40 text-xs leading-relaxed">{tx.privacy}</p>
+
             {error && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-300 text-sm">{error}</div>
             )}
@@ -167,7 +174,6 @@ export default function UploadPhase({ onComplete }: Props) {
               </button>
             )}
 
-            <p className="text-center text-white/20 text-xs">{tx.privacy}</p>
           </div>
         </div>
 

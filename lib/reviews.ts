@@ -36,7 +36,7 @@ export const REVIEWS: Review[] = [
     titleHe: "עברתי מהוראה ל-EdTech — ובפעם הראשונה הרגשתי שמישהו שומע אותי",
     titleEn: "Moved from teaching to EdTech — first time I felt actually heard",
     bodyHe:
-      "הייתי 6 שנים מורה לאנגלית ורציתי לעזוב אבל לא ידעתי לאן. היועץ שאל שאלות שאף יועץ אנושי לא שאל אותי (בערך 5 ראיתי). האבחון פתח לי את העיניים לתחום ה-EdTech ושלב האסטרטגיה נתן לי רשימה של חברות שבאמת התאימו. תוך חודש קיבלתי עבודה כ-Learning Designer ב-company israeli.",
+      "הייתי 6 שנים מורה לאנגלית ורציתי לעזוב אבל לא ידעתי לאן. היועץ שאל שאלות שאף יועץ אנושי לא שאל אותי (ראיתי בערך חמישה). האבחון פתח לי את העיניים לתחום ה-EdTech ושלב האסטרטגיה נתן לי רשימה של חברות שבאמת התאימו. תוך חודש קיבלתי עבודה כ-Learning Designer בסטארטאפ חינוכי.",
     bodyEn:
       "I was an English teacher for 6 years and wanted out but had no idea where to go. The advisor asked me questions no human coach (I saw 5) ever asked. The diagnosis opened my eyes to EdTech and the strategy stage gave me a real list of fitting companies. Within a month I got a Learning Designer role at an Israeli company.",
     rating: 5,
