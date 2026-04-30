@@ -58,6 +58,16 @@ function normalizeWorkPref(val: string | undefined): WorkPref | undefined {
   return WORK_PREF_NORMALIZE[lower];
 }
 
+const EDU_LEVELS = [
+  "12 שנות לימוד",
+  "בגרות חלקית",
+  "בגרות מלאה",
+  "תעודת הנדסאי",
+  "תואר ראשון",
+  "תואר שני",
+  "תואר שלישי",
+];
+
 function clean<T>(val: T | undefined): T | undefined {
   if (val === null || val === undefined) return undefined;
   if (typeof val === "string" && (val.trim() === "" || val.toLowerCase() === "null" || val.toLowerCase() === "undefined")) return undefined;
@@ -76,6 +86,8 @@ function mergeArr(userArr: string[] | undefined, scoutArr: string[] | undefined)
 export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [eduPickerVal, setEduPickerVal] = useState<string>("");
+  const [uvpLoading, setUvpLoading] = useState(false);
 
   // Merged display values
   const title         = merge(meta.title, scoutData.currentRole);
@@ -97,16 +109,19 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
   const roleRef  = useRef<HTMLInputElement>(null);
 
   function startEdit() {
+    const eduVal = meta.education ?? scoutData.education ?? "";
+    setEduPickerVal(EDU_LEVELS.includes(eduVal) ? eduVal : (eduVal ? "other" : ""));
     setDraft({
       title:           meta.title ?? scoutData.currentRole ?? "",
       location:        meta.location ?? scoutData.location ?? "",
       yearsExperience: meta.yearsExperience ?? scoutData.yearsExperience,
-      education:       meta.education ?? scoutData.education ?? "",
+      education:       eduVal,
       skills:          skills,
       targetRoles:     targetRoles,
       workPreference:  meta.workPreference ?? normalizeWorkPref(scoutData.workPreference as string | undefined),
       languages:       languages,
       bio:             meta.bio ?? "",
+      volunteering:    meta.volunteering ?? "",
       linkedin:        meta.linkedin ?? "",
       availability:    meta.availability,
     });
@@ -127,6 +142,7 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
       workPreference:  draft.workPreference,
       languages:       draft.languages,
       bio:             (draft.bio as string)?.trim() || undefined,
+      volunteering:    (draft.volunteering as string)?.trim() || undefined,
       linkedin:        (draft.linkedin as string)?.trim() || undefined,
       availability:    draft.availability,
     };
@@ -151,6 +167,27 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
     }
     setRoleInput("");
     roleRef.current?.focus();
+  }
+
+  async function generateUvp() {
+    setUvpLoading(true);
+    try {
+      const res = await fetch("/api/generate-uvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: draft.title,
+          yearsExperience: draft.yearsExperience,
+          skills: draft.skills,
+          volunteering: draft.volunteering,
+          lang: he ? "he" : "en",
+        }),
+      });
+      const data = await res.json();
+      if (data.uvp) setDraft((d) => ({ ...d, bio: data.uvp }));
+    } catch { /* silent */ } finally {
+      setUvpLoading(false);
+    }
   }
 
   // ── View mode ──────────────────────────────────────────────────────────────
@@ -229,6 +266,14 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
             {/* Bio */}
             {meta.bio && (
               <p className="text-white/60 text-sm leading-relaxed">{meta.bio}</p>
+            )}
+
+            {/* Volunteering */}
+            {meta.volunteering && (
+              <div>
+                <p className="text-white/35 text-xs uppercase tracking-wide mb-1">{he ? "התנדבות" : "Volunteering"}</p>
+                <p className="text-white/60 text-sm leading-relaxed">{meta.volunteering}</p>
+              </div>
             )}
 
             {/* Skills */}
@@ -339,9 +384,29 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
               placeholder="3" className={input} />
           </Field>
           <Field label={he ? "השכלה" : "Education"}>
-            <input value={(draft.education as string) ?? ""} onChange={(e) => setDraft((d) => ({ ...d, education: e.target.value }))}
-              placeholder={he ? "ב.ס מדעי המחשב..." : "BSc Computer Science..."}
-              className={input} />
+            <select
+              value={eduPickerVal}
+              onChange={(e) => {
+                const v = e.target.value;
+                setEduPickerVal(v);
+                if (v !== "other") setDraft((d) => ({ ...d, education: v || undefined }));
+              }}
+              className={`${input} appearance-none`}
+            >
+              <option value="">{he ? "בחר/י רמת השכלה..." : "Select level..."}</option>
+              {EDU_LEVELS.map((l) => (
+                <option key={l} value={l}>{l}</option>
+              ))}
+              <option value="other">{he ? "אחר" : "Other"}</option>
+            </select>
+            {eduPickerVal === "other" && (
+              <input
+                value={(draft.education as string) ?? ""}
+                onChange={(e) => setDraft((d) => ({ ...d, education: e.target.value }))}
+                placeholder={he ? "פרט/י את השכלתך..." : "Describe your education..."}
+                className={`${input} mt-2`}
+              />
+            )}
           </Field>
         </div>
 
@@ -405,11 +470,33 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
           />
         </Field>
 
-        {/* Bio */}
-        <Field label={he ? "על עצמי" : "About me"}>
+        {/* Bio + UVP */}
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-white/40 text-xs">{he ? "על עצמי" : "About me"}</label>
+            <button
+              type="button"
+              disabled={uvpLoading}
+              onClick={generateUvp}
+              className="flex items-center gap-1 text-xs text-purple-400 hover:text-purple-300 disabled:opacity-50 transition"
+            >
+              {uvpLoading
+                ? <span className="w-3 h-3 border border-purple-400/40 border-t-purple-400 rounded-full animate-spin" />
+                : <span>✨</span>}
+              {he ? "צור UVP" : "Generate UVP"}
+            </button>
+          </div>
           <textarea rows={3} value={(draft.bio as string) ?? ""}
             onChange={(e) => setDraft((d) => ({ ...d, bio: e.target.value }))}
             placeholder={he ? "קצת על הרקע, המטרות שלך..." : "A bit about your background and goals..."}
+            className={`${input} resize-none`} />
+        </div>
+
+        {/* Volunteering */}
+        <Field label={he ? "התנדבות" : "Volunteering"}>
+          <textarea rows={2} value={(draft.volunteering as string) ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, volunteering: e.target.value }))}
+            placeholder={he ? "תאר/י את פעילות ההתנדבות שלך..." : "Describe your volunteering experience..."}
             className={`${input} resize-none`} />
         </Field>
 

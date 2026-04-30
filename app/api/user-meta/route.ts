@@ -14,7 +14,7 @@ export async function PUT(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const body = await req.json();
-  const allowed = ["title", "location", "yearsExperience", "education", "skills", "targetRoles", "workPreference", "languages", "bio", "linkedin", "availability", "profileImage", "advisorCurrentStage", "advisorCompletedCount", "advisorState"] as const;
+  const allowed = ["title", "location", "yearsExperience", "education", "skills", "targetRoles", "workPreference", "languages", "bio", "volunteering", "linkedin", "availability", "profileImage", "advisorCurrentStage", "advisorCompletedCount", "advisorState"] as const;
   const patch: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in body) patch[key] = body[key];

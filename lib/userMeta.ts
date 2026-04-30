@@ -14,6 +14,7 @@ export interface UserMeta {
   workPreference?: WorkPref;
   languages?: string[];
   bio?: string;
+  volunteering?: string;
   linkedin?: string;
   availability?: Availability;
   profileImage?: string;
@@ -43,6 +44,7 @@ export async function getUserMeta(email: string): Promise<UserMeta | null> {
     bio: r.bio ?? undefined,
     linkedin: r.linkedin ?? undefined,
     availability: r.availability ?? undefined,
+    volunteering: r.volunteering ?? undefined,
     profileImage: r.profile_image ?? undefined,
     advisorCurrentStage: r.advisor_current_stage ?? undefined,
     advisorCompletedCount: r.advisor_completed_count ?? undefined,
@@ -56,17 +58,19 @@ export async function saveUserMeta(email: string, data: Partial<Omit<UserMeta, "
   const lowerEmail = email.toLowerCase();
   const now = new Date().toISOString();
   await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS advisor_state TEXT`;
+  await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS volunteering TEXT`;
   await db`
     INSERT INTO user_meta (
       email, title, location, years_experience, education, skills, target_roles,
-      work_preference, languages, bio, linkedin, availability, profile_image,
+      work_preference, languages, bio, volunteering, linkedin, availability, profile_image,
       advisor_current_stage, advisor_completed_count, advisor_state, updated_at
     ) VALUES (
       ${lowerEmail},
       ${data.title ?? null}, ${data.location ?? null}, ${data.yearsExperience ?? null},
       ${data.education ?? null}, ${data.skills ?? null}, ${data.targetRoles ?? null},
       ${data.workPreference ?? null}, ${data.languages ?? null}, ${data.bio ?? null},
-      ${data.linkedin ?? null}, ${data.availability ?? null}, ${data.profileImage ?? null},
+      ${data.volunteering ?? null}, ${data.linkedin ?? null}, ${data.availability ?? null},
+      ${data.profileImage ?? null},
       ${data.advisorCurrentStage ?? null}, ${data.advisorCompletedCount ?? null},
       ${data.advisorState ?? null}, ${now}
     )
@@ -80,6 +84,7 @@ export async function saveUserMeta(email: string, data: Partial<Omit<UserMeta, "
       work_preference = COALESCE(EXCLUDED.work_preference, user_meta.work_preference),
       languages = COALESCE(EXCLUDED.languages, user_meta.languages),
       bio = COALESCE(EXCLUDED.bio, user_meta.bio),
+      volunteering = COALESCE(EXCLUDED.volunteering, user_meta.volunteering),
       linkedin = COALESCE(EXCLUDED.linkedin, user_meta.linkedin),
       availability = COALESCE(EXCLUDED.availability, user_meta.availability),
       profile_image = COALESCE(EXCLUDED.profile_image, user_meta.profile_image),
