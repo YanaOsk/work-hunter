@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     );
 
     const prompt = `${langInstruction(lang)}\n\n${DIRECTION_ANALYSIS_PROMPT(profileStr, diagnosisStr, goalStr)}`;
-    const raw = await geminiGenerate("Analyze now.", prompt, 2800, true);
+    const raw = await geminiGenerate("Analyze now.", prompt, 2800, false);
 
     const parsed = safeParseJson<Record<string, unknown>>(raw, "direction");
     return NextResponse.json({ ...parsed, completedAt: new Date().toISOString() });
