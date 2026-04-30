@@ -76,7 +76,15 @@ export default function AdvisorPageInner() {
   const { data: session } = useSession();
   const guestProfileId = params.get("profileId");
   const [advisorState, setAdvisorState] = useState<AdvisorState | null>(null);
-  const [view, setView] = useState<View>("map");
+  const [view, setView] = useState<View>(() => (params.get("view") as View) ?? "map");
+
+  const setViewAndUrl = (v: View) => {
+    setView(v);
+    const url = new URL(window.location.href);
+    if (v === "map") url.searchParams.delete("view");
+    else url.searchParams.set("view", v);
+    window.history.replaceState({}, "", url.toString());
+  };
 
   // Use Google user ID when logged in, otherwise fall back to URL profileId
   const profileId = session?.user?.id ?? guestProfileId;
@@ -95,7 +103,7 @@ export default function AdvisorPageInner() {
 
     if (localState) {
       setAdvisorState(localState);
-      if (localState.currentStage === "done") setView("summary");
+      if (localState.currentStage === "done") setViewAndUrl("summary");
       return;
     }
 
@@ -173,8 +181,8 @@ export default function AdvisorPageInner() {
     }
   };
 
-  const backToMap = () => setView("map");
-  const backToSummary = () => setView("summary");
+  const backToMap = () => setViewAndUrl("map");
+  const backToSummary = () => setViewAndUrl("summary");
 
   const handleExit = () => {
     clearAdvisorState(profileId);
@@ -186,8 +194,8 @@ export default function AdvisorPageInner() {
     const next = advanceStage(advisorState.currentStage);
     const updated: AdvisorState = { ...advisorState, ...patch, currentStage: next };
     persist(updated);
-    if (next === "done") setView("summary");
-    else setView("map");
+    if (next === "done") setViewAndUrl("summary");
+    else setViewAndUrl("map");
   };
 
   const onDiagnosis = (r: DiagnosisResult) => {
@@ -276,7 +284,7 @@ export default function AdvisorPageInner() {
       <SummaryView
         advisorState={advisorState}
         onBack={backToMap}
-        onOpenInterview={() => setView("interview")}
+        onOpenInterview={() => setViewAndUrl("interview")}
         onExit={handleExit}
       />
     );
@@ -324,10 +332,10 @@ export default function AdvisorPageInner() {
   return wrap(
     <JourneyMap
       advisorState={advisorState}
-      onStartStage={(s) => setView(s as StageView)}
-      onOpenChat={() => setView("chat")}
-      onOpenSummary={() => setView("summary")}
-      onOpenInterview={() => setView("interview")}
+      onStartStage={(s) => setViewAndUrl(s as StageView)}
+      onOpenChat={() => setViewAndUrl("chat")}
+      onOpenSummary={() => setViewAndUrl("summary")}
+      onOpenInterview={() => setViewAndUrl("interview")}
       onExit={handleExit}
     />
   );
