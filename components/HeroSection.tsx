@@ -14,7 +14,7 @@ export default function HeroSection({ onChoose }: Props) {
   const tx = t[lang];
 
   return (
-    <section className="md:min-h-[90vh] flex items-start md:items-center justify-center px-4 pt-6 pb-10 md:py-24 relative overflow-hidden">
+    <section className="md:min-h-[90vh] flex items-start md:items-center justify-center px-4 pt-12 pb-10 md:py-24 relative overflow-hidden">
       <div
         className="pointer-events-none absolute inset-0 opacity-40"
         aria-hidden
