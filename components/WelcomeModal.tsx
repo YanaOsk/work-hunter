@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useLanguage } from "./LanguageProvider";
 import { getOrCreateAdvisorState, DEFAULT_ADVISOR_ID } from "@/lib/advisorState";
 import { queueAutoStart } from "@/lib/autoStart";
@@ -14,7 +13,6 @@ interface Props {
 const emptyProfile = { rawText: "", parsedData: {}, missingFields: [], clarifyingQuestions: [] };
 
 export default function WelcomeModal({ userName, userEmail }: Props) {
-  const router = useRouter();
   const { lang } = useLanguage();
   const he = lang === "he";
 
@@ -26,17 +24,17 @@ export default function WelcomeModal({ userName, userEmail }: Props) {
     }
     if (mode === "advisor") {
       getOrCreateAdvisorState(DEFAULT_ADVISOR_ID, emptyProfile);
-      router.push(`/advisor?profileId=${DEFAULT_ADVISOR_ID}`);
+      window.location.replace(`/advisor?profileId=${DEFAULT_ADVISOR_ID}`);
     } else if (mode === "cv") {
-      router.push("/cv-builder");
+      window.location.replace("/cv-builder");
     } else {
       queueAutoStart("jobs");
-      router.push("/");
+      window.location.replace("/");
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[200] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
 
         {/* Header */}
