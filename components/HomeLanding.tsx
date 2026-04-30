@@ -8,7 +8,6 @@ import ServicesIntro from "./ServicesIntro";
 import AllFields from "./AllFields";
 import JobMarketFacts from "./JobMarketFacts";
 import HighlightedReviews from "./HighlightedReviews";
-import PlansSection from "./PlansSection";
 import FaqSection from "./FaqSection";
 import FinalCTA from "./FinalCTA";
 import SiteFooter from "./SiteFooter";
@@ -31,7 +30,7 @@ export default function HomeLanding({ onChoose }: Props) {
       </FadeIn>
 
       <Divider />
-      <div id="how-it-works">
+      <div id="how-it-works" className="scroll-mt-20">
         <FadeIn>
           <HowItWorks />
         </FadeIn>
@@ -55,11 +54,6 @@ export default function HomeLanding({ onChoose }: Props) {
       <Divider />
       <FadeIn>
         <HighlightedReviews />
-      </FadeIn>
-
-      <Divider />
-      <FadeIn>
-        <PlansSection />
       </FadeIn>
 
       <Divider />

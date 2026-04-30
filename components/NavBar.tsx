@@ -18,10 +18,12 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
   const { data: session, status } = useSession();
   const isAdmin = status !== "loading" && session?.user?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
+  const isAuthenticated = status === "authenticated";
+
   const links = [
-    { href: "/#how-it-works", label: tx.navHowItWorks },
+    ...(!isAuthenticated ? [{ href: "/#how-it-works", label: tx.navHowItWorks }] : []),
     { href: "/cv-builder", label: tx.navCvBuilder },
-    { href: "/pricing", label: tx.navPricing },
+    ...(!isAuthenticated ? [{ href: "/pricing", label: tx.navPricing }] : []),
     { href: "/reviews", label: tx.navReviews },
   ];
 
@@ -64,7 +66,16 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
             </Link>
           )}
           <AuthButton plan={plan} />
-          {planReady && !hasPaidPlan && (
+          {isAuthenticated && !hasPaidPlan && (
+            <Link
+              href="/pricing"
+              className="hidden sm:inline-flex items-center gap-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition"
+            >
+              <span>👑</span>
+              Upgrade
+            </Link>
+          )}
+          {!isAuthenticated && planReady && (
             <Link
               href="/advisor?profileId=default-advisor"
               className="hidden sm:inline-flex bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"

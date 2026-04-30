@@ -139,9 +139,11 @@ export default function Home() {
       const key = `wh_welcomed_${session.user.email}`;
       if (!localStorage.getItem(key)) {
         setShowWelcome(true);
+      } else {
+        router.push("/profile");
       }
     }
-  }, [status, session?.user?.email, mode, pendingAutoMode]);
+  }, [status, session?.user?.email, mode, pendingAutoMode, router]);
 
   useEffect(() => {
     if (pendingAutoMode && status !== "loading" && mode === null) {
@@ -343,13 +345,12 @@ export default function Home() {
     setState(initialState);
     setDemoMode(false);
     setIsStreaming(false);
-    setMode(null);
-    sessionStorage.removeItem("wh_mode");
+    setResumeConv(null);
     sessionStorage.removeItem("wh_conv_id");
   };
 
   if (mode === null) {
-    if (pendingAutoMode) {
+    if (pendingAutoMode || status === "loading") {
       return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
     }
     if (showWelcome && session?.user) {
@@ -359,6 +360,9 @@ export default function Home() {
           userEmail={session.user.email ?? ""}
         />
       );
+    }
+    if (status === "authenticated") {
+      return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
     }
     return <HomeLanding onChoose={handleModeChoice} />;
   }
