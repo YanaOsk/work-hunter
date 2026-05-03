@@ -55,10 +55,12 @@ export async function POST(request: NextRequest) {
 4. ${genderRule}
 5. אסור להתחיל תשובה במילה "נשמע" — זה נשמע רובוטי ושחוק. תגיב ישירות לתוכן.
    ניסוחים מותרים לפתיחה: "אוקיי", "מעניין", "אז", "רגע", "הבנתי", "יופי" — אבל עדיף לפתוח ישר בתגובה.
+6. אם מתאים (לא חובה), הוסף בסוף 2-3 תשובות מהירות מוצעות בפורמט: [QUICK: "תשובה א'"|"תשובה ב'"|"תשובה ג'"]
 
 דוגמה טובה: "Full Stack עם ניסיון בענן — מעניין. ${searchExample}"
 דוגמה רעה: "נשמע! לאור המידע שסיפרת אשמח לדעת מה האזור הגיאוגרפי המועדף עליך לעבודה?"`
-      : "Respond in English only. Keep answers short — 1-3 sentences. One question at a time.";
+      : `Respond in English only. Keep answers short — 1-3 sentences. One question at a time.
+Optionally, when it makes sense, append 2-3 quick reply suggestions at the end in this exact format: [QUICK: "Option A"|"Option B"|"Option C"]`;
 
     const rawIntro = (userProfile as Record<string, unknown>)?.rawText as string | undefined;
 
@@ -81,16 +83,24 @@ Missing information: ${JSON.stringify(userProfile?.missingFields || [])}`;
     const agentResponse = await geminiChat(prompt, systemWithContext, 1200);
 
     const shouldSearch = agentResponse.includes("[SEARCH_NOW]") || agentResponse.includes("[READY_TO_SEARCH]");
+
+    // Parse optional quick-reply chips: [QUICK: "a"|"b"|"c"]
+    const quickMatch = agentResponse.match(/\[QUICK:\s*"([^"]+)"(?:\|"([^"]+)")?(?:\|"([^"]+)")?\]/);
+    const suggestedReplies: string[] = quickMatch
+      ? [quickMatch[1], quickMatch[2], quickMatch[3]].filter(Boolean) as string[]
+      : [];
+
     const cleanMessage = agentResponse
       .replace("[SEARCH_NOW]", "")
       .replace("[READY_TO_SEARCH]", "")
+      .replace(/\[QUICK:[^\]]+\]/g, "")
       .trim()
       // Strip leading "נשמע" openers that Gemini insists on adding
       .replace(/^נשמע[.,!،]?\s*/u, "")
       .replace(/^נשמע\s+/u, "")
       .trim();
 
-    return NextResponse.json({ message: cleanMessage, readyToSearch: shouldSearch });
+    return NextResponse.json({ message: cleanMessage, readyToSearch: shouldSearch, suggestedReplies });
   } catch (error) {
     console.error("chat error:", error);
     return NextResponse.json({ error: "Chat failed. Check your GEMINI_API_KEY." }, { status: 500 });

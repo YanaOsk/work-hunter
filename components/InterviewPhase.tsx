@@ -1,17 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ChatMessage, UserProfile, JobResult } from "@/lib/types";
-import { HiddenMarketResult } from "@/lib/jobSearch";
+import { ChatMessage, UserProfile } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import ScoutRobot from "./ScoutRobot";
 import { renderMixedText } from "@/lib/rtl";
 
 interface EnrichedMessage extends ChatMessage {
-  jobs?: JobResult[];
-  hiddenMarket?: HiddenMarketResult | null;
-  demoMode?: boolean;
+  suggestedReplies?: string[];
 }
 
 interface Props {
@@ -20,152 +17,16 @@ interface Props {
   onBack: () => void;
   initialMessages?: Array<{ role: "user" | "assistant"; content: string }>;
   initialConvId?: string;
+  initialReadyToSearch?: boolean;
 }
 
-function ScoreBadge({ score }: { score: number }) {
-  const color =
-    score >= 80 ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" :
-    score >= 60 ? "bg-purple-500/20 text-purple-300 border-purple-500/30" :
-    score >= 40 ? "bg-amber-500/20 text-amber-300 border-amber-500/30" :
-    "bg-red-500/20 text-red-300 border-red-500/30";
-  return (
-    <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${color}`}>
-      {score}%
-    </span>
-  );
-}
-
-function InlineJobCard({ job, lang }: { job: JobResult; lang: string }) {
-  const isHe = lang === "he";
-  return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 hover:border-purple-500/40 transition-all">
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-0.5">
-            <ScoreBadge score={job.matchScore} />
-            {job.isNonObvious && (
-              <span className="text-xs bg-amber-500/15 text-amber-300 border border-amber-500/25 px-2 py-0.5 rounded-full">
-                {isHe ? "כיוון לא מובן מאליו" : "Non-obvious pick"}
-              </span>
-            )}
-            {job.isRemote && (
-              <span className="text-xs bg-sky-500/15 text-sky-300 border border-sky-500/25 px-2 py-0.5 rounded-full">
-                {isHe ? "מרחוק" : "Remote"}
-              </span>
-            )}
-          </div>
-          <h4 className="text-white font-semibold text-sm leading-tight">{job.title}</h4>
-          <p className="text-white/50 text-xs">{job.company} · {job.source}</p>
-        </div>
-        <a
-          href={job.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-shrink-0 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition-all"
-        >
-          {isHe ? "להגשה" : "Apply"}
-        </a>
-      </div>
-
-      {job.salaryRange && (
-        <p className="text-emerald-400 text-xs mb-2">💰 {job.salaryRange}</p>
-      )}
-
-      <ul className="space-y-1">
-        {job.matchReasons.slice(0, 3).map((reason, i) => (
-          <li key={i} className="flex items-start gap-1.5 text-xs text-white/70">
-            <span className="text-purple-400 mt-0.5 flex-shrink-0">✓</span>
-            <span>{reason}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function HiddenMarketCard({ data, lang }: { data: HiddenMarketResult; lang: string }) {
-  const isHe = lang === "he";
-  const [copied, setCopied] = useState(false);
-
-  const copyTemplate = () => {
-    navigator.clipboard.writeText(data.outreachTemplate).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-
-  return (
-    <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 mt-3 space-y-4">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-amber-400 text-lg">🔍</span>
-        <h4 className="text-amber-300 font-semibold text-sm">
-          {isHe ? "שוק נסתר — מסלול חלופי" : "Hidden Market Strategy"}
-        </h4>
-      </div>
-
-      {data.intro && (
-        <p className="text-white/70 text-xs leading-relaxed">{data.intro}</p>
-      )}
-
-      {data.facebookGroups?.length > 0 && (
-        <div>
-          <p className="text-white/50 text-xs font-semibold uppercase tracking-wide mb-2">
-            {isHe ? "קבוצות פייסבוק מומלצות" : "Recommended Facebook Groups"}
-          </p>
-          <div className="space-y-2">
-            {data.facebookGroups.map((g, i) => (
-              <div key={i} className="bg-white/5 rounded-xl px-3 py-2">
-                <p className="text-white text-xs font-medium">{g.name}</p>
-                <p className="text-white/50 text-xs mt-0.5">{g.why}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {data.linkedinTip && (
-        <div className="bg-sky-500/10 border border-sky-500/20 rounded-xl px-3 py-2">
-          <p className="text-sky-300 text-xs font-semibold mb-0.5">LinkedIn</p>
-          <p className="text-white/70 text-xs leading-relaxed">{data.linkedinTip}</p>
-        </div>
-      )}
-
-      {data.outreachTemplate && (
-        <div>
-          <p className="text-white/50 text-xs font-semibold uppercase tracking-wide mb-2">
-            {isHe ? "תבנית פנייה ישירה" : "Outreach Template"}
-          </p>
-          <div className="bg-white/5 rounded-xl px-3 py-2 relative">
-            <p className="text-white/80 text-xs leading-relaxed whitespace-pre-wrap pr-8">{data.outreachTemplate}</p>
-            <button
-              onClick={copyTemplate}
-              className="absolute top-2 end-2 text-white/30 hover:text-white/70 transition"
-              title={isHe ? "העתק" : "Copy"}
-            >
-              {copied ? (
-                <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default function InterviewPhase({ userProfile, onComplete, onBack, initialMessages, initialConvId }: Props) {
+export default function InterviewPhase({ userProfile, onComplete, onBack, initialMessages, initialConvId, initialReadyToSearch }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
   const [messages, setMessages] = useState<EnrichedMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [readyToSearch, setReadyToSearch] = useState(false);
+  const [readyToSearch, setReadyToSearch] = useState(initialReadyToSearch ?? false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
   const convIdRef = useRef<string | null>(null);
@@ -210,7 +71,6 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
     if (initialized.current) return;
     initialized.current = true;
 
-    // Resuming an existing conversation
     if (initialMessages && initialMessages.length > 0) {
       const enriched: EnrichedMessage[] = initialMessages.map((m) => ({
         id: Math.random().toString(36).substr(2, 9),
@@ -244,7 +104,9 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
         .then((res) => res.json())
         .then((data) => {
           if (data.readyToSearch) setReadyToSearch(true);
-          addMessage("assistant", data.message || fallbackGreeting);
+          addMessage("assistant", data.message || fallbackGreeting, {
+            suggestedReplies: data.suggestedReplies ?? [],
+          });
           autoSave([
             { role: "user", content: rawText },
             { role: "assistant", content: data.message || fallbackGreeting },
@@ -259,15 +121,16 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
       addMessage("assistant", greeting);
       autoSave([{ role: "assistant", content: greeting }]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => { messagesRef.current = messages; }, [messages]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return;
-    const userText = input.trim();
+  const sendMessage = async (text?: string) => {
+    const userText = (text ?? input).trim();
+    if (!userText || loading) return;
     setInput("");
     addMessage("user", userText);
     setLoading(true);
@@ -289,7 +152,9 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
           : "Temporary error — please try again in a moment.");
       } else {
         if (data.readyToSearch) setReadyToSearch(true);
-        addMessage("assistant", data.message);
+        addMessage("assistant", data.message, {
+          suggestedReplies: data.suggestedReplies ?? [],
+        });
         const allPlain = [
           ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
           { role: "user" as const, content: userText },
@@ -360,8 +225,6 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
 
       {/* Chat area */}
       <div className="flex-1 overflow-y-auto px-4 py-6 relative">
-
-        {/* Robot — always visible, big when empty, small corner when chatting */}
         <div className={`pointer-events-none select-none flex flex-col items-center transition-all duration-700 ${
           messages.length === 0
             ? "justify-center opacity-40 py-6"
@@ -391,6 +254,21 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
                 </div>
               </div>
 
+              {/* Quick reply chips — only show for last assistant message */}
+              {msg.role === "assistant" && msg.suggestedReplies && msg.suggestedReplies.length > 0 && !readyToSearch && (
+                <div className="flex flex-wrap gap-2 mt-2 ms-11">
+                  {msg.suggestedReplies.map((reply, i) => (
+                    <button
+                      key={i}
+                      onClick={() => sendMessage(reply)}
+                      disabled={loading}
+                      className="text-xs bg-purple-500/15 hover:bg-purple-500/30 border border-purple-500/30 hover:border-purple-500/60 text-purple-200 px-3 py-1.5 rounded-full transition disabled:opacity-40"
+                    >
+                      {reply}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
 
@@ -440,7 +318,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
             className={`flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-500 resize-none transition ${readyToSearch ? "opacity-40 cursor-not-allowed" : ""}`}
           />
           <button
-            onClick={sendMessage}
+            onClick={() => sendMessage()}
             disabled={loading || !input.trim() || readyToSearch}
             className="bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white px-4 py-3 rounded-xl transition-all flex items-center justify-center"
           >

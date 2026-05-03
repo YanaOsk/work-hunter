@@ -119,6 +119,24 @@ export async function GET() {
       CREATE INDEX IF NOT EXISTS idx_conversations_user_id ON conversations(user_id)
     `;
 
+    await db`
+      CREATE TABLE IF NOT EXISTS job_applications (
+        user_id TEXT NOT NULL,
+        id TEXT NOT NULL,
+        job JSONB NOT NULL,
+        status TEXT NOT NULL DEFAULT 'saved',
+        saved_at TEXT NOT NULL,
+        applied_at TEXT,
+        notes TEXT,
+        cover_letter TEXT,
+        PRIMARY KEY (user_id, id)
+      )
+    `;
+
+    await db`
+      CREATE INDEX IF NOT EXISTS idx_job_applications_user_id ON job_applications(user_id)
+    `;
+
     return NextResponse.json({ ok: true, message: "All tables created" });
   } catch (err) {
     console.error("init-db error:", err);

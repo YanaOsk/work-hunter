@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { AppState, AppMode, UserProfile, JobResult } from "@/lib/types";
@@ -75,6 +75,11 @@ export default function Home() {
   const [resumeConv, setResumeConv] = useState<{
     id: string;
     messages: Array<{ role: "user" | "assistant"; content: string }>;
+  } | null>(null);
+  const scoutContextRef = useRef<{
+    context: string;
+    messages: Array<{ role: "user" | "assistant"; content: string }>;
+    convId?: string;
   } | null>(null);
   const [pendingAutoMode, setPendingAutoMode] = useState<AppMode | null>(() => {
     const queued = consumeAutoStart();
@@ -234,11 +239,21 @@ export default function Home() {
     setState((s) => ({ ...s, phase: "interview", userProfile: profile }));
   };
 
+  const handleRefineSearch = () => {
+    const ctx = scoutContextRef.current;
+    if (!ctx) return;
+    setResumeConv(ctx.convId ? { id: ctx.convId, messages: ctx.messages } : null);
+    setState((s) => ({ ...s, phase: "interview", userProfile: s.userProfile ?? emptyProfile }));
+    setIsStreaming(false);
+    setDemoMode(false);
+  };
+
   const handleInterviewComplete = async (
     context: string,
     convMessages: Array<{ role: "user" | "assistant"; content: string }>,
     existingConvId?: string
   ) => {
+    scoutContextRef.current = { context, messages: convMessages, convId: existingConvId };
     if (state.userProfile) saveProfile(state.userProfile);
     setState((s) => ({ ...s, phase: "searching" }));
     setIsStreaming(true);
@@ -384,6 +399,7 @@ export default function Home() {
           }}
           initialMessages={resumeConv?.messages}
           initialConvId={resumeConv?.id}
+          initialReadyToSearch={resumeConv !== null && state.jobResults.length > 0}
         />
       );
     case "searching":
@@ -397,6 +413,7 @@ export default function Home() {
           isSubscribed={isSubscribed}
           isStreaming={isStreaming}
           onReset={handleReset}
+          onRefine={scoutContextRef.current ? handleRefineSearch : undefined}
         />
       );
   }

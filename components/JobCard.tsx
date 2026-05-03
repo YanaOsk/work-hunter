@@ -4,12 +4,15 @@ import { useState } from "react";
 import { JobResult } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
+import CoverLetterModal from "./CoverLetterModal";
 
 interface Props {
   job: JobResult;
   rank: number;
   saved?: boolean;
   onToggleSave?: () => void;
+  onApplied?: () => void;
+  userSkills?: string[];
 }
 
 function ScoreBadge({
@@ -89,9 +92,53 @@ function ScoreBadge({
   );
 }
 
-export default function JobCard({ job, rank, saved = false, onToggleSave }: Props) {
+function highlightSkills(text: string, skills: string[]): React.ReactNode {
+  if (!skills.length) return text;
+  const escaped = skills.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const pattern = new RegExp(`(${escaped.join("|")})`, "gi");
+  const parts = text.split(pattern);
+  return parts.map((part, i) =>
+    pattern.test(part)
+      ? <mark key={i} className="bg-amber-400/25 text-amber-200 rounded px-0.5 not-italic">{part}</mark>
+      : part
+  );
+}
+
+function formatPostedDate(dateStr: string, lang: string): string {
+  try {
+    const d = new Date(dateStr);
+    const diffDays = Math.floor((Date.now() - d.getTime()) / 86400000);
+    if (diffDays === 0) return lang === "he" ? "היום" : "Today";
+    if (diffDays === 1) return lang === "he" ? "אתמול" : "Yesterday";
+    if (diffDays < 7) return lang === "he" ? `לפני ${diffDays} ימים` : `${diffDays}d ago`;
+    if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7);
+      return lang === "he" ? `לפני ${weeks} שבועות` : `${weeks}w ago`;
+    }
+    return d.toLocaleDateString(lang === "he" ? "he-IL" : "en-GB", { day: "numeric", month: "short" });
+  } catch {
+    return dateStr;
+  }
+}
+
+export default function JobCard({ job, rank, saved = false, onToggleSave, onApplied, userSkills = [] }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
+  const [showCoverLetter, setShowCoverLetter] = useState(false);
+  const [appliedToast, setAppliedToast] = useState(false);
+
+  const handleViewJob = () => {
+    if (!appliedToast) {
+      setAppliedToast(true);
+      setTimeout(() => setAppliedToast(false), 6000);
+    }
+  };
+
+  const handleApplied = () => {
+    setAppliedToast(false);
+    if (onApplied) onApplied();
+    if (!saved && onToggleSave) onToggleSave();
+  };
 
   return (
     <div className="group bg-white/5 hover:bg-white/8 border border-white/10 hover:border-purple-500/40 rounded-2xl p-4 sm:p-5 transition-all duration-200">
@@ -151,6 +198,14 @@ export default function JobCard({ job, rank, saved = false, onToggleSave }: Prop
             {job.salaryRange}
           </span>
         )}
+        {job.postedDate && (
+          <span className="flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            {tx.postedDate} {formatPostedDate(job.postedDate, lang)}
+          </span>
+        )}
         <span className="flex items-center gap-1 ms-auto">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" />
@@ -168,7 +223,9 @@ export default function JobCard({ job, rank, saved = false, onToggleSave }: Prop
         </p>
       )}
 
-      <p className="text-white/60 text-sm leading-relaxed mb-4 line-clamp-2">{job.description}</p>
+      <p className="text-white/60 text-sm leading-relaxed mb-4 line-clamp-2">
+        {userSkills.length > 0 ? highlightSkills(job.description, userSkills) : job.description}
+      </p>
 
       {job.matchReasons.length > 0 && (
         <div className="mb-4 space-y-1.5">
@@ -184,13 +241,56 @@ export default function JobCard({ job, rank, saved = false, onToggleSave }: Prop
         </div>
       )}
 
-      <a href={job.url} target="_blank" rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all duration-200">
-        {tx.viewJob}
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-        </svg>
-      </a>
+      <div className="flex items-center gap-2 flex-wrap">
+        <a href={job.url} target="_blank" rel="noopener noreferrer"
+          onClick={handleViewJob}
+          className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all duration-200">
+          {tx.viewJob}
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </a>
+        <button
+          onClick={() => setShowCoverLetter(true)}
+          className="inline-flex items-center gap-1.5 text-white/50 hover:text-white/80 text-sm border border-white/10 hover:border-white/30 px-3 py-2.5 rounded-xl transition"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          {tx.coverLetterBtn}
+        </button>
+      </div>
+
+      {/* Applied toast */}
+      {appliedToast && onApplied && (
+        <div className="mt-3 flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-3 py-2.5 animate-fade-in">
+          <span className="text-emerald-400 text-sm flex-shrink-0">✓</span>
+          <p className="text-emerald-300 text-xs flex-1">{tx.appliedToast}</p>
+          <button
+            onClick={handleApplied}
+            className="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg transition whitespace-nowrap"
+          >
+            {saved ? tx.appliedToastCta : tx.appliedToastSave}
+          </button>
+          <button
+            onClick={() => setAppliedToast(false)}
+            className="text-white/30 hover:text-white/60 transition"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {showCoverLetter && (
+        <CoverLetterModal
+          jobTitle={job.title}
+          jobDescription={job.description}
+          jobId={job.id}
+          onClose={() => setShowCoverLetter(false)}
+        />
+      )}
     </div>
   );
 }
