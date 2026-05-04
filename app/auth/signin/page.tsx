@@ -139,7 +139,7 @@ function SignInContent() {
           {/* Google OAuth — always first, works for both sign in and register */}
           <button
             onClick={() => signIn("google", { callbackUrl: callbackUrl ?? "/auth/welcome" })}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-900 font-semibold px-5 py-3.5 rounded-xl transition shadow-sm mb-5"
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-900 font-semibold px-5 py-3.5 rounded-xl transition shadow-sm border border-gray-200 mb-5"
           >
             <GoogleIcon />
             {lang === "he" ? "המשך עם Google" : "Continue with Google"}
@@ -153,19 +153,19 @@ function SignInContent() {
           </div>
 
           {/* Tabs */}
-          <div className="flex bg-white/5 rounded-xl p-1 mb-6 gap-1">
+          <div className="flex bg-white/5 border border-white/15 rounded-xl p-1 mb-6 gap-1">
             <button
               onClick={() => switchTab("signin")}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition ${
-                tab === "signin" ? "bg-white text-slate-900 shadow-sm" : "text-white/55 hover:text-white"
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition border ${
+                tab === "signin" ? "bg-white text-slate-900 shadow-sm border-purple-300/60" : "text-white/55 hover:text-white border-transparent"
               }`}
             >
               {tx.authSignInTab}
             </button>
             <button
               onClick={() => switchTab("register")}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition ${
-                tab === "register" ? "bg-white text-slate-900 shadow-sm" : "text-white/55 hover:text-white"
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition border ${
+                tab === "register" ? "bg-white text-slate-900 shadow-sm border-purple-300/60" : "text-white/55 hover:text-white border-transparent"
               }`}
             >
               {tx.authRegisterTab}
