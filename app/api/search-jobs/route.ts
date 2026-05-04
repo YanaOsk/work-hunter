@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
       try {
         const { demoMode } = await runJobSearch(profileText, (job: JobResult) => {
-          send({ type: "job", job });
+          if (job.matchScore >= 38) send({ type: "job", job });
         }, lang);
         send({ type: "done", demoMode });
       } catch (err) {

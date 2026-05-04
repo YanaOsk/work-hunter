@@ -223,7 +223,7 @@ async function analyzeMatch(profileText: string, job: TaggedResult, lang = "he")
       location: "ראה מודעה",
       url: job.link,
       description: job.snippet,
-      matchScore: 65,
+      matchScore: 40,
       matchReasons: ["מתאים לפרופיל שלך"],
       matchNegatives: [],
       isRemote: false,

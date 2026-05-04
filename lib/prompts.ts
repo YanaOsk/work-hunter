@@ -407,18 +407,32 @@ ${profile}
 
 CRITICAL RULES — read carefully before generating anything:
 
+0. CONVERSATION OVERRIDES PARSED DATA — THIS IS RULE ZERO:
+   The profile contains both structured fields (parsedData) AND an "additionalContext" field with the actual Scout conversation.
+   The additionalContext is the MOST IMPORTANT signal — it captures what the candidate explicitly said they want.
+   If additionalContext says the person wants to work in a kitchen, culinary, fitness, retail, social work, or ANY non-tech field:
+   → Generate queries ONLY for that field. Ignore tech skills in parsedData entirely.
+   → Set isTech: false. Set linkedinQuery: null.
+   This rule overrides ALL other rules. A person who said "אני עובדת במטבח" or "I want to work in a kitchen" must NEVER receive tech job queries.
+   Examples:
+   - additionalContext says "רוצה לעבוד במאפייה" → queries about bakery/pastry jobs, NOT software
+   - additionalContext says "I'm a fitness trainer" → queries about fitness/sports, NOT developer
+   - additionalContext says "עוסקת במטבח" → culinary/kitchen queries, NOT tech
+   - additionalContext says "עבדתי 8 שנה כמנהלת שיווק, עוברת למטבח" → culinary queries, NOT marketing
+
 1. REMOTE / WORK-FROM-HOME CONSTRAINT:
    - If workPreference is "remote" or "flexible", EVERY query must include "מרחוק" or "remote" or "עבודה מהבית".
    - Do NOT generate queries for office/onsite roles. Remote is a hard filter, not a preference.
 
 2. CAREER CHANGE:
-   - If careerChangeInterest is true, or if the profile/additionalNotes signal burnout from current field, DO NOT suggest roles in the old field.
+   - If careerChangeInterest is true, OR if additionalContext signals a desire to change fields, DO NOT suggest roles in the old field.
    - Focus queries on the new direction the candidate wants, not their past.
 
 3. ALL INDUSTRIES — NOT JUST TECH:
    - This system serves people from ALL fields: cooking, culinary arts, fitness, sports coaching, nursing, social work, education, HR, law, real estate, logistics, events, beauty, retail, finance, etc.
-   - Read the profile and generate queries for THEIR industry, not a default tech industry.
-   - isTech should only be true if software/hardware engineering is genuinely relevant.
+   - Read additionalContext FIRST to determine the field. If no additionalContext, use parsedData.
+   - isTech must be false for ANY non-tech field. isTech is true ONLY if the candidate explicitly wants software/hardware/engineering work.
+   - NEVER default to tech queries when the field is unclear — default to the most-mentioned non-tech field in additionalContext.
 
 4. SEARCH COVERAGE — Israel-wide, multiple platforms:
    - hebrewQueries: 3 queries for Israeli job boards. Target sites include: drushim.co.il, alljobs.co.il, jobmaster.co.il, gotfriends.co.il, sahbak.co.il, mploy.co.il, jobnet.co.il, comeet.io, nisha.co.il, seev.co.il, goozali.com. Cover: (a) obvious match, (b) one step up/pivot, (c) non-obvious opportunity.
