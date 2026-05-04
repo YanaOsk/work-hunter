@@ -23,7 +23,6 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
   const links = [
     ...(!isAuthenticated ? [{ href: "/#how-it-works", label: tx.navHowItWorks }] : []),
     { href: "/cv-builder", label: tx.navCvBuilder },
-    ...(!isAuthenticated ? [{ href: "/pricing", label: tx.navPricing }] : []),
     { href: "/reviews", label: tx.navReviews },
     ...(isAuthenticated ? [{ href: "/tracker", label: tx.navTracker }] : []),
   ];
