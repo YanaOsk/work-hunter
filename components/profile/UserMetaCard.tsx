@@ -108,6 +108,39 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
   const [saving, setSaving] = useState(false);
   const [eduPickerVal, setEduPickerVal] = useState<string>("");
   const [uvpLoading, setUvpLoading] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
+  function resizeImage(file: File, maxPx: number): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const scale = Math.min(maxPx / img.width, maxPx / img.height, 1);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL("image/jpeg", 0.88));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("load")); };
+      img.src = url;
+    });
+  }
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoUploading(true);
+    try {
+      const base64 = await resizeImage(file, 400);
+      await onSave({ profileImage: base64 });
+    } catch { /* silent */ } finally {
+      setPhotoUploading(false);
+      if (photoInputRef.current) photoInputRef.current.value = "";
+    }
+  }
 
   // Merged display values
   const title         = merge(meta.title, scoutData.currentRole);
@@ -144,6 +177,9 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
       volunteering:    meta.volunteering ?? "",
       linkedin:        meta.linkedin ?? "",
       availability:    meta.availability,
+      age:             meta.age,
+      phone:           meta.phone ?? "",
+      address:         meta.address ?? "",
     });
     setSkillInput("");
     setRoleInput("");
@@ -165,6 +201,9 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
       volunteering:    (draft.volunteering as string)?.trim() || undefined,
       linkedin:        (draft.linkedin as string)?.trim() || undefined,
       availability:    draft.availability,
+      age:             draft.age,
+      phone:           (draft.phone as string)?.trim() || undefined,
+      address:         (draft.address as string)?.trim() || undefined,
     };
     await onSave(patch);
     setSaving(false);
@@ -234,6 +273,33 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
           </button>
         </div>
 
+        {/* Passport photo */}
+        <div className="px-6 pb-2 flex items-center gap-4">
+          <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+          <button
+            onClick={() => photoInputRef.current?.click()}
+            className="relative group flex-shrink-0"
+            title={he ? "העלה תמונת פספורט" : "Upload passport photo"}
+          >
+            {meta.profileImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={meta.profileImage} alt="" className="w-20 h-24 rounded-xl object-cover border-2 border-white/10 group-hover:border-purple-500/50 transition" />
+            ) : (
+              <div className="w-20 h-24 rounded-xl border-2 border-dashed border-white/15 group-hover:border-purple-500/40 bg-white/3 flex flex-col items-center justify-center gap-1 transition">
+                <svg className="w-5 h-5 text-white/25 group-hover:text-purple-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span className="text-white/20 text-[10px] group-hover:text-purple-400 transition">{he ? "תמונה" : "Photo"}</span>
+              </div>
+            )}
+            {photoUploading && (
+              <div className="absolute inset-0 rounded-xl bg-black/50 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+              </div>
+            )}
+          </button>
+        </div>
+
         {!hasAnyData ? (
           <div className="px-6 pb-6 py-4 text-center">
             <p className="text-white/40 text-sm">
@@ -289,6 +355,36 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
               </p>
             )}
 
+            {/* Personal details row: age · phone · address */}
+            {(meta.age || meta.phone || meta.address) && (
+              <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+                {meta.age && (
+                  <span className="text-white/40 text-xs flex items-center gap-1">
+                    <svg className="w-3 h-3 text-violet-400/70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {he ? `גיל ${meta.age}` : `Age ${meta.age}`}
+                  </span>
+                )}
+                {meta.phone && (
+                  <span className="text-white/40 text-xs flex items-center gap-1" dir="ltr">
+                    <svg className="w-3 h-3 text-emerald-400/70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    {meta.phone}
+                  </span>
+                )}
+                {meta.address && (
+                  <span className="text-white/40 text-xs flex items-center gap-1">
+                    <svg className="w-3 h-3 text-rose-400/70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    {meta.address}
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Meta row: education · languages · work pref · linkedin */}
             <div className="flex flex-wrap gap-x-4 gap-y-1.5 pt-1">
               {education && (
@@ -341,6 +437,34 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
       </div>
 
       <div className="space-y-4" dir={he ? "rtl" : "ltr"}>
+        {/* Passport photo in edit mode */}
+        <div className="mb-4 flex items-center gap-4">
+          <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+          <button onClick={() => photoInputRef.current?.click()} className="relative group flex-shrink-0">
+            {meta.profileImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={meta.profileImage} alt="" className="w-20 h-24 rounded-xl object-cover border-2 border-white/10 group-hover:border-purple-500/50 transition" />
+            ) : (
+              <div className="w-20 h-24 rounded-xl border-2 border-dashed border-white/20 group-hover:border-purple-500/40 bg-white/5 flex flex-col items-center justify-center gap-1 transition">
+                <svg className="w-5 h-5 text-white/30 group-hover:text-purple-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="text-white/25 text-[10px] group-hover:text-purple-400 transition">{he ? "העלה" : "Upload"}</span>
+              </div>
+            )}
+            {photoUploading && (
+              <div className="absolute inset-0 rounded-xl bg-black/50 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+              </div>
+            )}
+          </button>
+          <div className="text-white/35 text-xs leading-relaxed">
+            <p className="font-medium text-white/50 mb-0.5">{he ? "תמונת פספורט" : "Passport photo"}</p>
+            <p>{he ? "יחס 3:4 · מומלץ 400×530px" : "3:4 ratio · recommended 400×530px"}</p>
+            <p className="mt-1">{he ? "לחץ/י על התמונה להחלפה" : "Click photo to replace"}</p>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label={he ? "תפקיד נוכחי" : "Current role"}>
             <input value={(draft.title as string) ?? ""} onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
@@ -351,6 +475,24 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
             <input value={(draft.location as string) ?? ""} onChange={(e) => setDraft((d) => ({ ...d, location: e.target.value }))}
               placeholder={he ? "תל אביב" : "Tel Aviv"}
               className={input} />
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <Field label={he ? "גיל" : "Age"}>
+            <input type="number" min={16} max={99} value={draft.age ?? ""}
+              onChange={(e) => setDraft((d) => ({ ...d, age: e.target.value ? Number(e.target.value) : undefined }))}
+              placeholder="28" className={input} />
+          </Field>
+          <Field label={he ? "טלפון" : "Phone"}>
+            <input type="tel" value={(draft.phone as string) ?? ""}
+              onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))}
+              placeholder="050-0000000" className={input} dir="ltr" />
+          </Field>
+          <Field label={he ? "כתובת" : "Address"}>
+            <input value={(draft.address as string) ?? ""}
+              onChange={(e) => setDraft((d) => ({ ...d, address: e.target.value }))}
+              placeholder={he ? "רחוב, עיר" : "Street, City"} className={input} />
           </Field>
         </div>
 

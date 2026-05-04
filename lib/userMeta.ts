@@ -18,6 +18,9 @@ export interface UserMeta {
   linkedin?: string;
   availability?: Availability;
   profileImage?: string;
+  age?: number;
+  phone?: string;
+  address?: string;
   advisorCurrentStage?: string;
   advisorCompletedCount?: number;
   advisorState?: string;
@@ -46,6 +49,9 @@ export async function getUserMeta(email: string): Promise<UserMeta | null> {
     availability: r.availability ?? undefined,
     volunteering: r.volunteering ?? undefined,
     profileImage: r.profile_image ?? undefined,
+    age: r.age ?? undefined,
+    phone: r.phone ?? undefined,
+    address: r.address ?? undefined,
     advisorCurrentStage: r.advisor_current_stage ?? undefined,
     advisorCompletedCount: r.advisor_completed_count ?? undefined,
     advisorState: r.advisor_state ?? undefined,
@@ -59,10 +65,14 @@ export async function saveUserMeta(email: string, data: Partial<Omit<UserMeta, "
   const now = new Date().toISOString();
   await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS advisor_state TEXT`;
   await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS volunteering TEXT`;
+  await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS age INTEGER`;
+  await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS phone TEXT`;
+  await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS address TEXT`;
   await db`
     INSERT INTO user_meta (
       email, title, location, years_experience, education, skills, target_roles,
       work_preference, languages, bio, volunteering, linkedin, availability, profile_image,
+      age, phone, address,
       advisor_current_stage, advisor_completed_count, advisor_state, updated_at
     ) VALUES (
       ${lowerEmail},
@@ -71,6 +81,7 @@ export async function saveUserMeta(email: string, data: Partial<Omit<UserMeta, "
       ${data.workPreference ?? null}, ${data.languages ?? null}, ${data.bio ?? null},
       ${data.volunteering ?? null}, ${data.linkedin ?? null}, ${data.availability ?? null},
       ${data.profileImage ?? null},
+      ${data.age ?? null}, ${data.phone ?? null}, ${data.address ?? null},
       ${data.advisorCurrentStage ?? null}, ${data.advisorCompletedCount ?? null},
       ${data.advisorState ?? null}, ${now}
     )
@@ -88,6 +99,9 @@ export async function saveUserMeta(email: string, data: Partial<Omit<UserMeta, "
       linkedin = COALESCE(EXCLUDED.linkedin, user_meta.linkedin),
       availability = COALESCE(EXCLUDED.availability, user_meta.availability),
       profile_image = COALESCE(EXCLUDED.profile_image, user_meta.profile_image),
+      age = COALESCE(EXCLUDED.age, user_meta.age),
+      phone = COALESCE(EXCLUDED.phone, user_meta.phone),
+      address = COALESCE(EXCLUDED.address, user_meta.address),
       advisor_current_stage = COALESCE(EXCLUDED.advisor_current_stage, user_meta.advisor_current_stage),
       advisor_completed_count = COALESCE(EXCLUDED.advisor_completed_count, user_meta.advisor_completed_count),
       advisor_state = COALESCE(EXCLUDED.advisor_state, user_meta.advisor_state),

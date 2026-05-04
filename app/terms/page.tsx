@@ -73,11 +73,11 @@ export default function TermsPage() {
               </div>
               <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                 <p className="text-white font-medium mb-1">מנוי שבועי — ₪25</p>
-                <p className="text-sm">גישה מלאה לכל הכלים למשך 7 ימים ממועד הרכישה. אינו מתחדש אוטומטית. לאחר הפגיעה — חוזרים לתוכנית החינמית.</p>
+                <p className="text-sm">גישה מלאה לכל הכלים למשך 7 ימים ממועד הרכישה. אם נשמר אמצעי תשלום — המנוי יתחדש אוטומטית כל 7 ימים. ניתן לבטל בכל עת דרך עמוד ההגדרות.</p>
               </div>
               <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                 <p className="text-white font-medium mb-1">מנוי רבעוני — ₪59</p>
-                <p className="text-sm">גישה מלאה למשך 90 יום. ניתן לחדש ידנית לאחר הפגיעה.</p>
+                <p className="text-sm">גישה מלאה למשך 90 יום. אם נשמר אמצעי תשלום — המנוי יתחדש אוטומטית כל 90 יום. ניתן לבטל בכל עת דרך עמוד ההגדרות.</p>
               </div>
               <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                 <p className="text-white font-medium mb-1">מנוי לצמיתות — ₪149</p>
@@ -102,8 +102,10 @@ export default function TermsPage() {
               ב-<a href={`mailto:${EMAIL}`} className="text-purple-400 hover:text-purple-300 underline" dir="ltr">{EMAIL}</a> ונבחן כל מקרה לגופו.
             </p>
             <p className="mt-3">
-              ביטול מנוי (הסרת חידוש אוטומטי) — ניתן בכל עת דרך עמוד ה&quot;מנוי שלי&quot;. הגישה תמשיך
-              עד סוף תקופת המנוי שנרכשה.
+              <strong className="text-white/80">חידוש אוטומטי:</strong> מנויים שבועיים ורבעוניים יתחדשו אוטומטית בסוף כל תקופה, בתנאי שנשמר אמצעי תשלום בחשבון.
+              החיוב יתבצע ביום הפגיעה של המנוי באמצעות אותו אמצעי תשלום.
+              להסרת החידוש האוטומטי — מחקו את אמצעי התשלום דרך עמוד ה<Link href="/settings" className="text-purple-400 hover:text-purple-300 underline">הגדרות</Link>.
+              הגישה תמשיך עד סוף תקופת המנוי שנרכשה.
             </p>
           </section>
 
