@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import PromoBanner from "./PromoBanner";
 import NavBar from "./NavBar";
 
 export default function NavBarWrapper() {
@@ -33,17 +32,14 @@ export default function NavBarWrapper() {
     const onVisible = () => { if (document.visibilityState === "visible") fetchSub(); };
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
-  }, [session?.user, status]);
+  }, [session?.user, status, pathname]);
 
   if (pathname.startsWith("/admin")) return null;
 
   const hasPaidPlan = plan !== "free";
-  // Don't show the banner until we know whether the user has a paid plan
-  const showBanner = subChecked && !hasPaidPlan;
 
   return (
     <div className="print:hidden sticky top-0 z-50">
-      {showBanner && <PromoBanner />}
       <NavBar hasPaidPlan={hasPaidPlan} plan={plan} planReady={subChecked} />
     </div>
   );

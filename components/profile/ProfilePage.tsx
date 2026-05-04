@@ -40,13 +40,6 @@ const PATH_LABELS: Record<string, { he: string; en: string }> = {
   studies:      { he: "לימודים · הסבה",  en: "Studies" },
 };
 
-const PLAN_META: Record<string, { he: string; en: string; cls: string }> = {
-  free:       { he: "חינמי",             en: "Explorer · Free",  cls: "text-white/60 bg-white/10 border-white/20" },
-  weekly:     { he: "שבועי",            en: "Weekly",            cls: "text-blue-300 bg-blue-500/20 border-blue-500/30" },
-  "one-time": { he: "קידום קריירה",     en: "Career Boost",      cls: "text-purple-300 bg-purple-500/20 border-purple-500/30" },
-  full:       { he: "מסע מלא",          en: "Full Journey",      cls: "text-purple-300 bg-purple-500/20 border-purple-500/30" },
-  pro:        { he: "Pro",              en: "Pro",               cls: "text-amber-300 bg-amber-500/20 border-amber-500/30" },
-};
 
 function timeAgo(iso: string, he: boolean): string {
   const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
@@ -374,8 +367,6 @@ export default function ProfilePage() {
   const [conversations, setConversations] = useState<ConversationPreview[]>([]);
   const [loadingConvs, setLoadingConvs] = useState(true);
   const [plan, setPlan] = useState("free");
-  const [subscriptionData, setSubscriptionData] = useState<{ plan: string; expiryDate?: string; isExpired?: boolean; cardLast4?: string } | null>(null);
-  const [cancellingPlan, setCancellingPlan] = useState(false);
   const [userMeta, setUserMeta] = useState<UserMeta>({} as UserMeta);
   const [scoutData, setScoutData] = useState<import("@/lib/types").UserProfile["parsedData"]>({});
   const [cvs, setCvs] = useState<CvMeta[]>([]);
@@ -463,12 +454,7 @@ export default function ProfilePage() {
   useEffect(() => {
     fetch("/api/subscription")
       .then((r) => r.json())
-      .then((d) => {
-        if (d?.plan) {
-          setPlan(d.plan);
-          setSubscriptionData(d);
-        }
-      })
+      .then((d) => { if (d?.plan) setPlan(d.plan); })
       .catch(() => {});
   }, []);
 
@@ -539,7 +525,6 @@ export default function ProfilePage() {
   const user = session?.user;
   const profileId = user?.id ?? DEFAULT_ADVISOR_ID;
   const initials = user?.name?.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "?";
-  const planMeta = PLAN_META[plan] ?? PLAN_META["free"];
   const displayImage = userMeta.profileImage ?? user?.image ?? null;
 
   function handleNewAdvisorSession() {
@@ -675,58 +660,6 @@ export default function ProfilePage() {
                   </SectionCard>
                 )}
 
-                {/* Subscription management */}
-                <SectionCard>
-                  <SectionTitle>{he ? "מנוי" : "Subscription"}</SectionTitle>
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${planMeta.cls}`}>
-                        {he ? planMeta.he : planMeta.en}
-                      </span>
-                      {subscriptionData?.expiryDate && plan !== "free" && (
-                        <span className="text-white/40 text-xs">
-                          {he ? "תוקף עד" : "Expires"} {new Date(subscriptionData.expiryDate).toLocaleDateString(he ? "he-IL" : "en-US", { day: "numeric", month: "short", year: "numeric" })}
-                        </span>
-                      )}
-                      {plan !== "free" && !subscriptionData?.expiryDate && (
-                        <span className="text-emerald-400 text-xs flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                          {he ? "פעיל" : "Active"}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {plan === "free" ? (
-                        <Link href="/pricing" className="text-xs bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold px-3 py-1.5 rounded-lg transition">
-                          {he ? "שדרג ↑" : "Upgrade ↑"}
-                        </Link>
-                      ) : (
-                        <button
-                          disabled={cancellingPlan}
-                          onClick={async () => {
-                            if (!window.confirm(he ? "לבטל את המנוי? הגישה תשמר עד תאריך התפוגה." : "Cancel subscription? Access remains until expiry date.")) return;
-                            setCancellingPlan(true);
-                            try {
-                              await fetch("/api/subscription", { method: "DELETE" });
-                              setPlan("free");
-                              setSubscriptionData(null);
-                            } finally {
-                              setCancellingPlan(false);
-                            }
-                          }}
-                          className="text-xs text-rose-400/70 hover:text-rose-400 border border-rose-500/20 hover:border-rose-500/40 px-3 py-1.5 rounded-lg transition disabled:opacity-40"
-                        >
-                          {cancellingPlan ? "..." : (he ? "בטל מנוי" : "Cancel plan")}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  {subscriptionData?.cardLast4 && plan !== "free" && (
-                    <p className="text-white/30 text-xs mt-2">
-                      {he ? `כרטיס: ••••${subscriptionData.cardLast4}` : `Card: ••••${subscriptionData.cardLast4}`}
-                    </p>
-                  )}
-                </SectionCard>
               </>
             )}
 
