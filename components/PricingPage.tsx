@@ -59,11 +59,11 @@ export default function PricingPage() {
           <p className="text-white/70 text-sm sm:text-base leading-relaxed">{tx.pricingSubtitle}</p>
         </div>
 
-        {/* ── Two-column: plans left, description right ── */}
-        <div className="flex flex-col lg:flex-row gap-6 items-start mb-8">
+        {/* ── Two-column: description left, plans right ── */}
+        <div className="flex flex-col lg:flex-row gap-6 items-stretch mb-8">
 
-          {/* Left: Plan cards in a horizontal row */}
-          <div className="w-full lg:w-[48%] flex-shrink-0">
+          {/* Right: Plan cards in a horizontal row */}
+          <div className="w-full lg:w-[48%] flex-shrink-0 lg:order-2 flex flex-col justify-center">
             <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3 text-center">
               {lang === "he" ? "בחרו את המסלול שמתאים לכם" : "Choose your plan"}
             </p>
@@ -107,8 +107,8 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* Right: Features description accordion */}
-          <div className="flex-1 min-w-0">
+          {/* Left: Features description accordion */}
+          <div className="flex-1 min-w-0 lg:order-1">
             <div className="text-center mb-4">
               <p className="text-purple-400/70 text-xs font-bold uppercase tracking-widest mb-1.5">
                 {lang === "he" ? "מה כלול בכל מנוי" : "Included in every plan"}
