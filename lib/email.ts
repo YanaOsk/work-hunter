@@ -68,6 +68,42 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string): P
   });
 }
 
+const ADMIN_EMAIL = "yanaoskin35@gmail.com";
+
+export async function sendAdminPurchaseNotificationEmail(
+  userName: string,
+  userEmail: string,
+  planId: string,
+  planNameHe: string,
+  price: string,
+): Promise<void> {
+  const now = new Date().toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" });
+  await getTransporter().sendMail({
+    from: process.env.SMTP_FROM ?? "Work Hunter <noreply@workhunter.com>",
+    to: ADMIN_EMAIL,
+    subject: `💰 רכישה חדשה: ${planNameHe} — ${userName}`,
+    html: `<!DOCTYPE html>
+<html dir="rtl" lang="he"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#0f0e1a;font-family:'Segoe UI',Arial,sans-serif;color:#f0f0f5;direction:rtl">
+<div style="max-width:480px;margin:0 auto;padding:40px 16px">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="color:#a855f7;font-weight:800;font-size:18px">Work Hunter — Admin</div>
+  </div>
+  <div style="background:#1a1730;border:1px solid rgba(16,185,129,0.35);border-radius:20px;padding:32px">
+    <div style="font-size:36px;text-align:center;margin-bottom:16px">💰</div>
+    <h1 style="margin:0 0 20px;font-size:20px;font-weight:800;text-align:center">רכישה חדשה!</h1>
+    <table style="width:100%;border-collapse:collapse">
+      <tr><td style="padding:9px 0;color:rgba(240,240,245,0.5);font-size:13px;border-bottom:1px solid rgba(255,255,255,0.07)">שם</td><td style="padding:9px 0;font-weight:600;font-size:14px;text-align:left">${userName}</td></tr>
+      <tr><td style="padding:9px 0;color:rgba(240,240,245,0.5);font-size:13px;border-bottom:1px solid rgba(255,255,255,0.07)">מייל</td><td style="padding:9px 0;font-weight:600;font-size:14px;text-align:left">${userEmail}</td></tr>
+      <tr><td style="padding:9px 0;color:rgba(240,240,245,0.5);font-size:13px;border-bottom:1px solid rgba(255,255,255,0.07)">מסלול</td><td style="padding:9px 0;font-weight:700;font-size:14px;color:#a855f7;text-align:left">${planNameHe} (${planId})</td></tr>
+      <tr><td style="padding:9px 0;color:rgba(240,240,245,0.5);font-size:13px;border-bottom:1px solid rgba(255,255,255,0.07)">מחיר</td><td style="padding:9px 0;font-weight:700;font-size:14px;color:#10b981;text-align:left">${price}</td></tr>
+      <tr><td style="padding:9px 0;color:rgba(240,240,245,0.5);font-size:13px">זמן</td><td style="padding:9px 0;font-size:13px;text-align:left">${now}</td></tr>
+    </table>
+  </div>
+</div></body></html>`,
+  });
+}
+
 export async function sendPurchaseConfirmationEmail(
   toEmail: string,
   toName: string,

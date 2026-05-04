@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { PLANS } from "@/lib/plans";
 import { saveSubscription, type SavedCard } from "@/lib/subscriptions";
-import { sendPurchaseConfirmationEmail } from "@/lib/email";
+import { sendPurchaseConfirmationEmail, sendAdminPurchaseNotificationEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,16 +36,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Send confirmation email — non-fatal
-    try {
-      await sendPurchaseConfirmationEmail(
+    // Send confirmation to user + admin notification — both non-fatal
+    const priceStr = plan.price === 0 ? "חינם" : `${plan.displayPrice}${plan.per ? ` ${plan.per}` : ""}`;
+    await Promise.allSettled([
+      sendPurchaseConfirmationEmail(session.user.email, session.user.name ?? "", plan),
+      sendAdminPurchaseNotificationEmail(
+        session.user.name ?? session.user.email,
         session.user.email,
-        session.user.name ?? "",
-        plan,
-      );
-    } catch {
-      // email failure is non-fatal
-    }
+        planId,
+        plan.nameHe,
+        priceStr,
+      ),
+    ]);
 
     return NextResponse.json({ ok: true });
   } catch (err) {
