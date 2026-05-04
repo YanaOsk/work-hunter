@@ -42,7 +42,7 @@ export default function RootLayout({
         <script
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('wh-theme');if(t==='light'){document.documentElement.classList.add('light');}else if(!t&&window.innerWidth>=768){document.documentElement.classList.add('light');}}catch(e){}`,
+            __html: `try{if(localStorage.getItem('wh-theme')==='light'){document.documentElement.classList.add('light');}}catch(e){}`,
           }}
         />
       </head>
