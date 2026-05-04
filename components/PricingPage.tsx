@@ -33,10 +33,6 @@ export default function PricingPage() {
     return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
   }
 
-  const weeklyFeatures = [tx.planWeekly1, tx.planWeekly2, tx.planWeekly3, tx.planWeekly4, tx.planWeekly5];
-  const quarterlyFeatures = [tx.planQuarterly1, tx.planQuarterly2, tx.planQuarterly3, tx.planQuarterly4, tx.planQuarterly5];
-  const lifetimeFeatures = [tx.planLifetime1, tx.planLifetime2, tx.planLifetime3, tx.planLifetime4, tx.planLifetime5];
-
   const faqs = [
     { q: tx.faq1Q, a: tx.faq1A },
     { q: tx.faq2Q, a: tx.faq2A },
@@ -51,152 +47,29 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-10">
-        <div className="flex justify-end mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8">
+        <div className="flex justify-end mb-4">
           <div className="text-white/40 text-xs bg-white/5 border border-white/10 rounded-full px-3 py-1">
             {tx.pricingDemoNote}
           </div>
         </div>
 
-        <div className="text-center mb-8 md:mb-10 max-w-2xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4">{tx.pricingTitle}</h1>
-          <p className="text-white/70 text-sm sm:text-base md:text-lg leading-relaxed">{tx.pricingSubtitle}</p>
+        <div className="text-center mb-6 max-w-2xl mx-auto">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">{tx.pricingTitle}</h1>
+          <p className="text-white/70 text-sm sm:text-base leading-relaxed">{tx.pricingSubtitle}</p>
         </div>
 
-        {/* ── Two-column: description left, cards right ── */}
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start mb-10">
-          <div className="flex-1 min-w-0">
-          <div className="text-center mb-6">
-            <p className="text-purple-400/70 text-xs font-bold uppercase tracking-widest mb-2">
-              {lang === "he" ? "מה כלול בכל מנוי" : "Included in every plan"}
-            </p>
-            <h2 className="text-xl sm:text-2xl font-bold text-white">
-              {lang === "he"
-                ? "כלים מקצועיים שישנו את חיפוש העבודה שלך"
-                : "Professional tools that transform your job search"}
-            </h2>
-          </div>
+        {/* ── Two-column: plans left, description right ── */}
+        <div className="flex flex-col lg:flex-row gap-6 items-start mb-8">
 
-          <div
-            className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden"
-            dir={lang === "he" ? "rtl" : "ltr"}
-          >
-            {([
-              {
-                icon: "🧠",
-                titleHe: "ייעוץ תעסוקתי אסטרטגי וניתוח אישיות",
-                titleEn: "Strategic Career Consulting & Personality Analysis",
-                descHe: "ניתוח אישיות עמוק, הכוונה למסלולי קריירה מותאמים וסימולציות ראיון עד להצלחה. זמין 24/7.",
-                descEn: "Deep personality analysis, tailored career path guidance, and interview simulations until success. Available 24/7.",
-                bulletsHe: [
-                  { title: "אבחון DNA מקצועי", desc: "ניתוח מעמיק של חוזקות, כישורים וסגנון עבודה (כגון ENFP) ליצירת התאמה מדויקת לשוק העבודה." },
-                  { title: "הכוונה למסלולי קריירה", desc: "זיהוי תפקידים אופטימליים (כמו ניהול יצירתי או יזמות) על בסיס שילוב בין כישורים לשאיפות אישיות." },
-                  { title: "ניתוח כדאיות (שכיר vs עצמאי)", desc: "השוואה כמותית של פוטנציאל השתכרות ואיכות חיים בין מסלולי תעסוקה שונים." },
-                  { title: "מיפוי חברות ואסטרטגיית חיפוש", desc: "בניית רשימת חברות יעד (Target Companies) ותוכנית נטוורקינג אופרטיבית ל-30 יום." },
-                  { title: "סימולציית ראיונות ומיתוג אישי", desc: 'הכנה לראיונות עבודה מותאמים אישית וגיבוש ה-"Pitch" המקצועי שלך למול מעסיקים.' },
-                ],
-                bulletsEn: [
-                  { title: "Professional DNA Diagnosis", desc: "In-depth analysis of strengths, skills, and work style (e.g. ENFP) to create a precise match with the job market." },
-                  { title: "Career Path Guidance", desc: "Identifying optimal roles (e.g. creative management or entrepreneurship) based on the combination of skills and personal aspirations." },
-                  { title: "Feasibility Analysis (Employee vs. Self-Employed)", desc: "Quantitative comparison of earning potential and quality of life across different employment paths." },
-                  { title: "Company Mapping & Search Strategy", desc: "Building a Target Companies list and an operational 30-day networking plan." },
-                  { title: "Interview Simulation & Personal Branding", desc: 'Personalized interview preparation and crafting your professional "Pitch" for employers.' },
-                ],
-              },
-              {
-                icon: "🤖",
-                titleHe: "הסקאוט — צייד המשרות האישי שלך",
-                titleEn: "The Scout — Your Personal Job Hunter",
-                descHe: "סריקה אקטיבית של השוק למציאת משרות שמתאימות בדיוק לפרופיל שלך ולאילוצים האישיים שלך.",
-                descEn: "Active market scanning to find positions that exactly match your profile and personal constraints.",
-                bulletsHe: [
-                  { title: "חיפוש חכם ללא הגבלה", desc: "סריקה אקטיבית של השוק למציאת משרות התואמות בדיוק את פרופיל הייעוץ שנבנה עבורך." },
-                  { title: "התאמה לאילוצים אישיים", desc: "איתור משרות המתחשבות בצרכים ספציפיים כגון שירות מילואים, הריון, הורות ודרישות גמישות (היברידי/מרחוק)." },
-                  { title: "גישה לשוק הנסתר", desc: "חשיפת הזדמנויות תעסוקתיות בחברות רלוונטיות עוד לפני שהן מתפרסמות בערוצים הרגילים." },
-                ],
-                bulletsEn: [
-                  { title: "Smart Unlimited Search", desc: "Active market scanning to find positions that exactly match the career profile built for you." },
-                  { title: "Adaptation to Personal Constraints", desc: "Finding positions that account for specific needs such as military reserve duty, pregnancy, parenthood, and flexibility (hybrid/remote)." },
-                  { title: "Access to the Hidden Market", desc: "Uncovering employment opportunities at relevant companies before they're published through regular channels." },
-                ],
-              },
-              {
-                icon: "🚀",
-                titleHe: "בניית ושדרוג קורות חיים עם AI",
-                titleEn: "CV Building & AI-Powered Optimization",
-                descHe: "יצירת קורות חיים מנצחים מ-0 או שדרוג קיימים — מותאמים ל-ATS ולדרישות המשרה.",
-                descEn: "Build a winning CV from scratch or upgrade an existing one — tailored to ATS systems and job requirements.",
-                bulletsHe: [
-                  { title: "יצירה מ-0 בסטנדרט גלובלי", desc: "בניית מסמך מקצועי ומנצח בעברית או באנגלית המותאם למערכות הסינון (ATS)." },
-                  { title: "שינוי תבניות (Formatting)", desc: "אפשרות להעלאת קובץ קיים והלבשתו על תבניות עיצוב מודרניות ומרשימות בלחיצת כפתור." },
-                  { title: "אופטימיזציה של התוכן", desc: "הפיכת רשימת מטלות יבשה לתיאור הישגים מדידים ומרשימים (Impact-driven)." },
-                  { title: "דיוק מילות מפתח", desc: "התאמת הניסיון התעסוקתי לדרישות המשרה כדי למשוך את תשומת לב המגייסים." },
-                  { title: "סיכום מקצועי מנצח", desc: 'כתיבת פסקת פתיחה ("Summary") המזקקת את הערך המוסף הייחודי שלך.' },
-                ],
-                bulletsEn: [
-                  { title: "Built from Scratch, Global Standard", desc: "Creating a professional, winning document in Hebrew or English, tailored to ATS filtering systems." },
-                  { title: "Template Formatting", desc: "Option to upload an existing file and apply modern, impressive design templates with one click." },
-                  { title: "Content Optimization", desc: "Transforming a dry task list into descriptions of measurable, impressive achievements (Impact-driven)." },
-                  { title: "Keyword Precision", desc: "Matching work experience to job requirements to attract recruiter attention." },
-                  { title: "Winning Professional Summary", desc: 'Writing an opening paragraph ("Summary") that distills your unique added value.' },
-                ],
-              },
-            ] as const).map((item, i, arr) => {
-              const isOpen = openFeature === i;
-              const bullets = lang === "he" ? item.bulletsHe : item.bulletsEn;
-              return (
-                <div key={item.titleEn} className={i < arr.length - 1 ? "border-b border-white/10" : ""}>
-                  <button
-                    onClick={() => setOpenFeature(isOpen ? null : i)}
-                    className="w-full flex items-start gap-4 px-6 py-5 text-start hover:bg-white/5 transition-colors"
-                  >
-                    <span className="text-3xl flex-shrink-0 mt-0.5">{item.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white font-bold text-sm mb-1">
-                        {lang === "he" ? item.titleHe : item.titleEn}
-                      </p>
-                      <p className="text-white/60 text-sm leading-relaxed">
-                        {lang === "he" ? item.descHe : item.descEn}
-                      </p>
-                    </div>
-                    <svg
-                      className={`w-4 h-4 text-white/40 flex-shrink-0 mt-1.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-                      fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {isOpen && (
-                    <div className="px-6 pb-5 border-t border-white/10 bg-white/3">
-                      <ul className="mt-4 space-y-3">
-                        {bullets.map((b, j) => (
-                          <li key={j} className="flex items-start gap-2.5 text-sm">
-                            <svg className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <span className="text-white/75 leading-relaxed">
-                              <span className="text-white font-semibold">{b.title}</span>
-                              {b.desc ? `: ${b.desc}` : ""}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          </div>
-
-          {/* Right: Plan cards — sticky on desktop */}
-          <div className="w-full lg:w-80 xl:w-96 flex-shrink-0 lg:sticky lg:top-20">
-            <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-4 text-center">
+          {/* Left: Plan cards in a horizontal row */}
+          <div className="w-full lg:w-[48%] flex-shrink-0">
+            <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3 text-center">
               {lang === "he" ? "בחרו את המסלול שמתאים לכם" : "Choose your plan"}
             </p>
-            <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-3 gap-2.5">
               <PlanCard
+                compact
                 name={tx.planWeeklyName}
                 badge={tx.planWeeklyBadge}
                 price={tx.planWeeklyPrice}
@@ -208,6 +81,7 @@ export default function PricingPage() {
                 variant="weekly"
               />
               <PlanCard
+                compact
                 name={tx.planQuarterlyName}
                 badge={tx.planQuarterlyBadge}
                 price={tx.planQuarterlyPrice}
@@ -219,6 +93,7 @@ export default function PricingPage() {
                 variant="popular"
               />
               <PlanCard
+                compact
                 name={tx.planLifetimeName}
                 badge={tx.planLifetimeBadge}
                 oldPrice={tx.planLifetimeOld}
@@ -231,10 +106,135 @@ export default function PricingPage() {
               />
             </div>
           </div>
+
+          {/* Right: Features description accordion */}
+          <div className="flex-1 min-w-0">
+            <div className="text-center mb-4">
+              <p className="text-purple-400/70 text-xs font-bold uppercase tracking-widest mb-1.5">
+                {lang === "he" ? "מה כלול בכל מנוי" : "Included in every plan"}
+              </p>
+              <h2 className="text-xl sm:text-2xl font-bold text-white">
+                {lang === "he"
+                  ? "כלים מקצועיים שישנו את חיפוש העבודה שלך"
+                  : "Professional tools that transform your job search"}
+              </h2>
+            </div>
+
+            <div
+              className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden"
+              dir={lang === "he" ? "rtl" : "ltr"}
+            >
+              {([
+                {
+                  icon: "🧠",
+                  titleHe: "ייעוץ תעסוקתי אסטרטגי וניתוח אישיות",
+                  titleEn: "Strategic Career Consulting & Personality Analysis",
+                  descHe: "ניתוח אישיות עמוק, הכוונה למסלולי קריירה מותאמים וסימולציות ראיון עד להצלחה. זמין 24/7.",
+                  descEn: "Deep personality analysis, tailored career path guidance, and interview simulations until success. Available 24/7.",
+                  bulletsHe: [
+                    { title: "אבחון DNA מקצועי", desc: "ניתוח מעמיק של חוזקות, כישורים וסגנון עבודה (כגון ENFP) ליצירת התאמה מדויקת לשוק העבודה." },
+                    { title: "הכוונה למסלולי קריירה", desc: "זיהוי תפקידים אופטימליים (כמו ניהול יצירתי או יזמות) על בסיס שילוב בין כישורים לשאיפות אישיות." },
+                    { title: "ניתוח כדאיות (שכיר vs עצמאי)", desc: "השוואה כמותית של פוטנציאל השתכרות ואיכות חיים בין מסלולי תעסוקה שונים." },
+                    { title: "מיפוי חברות ואסטרטגיית חיפוש", desc: "בניית רשימת חברות יעד (Target Companies) ותוכנית נטוורקינג אופרטיבית ל-30 יום." },
+                    { title: "סימולציית ראיונות ומיתוג אישי", desc: 'הכנה לראיונות עבודה מותאמים אישית וגיבוש ה-"Pitch" המקצועי שלך למול מעסיקים.' },
+                  ],
+                  bulletsEn: [
+                    { title: "Professional DNA Diagnosis", desc: "In-depth analysis of strengths, skills, and work style (e.g. ENFP) to create a precise match with the job market." },
+                    { title: "Career Path Guidance", desc: "Identifying optimal roles (e.g. creative management or entrepreneurship) based on the combination of skills and personal aspirations." },
+                    { title: "Feasibility Analysis (Employee vs. Self-Employed)", desc: "Quantitative comparison of earning potential and quality of life across different employment paths." },
+                    { title: "Company Mapping & Search Strategy", desc: "Building a Target Companies list and an operational 30-day networking plan." },
+                    { title: "Interview Simulation & Personal Branding", desc: 'Personalized interview preparation and crafting your professional "Pitch" for employers.' },
+                  ],
+                },
+                {
+                  icon: "🤖",
+                  titleHe: "הסקאוט — צייד המשרות האישי שלך",
+                  titleEn: "The Scout — Your Personal Job Hunter",
+                  descHe: "סריקה אקטיבית של השוק למציאת משרות שמתאימות בדיוק לפרופיל שלך ולאילוצים האישיים שלך.",
+                  descEn: "Active market scanning to find positions that exactly match your profile and personal constraints.",
+                  bulletsHe: [
+                    { title: "חיפוש חכם ללא הגבלה", desc: "סריקה אקטיבית של השוק למציאת משרות התואמות בדיוק את פרופיל הייעוץ שנבנה עבורך." },
+                    { title: "התאמה לאילוצים אישיים", desc: "איתור משרות המתחשבות בצרכים ספציפיים כגון שירות מילואים, הריון, הורות ודרישות גמישות (היברידי/מרחוק)." },
+                    { title: "גישה לשוק הנסתר", desc: "חשיפת הזדמנויות תעסוקתיות בחברות רלוונטיות עוד לפני שהן מתפרסמות בערוצים הרגילים." },
+                  ],
+                  bulletsEn: [
+                    { title: "Smart Unlimited Search", desc: "Active market scanning to find positions that exactly match the career profile built for you." },
+                    { title: "Adaptation to Personal Constraints", desc: "Finding positions that account for specific needs such as military reserve duty, pregnancy, parenthood, and flexibility (hybrid/remote)." },
+                    { title: "Access to the Hidden Market", desc: "Uncovering employment opportunities at relevant companies before they're published through regular channels." },
+                  ],
+                },
+                {
+                  icon: "🚀",
+                  titleHe: "בניית ושדרוג קורות חיים עם AI",
+                  titleEn: "CV Building & AI-Powered Optimization",
+                  descHe: "יצירת קורות חיים מנצחים מ-0 או שדרוג קיימים — מותאמים ל-ATS ולדרישות המשרה.",
+                  descEn: "Build a winning CV from scratch or upgrade an existing one — tailored to ATS systems and job requirements.",
+                  bulletsHe: [
+                    { title: "יצירה מ-0 בסטנדרט גלובלי", desc: "בניית מסמך מקצועי ומנצח בעברית או באנגלית המותאם למערכות הסינון (ATS)." },
+                    { title: "שינוי תבניות (Formatting)", desc: "אפשרות להעלאת קובץ קיים והלבשתו על תבניות עיצוב מודרניות ומרשימות בלחיצת כפתור." },
+                    { title: "אופטימיזציה של התוכן", desc: "הפיכת רשימת מטלות יבשה לתיאור הישגים מדידים ומרשימים (Impact-driven)." },
+                    { title: "דיוק מילות מפתח", desc: "התאמת הניסיון התעסוקתי לדרישות המשרה כדי למשוך את תשומת לב המגייסים." },
+                    { title: "סיכום מקצועי מנצח", desc: 'כתיבת פסקת פתיחה ("Summary") המזקקת את הערך המוסף הייחודי שלך.' },
+                  ],
+                  bulletsEn: [
+                    { title: "Built from Scratch, Global Standard", desc: "Creating a professional, winning document in Hebrew or English, tailored to ATS filtering systems." },
+                    { title: "Template Formatting", desc: "Option to upload an existing file and apply modern, impressive design templates with one click." },
+                    { title: "Content Optimization", desc: "Transforming a dry task list into descriptions of measurable, impressive achievements (Impact-driven)." },
+                    { title: "Keyword Precision", desc: "Matching work experience to job requirements to attract recruiter attention." },
+                    { title: "Winning Professional Summary", desc: 'Writing an opening paragraph ("Summary") that distills your unique added value.' },
+                  ],
+                },
+              ] as const).map((item, i, arr) => {
+                const isOpen = openFeature === i;
+                const bullets = lang === "he" ? item.bulletsHe : item.bulletsEn;
+                return (
+                  <div key={item.titleEn} className={i < arr.length - 1 ? "border-b border-white/10" : ""}>
+                    <button
+                      onClick={() => setOpenFeature(isOpen ? null : i)}
+                      className="w-full flex items-start gap-4 px-5 py-4 text-start hover:bg-white/5 transition-colors"
+                    >
+                      <span className="text-2xl flex-shrink-0 mt-0.5">{item.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-bold text-sm mb-1">
+                          {lang === "he" ? item.titleHe : item.titleEn}
+                        </p>
+                        <p className="text-white/60 text-sm leading-relaxed">
+                          {lang === "he" ? item.descHe : item.descEn}
+                        </p>
+                      </div>
+                      <svg
+                        className={`w-4 h-4 text-white/40 flex-shrink-0 mt-1.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {isOpen && (
+                      <div className="px-5 pb-4 border-t border-white/10 bg-white/3">
+                        <ul className="mt-3 space-y-2.5">
+                          {bullets.map((b, j) => (
+                            <li key={j} className="flex items-start gap-2.5 text-sm">
+                              <svg className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-white/75 leading-relaxed">
+                                <span className="text-white font-semibold">{b.title}</span>
+                                {b.desc ? `: ${b.desc}` : ""}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Free CTA */}
-        <div className="flex flex-col items-center gap-3 mt-2 mb-10 md:mb-12">
+        <div className="flex flex-col items-center gap-3 mt-2 mb-8 md:mb-10">
           <div className="relative">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500 to-emerald-500 blur-md opacity-40 animate-pulse pointer-events-none" />
             <button
@@ -283,62 +283,63 @@ interface PlanProps {
   cta: string;
   onCtaClick: () => void;
   variant: "free" | "weekly" | "popular" | "pro";
+  compact?: boolean;
 }
 
-function PlanCard({ name, badge, oldPrice, price, per, tagline, features, cta, onCtaClick, variant }: PlanProps) {
+function PlanCard({ name, badge, oldPrice, price, per, tagline, features, cta, onCtaClick, variant, compact = false }: PlanProps) {
   const variantClasses = {
     free: {
       wrap: "bg-white/5 border-white/10",
       accent: "text-white",
       cta: "bg-white/10 hover:bg-white/15 border border-white/20 text-white",
+      badge: "",
     },
     weekly: {
       wrap: "bg-white/5 border-sky-500/20",
       accent: "text-sky-300",
       cta: "bg-sky-500 hover:bg-sky-400 text-slate-900 font-semibold",
+      badge: "bg-sky-500 text-slate-900",
     },
     popular: {
-      wrap: "bg-gradient-to-br from-purple-600/20 via-white/5 to-emerald-600/20 border-purple-500/50 shadow-2xl shadow-purple-500/20 lg:-translate-y-2 lg:scale-[1.02]",
+      wrap: `bg-gradient-to-br from-purple-600/20 via-white/5 to-emerald-600/20 border-purple-500/50 shadow-xl shadow-purple-500/20${compact ? "" : " lg:-translate-y-2 lg:scale-[1.02]"}`,
       accent: "text-purple-300",
       cta: "bg-purple-600 hover:bg-purple-500 text-white",
+      badge: "bg-gradient-to-r from-purple-500 to-emerald-500 text-white",
     },
     pro: {
       wrap: "bg-white/5 border-white/10",
       accent: "text-amber-300",
       cta: "bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold",
+      badge: "bg-amber-500 text-slate-900",
     },
   }[variant];
 
   return (
-    <div className={`relative rounded-3xl p-6 backdrop-blur-sm border transition-all ${variantClasses.wrap}`}>
+    <div className={`relative rounded-2xl ${compact ? "p-3" : "p-4"} backdrop-blur-sm border transition-all ${variantClasses.wrap}`}>
       {badge && (
-        <div className={`absolute -top-3 start-6 text-xs font-bold px-3 py-1 rounded-full ${
-          variant === "popular" ? "bg-gradient-to-r from-purple-500 to-emerald-500 text-white"
-          : variant === "weekly" ? "bg-sky-500 text-slate-900"
-          : "bg-amber-500 text-slate-900"
-        }`}>
+        <div className={`absolute -top-2.5 ${compact ? "start-2 text-[10px] px-2 py-0.5" : "start-5 text-xs px-3 py-1"} font-bold rounded-full ${variantClasses.badge}`}>
           {badge}
         </div>
       )}
 
-      <div className="mb-6">
-        <h3 className={`text-lg font-semibold mb-2 ${variantClasses.accent}`}>{name}</h3>
-        <div className="flex items-baseline gap-2 mb-1">
-          {oldPrice && <span className="text-white/40 line-through text-lg">{oldPrice}</span>}
-          <span className="text-4xl font-bold text-white">{price}</span>
-          {per && <span className="text-white/50 text-sm">{per}</span>}
+      <div className={compact ? "mb-2.5" : "mb-3"}>
+        <h3 className={`${compact ? "text-sm" : "text-base"} font-semibold mb-1 ${variantClasses.accent}`}>{name}</h3>
+        <div className="flex items-baseline gap-1 mb-1 flex-wrap">
+          {oldPrice && <span className="text-white/40 line-through text-xs">{oldPrice}</span>}
+          <span className={`${compact ? "text-2xl" : "text-3xl"} font-bold text-white leading-none`}>{price}</span>
+          {per && <span className="text-white/50 text-xs">{per}</span>}
         </div>
-        <p className="text-white/60 text-sm">{tagline}</p>
+        <p className="text-white/60 text-xs leading-snug">{tagline}</p>
       </div>
 
       <button
         onClick={onCtaClick}
-        className={`w-full py-3 px-2 rounded-xl font-semibold transition mb-6 text-sm sm:text-base truncate ${variantClasses.cta}`}
+        className={`w-full ${compact ? "py-2 text-xs" : "py-2.5 text-sm"} px-2 rounded-xl font-semibold transition truncate ${variantClasses.cta}`}
       >
         {cta}
       </button>
 
-      <ul className="space-y-2.5">
+      <ul className="space-y-2.5 mt-3">
         {features.map((f, i) => (
           <li key={i} className="flex items-start gap-2 text-sm">
             <svg
