@@ -3,7 +3,6 @@
 import { AppMode } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
-import LogoMark from "./LogoMark";
 
 interface Props {
   onChoose: (mode: AppMode) => void;
@@ -12,48 +11,81 @@ interface Props {
 export default function HeroSection({ onChoose }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
+  const he = lang === "he";
+
+  const stats = [
+    { value: "2,400+", label: he ? "משתמשים" : "Users" },
+    { value: "4.8★", label: he ? "דירוג ממוצע" : "Avg rating" },
+    { value: "50+", label: he ? "תחומי עיסוק" : "Fields" },
+    { value: "100%", label: he ? "בעברית" : "In Hebrew" },
+  ];
 
   return (
-    <section className="md:min-h-[90vh] flex items-start md:items-center justify-center px-4 pt-12 pb-10 md:py-24 relative overflow-hidden">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-40"
-        aria-hidden
-      >
-        <div className="absolute top-1/4 start-1/4 w-40 h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 bg-purple-500/30 rounded-full blur-3xl animate-pulse [animation-duration:6s]" />
-        <div className="absolute bottom-1/4 end-1/4 w-40 h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 bg-emerald-500/20 rounded-full blur-3xl animate-pulse [animation-duration:8s] [animation-delay:1s]" />
+    <section className="relative overflow-hidden min-h-[88vh] flex items-center justify-center px-4 pt-12 pb-20 md:py-32">
+      {/* Background glows */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(120,40,200,0.22),transparent)]" />
+        <div className="absolute top-1/3 -start-40 w-[500px] h-[500px] bg-purple-700/[0.09] rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -end-40 w-[400px] h-[400px] bg-violet-600/[0.07] rounded-full blur-3xl" />
       </div>
 
-      <div className="max-w-4xl text-center relative z-10 w-full">
-        <div className="flex justify-center mb-5 md:mb-8 animate-hero-in [animation-delay:0ms] animate-float">
-          <LogoMark size="lg" animate />
+      <div className="relative z-10 max-w-4xl mx-auto text-center w-full">
+        {/* Pill badge */}
+        <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/25 text-purple-300 text-xs font-semibold px-4 py-2 rounded-full mb-8 md:mb-10">
+          <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+          {he ? "ייעוץ קריירה מבוסס בינה מלאכותית" : "AI-Powered Career Advisor"}
         </div>
 
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.15] mb-4 md:mb-6 tracking-tight animate-hero-in [animation-delay:100ms]">
-          {tx.heroTitle}
+        {/* Headline */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-bold text-white leading-[1.12] mb-6 md:mb-7 tracking-tight">
+          {he ? (
+            <>
+              <span>המהלך הקרייריסטי הבא שלך</span>
+              <br />
+              <span className="bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
+                מעולם לא היה ברור יותר
+              </span>
+            </>
+          ) : (
+            <>
+              <span>Your next career move</span>
+              <br />
+              <span className="bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
+                has never been clearer
+              </span>
+            </>
+          )}
         </h1>
 
-        <p className="text-white/70 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-7 md:mb-10 animate-hero-in [animation-delay:250ms]">
+        <p className="text-white/60 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-10 md:mb-12">
           {tx.heroSubtitle}
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8 md:mb-12 animate-hero-in [animation-delay:400ms]">
+        {/* CTA buttons */}
+        <div className="flex flex-col sm:flex-row gap-3.5 justify-center items-center mb-14 md:mb-20">
           <button
             onClick={() => onChoose("advisor")}
-            className="w-full sm:w-auto bg-purple-600 hover:bg-purple-500 text-white font-semibold px-7 py-3.5 md:px-8 md:py-4 rounded-xl transition-all shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105 active:scale-95"
+            className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-fuchsia-500 text-white font-semibold px-9 py-4 rounded-xl transition-all shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-[1.03] active:scale-[0.97] text-base"
           >
             {tx.heroPrimaryCta}
           </button>
           <button
             onClick={() => onChoose("jobs")}
-            className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-white/20 hover:border-white/40 text-white font-medium px-7 py-3.5 md:px-8 md:py-4 rounded-xl transition-all hover:scale-105 active:scale-95"
+            className="w-full sm:w-auto bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.13] hover:border-white/[0.28] text-white font-medium px-9 py-4 rounded-xl transition-all hover:scale-[1.03] active:scale-[0.97] text-base"
           >
             {tx.heroSecondaryCta}
           </button>
         </div>
 
-        <p className="text-white/40 text-xs md:text-sm animate-hero-in [animation-delay:600ms] px-4">
-          {tx.trustBar}
-        </p>
+        {/* Stats bar */}
+        <div className="flex flex-wrap justify-center items-center gap-x-10 gap-y-5 md:gap-x-16">
+          {stats.map((s, i) => (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <span className="text-white font-bold text-xl md:text-2xl leading-none">{s.value}</span>
+              <span className="text-white/38 text-xs tracking-wide">{s.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

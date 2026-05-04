@@ -2,11 +2,9 @@
 
 import { AppMode } from "@/lib/types";
 import HeroSection from "./HeroSection";
-import PainPoints from "./PainPoints";
+import FeaturesGrid from "./FeaturesGrid";
 import HowItWorks from "./HowItWorks";
 import ServicesIntro from "./ServicesIntro";
-import AllFields from "./AllFields";
-import JobMarketFacts from "./JobMarketFacts";
 import HighlightedReviews from "./HighlightedReviews";
 import FaqSection from "./FaqSection";
 import FinalCTA from "./FinalCTA";
@@ -17,7 +15,7 @@ interface Props {
   onChoose: (mode: AppMode) => void;
 }
 
-const Divider = () => <div className="border-t border-white/5" />;
+const Divider = () => <div className="border-t border-white/[0.05]" />;
 
 export default function HomeLanding({ onChoose }: Props) {
   return (
@@ -26,7 +24,7 @@ export default function HomeLanding({ onChoose }: Props) {
 
       <Divider />
       <FadeIn>
-        <PainPoints />
+        <FeaturesGrid />
       </FadeIn>
 
       <Divider />
@@ -39,16 +37,6 @@ export default function HomeLanding({ onChoose }: Props) {
       <Divider />
       <FadeIn>
         <ServicesIntro onChoose={onChoose} />
-      </FadeIn>
-
-      <Divider />
-      <FadeIn>
-        <AllFields />
-      </FadeIn>
-
-      <Divider />
-      <FadeIn>
-        <JobMarketFacts />
       </FadeIn>
 
       <Divider />
