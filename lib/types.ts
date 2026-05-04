@@ -64,11 +64,19 @@ export interface DiagnosisAnswer {
   answer: string;
 }
 
+export interface MarketReality {
+  salaryRange: string;
+  trainingNeeded: string;
+  marketDemand: string;
+  timeToEntry: string;
+}
+
 export interface CareerPath {
   title: string;
   domain: string;
   reasoning: string;
   matchBridge: string;
+  marketReality?: MarketReality;
 }
 
 export interface DiagnosisResult {
@@ -84,7 +92,8 @@ export interface DiagnosisResult {
   // Career advisor fields
   reflection?: string;
   careerPaths?: CareerPath[];
-  tomorrowStep?: string;
+  tomorrowStep?: string; // legacy — kept for old saved states
+  weekOneSteps?: string[];
   realismNote?: string;
 }
 
@@ -170,6 +179,7 @@ export type AdvisorStage =
   | "diagnosis"
   | "direction"
   | "cv"
+  | "linkedin"
   | "strategy"
   | "done";
 
@@ -177,7 +187,87 @@ export const STAGE_ORDER: AdvisorStage[] = [
   "diagnosis",
   "direction",
   "cv",
+  "linkedin",
+  "strategy",
 ];
+
+export interface SkillGapResource {
+  title: string;
+  type: "course" | "book" | "video" | "practice";
+  platform?: string;
+  free: boolean;
+}
+
+export interface SkillGapItem {
+  skill: string;
+  importance: "high" | "medium" | "low";
+  currentLevel: "none" | "basic" | "intermediate";
+  resources: SkillGapResource[];
+}
+
+export interface JDFitResult {
+  score: number;
+  matchPoints: string[];
+  gapPoints: string[];
+  tips: string[];
+}
+
+export interface OnboardingPlan {
+  days30: string[];
+  days60: string[];
+  days90: string[];
+  completedAt: string;
+}
+
+export interface FreelanceKit {
+  pricingGuidance: string[];
+  legalSteps: string[];
+  firstClientSources: string[];
+  monthlyGoal: string;
+  completedAt: string;
+}
+
+export interface PracticalPrepSection {
+  category: string;
+  items: string[];
+}
+
+export interface PracticalPrep {
+  format: string;
+  whatToBring: string[];
+  whatToExpect: PracticalPrepSection[];
+  howToStandOut: string[];
+  completedAt: string;
+}
+
+export interface SalaryRange {
+  role: string;
+  junior: string;
+  mid: string;
+  senior: string;
+  notes: string;
+}
+
+export interface SalaryResearch {
+  ranges: SalaryRange[];
+  marketInsight: string;
+  negotiationTip: string;
+  completedAt: string;
+}
+
+export interface TransitionPhase {
+  name: string;
+  duration: string;
+  actions: string[];
+  milestone: string;
+}
+
+export interface TransitionRoadmap {
+  totalDuration: string;
+  phases: TransitionPhase[];
+  honestNote: string;
+  completedAt: string;
+}
 
 export interface AdvisorState {
   userProfile: UserProfile;
@@ -191,7 +281,30 @@ export interface AdvisorState {
   chosenPath: LifePath | null;
   cvSkipped: boolean;
   cvReview: CVReview | null;
+  linkedIn: LinkedInProfile | null;
+  linkedInSkipped: boolean;
   strategy: SearchStrategy | null;
   mockInterview: MockInterview | null;
+  skillGap?: SkillGapItem[] | null;
+  onboardingPlan?: OnboardingPlan | null;
+  jobSearchDeadline?: string | null;
+  freelanceKit?: FreelanceKit | null;
+  practicalPrep?: PracticalPrep | null;
+  salaryResearch?: SalaryResearch | null;
+  transitionRoadmap?: TransitionRoadmap | null;
   chatMessages: ChatMessage[];
+  lastVisitedAt?: string;
+}
+
+export type ApplicationStatus = "saved" | "applied" | "interview" | "offer" | "rejected";
+
+export interface JobApplication {
+  id: string;
+  job: JobResult;
+  status: ApplicationStatus;
+  savedAt: string;
+  appliedAt?: string;
+  interviewDate?: string;
+  notes?: string;
+  coverLetter?: string;
 }

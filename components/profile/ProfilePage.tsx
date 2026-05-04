@@ -29,7 +29,9 @@ const STAGE_LABELS: Record<string, { he: string; en: string }> = {
   diagnosis: { he: "מיפוי אישיות", en: "Personality" },
   direction:  { he: "כיוון חיים",  en: "Life direction" },
   cv:         { he: "קורות חיים",  en: "CV review" },
+  linkedin:   { he: "לינקדאין",    en: "LinkedIn" },
   strategy:   { he: "אסטרטגיה",   en: "Strategy" },
+  done:       { he: "הושלם",       en: "Done" },
 };
 
 const PATH_LABELS: Record<string, { he: string; en: string }> = {
@@ -278,7 +280,7 @@ function ArchivedSessionCard({ session, he }: { session: ArchivedAdvisorSession;
             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
               {snapshot.chosenPath && (
                 <span className="text-purple-300/70 text-xs bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">
-                  {he ? pathLabels[snapshot.chosenPath].he : pathLabels[snapshot.chosenPath].en}
+                  {he ? (pathLabels[snapshot.chosenPath]?.he ?? snapshot.chosenPath) : (pathLabels[snapshot.chosenPath]?.en ?? snapshot.chosenPath)}
                 </span>
               )}
               <span className={`text-xs px-2 py-0.5 rounded-full border ${
@@ -372,6 +374,8 @@ export default function ProfilePage() {
   const [conversations, setConversations] = useState<ConversationPreview[]>([]);
   const [loadingConvs, setLoadingConvs] = useState(true);
   const [plan, setPlan] = useState("free");
+  const [subscriptionData, setSubscriptionData] = useState<{ plan: string; expiryDate?: string; isExpired?: boolean; cardLast4?: string } | null>(null);
+  const [cancellingPlan, setCancellingPlan] = useState(false);
   const [userMeta, setUserMeta] = useState<UserMeta>({} as UserMeta);
   const [scoutData, setScoutData] = useState<import("@/lib/types").UserProfile["parsedData"]>({});
   const [cvs, setCvs] = useState<CvMeta[]>([]);
@@ -459,7 +463,12 @@ export default function ProfilePage() {
   useEffect(() => {
     fetch("/api/subscription")
       .then((r) => r.json())
-      .then((d) => { if (d?.plan) setPlan(d.plan); })
+      .then((d) => {
+        if (d?.plan) {
+          setPlan(d.plan);
+          setSubscriptionData(d);
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -524,7 +533,7 @@ export default function ProfilePage() {
     setUserMeta((prev) => ({ ...prev, ...patch }));
   }
 
-  const [activeSection, setActiveSection] = useState<"profile" | "advisor" | "searches" | "jobs" | "cvs">("profile");
+  const [activeSection, setActiveSection] = useState<"profile" | "advisor" | "searches" | "jobs" | "cvs" | "tracker">("profile");
 
   const router = useRouter();
   const user = session?.user;
@@ -558,12 +567,13 @@ export default function ProfilePage() {
   const mockDone        = !!advisor?.mockInterview?.finished;
   const professionalSummary = advisor?.cvReview?.rewrittenSummary ?? null;
 
-  const navItems: { id: "profile" | "advisor" | "searches" | "jobs" | "cvs"; labelHe: string; labelEn: string; badge?: number }[] = [
+  const navItems: { id: "profile" | "advisor" | "searches" | "jobs" | "cvs" | "tracker"; labelHe: string; labelEn: string; badge?: number }[] = [
     { id: "profile",  labelHe: "פרופיל",          labelEn: "Profile",       badge: undefined },
     { id: "advisor",  labelHe: "ייעוץ תעסוקתי",   labelEn: "Career Advisor", badge: completedCount > 0 ? completedCount : undefined },
     { id: "searches", labelHe: "חיפושי משרות",     labelEn: "Job Searches",   badge: conversations.length || undefined },
     { id: "jobs",     labelHe: "המשרות שלי",        labelEn: "My Jobs",        badge: allOfferedJobs.length || undefined },
     { id: "cvs",      labelHe: "קורות חיים",        labelEn: "My CVs",         badge: cvs.length || undefined },
+    { id: "tracker",  labelHe: "מעקב הגשות",        labelEn: "Applications",   badge: undefined },
   ];
 
   const navIcons: Record<string, React.ReactNode> = {
@@ -572,6 +582,7 @@ export default function ProfilePage() {
     searches: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>,
     jobs: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2" /></svg>,
     cvs: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
+    tracker: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>,
   };
 
   return (
@@ -663,6 +674,59 @@ export default function ProfilePage() {
                     <blockquote className="border-s-2 border-purple-500 ps-4 text-white/80 text-sm leading-relaxed">{professionalSummary}</blockquote>
                   </SectionCard>
                 )}
+
+                {/* Subscription management */}
+                <SectionCard>
+                  <SectionTitle>{he ? "מנוי" : "Subscription"}</SectionTitle>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${planMeta.cls}`}>
+                        {he ? planMeta.he : planMeta.en}
+                      </span>
+                      {subscriptionData?.expiryDate && plan !== "free" && (
+                        <span className="text-white/40 text-xs">
+                          {he ? "תוקף עד" : "Expires"} {new Date(subscriptionData.expiryDate).toLocaleDateString(he ? "he-IL" : "en-US", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
+                      )}
+                      {plan !== "free" && !subscriptionData?.expiryDate && (
+                        <span className="text-emerald-400 text-xs flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                          {he ? "פעיל" : "Active"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {plan === "free" ? (
+                        <Link href="/pricing" className="text-xs bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold px-3 py-1.5 rounded-lg transition">
+                          {he ? "שדרג ↑" : "Upgrade ↑"}
+                        </Link>
+                      ) : (
+                        <button
+                          disabled={cancellingPlan}
+                          onClick={async () => {
+                            if (!window.confirm(he ? "לבטל את המנוי? הגישה תשמר עד תאריך התפוגה." : "Cancel subscription? Access remains until expiry date.")) return;
+                            setCancellingPlan(true);
+                            try {
+                              await fetch("/api/subscription", { method: "DELETE" });
+                              setPlan("free");
+                              setSubscriptionData(null);
+                            } finally {
+                              setCancellingPlan(false);
+                            }
+                          }}
+                          className="text-xs text-rose-400/70 hover:text-rose-400 border border-rose-500/20 hover:border-rose-500/40 px-3 py-1.5 rounded-lg transition disabled:opacity-40"
+                        >
+                          {cancellingPlan ? "..." : (he ? "בטל מנוי" : "Cancel plan")}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  {subscriptionData?.cardLast4 && plan !== "free" && (
+                    <p className="text-white/30 text-xs mt-2">
+                      {he ? `כרטיס: ••••${subscriptionData.cardLast4}` : `Card: ••••${subscriptionData.cardLast4}`}
+                    </p>
+                  )}
+                </SectionCard>
               </>
             )}
 
@@ -723,7 +787,7 @@ export default function ProfilePage() {
                               {done ? <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg> : <span>{i + 1}</span>}
                             </div>
                             <span className={`text-xs text-center leading-tight px-1 ${done ? "text-green-400" : current ? "text-purple-300" : "text-white/30"}`}>
-                              {he ? STAGE_LABELS[stage].he : STAGE_LABELS[stage].en}
+                              {he ? (STAGE_LABELS[stage]?.he ?? stage) : (STAGE_LABELS[stage]?.en ?? stage)}
                             </span>
                           </div>
                           {i < STAGE_ORDER.length - 1 && <div className={`h-0.5 w-8 mt-4 flex-shrink-0 ${done ? "bg-green-500" : "bg-white/10"}`} />}
@@ -747,7 +811,7 @@ export default function ProfilePage() {
                     <div className="mt-5 pt-4 border-t border-white/10 flex items-center gap-2 flex-wrap">
                       <span className="text-white/40 text-xs">{he ? "המסלול שנבחר:" : "Chosen path:"}</span>
                       <span className="text-purple-300 text-xs font-medium bg-purple-500/20 border border-purple-500/30 px-2.5 py-1 rounded-full">
-                        {he ? PATH_LABELS[advisor.chosenPath].he : PATH_LABELS[advisor.chosenPath].en}
+                        {he ? PATH_LABELS[advisor.chosenPath]?.he ?? advisor.chosenPath : PATH_LABELS[advisor.chosenPath]?.en ?? advisor.chosenPath}
                       </span>
                       {advisor.diagnosis?.strengths.slice(0, 2).map((s) => (
                         <span key={s} className="text-white/40 text-xs bg-white/5 px-2 py-0.5 rounded-full">{s}</span>
@@ -811,7 +875,7 @@ export default function ProfilePage() {
                         const lines: string[] = [];
                         if (advisor.diagnosis?.topRoles?.length) lines.push(`תפקידים שמתאימים לי: ${advisor.diagnosis.topRoles.join(", ")}`);
                         if (advisor.strategy?.targetCompanies?.length) lines.push(`חברות יעד: ${advisor.strategy.targetCompanies.map((c) => c.name).join(", ")}`);
-                        if (advisor.chosenPath) lines.push(`מסלול: ${he ? PATH_LABELS[advisor.chosenPath].he : PATH_LABELS[advisor.chosenPath].en}`);
+                        if (advisor.chosenPath) lines.push(`מסלול: ${he ? PATH_LABELS[advisor.chosenPath]?.he ?? advisor.chosenPath : PATH_LABELS[advisor.chosenPath]?.en ?? advisor.chosenPath}`);
                         if (advisor.diagnosis?.strengths?.length) lines.push(`חוזקות: ${advisor.diagnosis.strengths.slice(0, 3).join(", ")}`);
                         queueAdvisorScoutContext(lines.join("\n"));
                         queueAutoStart("jobs");
@@ -927,6 +991,40 @@ export default function ProfilePage() {
                     ))}
                   </div>
                 )}
+              </SectionCard>
+            )}
+
+            {/* ── APPLICATION TRACKER ── */}
+            {activeSection === "tracker" && (
+              <SectionCard>
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <SectionTitle>{he ? "מעקב הגשות" : "Application Tracker"}</SectionTitle>
+                    <p className="text-white/40 text-sm">{he ? "עקוב אחר כל ההגשות שלך במקום אחד" : "Track all your applications in one place"}</p>
+                  </div>
+                  <Link
+                    href="/tracker"
+                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition"
+                  >
+                    {he ? "פתח לוח מעקב" : "Open Tracker"}
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </Link>
+                </div>
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 text-center">
+                  <svg className="w-10 h-10 text-white/15 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                  <p className="text-white/40 text-sm leading-relaxed">
+                    {he
+                      ? "שמור משרות מ-Scout, עקוב אחרי סטטוס ההגשה, קבל תזכורות ועוד."
+                      : "Save jobs from Scout, track application status, get follow-up reminders and more."}
+                  </p>
+                  <Link href="/tracker" className="inline-block mt-4 text-purple-400 hover:text-purple-300 text-sm font-semibold transition">
+                    {he ? "עבור ללוח המעקב ←" : "Go to Tracker ←"}
+                  </Link>
+                </div>
               </SectionCard>
             )}
 

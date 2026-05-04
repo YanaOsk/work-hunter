@@ -16,7 +16,8 @@ export default function PreJourneyIntro({ onStart, onExit }: Props) {
     { num: 1, title: tx.preIntroStage1, desc: tx.preIntroStage1Desc, color: "emerald" },
     { num: 2, title: tx.preIntroStage2, desc: tx.preIntroStage2Desc, color: "purple" },
     { num: 3, title: tx.preIntroStage3, desc: tx.preIntroStage3Desc, color: "blue" },
-    { num: 4, title: tx.preIntroStage4, desc: tx.preIntroStage4Desc, color: "amber" },
+    { num: 4, title: tx.preIntroStage4, desc: tx.preIntroStage4Desc, color: "sky" },
+    { num: 5, title: tx.preIntroStage5, desc: tx.preIntroStage5Desc, color: "amber" },
   ];
 
   const colorMap: Record<string, { dot: string; num: string }> = {

@@ -55,6 +55,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
   const he = lang === "he";
   const [open, setOpen] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [imgError, setImgError] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const planBadge = PLAN_BADGE[plan] ?? null;
 
@@ -92,7 +93,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
   if (session?.user) {
     const user = session.user;
     const initials = user.name?.charAt(0).toUpperCase() || "?";
-    const displayImage = profileImage ?? user.image ?? null;
+    const displayImage = imgError ? null : (profileImage ?? user.image ?? null);
 
     return (
       <div className="relative" ref={ref}>
@@ -107,6 +108,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
               src={displayImage}
               alt={user.name || ""}
               className="w-[30px] h-[30px] rounded-full flex-shrink-0 object-cover"
+              onError={() => setImgError(true)}
             />
           ) : (
             <div className="w-[30px] h-[30px] rounded-full bg-purple-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
@@ -138,7 +140,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
             <div className="px-4 py-3.5 border-b border-white/10 flex items-center gap-3">
               {displayImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={displayImage} alt="" className="w-[38px] h-[38px] rounded-full flex-shrink-0 object-cover" />
+                <img src={displayImage} alt="" className="w-[38px] h-[38px] rounded-full flex-shrink-0 object-cover" onError={() => setImgError(true)} />
               ) : (
                 <div className="w-[38px] h-[38px] rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
                   {initials}

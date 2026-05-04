@@ -26,7 +26,7 @@ function SignInContent() {
   const router = useRouter();
   const { status } = useSession();
   // callbackUrl is set by NextAuth middleware when redirecting unauthenticated users
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const [tab, setTab] = useState<Tab>("signin");
   const [name, setName] = useState("");
@@ -40,7 +40,7 @@ function SignInContent() {
 
   useEffect(() => {
     if (status === "authenticated" && !showWelcome) {
-      router.replace(callbackUrl);
+      router.replace(callbackUrl ?? "/");
     }
   }, [status, router, callbackUrl, showWelcome]);
 
@@ -95,7 +95,7 @@ function SignInContent() {
           setLoading(false);
           return;
         }
-        window.location.href = callbackUrl ?? "/profile";
+        window.location.href = callbackUrl ?? "/";
       }
     } catch {
       setError(tx.authInvalidCreds);
@@ -195,16 +195,25 @@ function SignInContent() {
               autoComplete={tab === "register" ? "email" : "username"}
               className="w-full bg-white/5 border border-white/15 focus:border-purple-500 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none text-sm transition"
             />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setError(""); }}
-              placeholder={tab === "register" ? tx.authPasswordRegPh : tx.authPasswordPh}
-              required
-              minLength={tab === "register" ? 8 : 1}
-              autoComplete={tab === "register" ? "new-password" : "current-password"}
-              className="w-full bg-white/5 border border-white/15 focus:border-purple-500 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none text-sm transition"
-            />
+            <div className="space-y-1">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                placeholder={tab === "register" ? tx.authPasswordRegPh : tx.authPasswordPh}
+                required
+                minLength={tab === "register" ? 8 : 1}
+                autoComplete={tab === "register" ? "new-password" : "current-password"}
+                className="w-full bg-white/5 border border-white/15 focus:border-purple-500 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none text-sm transition"
+              />
+              {tab === "signin" && (
+                <div className="text-end">
+                  <a href="/auth/forgot-password" className="text-white/35 hover:text-purple-400 text-xs transition">
+                    {lang === "he" ? "שכחתי סיסמה" : "Forgot password?"}
+                  </a>
+                </div>
+              )}
+            </div>
 
             {error && <p className="text-red-400 text-sm px-1">{error}</p>}
 

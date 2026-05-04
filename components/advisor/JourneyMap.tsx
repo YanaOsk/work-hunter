@@ -1,12 +1,15 @@
 "use client";
 
 import { AdvisorStage, AdvisorState, STAGE_ORDER } from "@/lib/types";
+import { CompletionSnapshot } from "@/lib/advisorState";
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
 
 interface Props {
   advisorState: AdvisorState;
+  previousSnapshot: CompletionSnapshot | null;
   onStartStage: (stage: AdvisorStage) => void;
+  onRedoStage: (stage: AdvisorStage) => void;
   onOpenChat: () => void;
   onOpenSummary: () => void;
   onOpenInterview: () => void;
@@ -16,14 +19,18 @@ interface Props {
 type StageStatus = "done" | "skipped" | "current" | "locked";
 
 function getStageStatus(stage: AdvisorStage, state: AdvisorState): StageStatus {
+  const isSkippedStage =
+    (stage === "cv" && state.cvSkipped) ||
+    (stage === "linkedin" && state.linkedInSkipped);
+
   if (state.currentStage === "done") {
-    if (stage === "cv" && state.cvSkipped) return "skipped";
+    if (isSkippedStage) return "skipped";
     return "done";
   }
   const currentIdx = STAGE_ORDER.indexOf(state.currentStage);
   const stageIdx = STAGE_ORDER.indexOf(stage);
   if (stageIdx < currentIdx) {
-    if (stage === "cv" && state.cvSkipped) return "skipped";
+    if (isSkippedStage) return "skipped";
     return "done";
   }
   if (stageIdx === currentIdx) return "current";
@@ -33,7 +40,7 @@ function getStageStatus(stage: AdvisorStage, state: AdvisorState): StageStatus {
 type TxKey = keyof typeof t.he;
 
 const STAGE_CONFIG: Record<
-  Exclude<AdvisorStage, "done" | "strategy">,
+  Exclude<AdvisorStage, "done">,
   {
     titleKey: TxKey;
     descKey: TxKey;
@@ -84,11 +91,41 @@ const STAGE_CONFIG: Record<
     },
     duration: "~12 min",
   },
+  linkedin: {
+    titleKey: "toolLinkedin",
+    descKey: "toolLinkedinDesc",
+    icon: "M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z M4 6a2 2 0 100-4 2 2 0 000 4z",
+    color: {
+      ring: "ring-sky-500 shadow-sky-500/30",
+      icon: "text-sky-300 bg-sky-500/20",
+      badge: "bg-sky-500/20 text-sky-300",
+      card: "border-sky-500/30 bg-sky-500/5",
+      glow: "from-sky-600/20",
+      num: "text-sky-400",
+    },
+    duration: "~5 min",
+  },
+  strategy: {
+    titleKey: "toolStrategy",
+    descKey: "toolStrategyDesc",
+    icon: "M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7",
+    color: {
+      ring: "ring-amber-500 shadow-amber-500/30",
+      icon: "text-amber-300 bg-amber-500/20",
+      badge: "bg-amber-500/20 text-amber-300",
+      card: "border-amber-500/30 bg-amber-500/5",
+      glow: "from-amber-600/20",
+      num: "text-amber-400",
+    },
+    duration: "~8 min",
+  },
 };
 
 export default function JourneyMap({
   advisorState,
+  previousSnapshot,
   onStartStage,
+  onRedoStage,
   onOpenChat,
   onOpenSummary,
   onOpenInterview,
@@ -98,6 +135,19 @@ export default function JourneyMap({
   const tx = t[lang];
   const name = advisorState.userProfile.parsedData?.name || "";
   const isDone = advisorState.currentStage === "done";
+
+  const lastVisited = advisorState.lastVisitedAt;
+  const isReturning = !!lastVisited && (() => {
+    const diff = Date.now() - new Date(lastVisited).getTime();
+    return diff > 60 * 60 * 1000; // more than 1 hour ago
+  })();
+  const lastVisitedLabel = lastVisited ? (() => {
+    const diff = Date.now() - new Date(lastVisited).getTime();
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (days >= 1) return lang === "he" ? `לפני ${days} ${days === 1 ? "יום" : "ימים"}` : `${days} day${days > 1 ? "s" : ""} ago`;
+    return lang === "he" ? `לפני ${hours} שעות` : `${hours}h ago`;
+  })() : "";
 
   const completedCount = STAGE_ORDER.filter((s) => {
     const status = getStageStatus(s, advisorState);
@@ -123,6 +173,64 @@ export default function JourneyMap({
             {tx.advisorChatTitle}
           </button>
         </div>
+
+        {/* Welcome back banner */}
+        {isReturning && !isDone && (
+          <div className="mb-5 flex items-center gap-3 bg-purple-500/10 border border-purple-500/20 rounded-2xl px-4 py-3">
+            <span className="text-xl">👋</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-semibold text-sm">
+                {tx.welcomeBack.replace("{name}", name || "")}
+              </p>
+              <p className="text-white/40 text-xs">
+                {tx.lastVisited.replace("{time}", lastVisitedLabel)}
+              </p>
+            </div>
+            <span className="text-purple-300 text-xs font-medium whitespace-nowrap">
+              {tx.continueJourney}
+            </span>
+          </div>
+        )}
+
+        {/* Previous session comparison — shown only when starting fresh */}
+        {previousSnapshot && !advisorState.diagnosis && !isDone && (() => {
+          const snap = previousSnapshot;
+          const daysAgo = Math.floor((Date.now() - new Date(snap.completedAt).getTime()) / 86400000);
+          const dateLabel = daysAgo === 0
+            ? (lang === "he" ? "היום" : "today")
+            : daysAgo === 1
+            ? (lang === "he" ? "אתמול" : "yesterday")
+            : lang === "he" ? `לפני ${daysAgo} ימים` : `${daysAgo} days ago`;
+          return (
+            <div className="mb-5 bg-blue-500/10 border border-blue-500/20 rounded-2xl px-4 py-3 space-y-2">
+              <p className="text-blue-300 text-xs font-semibold uppercase tracking-wide">
+                {tx.sessionPrevious} · {dateLabel}
+              </p>
+              <div className="flex flex-wrap gap-4">
+                {snap.cvScore !== undefined && (
+                  <div>
+                    <p className="text-white/40 text-[10px]">{lang === "he" ? "ציון קו\"ח" : "CV score"}</p>
+                    <p className="text-white font-bold text-sm">{snap.cvScore}<span className="text-white/30 text-xs">/100</span></p>
+                  </div>
+                )}
+                {snap.topRoles?.[0] && (
+                  <div>
+                    <p className="text-white/40 text-[10px]">{lang === "he" ? "תפקיד מוביל" : "Top role"}</p>
+                    <p className="text-white font-bold text-sm">{snap.topRoles[0]}</p>
+                  </div>
+                )}
+                {snap.chosenPath && (
+                  <div>
+                    <p className="text-white/40 text-[10px]">{lang === "he" ? "מסלול" : "Path"}</p>
+                    <p className="text-white font-bold text-sm">
+                      {snap.chosenPath === "employee" ? (lang === "he" ? "שכיר" : "Employee") : snap.chosenPath === "entrepreneur" ? (lang === "he" ? "יזם" : "Entrepreneur") : (lang === "he" ? "לימודים" : "Studies")}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Header */}
         <div className="mb-8">
@@ -151,7 +259,7 @@ export default function JourneyMap({
         <div className="space-y-3 mb-8">
           {STAGE_ORDER.map((stage, i) => {
             const status = getStageStatus(stage, advisorState);
-            const cfg = STAGE_CONFIG[stage as Exclude<AdvisorStage, "done" | "strategy">];
+            const cfg = STAGE_CONFIG[stage as Exclude<AdvisorStage, "done">];
             const isCurrent = status === "current";
             const isDoneSt = status === "done";
             const isSkipped = status === "skipped";
@@ -270,6 +378,19 @@ export default function JourneyMap({
                     </div>
                   )}
                 </button>
+
+                {/* Redo button — outside outer button to avoid invalid button nesting */}
+                {(isDoneSt || isSkipped) && (
+                  <button
+                    onClick={() => onRedoStage(stage)}
+                    className="absolute bottom-3.5 end-4 text-xs text-white/30 hover:text-white/70 transition flex items-center gap-1"
+                  >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    {tx.stageRedo}
+                  </button>
+                )}
               </div>
             );
           })}

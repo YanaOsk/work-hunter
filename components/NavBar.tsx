@@ -25,31 +25,34 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
     { href: "/cv-builder", label: tx.navCvBuilder },
     ...(!isAuthenticated ? [{ href: "/pricing", label: tx.navPricing }] : []),
     { href: "/reviews", label: tx.navReviews },
+    ...(isAuthenticated ? [{ href: "/tracker", label: tx.navTracker }] : []),
   ];
 
   return (
     <nav className="bg-slate-900/40 backdrop-blur-2xl border-b border-white/[0.08]">
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between gap-4">
-        <a
-          href="/"
-          className="flex items-center gap-2.5 flex-shrink-0 hover:opacity-90 transition"
-        >
-          <LogoMark size="sm" />
-          <span className="text-white font-semibold tracking-tight">
-            Work Hunter
-          </span>
-        </a>
+        <div className="flex items-center gap-6">
+          <a
+            href="/"
+            className="flex items-center gap-2.5 flex-shrink-0 hover:opacity-90 transition"
+          >
+            <LogoMark size="sm" />
+            <span className="text-white font-semibold tracking-tight">
+              Work Hunter
+            </span>
+          </a>
 
-        <div className="hidden md:flex items-center gap-6">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-white/70 hover:text-white text-sm transition"
-            >
-              {l.label}
-            </Link>
-          ))}
+          <div className="hidden md:flex items-center gap-6">
+            {links.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="text-white/70 hover:text-white text-sm transition"
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

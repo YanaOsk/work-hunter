@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useRef, DragEvent } from "react";
+import { useState, useRef, useEffect, DragEvent } from "react";
+import { useSession } from "next-auth/react";
 import { UserProfile } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
+import { DEFAULT_ADVISOR_ID, getAdvisorState } from "@/lib/advisorState";
 import ScoutRobot from "./ScoutRobot";
 import FaqSection from "./FaqSection";
 import SiteFooter from "./SiteFooter";
@@ -16,13 +18,23 @@ export default function UploadPhase({ onComplete }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
   const he = lang === "he";
+  const { data: session } = useSession();
   const [freeText, setFreeText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [parsedResult, setParsedResult] = useState<UserProfile | null>(null);
+  const [advisorProfile, setAdvisorProfile] = useState<UserProfile | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const profileId = session?.user?.id ?? DEFAULT_ADVISOR_ID;
+    const state = getAdvisorState(profileId);
+    if (state?.diagnosis && state.userProfile.parsedData?.name) {
+      setAdvisorProfile(state.userProfile);
+    }
+  }, [session?.user?.id]);
 
   const isAccepted = (f: File) =>
     f.type === "application/pdf" ||
@@ -90,6 +102,24 @@ export default function UploadPhase({ onComplete }: Props) {
 
           {/* Form card */}
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-6 sm:p-8 space-y-5">
+
+            {/* Advisor import banner */}
+            {advisorProfile && (
+              <div className="bg-purple-500/10 border border-purple-500/30 rounded-2xl px-4 py-3 flex items-center gap-3">
+                <span className="text-2xl flex-shrink-0">🎯</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-sm font-semibold">{tx.scoutAdvisorBanner}</p>
+                  <p className="text-white/50 text-xs truncate">{advisorProfile.parsedData?.name}</p>
+                </div>
+                <button
+                  onClick={() => onComplete(advisorProfile)}
+                  className="flex-shrink-0 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition"
+                >
+                  {tx.scoutAdvisorImport}
+                </button>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-purple-300 mb-2">{tx.tellMe}</label>
               <textarea

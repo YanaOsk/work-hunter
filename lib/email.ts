@@ -45,6 +45,29 @@ function getTransporter() {
   });
 }
 
+export async function sendPasswordResetEmail(email: string, resetUrl: string): Promise<void> {
+  const html = `<!DOCTYPE html>
+<html dir="rtl" lang="he"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#0f0e1a;font-family:'Segoe UI',Arial,sans-serif;color:#f0f0f5;direction:rtl">
+<div style="max-width:520px;margin:0 auto;padding:40px 16px">
+  <div style="text-align:center;margin-bottom:24px">
+    <div style="color:#a855f7;font-weight:800;font-size:18px">Work Hunter</div>
+  </div>
+  <div style="background:#1a1730;border:1px solid rgba(168,85,247,0.25);border-radius:24px;padding:36px 32px">
+    <h1 style="margin:0 0 12px;font-size:22px;font-weight:800">איפוס סיסמה 🔑</h1>
+    <p style="color:rgba(240,240,245,0.65);line-height:1.6;margin:0 0 24px">קיבלנו בקשה לאיפוס הסיסמה שלך.<br>לחץ/י על הכפתור כדי לאפס את הסיסמה — הקישור תקף לשעה אחת.</p>
+    <a href="${resetUrl}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:700;font-size:15px;padding:14px 32px;border-radius:12px;text-decoration:none">אפס/י סיסמה ←</a>
+    <p style="color:rgba(240,240,245,0.35);font-size:12px;margin-top:24px">אם לא ביקשת איפוס סיסמה, אפשר להתעלם ממייל זה.</p>
+  </div>
+</div></body></html>`;
+  await getTransporter().sendMail({
+    from: process.env.SMTP_FROM ?? "Work Hunter <noreply@workhunter.com>",
+    to: email,
+    subject: "איפוס סיסמה — Work Hunter",
+    html,
+  });
+}
+
 export async function sendPurchaseConfirmationEmail(
   toEmail: string,
   toName: string,

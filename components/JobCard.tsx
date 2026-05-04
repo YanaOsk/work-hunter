@@ -12,7 +12,16 @@ interface Props {
   saved?: boolean;
   onToggleSave?: () => void;
   onApplied?: () => void;
+  onFindSimilar?: (job: JobResult) => void;
   userSkills?: string[];
+}
+
+function detectJobType(title: string, description: string): "part-time" | "freelance" | "contract" | null {
+  const text = (title + " " + (description ?? "")).toLowerCase();
+  if (/משרה חלקית|part[\s-]time|חלקי\b/.test(text)) return "part-time";
+  if (/פרילנס|freelance/.test(text)) return "freelance";
+  if (/\bארעי|\bזמני|temporary|\bcontract\b|קבלני/.test(text)) return "contract";
+  return null;
 }
 
 function ScoreBadge({
@@ -121,11 +130,12 @@ function formatPostedDate(dateStr: string, lang: string): string {
   }
 }
 
-export default function JobCard({ job, rank, saved = false, onToggleSave, onApplied, userSkills = [] }: Props) {
+export default function JobCard({ job, rank, saved = false, onToggleSave, onApplied, onFindSimilar, userSkills = [] }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
   const [showCoverLetter, setShowCoverLetter] = useState(false);
   const [appliedToast, setAppliedToast] = useState(false);
+  const jobType = detectJobType(job.title, job.description);
 
   const handleViewJob = () => {
     if (!appliedToast) {
@@ -158,6 +168,21 @@ export default function JobCard({ job, rank, saved = false, onToggleSave, onAppl
             {job.isRemote && (
               <span className="text-xs bg-blue-500/20 border border-blue-500/30 text-blue-300 px-2 py-0.5 rounded-full">
                 {tx.remote}
+              </span>
+            )}
+            {jobType === "part-time" && (
+              <span className="text-xs bg-teal-500/20 border border-teal-500/30 text-teal-300 px-2 py-0.5 rounded-full">
+                {tx.jobTypePart}
+              </span>
+            )}
+            {jobType === "freelance" && (
+              <span className="text-xs bg-orange-500/20 border border-orange-500/30 text-orange-300 px-2 py-0.5 rounded-full">
+                {tx.jobTypeFreelance}
+              </span>
+            )}
+            {jobType === "contract" && (
+              <span className="text-xs bg-slate-500/20 border border-slate-400/30 text-slate-300 px-2 py-0.5 rounded-full">
+                {tx.jobTypeContract}
               </span>
             )}
           </div>
@@ -259,6 +284,17 @@ export default function JobCard({ job, rank, saved = false, onToggleSave, onAppl
           </svg>
           {tx.coverLetterBtn}
         </button>
+        {onFindSimilar && (
+          <button
+            onClick={() => onFindSimilar(job)}
+            className="inline-flex items-center gap-1.5 text-purple-400/70 hover:text-purple-300 text-sm border border-purple-500/20 hover:border-purple-500/50 px-3 py-2.5 rounded-xl transition"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            {tx.findSimilar}
+          </button>
+        )}
       </div>
 
       {/* Applied toast */}

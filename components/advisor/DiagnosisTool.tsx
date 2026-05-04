@@ -19,6 +19,7 @@ export default function DiagnosisTool({ advisorState, onBack, onComplete }: Prop
   const questions = lang === "he" ? DIAGNOSIS_QUESTIONS_HE : DIAGNOSIS_QUESTIONS_EN;
 
   const [phase, setPhase] = useState<"intro" | "quiz">("intro");
+  const freeformIntro = advisorState.userProfile.parsedData?.additionalNotes || advisorState.userProfile.rawText || "";
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<DiagnosisAnswer[]>([]);
   const [textAnswer, setTextAnswer] = useState("");
@@ -64,7 +65,12 @@ export default function DiagnosisTool({ advisorState, onBack, onComplete }: Prop
     const res = await fetch("/api/advisor/diagnosis", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userProfile: advisorState.userProfile, answers: updated, lang }),
+      body: JSON.stringify({
+        userProfile: advisorState.userProfile,
+        answers: updated,
+        lang,
+        freeformIntro: freeformIntro.trim() || undefined,
+      }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Failed");

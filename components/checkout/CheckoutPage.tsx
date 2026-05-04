@@ -141,7 +141,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
 
             {/* Career advisor */}
             <button
-              onClick={() => router.push("/advisor?profileId=default-advisor")}
+              onClick={() => router.push("/advisor?profileId=default-advisor&returnTo=summary")}
               className="group relative bg-gradient-to-br from-purple-600/20 via-white/5 to-violet-600/20 hover:from-purple-600/30 hover:to-violet-600/30 border border-purple-500/40 hover:border-purple-500/70 rounded-3xl p-7 text-right transition-all duration-200 hover:shadow-xl hover:shadow-purple-900/40"
             >
               <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">

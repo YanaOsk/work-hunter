@@ -103,3 +103,39 @@ export function saveCoverLetter(profileId: string, jobId: string, letter: string
   );
   saveApplications(profileId, apps);
 }
+
+export function updateInterviewDate(profileId: string, jobId: string, date: string | null): void {
+  const apps = getApplications(profileId).map((a) =>
+    a.id === jobId ? { ...a, interviewDate: date ?? undefined } : a
+  );
+  saveApplications(profileId, apps);
+}
+
+export function addManualApplication(
+  profileId: string,
+  title: string,
+  company: string,
+  url: string
+): JobApplication {
+  const apps = getApplications(profileId);
+  const id = `manual_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const newApp: JobApplication = {
+    id,
+    job: {
+      id,
+      title,
+      company: company || "—",
+      location: "",
+      url: url || "#",
+      description: "",
+      matchScore: 0,
+      matchReasons: [],
+      isRemote: false,
+      source: "Manual",
+    },
+    status: "saved",
+    savedAt: new Date().toISOString(),
+  };
+  saveApplications(profileId, [newApp, ...apps]);
+  return newApp;
+}

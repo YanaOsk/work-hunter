@@ -47,15 +47,15 @@ export const authOptions: NextAuthOptions = {
               VALUES (${email}, ${user.name ?? ""}, ${new Date().toISOString()})
               ON CONFLICT (email) DO NOTHING
             `;
-            try {
-              const { sendWelcomeEmail, sendAdminNotificationEmail } = await import("./email");
-              await Promise.all([
+            // fire-and-forget — don't block token creation on email delivery
+            import("./email").then(({ sendWelcomeEmail, sendAdminNotificationEmail }) =>
+              Promise.all([
                 sendWelcomeEmail(user.name ?? "", email),
                 sendAdminNotificationEmail(user.name ?? "", email),
-              ]);
-            } catch (emailErr) {
+              ])
+            ).catch((emailErr) => {
               console.error("[auth] email send failed:", emailErr);
-            }
+            });
           } else {
             token.isNewUser = false;
           }

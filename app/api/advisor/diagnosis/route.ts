@@ -7,10 +7,11 @@ import { langInstruction } from "@/lib/langInstruction";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userProfile, answers, lang } = (await request.json()) as {
+    const { userProfile, answers, lang, freeformIntro } = (await request.json()) as {
       userProfile: UserProfile;
       answers: DiagnosisAnswer[];
       lang?: string;
+      freeformIntro?: string;
     };
 
     const profileStr = truncate(JSON.stringify(userProfile.parsedData || {}, null, 2), 1500);
@@ -18,8 +19,9 @@ export async function POST(request: NextRequest) {
       answers.map((a) => `Q: ${a.question}\nA: ${a.answer}`).join("\n\n"),
       2000
     );
+    const introStr = freeformIntro ? truncate(freeformIntro, 800) : undefined;
 
-    const prompt = `${langInstruction(lang)}\n\n${DIAGNOSIS_ANALYSIS_PROMPT(profileStr, answersStr)}`;
+    const prompt = `${langInstruction(lang)}\n\n${DIAGNOSIS_ANALYSIS_PROMPT(profileStr, answersStr, introStr)}`;
     const raw = await geminiGenerate("Analyze now.", prompt, 2800, false);
 
     const parsed = safeParseJson<Record<string, unknown>>(raw, "diagnosis");

@@ -35,6 +35,12 @@ export async function POST(request: NextRequest) {
     const parsedData = (userProfile?.parsedData as Record<string, unknown>) || {};
     const gender = detectGender(messages, parsedData);
 
+    const lastUserMsg = messages[messages.length - 1];
+    const CV_PASTE_RE = /(\bניסיון עבודה\b|\bהשכלה\b|\bכישורים\b|\bWork Experience\b|\bEducation\b|\bSkills\b|\bקורות חיים\b|\bResume\b)/i;
+    const isPastedCV = lastUserMsg?.role === "user" &&
+      lastUserMsg.content.length > 350 &&
+      CV_PASTE_RE.test(lastUserMsg.content);
+
     const genderRule = gender === "female"
       ? 'פנה למשתמש בלשון נקבה: "את", "שלך", "אותך", "את מחפשת", "מה מדליק אותך".'
       : gender === "male"
@@ -64,8 +70,18 @@ Optionally, when it makes sense, append 2-3 quick reply suggestions at the end i
 
     const rawIntro = (userProfile as Record<string, unknown>)?.rawText as string | undefined;
 
-    const systemWithContext = `${CHAT_SYSTEM_PROMPT}
+    const cvPasteInstruction = isPastedCV ? `
 
+═══ קורות חיים הודבקו לצ'אט ═══
+המשתמש הדביק קורות חיים ישירות לצ'אט. אל תשאל שאלות.
+1. חלץ מהטקסט: תפקיד נוכחי, שנות ניסיון, מיקום (אם קיים), מיומנויות בולטות.
+2. שקף בקצרה בשורה אחת: "ראיתי — [פרטים עיקריים]. עכשיו מתחיל לחפש."
+3. הוסף [SEARCH_NOW] מיד. אסור לשאול שאלה נוספת.
+If the CV is in English, respond in English with the same logic.
+` : "";
+
+    const systemWithContext = `${CHAT_SYSTEM_PROMPT}
+${cvPasteInstruction}
 ${langInstruction}
 
 Current user profile (what we know so far):

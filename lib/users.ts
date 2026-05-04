@@ -64,3 +64,42 @@ export async function deleteUser(id: string): Promise<boolean> {
   const rows = await db`DELETE FROM users WHERE id = ${id} RETURNING id`;
   return rows.length > 0;
 }
+
+async function ensureResetTokensTable() {
+  const db = sql();
+  await db`CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    token TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL
+  )`;
+}
+
+export async function createPasswordResetToken(email: string): Promise<string | null> {
+  const db = sql();
+  const rows = await db`SELECT id FROM users WHERE email = ${email.toLowerCase()}`;
+  if (rows.length === 0) return null;
+  await ensureResetTokensTable();
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+  await db`DELETE FROM password_reset_tokens WHERE email = ${email.toLowerCase()}`;
+  await db`INSERT INTO password_reset_tokens (token, email, expires_at) VALUES (${token}, ${email.toLowerCase()}, ${expiresAt.toISOString()})`;
+  return token;
+}
+
+export async function consumePasswordResetToken(token: string): Promise<string | null> {
+  await ensureResetTokensTable();
+  const db = sql();
+  const rows = await db`SELECT email, expires_at FROM password_reset_tokens WHERE token = ${token}`;
+  if (rows.length === 0) return null;
+  const { email, expires_at } = rows[0];
+  await db`DELETE FROM password_reset_tokens WHERE token = ${token}`;
+  if (new Date(expires_at) < new Date()) return null;
+  return email as string;
+}
+
+export async function updateUserPassword(email: string, newPassword: string): Promise<boolean> {
+  const db = sql();
+  const salt = crypto.randomBytes(16).toString("hex");
+  const rows = await db`UPDATE users SET password_hash = ${hashPassword(newPassword, salt)}, salt = ${salt} WHERE email = ${email.toLowerCase()} RETURNING id`;
+  return rows.length > 0;
+}

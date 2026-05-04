@@ -56,6 +56,8 @@ export default function CVReviewTool({ advisorState, onBack, onComplete, onSkip 
           diagnosis: advisorState.diagnosis,
           cvText: cvText.trim(),
           lang,
+          direction: advisorState.direction,
+          chosenPath: advisorState.chosenPath,
         }),
       });
       const data = await res.json();

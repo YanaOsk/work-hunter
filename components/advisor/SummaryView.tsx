@@ -2,26 +2,216 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AdvisorState, CareerPath, LifePath } from "@/lib/types";
+import { useSession } from "next-auth/react";
+import { AdvisorState, CareerPath, LifePath, SkillGapItem, OnboardingPlan, FreelanceKit, PracticalPrep, SalaryResearch, TransitionRoadmap } from "@/lib/types";
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
 import { queueAutoStart, queueAdvisorScoutContext } from "@/lib/autoStart";
+
+const CHECKLIST_KEY = "work_hunter_weekly_checklist";
+
+function buildChecklist(state: AdvisorState, lang: string): string[] {
+  const items: string[] = [];
+  if (state.diagnosis?.weekOneSteps?.length)
+    items.push(...state.diagnosis.weekOneSteps.slice(0, 3));
+  const chosen = state.direction?.options?.find((o) => o.path === state.chosenPath);
+  if (chosen?.firstSteps?.length) items.push(chosen.firstSteps[0]);
+  if (state.cvReview?.improvements?.length) items.push(state.cvReview.improvements[0].suggestion);
+  if (state.linkedInSkipped)
+    items.push(lang === "he" ? "עדכן את פרופיל הלינקדאין שלך" : "Update your LinkedIn profile");
+  if (state.strategy?.thirtyDayPlan?.length) items.push(state.strategy.thirtyDayPlan[0]);
+  const seen = new Set<string>();
+  return items.filter((it) => { if (!it || seen.has(it)) return false; seen.add(it); return true; }).slice(0, 8);
+}
 
 interface Props {
   advisorState: AdvisorState;
   onBack: () => void;
   onOpenInterview: () => void;
   onExit: () => void;
+  onUpdate?: (next: AdvisorState) => void;
 }
 
-export default function SummaryView({ advisorState, onBack, onOpenInterview, onExit }: Props) {
+export default function SummaryView({ advisorState, onBack, onOpenInterview, onExit, onUpdate }: Props) {
   const { lang } = useLanguage();
   const router = useRouter();
+  const { data: session } = useSession();
   const tx = t[lang];
-  const { diagnosis, direction, cvReview, chosenPath, userProfile } = advisorState;
+  const { diagnosis, direction, cvReview, linkedIn, strategy, mockInterview, chosenPath, userProfile } = advisorState;
   const name = userProfile.parsedData?.name || "";
   const contentRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
+  const [emailInput, setEmailInput] = useState(session?.user?.email || "");
+  const [emailState, setEmailState] = useState<"idle" | "sending" | "sent" | "failed">("idle");
+  const [checkedItems, setCheckedItems] = useState<Set<number>>(() => {
+    if (typeof window === "undefined") return new Set<number>();
+    try {
+      const raw = localStorage.getItem(CHECKLIST_KEY);
+      return raw ? new Set<number>(JSON.parse(raw) as number[]) : new Set<number>();
+    } catch { return new Set<number>(); }
+  });
+
+  const checklist = buildChecklist(advisorState, lang);
+
+  const toggleCheck = (i: number) => {
+    setCheckedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i); else next.add(i);
+      try { localStorage.setItem(CHECKLIST_KEY, JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  };
+
+  const [skillGapLoading, setSkillGapLoading] = useState(false);
+  const [skillGapError, setSkillGapError] = useState("");
+  const [skillGapData, setSkillGapData] = useState<SkillGapItem[] | null>(advisorState.skillGap ?? null);
+
+  const [onboardingLoading, setOnboardingLoading] = useState(false);
+  const [onboardingError, setOnboardingError] = useState("");
+  const [onboardingData, setOnboardingData] = useState<OnboardingPlan | null>(advisorState.onboardingPlan ?? null);
+
+  const [deadline, setDeadline] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("work_hunter_job_deadline") ?? "";
+  });
+  const [deadlineInput, setDeadlineInput] = useState(deadline);
+
+  const weeksLeft = deadline
+    ? Math.max(0, Math.ceil((new Date(deadline).getTime() - Date.now()) / (7 * 86400000)))
+    : null;
+
+  const handleSetDeadline = () => {
+    if (!deadlineInput) return;
+    setDeadline(deadlineInput);
+    try { localStorage.setItem("work_hunter_job_deadline", deadlineInput); } catch {}
+  };
+
+  const loadSkillGap = async () => {
+    setSkillGapLoading(true);
+    setSkillGapError("");
+    try {
+      const res = await fetch("/api/advisor/skill-gap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userProfile, diagnosis, lang }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      const gaps = data.gaps as SkillGapItem[];
+      setSkillGapData(gaps);
+      onUpdate?.({ ...advisorState, skillGap: gaps });
+    } catch {
+      setSkillGapError(lang === "he" ? "שגיאה בניתוח — נסה שוב" : "Analysis failed — try again");
+    } finally {
+      setSkillGapLoading(false);
+    }
+  };
+
+  const [freelanceLoading, setFreelanceLoading] = useState(false);
+  const [freelanceError, setFreelanceError] = useState("");
+  const [freelanceData, setFreelanceData] = useState<FreelanceKit | null>(advisorState.freelanceKit ?? null);
+
+  const [practicalLoading, setPracticalLoading] = useState(false);
+  const [practicalError, setPracticalError] = useState("");
+  const [practicalData, setPracticalData] = useState<PracticalPrep | null>(advisorState.practicalPrep ?? null);
+
+  const [salaryLoading, setSalaryLoading] = useState(false);
+  const [salaryError, setSalaryError] = useState("");
+  const [salaryData, setSalaryData] = useState<SalaryResearch | null>(advisorState.salaryResearch ?? null);
+
+  const [transitionLoading, setTransitionLoading] = useState(false);
+  const [transitionError, setTransitionError] = useState("");
+  const [transitionData, setTransitionData] = useState<TransitionRoadmap | null>(advisorState.transitionRoadmap ?? null);
+
+  const loadFreelance = async () => {
+    setFreelanceLoading(true); setFreelanceError("");
+    try {
+      const res = await fetch("/api/advisor/freelance-kit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userProfile, diagnosis, chosenPath, lang }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      setFreelanceData(data as FreelanceKit);
+      onUpdate?.({ ...advisorState, freelanceKit: data as FreelanceKit });
+    } catch { setFreelanceError(lang === "he" ? "שגיאה — נסה שוב" : "Failed — try again"); }
+    finally { setFreelanceLoading(false); }
+  };
+
+  const loadPractical = async () => {
+    setPracticalLoading(true); setPracticalError("");
+    try {
+      const res = await fetch("/api/advisor/practical-prep", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userProfile, diagnosis, role: diagnosis?.topRoles?.[0], lang }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      setPracticalData(data as PracticalPrep);
+      onUpdate?.({ ...advisorState, practicalPrep: data as PracticalPrep });
+    } catch { setPracticalError(lang === "he" ? "שגיאה — נסה שוב" : "Failed — try again"); }
+    finally { setPracticalLoading(false); }
+  };
+
+  const loadSalary = async () => {
+    setSalaryLoading(true); setSalaryError("");
+    try {
+      const res = await fetch("/api/advisor/salary-research", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userProfile, diagnosis, lang }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      setSalaryData(data as SalaryResearch);
+      onUpdate?.({ ...advisorState, salaryResearch: data as SalaryResearch });
+    } catch { setSalaryError(lang === "he" ? "שגיאה — נסה שוב" : "Failed — try again"); }
+    finally { setSalaryLoading(false); }
+  };
+
+  const loadTransition = async () => {
+    setTransitionLoading(true); setTransitionError("");
+    try {
+      const res = await fetch("/api/advisor/transition-roadmap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userProfile, diagnosis, chosenPath, lang }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      setTransitionData(data as TransitionRoadmap);
+      onUpdate?.({ ...advisorState, transitionRoadmap: data as TransitionRoadmap });
+    } catch { setTransitionError(lang === "he" ? "שגיאה — נסה שוב" : "Failed — try again"); }
+    finally { setTransitionLoading(false); }
+  };
+
+  const loadOnboarding = async () => {
+    setOnboardingLoading(true);
+    setOnboardingError("");
+    try {
+      const res = await fetch("/api/advisor/onboarding-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chosenPath,
+          topRoles: diagnosis?.topRoles ?? [],
+          strategy,
+          lang,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      const plan = data as OnboardingPlan;
+      setOnboardingData(plan);
+      onUpdate?.({ ...advisorState, onboardingPlan: plan });
+    } catch {
+      setOnboardingError(lang === "he" ? "שגיאה ביצירת התוכנית — נסה שוב" : "Failed to generate plan — try again");
+    } finally {
+      setOnboardingLoading(false);
+    }
+  };
 
   const handleDownloadPDF = async () => {
     const wrapper = contentRef.current;
@@ -67,6 +257,22 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
     }
   };
 
+  const handleSendEmail = async () => {
+    if (!emailInput.trim() || emailState === "sending") return;
+    setEmailState("sending");
+    try {
+      const res = await fetch("/api/advisor/send-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ toEmail: emailInput.trim(), advisorState, lang }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setEmailState("sent");
+    } catch {
+      setEmailState("failed");
+    }
+  };
+
   const handleSendToScout = () => {
     const lines: string[] = [];
     if (diagnosis?.topRoles?.length)
@@ -91,7 +297,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm transition">
             {tx.backToMap}
           </button>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={handleDownloadPDF}
               disabled={downloading}
@@ -110,6 +316,12 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               )}
               {downloading ? (lang === "he" ? "מכין..." : "Preparing...") : "PDF"}
             </button>
+            <a href="/tracker" className="flex items-center gap-1.5 text-xs text-white/40 hover:text-purple-300 border border-white/10 hover:border-purple-500/40 px-2.5 py-1.5 rounded-lg transition">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              {lang === "he" ? "מעקב הגשות" : "My Applications"}
+            </a>
             <button onClick={onExit} className="text-white/50 hover:text-white text-sm transition">
               {tx.newSearch}
             </button>
@@ -141,8 +353,92 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </div>
         )}
 
-        {/* Career Advisory Panel — reflection, 3 paths, tomorrow step, realism */}
-        {diagnosis && (diagnosis.reflection || diagnosis.careerPaths?.length || diagnosis.tomorrowStep) && (
+        {/* Weekly action checklist */}
+        {checklist.length > 0 && (
+          <div className="mb-5 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-5" data-no-pdf>
+            <h3 className="text-emerald-300 text-xs font-semibold uppercase tracking-wide mb-3">
+              {tx.weeklyChecklistTitle}
+            </h3>
+            <ul className="space-y-2.5">
+              {checklist.map((item, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-3 cursor-pointer group"
+                  onClick={() => toggleCheck(i)}
+                >
+                  <div className={`flex-shrink-0 mt-0.5 w-4 h-4 rounded border flex items-center justify-center transition ${
+                    checkedItems.has(i)
+                      ? "bg-emerald-500 border-emerald-500"
+                      : "border-white/30 group-hover:border-emerald-500/50"
+                  }`}>
+                    {checkedItems.has(i) && (
+                      <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <p className={`text-sm leading-relaxed transition ${
+                    checkedItems.has(i) ? "text-white/30 line-through" : "text-white/85"
+                  }`}>
+                    {item}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <p className="text-white/30 text-xs mt-3">
+              {checkedItems.size}/{checklist.length}{" "}
+              {lang === "he" ? "הושלמו" : "completed"}
+            </p>
+          </div>
+        )}
+
+        {/* Goal deadline */}
+        <div className="mb-5 bg-white/[0.03] border border-white/10 rounded-2xl px-5 py-4" data-no-pdf>
+          <div className="flex items-center gap-2 mb-2">
+            <svg className="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h3 className="text-amber-300 text-xs font-semibold uppercase tracking-wide">{tx.goalDeadlineTitle}</h3>
+            {weeksLeft !== null && (
+              <span className="ms-auto text-amber-400 text-xs font-bold tabular-nums">
+                {weeksLeft} {tx.goalWeeksLeft}
+              </span>
+            )}
+          </div>
+          {deadline ? (
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-amber-500 rounded-full transition-all" style={{ width: `${Math.max(5, 100 - (weeksLeft ?? 0) * 4)}%` }} />
+              </div>
+              <button
+                onClick={() => { setDeadline(""); setDeadlineInput(""); try { localStorage.removeItem("work_hunter_job_deadline"); } catch {} }}
+                className="text-white/30 hover:text-white/60 text-xs transition"
+              >
+                ✕
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                type="date"
+                value={deadlineInput}
+                onChange={(e) => setDeadlineInput(e.target.value)}
+                min={new Date().toISOString().split("T")[0]}
+                className="flex-1 bg-white/5 border border-white/15 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-amber-500"
+              />
+              <button
+                onClick={handleSetDeadline}
+                disabled={!deadlineInput}
+                className="bg-amber-600 hover:bg-amber-500 disabled:opacity-40 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition"
+              >
+                {tx.goalDeadlineSet}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Career Advisory Panel — reflection, 3 paths, week-one steps, realism */}
+        {diagnosis && (diagnosis.reflection || diagnosis.careerPaths?.length || diagnosis.weekOneSteps?.length || diagnosis.tomorrowStep) && (
           <div className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-5 space-y-6">
             <h2 className="text-lg font-bold text-white border-b border-white/10 pb-3">
               {lang === "he" ? "ייעוץ תעסוקתי מותאם אישית" : "Your personalized career advisory"}
@@ -186,21 +482,55 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
                         </span>
                         <p className="text-white/80 text-xs italic">{path.matchBridge}</p>
                       </div>
+                      {path.marketReality && (
+                        <div className="pt-2 border-t border-white/10 space-y-1">
+                          <span className="text-amber-300 text-[10px] font-semibold uppercase tracking-wide block">
+                            {lang === "he" ? "מציאות שוק" : "Market reality"}
+                          </span>
+                          {[
+                            [tx.summaryMarketSalary, path.marketReality.salaryRange],
+                            [tx.summaryMarketDemand, path.marketReality.marketDemand],
+                            [tx.summaryMarketEntry, path.marketReality.timeToEntry],
+                            [tx.summaryMarketTraining, path.marketReality.trainingNeeded],
+                          ].map(([label, value]) => value ? (
+                            <div key={label} className="flex gap-1.5 text-[10px]">
+                              <span className="text-white/40 flex-shrink-0">{label}:</span>
+                              <span className="text-white/70">{value}</span>
+                            </div>
+                          ) : null)}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Tomorrow Step */}
-            {diagnosis.tomorrowStep && (
+            {/* Week One Steps (new) or legacy tomorrowStep */}
+            {diagnosis.weekOneSteps && diagnosis.weekOneSteps.length > 0 ? (
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl px-5 py-4">
+                <h3 className="text-amber-300 text-xs font-semibold uppercase tracking-wide mb-3">
+                  {tx.summaryWeekOneSteps}
+                </h3>
+                <ol className="space-y-3">
+                  {diagnosis.weekOneSteps.map((step, i) => (
+                    <li key={i} className="flex gap-3">
+                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold flex items-center justify-center">
+                        {i + 1}
+                      </span>
+                      <p className="text-white/90 text-sm leading-relaxed">{step}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            ) : diagnosis.tomorrowStep ? (
               <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl px-5 py-4">
                 <h3 className="text-amber-300 text-xs font-semibold uppercase tracking-wide mb-2">
                   {tx.summaryTomorrowStep}
                 </h3>
                 <p className="text-white/90 text-sm leading-relaxed font-medium">{diagnosis.tomorrowStep}</p>
               </div>
-            )}
+            ) : null}
 
             {/* Realism Note */}
             {diagnosis.realismNote && (
@@ -215,6 +545,63 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               </div>
             )}
           </div>
+        )}
+
+        {/* Transition roadmap */}
+        {diagnosis && (
+          <Section title={tx.transitionTitle}>
+            {transitionData ? (
+              <div className="space-y-5">
+                <div className="flex items-center gap-3 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3">
+                  <svg className="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <span className="text-amber-300 text-xs font-semibold uppercase tracking-wide">{tx.transitionTotal}: </span>
+                    <span className="text-white font-bold">{transitionData.totalDuration}</span>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {transitionData.phases.map((phase, i) => (
+                    <div key={i} className="flex gap-4">
+                      <div className="flex flex-col items-center flex-shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 text-xs font-bold">{i + 1}</div>
+                        {i < transitionData.phases.length - 1 && <div className="w-px flex-1 bg-purple-500/20 mt-1" />}
+                      </div>
+                      <div className="pb-4 flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="text-white font-semibold text-sm">{phase.name}</h4>
+                          <span className="text-purple-400 text-xs bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">{phase.duration}</span>
+                        </div>
+                        <ul className="space-y-1 mb-2">
+                          {phase.actions.map((a, j) => (
+                            <li key={j} className="text-white/70 text-sm flex gap-2">
+                              <span className="text-purple-400 flex-shrink-0">→</span>{a}
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="text-emerald-400 text-xs">✓ {phase.milestone}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-start gap-2 bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3">
+                  <span className="text-white/30 flex-shrink-0">!</span>
+                  <div>
+                    <span className="text-white/40 text-xs font-semibold uppercase tracking-wide block mb-1">{tx.transitionHonest}</span>
+                    <p className="text-white/70 text-sm leading-relaxed">{transitionData.honestNote}</p>
+                  </div>
+                </div>
+                <button onClick={loadTransition} disabled={transitionLoading} className="text-xs text-white/30 hover:text-white/60 transition disabled:opacity-40">
+                  {lang === "he" ? "↺ רענן" : "↺ Refresh"}
+                </button>
+              </div>
+            ) : transitionLoading ? (
+              <LoadingSpinner text={tx.transitionGenerating} />
+            ) : (
+              <GenerateButton onClick={loadTransition} icon="map" label={tx.transitionGenerate} error={transitionError} />
+            )}
+          </Section>
         )}
 
         {/* Section 1: Professional DNA */}
@@ -263,6 +650,116 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               <MiniList title={tx.diagnosisEnvironments} items={diagnosis.workEnvironmentFit} color="purple" />
               <MiniList title={tx.diagnosisDirections} items={diagnosis.careerDirections} color="blue" />
             </div>
+          </Section>
+        )}
+
+        {/* Skill gap analysis */}
+        {diagnosis && (
+          <Section title={tx.skillGapTitle}>
+            {skillGapData ? (
+              <div className="space-y-4">
+                {skillGapData.map((item, i) => (
+                  <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        item.importance === "high"
+                          ? "bg-rose-500/20 text-rose-300"
+                          : "bg-amber-500/20 text-amber-300"
+                      }`}>
+                        {item.importance === "high" ? tx.skillGapHigh : tx.skillGapMedium}
+                      </span>
+                      <h4 className="text-white font-semibold text-sm">{item.skill}</h4>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {item.resources.map((r, j) => (
+                        <div key={j} className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5">
+                          <span className="text-white/50 text-[10px] uppercase tracking-wide">{r.type}</span>
+                          <span className="text-white/80 text-xs font-medium">{r.title}</span>
+                          {r.platform && <span className="text-white/40 text-[10px]">· {r.platform}</span>}
+                          <span className={`text-[10px] font-semibold ms-1 ${r.free ? "text-emerald-400" : "text-white/30"}`}>
+                            {r.free ? tx.skillGapFree : tx.skillGapPaid}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                <button
+                  onClick={loadSkillGap}
+                  disabled={skillGapLoading}
+                  className="text-xs text-white/30 hover:text-white/60 transition disabled:opacity-40"
+                >
+                  {lang === "he" ? "↺ רענן ניתוח" : "↺ Refresh analysis"}
+                </button>
+              </div>
+            ) : skillGapLoading ? (
+              <div className="flex items-center gap-2 text-white/50 text-sm">
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                {tx.skillGapGenerating}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {skillGapError && <p className="text-rose-400 text-sm">{skillGapError}</p>}
+                <button
+                  onClick={loadSkillGap}
+                  className="flex items-center gap-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 hover:border-blue-500/50 text-blue-300 text-sm font-medium px-4 py-2.5 rounded-xl transition"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  {tx.skillGapGenerate}
+                </button>
+              </div>
+            )}
+          </Section>
+        )}
+
+        {/* Salary research */}
+        {diagnosis && (
+          <Section title={tx.salaryTitle}>
+            {salaryData ? (
+              <div className="space-y-4">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-white/10">
+                        <th className="text-start text-white/40 text-xs font-semibold pb-2 pe-4">{lang === "he" ? "תפקיד" : "Role"}</th>
+                        <th className="text-center text-white/40 text-xs font-semibold pb-2 px-2">{tx.salaryJunior}</th>
+                        <th className="text-center text-white/40 text-xs font-semibold pb-2 px-2">{tx.salaryMid}</th>
+                        <th className="text-center text-white/40 text-xs font-semibold pb-2 ps-2">{tx.salarySenior}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {salaryData.ranges.map((r, i) => (
+                        <tr key={i}>
+                          <td className="py-2.5 pe-4">
+                            <p className="text-white font-medium text-xs">{r.role}</p>
+                            {r.notes && <p className="text-white/40 text-[10px] mt-0.5">{r.notes}</p>}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-white/70 text-xs tabular-nums">{r.junior}</td>
+                          <td className="py-2.5 px-2 text-center text-emerald-400 text-xs font-semibold tabular-nums">{r.mid}</td>
+                          <td className="py-2.5 ps-2 text-center text-purple-400 text-xs tabular-nums">{r.senior}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="bg-blue-500/5 border border-blue-500/15 rounded-xl px-4 py-3 space-y-2">
+                  <p className="text-blue-300 text-xs leading-relaxed">{salaryData.marketInsight}</p>
+                  <p className="text-emerald-300 text-xs font-medium">💡 {salaryData.negotiationTip}</p>
+                </div>
+                <button onClick={loadSalary} disabled={salaryLoading} className="text-xs text-white/30 hover:text-white/60 transition disabled:opacity-40">
+                  {lang === "he" ? "↺ רענן נתונים" : "↺ Refresh data"}
+                </button>
+              </div>
+            ) : salaryLoading ? (
+              <LoadingSpinner text={tx.salaryGenerating} />
+            ) : (
+              <GenerateButton onClick={loadSalary} icon="chart" label={tx.salaryGenerate} error={salaryError} />
+            )}
           </Section>
         )}
 
@@ -323,6 +820,44 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               <MiniList title={tx.cons} items={chosenOption.cons} color="rose" />
               <MiniList title={tx.firstSteps} items={chosenOption.firstSteps} color="blue" />
             </div>
+          </Section>
+        )}
+
+        {/* Freelance kit — only for entrepreneur path */}
+        {chosenPath === "entrepreneur" && (
+          <Section title={tx.freelanceKitTitle}>
+            {freelanceData ? (
+              <div className="space-y-5">
+                {[
+                  { label: tx.freelanceKitPricing, items: freelanceData.pricingGuidance, color: "emerald" },
+                  { label: tx.freelanceKitLegal, items: freelanceData.legalSteps, color: "blue" },
+                  { label: tx.freelanceKitClients, items: freelanceData.firstClientSources, color: "purple" },
+                ].map(({ label, items, color }) => (
+                  <div key={label}>
+                    <h4 className={`text-${color}-300 text-xs font-semibold uppercase tracking-wide mb-2`}>{label}</h4>
+                    <ul className="space-y-1.5">
+                      {items.map((item, i) => (
+                        <li key={i} className="flex gap-2 text-sm text-white/80">
+                          <span className={`text-${color}-400 flex-shrink-0 font-bold text-xs mt-0.5`}>{i + 1}.</span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+                <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3">
+                  <span className="text-amber-300 text-xs font-semibold uppercase tracking-wide">{tx.freelanceKitGoal}: </span>
+                  <span className="text-white/85 text-sm">{freelanceData.monthlyGoal}</span>
+                </div>
+                <button onClick={loadFreelance} disabled={freelanceLoading} className="text-xs text-white/30 hover:text-white/60 transition disabled:opacity-40">
+                  {lang === "he" ? "↺ רענן" : "↺ Refresh"}
+                </button>
+              </div>
+            ) : freelanceLoading ? (
+              <LoadingSpinner text={tx.freelanceKitGenerating} />
+            ) : (
+              <GenerateButton onClick={loadFreelance} icon="briefcase" label={tx.freelanceKitGenerate} error={freelanceError} />
+            )}
           </Section>
         )}
 
@@ -407,8 +942,318 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
                 {cvReview.rewrittenSummary}
               </div>
             </div>
+            <div className="mt-4 flex justify-end" data-no-pdf>
+              <button
+                onClick={() => {
+                  try {
+                    localStorage.setItem("work_hunter_advisor_cv_import", JSON.stringify({
+                      summary: cvReview.rewrittenSummary,
+                      improvements: cvReview.improvements ?? [],
+                    }));
+                  } catch {}
+                  router.push("/cv-builder");
+                }}
+                className="inline-flex items-center gap-1.5 text-xs text-blue-300 hover:text-blue-200 border border-blue-500/30 hover:border-blue-500/60 px-3 py-1.5 rounded-xl transition"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                {tx.cvBuilderAdvisorImportBtn}
+              </button>
+            </div>
           </Section>
         )}
+
+        {/* Section 4: LinkedIn Profile */}
+        {linkedIn && (
+          <Section title={tx.summarySection4}>
+            <div className="space-y-4">
+              <CopyField label={tx.linkedinHeadline} copyLabel={tx.linkedinCopyHeadline} text={linkedIn.headline}>
+                <p className="text-white font-semibold">{linkedIn.headline}</p>
+              </CopyField>
+              <CopyField label={tx.linkedinAbout} copyLabel={tx.linkedinCopyAbout} text={linkedIn.about}>
+                <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{linkedIn.about}</p>
+              </CopyField>
+              {linkedIn.experienceBullets?.length > 0 && (
+                <CopyField
+                  label={tx.linkedinExperience}
+                  copyLabel={tx.linkedinCopyBullets}
+                  text={linkedIn.experienceBullets.map((b) => `• ${b}`).join("\n")}
+                >
+                  <ul className="space-y-1">
+                    {linkedIn.experienceBullets.map((b, i) => (
+                      <li key={i} className="text-white/80 text-sm flex gap-2">
+                        <span className="text-sky-400 flex-shrink-0">•</span><span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CopyField>
+              )}
+              {linkedIn.skills?.length > 0 && (
+                <div>
+                  <p className="text-purple-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.linkedinSkills}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {linkedIn.skills.map((s, i) => (
+                      <span key={i} className="text-xs bg-purple-500/15 text-purple-300 border border-purple-500/25 px-2.5 py-1 rounded-full">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {linkedIn.keywords?.length > 0 && (
+                <div>
+                  <p className="text-sky-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.linkedinKeywords}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {linkedIn.keywords.map((k, i) => (
+                      <span key={i} className="text-xs bg-sky-500/15 text-sky-300 border border-sky-500/25 px-2.5 py-1 rounded-full">{k}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </Section>
+        )}
+
+        {/* Section 5: Search Strategy */}
+        {strategy && (
+          <Section title={tx.summarySection5}>
+            {strategy.topLine && (
+              <div className="mb-5 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3">
+                <p className="text-amber-300 text-xs font-semibold uppercase tracking-wide mb-1">{tx.summaryTopLine}</p>
+                <p className="text-white/90 text-sm leading-relaxed italic">"{strategy.topLine}"</p>
+              </div>
+            )}
+
+            {/* Hot jobs */}
+            {strategy.hotJobs && strategy.hotJobs.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-rose-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.strategyHotJobs}</h4>
+                <div className="space-y-2">
+                  {strategy.hotJobs.map((j, i) => (
+                    <div key={i} className="bg-white/5 rounded-xl px-3 py-2.5 text-sm border border-white/5">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-white font-medium">{j.title}</span>
+                        {j.company && <span className="text-white/40 text-xs">@ {j.company}</span>}
+                      </div>
+                      {j.description && <p className="text-white/60 text-xs">{j.description}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Target companies */}
+            {strategy.targetCompanies?.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-emerald-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.strategyCompanies}</h4>
+                <div className="space-y-2">
+                  {strategy.targetCompanies.slice(0, 5).map((c, i) => (
+                    <div key={i} className="bg-white/5 rounded-xl px-3 py-2 text-sm">
+                      <span className="text-white font-medium">{c.name}</span>
+                      <span className="text-white/40 text-xs ms-2">{c.size}</span>
+                      <p className="text-white/60 text-xs mt-0.5">{c.reason}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 30-day plan */}
+            {strategy.thirtyDayPlan && strategy.thirtyDayPlan.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-purple-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.strategyThirtyDay}</h4>
+                <ol className="space-y-2">
+                  {strategy.thirtyDayPlan.map((step, i) => (
+                    <li key={i} className="flex gap-3">
+                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold flex items-center justify-center">{i + 1}</span>
+                      <p className="text-white/80 text-sm leading-relaxed">{step}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            {/* Networking plan */}
+            {strategy.networkingPlan && strategy.networkingPlan.length > 0 && (
+              <div className="mb-5">
+                <MiniList title={tx.strategyNetwork} items={strategy.networkingPlan} color="blue" />
+              </div>
+            )}
+
+            {/* Hidden market tips */}
+            {strategy.hiddenMarketTips && strategy.hiddenMarketTips.length > 0 && (
+              <div className="mb-5">
+                <MiniList title={tx.strategySectionHidden} items={strategy.hiddenMarketTips} color="emerald" />
+              </div>
+            )}
+
+            {/* Facebook groups */}
+            {strategy.facebookGroups && strategy.facebookGroups.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-blue-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.strategyFacebook}</h4>
+                <div className="flex flex-wrap gap-2">
+                  {strategy.facebookGroups.map((g, i) => (
+                    <span key={i} className="text-xs bg-blue-500/15 text-blue-200 border border-blue-500/20 px-2.5 py-1 rounded-full">{g}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Outreach template */}
+            {strategy.outreachTemplate && (
+              <CopyField label={tx.strategyTemplate} copyLabel={lang === "he" ? "העתק תבנית" : "Copy template"} text={strategy.outreachTemplate}>
+                <div className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{strategy.outreachTemplate}</div>
+              </CopyField>
+            )}
+          </Section>
+        )}
+
+        {/* Practical interview prep */}
+        {diagnosis && (
+          <Section title={tx.practicalPrepTitle}>
+            {practicalData ? (
+              <div className="space-y-4">
+                <div className="bg-purple-500/5 border border-purple-500/20 rounded-xl px-4 py-3">
+                  <span className="text-purple-300 text-xs font-semibold uppercase tracking-wide block mb-1">{tx.practicalPrepFormat}</span>
+                  <p className="text-white/85 text-sm leading-relaxed">{practicalData.format}</p>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-amber-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.practicalPrepBring}</h4>
+                    <ul className="space-y-1">
+                      {practicalData.whatToBring.map((item, i) => (
+                        <li key={i} className="text-white/80 text-sm flex gap-2"><span className="text-amber-400">•</span>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="text-emerald-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.practicalPrepStandOut}</h4>
+                    <ul className="space-y-1">
+                      {practicalData.howToStandOut.map((tip, i) => (
+                        <li key={i} className="text-white/80 text-sm flex gap-2"><span className="text-emerald-400">★</span>{tip}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                {practicalData.whatToExpect.length > 0 && (
+                  <div>
+                    <h4 className="text-blue-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.practicalPrepExpect}</h4>
+                    <div className="space-y-2">
+                      {practicalData.whatToExpect.map((section, i) => (
+                        <div key={i} className="bg-white/[0.03] border border-white/10 rounded-xl px-3 py-2.5">
+                          <p className="text-blue-300 text-xs font-semibold mb-1">{section.category}</p>
+                          <ul className="space-y-0.5">
+                            {section.items.map((it, j) => (
+                              <li key={j} className="text-white/70 text-xs flex gap-1.5"><span className="text-blue-400">→</span>{it}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <button onClick={loadPractical} disabled={practicalLoading} className="text-xs text-white/30 hover:text-white/60 transition disabled:opacity-40">
+                  {lang === "he" ? "↺ רענן" : "↺ Refresh"}
+                </button>
+              </div>
+            ) : practicalLoading ? (
+              <LoadingSpinner text={tx.practicalPrepGenerating} />
+            ) : (
+              <GenerateButton onClick={loadPractical} icon="clipboard" label={tx.practicalPrepGenerate} error={practicalError} />
+            )}
+          </Section>
+        )}
+
+        {/* Section 6: Mock Interview Feedback */}
+        {mockInterview?.feedback && (
+          <Section title={tx.summarySection6}>
+            <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl px-5 py-4">
+              <p className="text-white/85 text-sm leading-relaxed whitespace-pre-wrap">{mockInterview.feedback}</p>
+            </div>
+            {mockInterview.role && (
+              <p className="text-white/30 text-xs mt-3">
+                {lang === "he" ? `ראיון מדומה עבור: ${mockInterview.role}` : `Practiced for: ${mockInterview.role}`}
+              </p>
+            )}
+          </Section>
+        )}
+
+        {/* Onboarding plan */}
+        <Section title={tx.onboardingTitle}>
+          {onboardingData ? (
+            <div className="grid md:grid-cols-3 gap-4">
+              {([
+                { key: "days30", label: tx.onboarding30, color: "emerald" },
+                { key: "days60", label: tx.onboarding60, color: "blue" },
+                { key: "days90", label: tx.onboarding90, color: "purple" },
+              ] as const).map(({ key, label, color }) => (
+                <div key={key} className="space-y-2">
+                  <h4 className={`text-${color}-300 text-xs font-semibold uppercase tracking-wide`}>{label}</h4>
+                  <ul className="space-y-1.5">
+                    {onboardingData[key].map((step, i) => (
+                      <li key={i} className="flex gap-2 text-sm">
+                        <span className={`text-${color}-400 flex-shrink-0 font-bold text-xs mt-0.5`}>{i + 1}.</span>
+                        <span className="text-white/80 leading-relaxed">{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : onboardingLoading ? (
+            <div className="flex items-center gap-2 text-white/50 text-sm">
+              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              {tx.onboardingGenerating}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {onboardingError && <p className="text-rose-400 text-sm">{onboardingError}</p>}
+              <button
+                onClick={loadOnboarding}
+                className="flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 hover:border-purple-500/50 text-purple-300 text-sm font-medium px-4 py-2.5 rounded-xl transition"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                {tx.onboardingGenerate}
+              </button>
+            </div>
+          )}
+        </Section>
+
+        {/* Email summary panel */}
+        <div data-no-pdf className="mt-4 bg-white/[0.03] border border-white/10 rounded-3xl p-6">
+          <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+            <svg className="w-4 h-4 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            {tx.emailSummary}
+          </h3>
+          {emailState === "sent" ? (
+            <p className="text-emerald-400 text-sm">{tx.emailSent}</p>
+          ) : emailState === "failed" ? (
+            <p className="text-rose-400 text-sm">{tx.emailFailed}</p>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder={tx.emailInput}
+                className="flex-1 bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-white text-sm placeholder-white/30 focus:outline-none focus:border-purple-500"
+              />
+              <button
+                onClick={handleSendEmail}
+                disabled={!emailInput.trim() || emailState === "sending"}
+                className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-xl transition whitespace-nowrap"
+              >
+                {emailState === "sending" ? tx.emailSending : tx.emailSummary}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Scout CTA */}
         <div data-no-pdf className="mt-4 bg-gradient-to-br from-purple-600/20 to-emerald-600/20 border border-purple-500/30 rounded-3xl p-8">
@@ -458,6 +1303,42 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function LoadingSpinner({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-2 text-white/50 text-sm">
+      <svg className="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+      </svg>
+      {text}
+    </div>
+  );
+}
+
+const GENERATE_ICONS: Record<string, React.ReactNode> = {
+  chart: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />,
+  map: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />,
+  briefcase: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />,
+  clipboard: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />,
+};
+
+function GenerateButton({ onClick, icon, label, error }: { onClick: () => void; icon: string; label: string; error?: string }) {
+  return (
+    <div className="space-y-2">
+      {error && <p className="text-rose-400 text-sm">{error}</p>}
+      <button
+        onClick={onClick}
+        className="flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 hover:border-purple-500/50 text-purple-300 text-sm font-medium px-4 py-2.5 rounded-xl transition"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {GENERATE_ICONS[icon]}
+        </svg>
+        {label}
+      </button>
     </div>
   );
 }
@@ -515,4 +1396,51 @@ function pathLabel(
   if (path === "employee") return tx.pathEmployee;
   if (path === "entrepreneur") return tx.pathEntrepreneur;
   return tx.pathStudies;
+}
+
+function CopyField({
+  label,
+  copyLabel,
+  text,
+  children,
+}: {
+  label: string;
+  copyLabel: string;
+  text: string;
+  children: React.ReactNode;
+}) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sky-300 text-xs font-semibold uppercase tracking-wide">{label}</p>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1 text-xs text-white/40 hover:text-sky-300 transition"
+        >
+          {copied ? (
+            <>
+              <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-emerald-400">✓</span>
+            </>
+          ) : (
+            <>
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              {copyLabel}
+            </>
+          )}
+        </button>
+      </div>
+      {children}
+    </div>
+  );
 }

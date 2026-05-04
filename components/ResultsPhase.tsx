@@ -26,9 +26,31 @@ interface Props {
   isStreaming?: boolean;
   onReset: () => void;
   onRefine?: () => void;
+  onFindSimilar?: (job: JobResult) => void;
 }
 
 type SortKey = "score" | "date";
+type JobTypeFilter = "all" | "part-time" | "freelance" | "contract";
+
+function parseSalaryMin(range: string | undefined): number | null {
+  if (!range) return null;
+  const clean = range.replace(/[,\s₪$]/g, "");
+  const match = clean.match(/(\d+(?:\.\d+)?)([kK])?/);
+  if (!match) return null;
+  let val = parseFloat(match[1]);
+  if (match[2]) val *= 1000;
+  // If value < 1000 it's likely in thousands already (e.g. "18" → 18000)
+  if (val < 1000) val *= 1000;
+  return val;
+}
+
+function detectJobType(title: string, description: string): "part-time" | "freelance" | "contract" | null {
+  const text = (title + " " + (description ?? "")).toLowerCase();
+  if (/משרה חלקית|part[\s-]time|חלקי\b/.test(text)) return "part-time";
+  if (/פרילנס|freelance/.test(text)) return "freelance";
+  if (/\bארעי|\bזמני|temporary|\bcontract\b|קבלני/.test(text)) return "contract";
+  return null;
+}
 
 function EmailModal({
   jobs,
@@ -126,6 +148,7 @@ export default function ResultsPhase({
   isStreaming = false,
   onReset,
   onRefine,
+  onFindSimilar,
 }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
@@ -135,6 +158,8 @@ export default function ResultsPhase({
   const [filterMinScore, setFilterMinScore] = useState(0);
   const [filterSaved, setFilterSaved] = useState(false);
   const [filterLocation, setFilterLocation] = useState("all");
+  const [filterJobType, setFilterJobType] = useState<JobTypeFilter>("all");
+  const [filterMinSalary, setFilterMinSalary] = useState(0);
   const [sortKey, setSortKey] = useState<SortKey>("score");
   const [savedIds, setSavedIds] = useState<Set<string>>(() => new Set());
   const [showEmail, setShowEmail] = useState(false);
@@ -171,12 +196,28 @@ export default function ResultsPhase({
     return locs;
   }, [jobs]);
 
+  // Deduplicate by title+company, keeping the highest-scoring result
+  const deduped = useMemo(() => {
+    const seen = new Map<string, JobResult>();
+    for (const j of jobs) {
+      const key = `${j.title.toLowerCase().trim()}|${j.company.toLowerCase().trim()}`;
+      const existing = seen.get(key);
+      if (!existing || j.matchScore > existing.matchScore) seen.set(key, j);
+    }
+    return [...seen.values()];
+  }, [jobs]);
+
   const filtered = useMemo(() => {
-    let list = jobs.filter((j) => {
+    let list = deduped.filter((j) => {
       if (filterRemote && !j.isRemote) return false;
       if (j.matchScore < filterMinScore) return false;
       if (filterSaved && !savedIds.has(j.id)) return false;
       if (filterLocation !== "all" && j.location !== filterLocation) return false;
+      if (filterJobType !== "all" && detectJobType(j.title, j.description) !== filterJobType) return false;
+      if (filterMinSalary > 0) {
+        const salMin = parseSalaryMin(j.salaryRange);
+        if (salMin !== null && salMin < filterMinSalary) return false;
+      }
       return true;
     });
     if (sortKey === "date") {
@@ -188,7 +229,7 @@ export default function ResultsPhase({
       });
     }
     return list;
-  }, [jobs, filterRemote, filterMinScore, filterSaved, filterLocation, sortKey, savedIds]);
+  }, [deduped, filterRemote, filterMinScore, filterSaved, filterLocation, filterJobType, filterMinSalary, sortKey, savedIds]);
 
   const showPaywall = !isSubscribed && !demoMode && !isStreaming && filtered.length > FREE_RESULTS;
   const visibleJobs = showPaywall ? filtered.slice(0, FREE_RESULTS) : filtered;
@@ -197,7 +238,8 @@ export default function ResultsPhase({
   const userSkills = userProfile?.parsedData?.skills ?? [];
   const profile = userProfile.parsedData;
 
-  const activeFilterCount = [filterRemote, filterMinScore > 0, filterSaved, filterLocation !== "all"].filter(Boolean).length;
+  const jobsWithSalary = useMemo(() => deduped.filter((j) => parseSalaryMin(j.salaryRange) !== null).length, [deduped]);
+  const activeFilterCount = [filterRemote, filterMinScore > 0, filterSaved, filterLocation !== "all", filterJobType !== "all", filterMinSalary > 0].filter(Boolean).length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
@@ -208,7 +250,10 @@ export default function ResultsPhase({
               {isStreaming && (
                 <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse inline-block flex-shrink-0" />
               )}
-              {jobs.length} {tx.jobsFound}
+              {deduped.length} {tx.jobsFound}
+              {!isStreaming && deduped.length < jobs.length && (
+                <span className="text-white/30 text-xs font-normal">({jobs.length - deduped.length} {lang === "he" ? "כפילויות הוסרו" : "dupes removed"})</span>
+              )}
               {isStreaming ? "..." : (
                 profile?.name && <span className="text-purple-400 hidden sm:inline"> — {profile.name}</span>
               )}
@@ -337,6 +382,42 @@ export default function ResultsPhase({
             </select>
           )}
 
+          {/* Job type filter */}
+          <select
+            value={filterJobType}
+            onChange={(e) => setFilterJobType(e.target.value as JobTypeFilter)}
+            className={`px-3 py-1.5 rounded-full text-sm bg-white/5 border transition-all appearance-none cursor-pointer ${
+              filterJobType !== "all"
+                ? "border-teal-500/50 text-teal-300"
+                : "border-white/20 text-white/60 hover:border-white/40"
+            }`}
+          >
+            <option value="all" className="bg-slate-900">{tx.filterJobType}: {tx.allJobTypes}</option>
+            <option value="part-time" className="bg-slate-900">{tx.jobTypePart}</option>
+            <option value="freelance" className="bg-slate-900">{tx.jobTypeFreelance}</option>
+            <option value="contract" className="bg-slate-900">{tx.jobTypeContract}</option>
+          </select>
+
+          {/* Salary filter — only shown when enough jobs have salary data */}
+          {jobsWithSalary >= 3 && (
+            <select
+              value={filterMinSalary}
+              onChange={(e) => setFilterMinSalary(Number(e.target.value))}
+              className={`px-3 py-1.5 rounded-full text-sm bg-white/5 border transition-all appearance-none cursor-pointer ${
+                filterMinSalary > 0
+                  ? "border-emerald-500/50 text-emerald-300"
+                  : "border-white/20 text-white/60 hover:border-white/40"
+              }`}
+            >
+              <option value={0} className="bg-slate-900">{tx.filterSalary}: {tx.anySalary}</option>
+              <option value={8000} className="bg-slate-900">8K+ ₪</option>
+              <option value={12000} className="bg-slate-900">12K+ ₪</option>
+              <option value={18000} className="bg-slate-900">18K+ ₪</option>
+              <option value={25000} className="bg-slate-900">25K+ ₪</option>
+              <option value={35000} className="bg-slate-900">35K+ ₪</option>
+            </select>
+          )}
+
           {/* Sort */}
           <div className="flex items-center gap-1 ms-auto">
             <span className="text-white/40 text-xs hidden sm:inline">{tx.sortBy}:</span>
@@ -364,7 +445,7 @@ export default function ResultsPhase({
 
           {activeFilterCount > 0 && (
             <button
-              onClick={() => { setFilterRemote(false); setFilterMinScore(0); setFilterSaved(false); setFilterLocation("all"); }}
+              onClick={() => { setFilterRemote(false); setFilterMinScore(0); setFilterSaved(false); setFilterLocation("all"); setFilterJobType("all"); setFilterMinSalary(0); }}
               className="text-white/40 hover:text-white text-xs transition"
             >
               {tx.clearFilters}
@@ -384,7 +465,7 @@ export default function ResultsPhase({
           <div className="text-center py-16">
             <p className="text-white/40 text-lg">{tx.noResults}</p>
             <button
-              onClick={() => { setFilterRemote(false); setFilterMinScore(0); setFilterSaved(false); setFilterLocation("all"); }}
+              onClick={() => { setFilterRemote(false); setFilterMinScore(0); setFilterSaved(false); setFilterLocation("all"); setFilterJobType("all"); setFilterMinSalary(0); }}
               className="text-purple-400 text-sm mt-2 hover:underline"
             >
               {tx.clearFilters}
@@ -400,6 +481,7 @@ export default function ResultsPhase({
                 saved={savedIds.has(job.id)}
                 onToggleSave={() => toggleSave(job)}
                 onApplied={() => handleMarkApplied(job)}
+                onFindSimilar={onFindSimilar}
                 userSkills={userSkills}
               />
             ))}

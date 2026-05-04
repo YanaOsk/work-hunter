@@ -237,12 +237,20 @@ export default function SelfIntro({ advisorState, onBack, onComplete }: Props) {
               {step === "welcome" ? tx.selfIntroFinish : tx.selfIntroNext}
             </button>
             {step !== "name" && step !== "welcome" && (
-              <button
-                onClick={next}
-                className="text-white/40 hover:text-white/70 text-sm"
-              >
-                {tx.selfIntroSkip}
-              </button>
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => setStep(steps[currentIdx - 1])}
+                  className="text-white/40 hover:text-white/70 text-sm"
+                >
+                  {lang === "he" ? "← חזור" : "← Back"}
+                </button>
+                <button
+                  onClick={next}
+                  className="text-white/40 hover:text-white/70 text-sm"
+                >
+                  {tx.selfIntroSkip}
+                </button>
+              </div>
             )}
           </div>
         </div>

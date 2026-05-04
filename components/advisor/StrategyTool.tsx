@@ -29,6 +29,7 @@ export default function StrategyTool({ advisorState, onBack, onComplete }: Props
         userProfile: advisorState.userProfile,
         diagnosis: advisorState.diagnosis,
         direction: advisorState.direction,
+        chosenPath: advisorState.chosenPath,
         userNotes: userNotes.trim(),
         lang,
       }),

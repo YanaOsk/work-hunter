@@ -72,6 +72,22 @@ function isGenericLandingPage(result: SerperResult): boolean {
   return false;
 }
 
+const JOBSEEKER_POST_MARKERS = [
+  "מחפש עבודה", "מחפשת עבודה", "מחפש/ת עבודה",
+  "זמין למשרה", "זמינה למשרה", "פנוי לתפקיד", "פנויה לתפקיד",
+  "מחפש הזדמנות", "מחפשת הזדמנות", "אני מחפש", "אני מחפשת",
+  "זמין לעבודה", "זמינה לעבודה", "מעוניין במשרה", "מעוניינת במשרה",
+  "מציג את עצמי", "קורות חיים לשיתוף", "שיתוף קו\"ח",
+  "looking for work", "seeking employment", "available for hire",
+  "open to work", "seeking a job", "job seeker", "seeking new opportunities",
+  "i am looking for", "currently seeking",
+];
+
+function isJobSeekerPost(result: SerperResult): boolean {
+  const text = `${result.title} ${result.snippet}`.toLowerCase();
+  return JOBSEEKER_POST_MARKERS.some((m) => text.includes(m.toLowerCase()));
+}
+
 async function generateSearchPlan(profileText: string): Promise<SearchPlan> {
   const text = await geminiAnalyze(SEARCH_QUERY_PROMPT(profileText), undefined, 1024, true);
   const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
@@ -129,7 +145,7 @@ async function runSearches(plan: SearchPlan): Promise<TaggedResult[]> {
 
   const all = results.flat();
   const deduped = all.filter((r, i, arr) => arr.findIndex((x) => x.link === r.link) === i);
-  const active = deduped.filter((r) => !isExpiredListing(r) && !isGenericLandingPage(r));
+  const active = deduped.filter((r) => !isExpiredListing(r) && !isGenericLandingPage(r) && !isJobSeekerPost(r));
   return active.slice(0, 18);
 }
 

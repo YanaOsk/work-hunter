@@ -358,6 +358,55 @@ export default function Home() {
     }
   };
 
+  const handleFindSimilar = async (job: JobResult) => {
+    const ctx = scoutContextRef.current;
+    if (!ctx) return;
+    const similarContext = ctx.context +
+      `\nמועמד: ראיתי תפקיד שממש מוצא חן בעיני — "${job.title}" ב-"${job.company}". אפשר למצוא לי עוד תפקידים דומים?`;
+    scoutContextRef.current = { ...ctx, context: similarContext };
+    setState((s) => ({ ...s, phase: "searching" }));
+    setIsStreaming(true);
+    const collectedJobs: JobResult[] = [];
+    let streamStarted = false;
+    const capturedProfile = state.userProfile;
+    try {
+      const res = await fetch("/api/search-jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userProfile: capturedProfile, chatContext: similarContext, lang }),
+      });
+      if (!res.ok) throw new Error("Search failed");
+      await readSearchStream(
+        res,
+        (j) => {
+          collectedJobs.push(j);
+          if (!streamStarted) {
+            streamStarted = true;
+            setState((s) => ({ ...s, phase: "results", jobResults: [j] }));
+          } else {
+            setState((s) => ({
+              ...s,
+              jobResults: [...s.jobResults, j].sort((a, b) => b.matchScore - a.matchScore),
+            }));
+          }
+        },
+        (demo) => {
+          setDemoMode(demo);
+          setState((s) => ({
+            ...s,
+            jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore),
+          }));
+        }
+      );
+    } catch {
+      if (!streamStarted) {
+        setState((s) => ({ ...s, phase: "results", jobResults: [] }));
+      }
+    } finally {
+      setIsStreaming(false);
+    }
+  };
+
   const handleReset = () => {
     setState(initialState);
     setDemoMode(false);
@@ -414,6 +463,7 @@ export default function Home() {
           isStreaming={isStreaming}
           onReset={handleReset}
           onRefine={scoutContextRef.current ? handleRefineSearch : undefined}
+          onFindSimilar={scoutContextRef.current ? handleFindSimilar : undefined}
         />
       );
   }

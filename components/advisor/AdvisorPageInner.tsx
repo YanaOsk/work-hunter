@@ -10,22 +10,32 @@ import {
   DiagnosisResult,
   DirectionResult,
   LifePath,
+  LinkedInProfile,
   MockInterview,
+  SearchStrategy,
   STAGE_ORDER,
   UserProfile,
 } from "@/lib/types";
 import {
   advanceStage,
   clearAdvisorState,
+  CompletionSnapshot,
   createInitialAdvisorState,
   getAdvisorState,
+  getPreviousSnapshot,
   migrateGuestToUser,
   saveAdvisorState,
+  saveCompletionSnapshot,
+  touchLastVisited,
 } from "@/lib/advisorState";
+import { useLanguage } from "../LanguageProvider";
+import { t } from "@/lib/i18n";
 import JourneyMap from "./JourneyMap";
 import DiagnosisTool from "./DiagnosisTool";
 import DirectionTool from "./DirectionTool";
 import CVReviewTool from "./CVReviewTool";
+import LinkedInTool from "./LinkedInTool";
+import StrategyTool from "./StrategyTool";
 import MockInterviewTool from "./MockInterviewTool";
 import SummaryView from "./SummaryView";
 import SummaryGate, { UnlockPlan } from "./SummaryGate";
@@ -34,7 +44,7 @@ import PreJourneyIntro from "./PreJourneyIntro";
 import SelfIntro from "./SelfIntro";
 import AdvisorHomeButton from "./AdvisorHomeButton";
 
-type StageView = Exclude<AdvisorStage, "done" | "strategy">;
+type StageView = Exclude<AdvisorStage, "done">;
 type View = "map" | "chat" | "summary" | "interview" | StageView;
 
 function mergeIntoProfile(
@@ -69,8 +79,6 @@ function mergeIntoProfile(
 }
 
 function normalizeStage(stage: AdvisorStage): AdvisorStage {
-  // Migrate users who completed the old "strategy" stage → treat as "done"
-  if (stage === "strategy") return "done";
   return stage;
 }
 
@@ -78,8 +86,10 @@ export default function AdvisorPageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const { data: session } = useSession();
+  const { lang } = useLanguage();
   const guestProfileId = params.get("profileId");
   const [advisorState, setAdvisorState] = useState<AdvisorState | null>(null);
+  const [previousSnapshot, setPreviousSnapshot] = useState<CompletionSnapshot | null>(null);
   const [view, setView] = useState<View>(() => (params.get("view") as View) ?? "map");
 
   const setViewAndUrl = (v: View) => {
@@ -91,6 +101,11 @@ export default function AdvisorPageInner() {
   };
 
   const profileId = session?.user?.id ?? guestProfileId;
+
+  useEffect(() => {
+    if (!profileId) return;
+    setPreviousSnapshot(getPreviousSnapshot(profileId));
+  }, [profileId]);
 
   useEffect(() => {
     if (!profileId) {
@@ -154,6 +169,9 @@ export default function AdvisorPageInner() {
             saveAdvisorState(profileId, updated);
             return updated;
           });
+          if (params.get("returnTo") === "summary") {
+            setViewAndUrl("summary");
+          }
         }
       })
       .catch(() => {});
@@ -166,7 +184,7 @@ export default function AdvisorPageInner() {
 
   const persist = (next: AdvisorState) => {
     setAdvisorState(next);
-    saveAdvisorState(profileId, next);
+    saveAdvisorState(profileId, { ...next, lastVisitedAt: new Date().toISOString() });
     if (session?.user?.email) {
       const completedCount =
         next.currentStage === "done"
@@ -196,8 +214,12 @@ export default function AdvisorPageInner() {
     const next = advanceStage(advisorState.currentStage);
     const updated: AdvisorState = { ...advisorState, ...patch, currentStage: next };
     persist(updated);
-    if (next === "done") setViewAndUrl("summary");
-    else setViewAndUrl("map");
+    if (next === "done") {
+      saveCompletionSnapshot(profileId, updated);
+      setViewAndUrl("summary");
+    } else {
+      setViewAndUrl("map");
+    }
   };
 
   const onDiagnosis = (r: DiagnosisResult) => {
@@ -231,10 +253,27 @@ export default function AdvisorPageInner() {
 
   const onCV = (r: CVReview) => completeAndAdvance({ cvReview: r });
   const onCVSkip = () => completeAndAdvance({ cvSkipped: true });
+  const onLinkedIn = (r: LinkedInProfile) => completeAndAdvance({ linkedIn: r });
+  const onLinkedInSkip = () => completeAndAdvance({ linkedInSkipped: true });
+  const onStrategy = (r: SearchStrategy) => completeAndAdvance({ strategy: r });
   const onInterview = (r: MockInterview) => persist({ ...advisorState, mockInterview: r });
 
-  const onUnlock = (_plan: UnlockPlan) => {
-    persist({ ...advisorState, isPremium: true });
+  const onUnlock = (plan: UnlockPlan) => {
+    router.push(`/checkout?plan=${plan}`);
+  };
+
+  const handleRedoStage = (stage: AdvisorStage) => {
+    if (!window.confirm(t[lang]?.stageRedoConfirm || "This will clear this stage's results. Continue?")) return;
+    const redoIdx = STAGE_ORDER.indexOf(stage);
+    const patch: Partial<AdvisorState> = { currentStage: stage };
+    if (STAGE_ORDER.indexOf("diagnosis") >= redoIdx) patch.diagnosis = null;
+    if (STAGE_ORDER.indexOf("direction") >= redoIdx) { patch.direction = null; patch.chosenPath = null; }
+    if (STAGE_ORDER.indexOf("cv") >= redoIdx) { patch.cvReview = null; patch.cvSkipped = false; }
+    if (STAGE_ORDER.indexOf("linkedin") >= redoIdx) { patch.linkedIn = null; patch.linkedInSkipped = false; }
+    if (STAGE_ORDER.indexOf("strategy") >= redoIdx) patch.strategy = null;
+    const updated = { ...advisorState, ...patch };
+    persist(updated);
+    setViewAndUrl(stage as StageView);
   };
 
   const wrap = (content: React.ReactNode) => (
@@ -279,6 +318,7 @@ export default function AdvisorPageInner() {
         onBack={backToMap}
         onOpenInterview={() => setViewAndUrl("interview")}
         onExit={handleExit}
+        onUpdate={persist}
       />
     );
   }
@@ -318,10 +358,33 @@ export default function AdvisorPageInner() {
     );
   }
 
+  if (view === "linkedin") {
+    return wrap(
+      <LinkedInTool
+        advisorState={advisorState}
+        onBack={backToMap}
+        onComplete={onLinkedIn}
+        onSkip={onLinkedInSkip}
+      />
+    );
+  }
+
+  if (view === "strategy") {
+    return wrap(
+      <StrategyTool
+        advisorState={advisorState}
+        onBack={backToMap}
+        onComplete={onStrategy}
+      />
+    );
+  }
+
   return wrap(
     <JourneyMap
       advisorState={advisorState}
+      previousSnapshot={previousSnapshot}
       onStartStage={(s) => setViewAndUrl(s as StageView)}
+      onRedoStage={handleRedoStage}
       onOpenChat={() => setViewAndUrl("chat")}
       onOpenSummary={() => setViewAndUrl("summary")}
       onOpenInterview={() => setViewAndUrl("interview")}

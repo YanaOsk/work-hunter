@@ -21,9 +21,19 @@ export function getAdvisorState(profileId: string): AdvisorState | null {
       chosenPath: parsed.chosenPath ?? null,
       cvSkipped: parsed.cvSkipped ?? false,
       cvReview: parsed.cvReview ?? null,
+      linkedIn: parsed.linkedIn ?? null,
+      linkedInSkipped: parsed.linkedInSkipped ?? false,
       strategy: parsed.strategy ?? null,
       mockInterview: parsed.mockInterview ?? null,
+      skillGap: parsed.skillGap ?? null,
+      onboardingPlan: parsed.onboardingPlan ?? null,
+      jobSearchDeadline: parsed.jobSearchDeadline ?? null,
+      freelanceKit: parsed.freelanceKit ?? null,
+      practicalPrep: parsed.practicalPrep ?? null,
+      salaryResearch: parsed.salaryResearch ?? null,
+      transitionRoadmap: parsed.transitionRoadmap ?? null,
       chatMessages: parsed.chatMessages ?? [],
+      lastVisitedAt: parsed.lastVisitedAt,
     };
   } catch {
     return null;
@@ -47,10 +57,26 @@ export function createInitialAdvisorState(profile: UserProfile): AdvisorState {
     chosenPath: null,
     cvSkipped: false,
     cvReview: null,
+    linkedIn: null,
+    linkedInSkipped: false,
     strategy: null,
     mockInterview: null,
+    skillGap: null,
+    onboardingPlan: null,
+    jobSearchDeadline: null,
+    freelanceKit: null,
+    practicalPrep: null,
+    salaryResearch: null,
+    transitionRoadmap: null,
     chatMessages: [],
   };
+}
+
+export function touchLastVisited(profileId: string): void {
+  if (typeof window === "undefined") return;
+  const state = getAdvisorState(profileId);
+  if (!state) return;
+  saveAdvisorState(profileId, { ...state, lastVisitedAt: new Date().toISOString() });
 }
 
 export function advanceStage(current: AdvisorStage): AdvisorStage {
@@ -72,6 +98,41 @@ export function getOrCreateAdvisorState(
 
 export function clearAdvisorState(profileId: string): void {
   localStorage.removeItem(`${STORAGE_KEY}_${profileId}`);
+}
+
+// ── Completion snapshot (for session comparison) ─────────────────────────────
+
+const SNAPSHOT_KEY = "work_hunter_advisor_snapshot";
+
+export interface CompletionSnapshot {
+  completedAt: string;
+  cvScore?: number;
+  topRoles?: string[];
+  chosenPath?: string;
+  mbtiType?: string;
+}
+
+export function saveCompletionSnapshot(profileId: string, state: AdvisorState): void {
+  if (typeof window === "undefined") return;
+  const snapshot: CompletionSnapshot = {
+    completedAt: new Date().toISOString(),
+    cvScore: state.cvReview?.overallScore,
+    topRoles: state.diagnosis?.topRoles,
+    chosenPath: state.chosenPath ?? undefined,
+    mbtiType: state.diagnosis?.mbtiType,
+  };
+  localStorage.setItem(`${SNAPSHOT_KEY}_${profileId}`, JSON.stringify(snapshot));
+}
+
+export function getPreviousSnapshot(profileId: string): CompletionSnapshot | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(`${SNAPSHOT_KEY}_${profileId}`);
+    if (!raw) return null;
+    return JSON.parse(raw) as CompletionSnapshot;
+  } catch {
+    return null;
+  }
 }
 
 // ── Archive ──────────────────────────────────────────────────────────────────

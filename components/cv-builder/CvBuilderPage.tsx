@@ -45,6 +45,15 @@ export default function CvBuilderPage() {
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [downloading, setDownloading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [advisorImport, setAdvisorImport] = useState<{ summary: string; improvements: Array<{ section: string; issue: string; suggestion: string }> } | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = localStorage.getItem("work_hunter_advisor_cv_import");
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed?.summary ? parsed : null;
+    } catch { return null; }
+  });
   const [showResetModal, setShowResetModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -523,6 +532,37 @@ export default function CvBuilderPage() {
   // ---------- EDITOR VIEW ----------
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+
+      {/* Advisor CV import banner */}
+      {advisorImport && (
+        <div className="print:hidden bg-blue-500/10 border-b border-blue-500/25 px-4 py-3 flex items-center gap-3">
+          <svg className="w-5 h-5 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p className="text-blue-300 text-sm flex-1">{tx.cvBuilderAdvisorBanner}</p>
+          <button
+            onClick={() => {
+              setData((prev) => ({ ...prev, summary: advisorImport.summary }));
+              try { localStorage.removeItem("work_hunter_advisor_cv_import"); } catch {}
+              setAdvisorImport(null);
+            }}
+            className="flex-shrink-0 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition"
+          >
+            {tx.cvBuilderAdvisorImportBtn}
+          </button>
+          <button
+            onClick={() => {
+              try { localStorage.removeItem("work_hunter_advisor_cv_import"); } catch {}
+              setAdvisorImport(null);
+            }}
+            className="text-white/30 hover:text-white/60 transition flex-shrink-0"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* Mobile desktop-recommendation banner */}
       <div className="lg:hidden print:hidden bg-amber-500/10 border-b border-amber-500/25 px-4 py-3 flex items-center gap-3 animate-fade-in-down">

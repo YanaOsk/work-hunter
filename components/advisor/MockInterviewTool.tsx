@@ -12,7 +12,7 @@ interface Props {
   onUpdate: (next: MockInterview) => void;
 }
 
-type Stage = "intro" | "role" | "chatting" | "fetching-feedback" | "done";
+type Stage = "intro" | "role" | "loading-questions" | "questions" | "chatting" | "fetching-feedback" | "done";
 
 export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Props) {
   const { lang } = useLanguage();
@@ -22,13 +22,16 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
   const [stage, setStage] = useState<Stage>(
     existing?.feedback ? "done" : existing?.messages.length ? "chatting" : "intro"
   );
-  const [role, setRole] = useState(existing?.role || "");
+  const suggestedRoles = advisorState.diagnosis?.topRoles ?? [];
+  const [role, setRole] = useState(existing?.role || advisorState.diagnosis?.topRoles?.[0] || "");
   const [messages, setMessages] = useState<ChatMessage[]>(existing?.messages || []);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [finished, setFinished] = useState(existing?.finished || false);
   const [error, setError] = useState("");
   const [localFeedback, setLocalFeedback] = useState<string | null>(existing?.feedback || null);
+  const [prepQuestions, setPrepQuestions] = useState<string[]>([]);
+  const [prepTips, setPrepTips] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,6 +48,31 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
       ...partial,
     };
     onUpdate(next);
+  };
+
+  const loadQuestions = async () => {
+    if (!role.trim()) return;
+    setStage("loading-questions");
+    try {
+      const res = await fetch("/api/advisor/interview-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userProfile: advisorState.userProfile,
+          diagnosis: advisorState.diagnosis,
+          role: role.trim(),
+          chosenPath: advisorState.chosenPath,
+          lang,
+        }),
+      });
+      const data = await res.json();
+      setPrepQuestions(data.questions ?? []);
+      setPrepTips(data.tips ?? []);
+      setStage("questions");
+    } catch {
+      setStage("chatting");
+      start();
+    }
   };
 
   const start = async () => {
@@ -182,6 +210,24 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
             <h1 className="text-2xl font-bold text-white">{tx.toolInterview}</h1>
             <p className="text-white/70 leading-relaxed">{tx.interviewIntroRole}</p>
 
+            {suggestedRoles.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {suggestedRoles.map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setRole(r)}
+                    className={`text-sm px-3 py-1.5 rounded-full border transition ${
+                      role === r
+                        ? "bg-purple-600 border-purple-500 text-white"
+                        : "bg-white/5 border-white/20 text-white/70 hover:bg-white/10"
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            )}
+
             <input
               value={role}
               onChange={(e) => setRole(e.target.value)}
@@ -197,11 +243,78 @@ export default function MockInterviewTool({ advisorState, onBack, onUpdate }: Pr
             )}
 
             <button
-              onClick={start}
+              onClick={loadQuestions}
               disabled={!role.trim()}
               className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition"
             >
               {tx.interviewStart}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (stage === "loading-questions") {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center p-6">
+        <div className="text-center">
+          <svg className="animate-spin w-10 h-10 text-purple-400 mx-auto mb-4" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <p className="text-white/70">{tx.interviewQuestionsLoading}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (stage === "questions") {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 p-6">
+        <div className="max-w-2xl mx-auto">
+          <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">
+            {tx.backToAdvisor}
+          </button>
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 space-y-6">
+            <div>
+              <h1 className="text-2xl font-bold text-white mb-1">{tx.interviewQuestionsTitle}</h1>
+              <p className="text-purple-300 text-sm">{role}</p>
+              <p className="text-white/50 text-sm mt-2">{tx.interviewQuestionsSubtitle}</p>
+            </div>
+
+            {prepQuestions.length > 0 && (
+              <ol className="space-y-3">
+                {prepQuestions.map((q, i) => (
+                  <li key={i} className="flex gap-3 items-start">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold flex items-center justify-center mt-0.5">
+                      {i + 1}
+                    </span>
+                    <p className="text-white/85 text-sm leading-relaxed">{q}</p>
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            {prepTips.length > 0 && (
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl px-4 py-3">
+                <p className="text-amber-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.interviewTipsTitle}</p>
+                <ul className="space-y-1.5">
+                  {prepTips.map((tip, i) => (
+                    <li key={i} className="flex gap-2 text-white/75 text-sm">
+                      <span className="text-amber-400 flex-shrink-0">•</span>
+                      <span>{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <button
+              onClick={start}
+              className="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3.5 rounded-xl transition text-base"
+            >
+              {tx.interviewQuestionsStart} →
             </button>
           </div>
         </div>
