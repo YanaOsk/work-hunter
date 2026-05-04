@@ -251,7 +251,8 @@ export default function Home() {
   const handleInterviewComplete = async (
     context: string,
     convMessages: Array<{ role: "user" | "assistant"; content: string }>,
-    existingConvId?: string
+    existingConvId?: string,
+    cvUsage?: "cv" | "text" | "both"
   ) => {
     scoutContextRef.current = { context, messages: convMessages, convId: existingConvId };
     if (state.userProfile) saveProfile(state.userProfile);
@@ -304,7 +305,7 @@ export default function Home() {
       const res = await fetch("/api/search-jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userProfile: capturedProfile, chatContext: context, lang }),
+        body: JSON.stringify({ userProfile: capturedProfile, chatContext: context, lang, cvUsage }),
       });
       if (!res.ok) throw new Error("Search failed");
 
@@ -440,7 +441,7 @@ export default function Home() {
       return (
         <InterviewPhase
           userProfile={state.userProfile!}
-          onComplete={(ctx: string, msgs: Array<{ role: "user" | "assistant"; content: string }>, convId?: string) => handleInterviewComplete(ctx, msgs, convId)}
+          onComplete={(ctx, msgs, convId, cvUsage) => handleInterviewComplete(ctx, msgs, convId, cvUsage)}
           onBack={() => {
             setState((s) => ({ ...s, phase: "upload", userProfile: null }));
             setResumeConv(null);

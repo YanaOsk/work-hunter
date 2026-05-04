@@ -11,18 +11,29 @@ export async function POST(request: NextRequest) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  let body: { userProfile?: { parsedData?: Record<string, unknown> }; chatContext?: string; lang?: string };
+  let body: { userProfile?: { parsedData?: Record<string, unknown> }; chatContext?: string; lang?: string; cvUsage?: "cv" | "text" | "both" };
   try {
     body = await request.json();
   } catch {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400 });
   }
 
-  const { userProfile, chatContext, lang = "he" } = body;
-  const profileText = JSON.stringify({
-    ...(userProfile?.parsedData ?? {}),
-    additionalContext: chatContext,
-  });
+  const { userProfile, chatContext, lang = "he", cvUsage } = body;
+
+  let profileText: string;
+  if (cvUsage === "text") {
+    // User wants to ignore their CV — search only by what they said in the conversation
+    profileText = JSON.stringify({ additionalContext: chatContext });
+  } else if (cvUsage === "cv") {
+    // User wants CV-only search — ignore conversational context
+    profileText = JSON.stringify({ ...(userProfile?.parsedData ?? {}) });
+  } else {
+    // "both" or not set — merge CV data with conversation (default)
+    profileText = JSON.stringify({
+      ...(userProfile?.parsedData ?? {}),
+      additionalContext: chatContext,
+    });
+  }
 
   const encoder = new TextEncoder();
 

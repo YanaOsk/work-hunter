@@ -11,9 +11,11 @@ interface EnrichedMessage extends ChatMessage {
   suggestedReplies?: string[];
 }
 
+type CvUsage = "cv" | "text" | "both";
+
 interface Props {
   userProfile: UserProfile;
-  onComplete: (context: string, messages: Array<{ role: "user" | "assistant"; content: string }>, convId?: string) => void;
+  onComplete: (context: string, messages: Array<{ role: "user" | "assistant"; content: string }>, convId?: string, cvUsage?: CvUsage) => void;
   onBack: () => void;
   initialMessages?: Array<{ role: "user" | "assistant"; content: string }>;
   initialConvId?: string;
@@ -27,6 +29,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [readyToSearch, setReadyToSearch] = useState(initialReadyToSearch ?? false);
+  const [cvUsage, setCvUsage] = useState<CvUsage | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
   const convIdRef = useRef<string | null>(null);
@@ -175,12 +178,24 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
     if (e.key === "Enter" && !e.shiftKey && !readyToSearch) { e.preventDefault(); sendMessage(); }
   };
 
-  const handleStartSearch = () => {
+  const pd = userProfile.parsedData as Record<string, unknown> | undefined;
+  const hasCvData = !!(pd?.name || pd?.currentRole || (pd?.skills as string[] | undefined)?.length);
+  const userMessageCount = messages.filter((m) => m.role === "user").length;
+  const hasConversationContext = userMessageCount > 1;
+  const needsCvChoice = readyToSearch && hasCvData && hasConversationContext && cvUsage === null;
+
+  const handleStartSearch = (chosenUsage?: CvUsage) => {
+    const usage = chosenUsage ?? cvUsage ?? "both";
     const context = messagesRef.current
       .slice(-12)
       .map((m) => `${m.role === "user" ? "מועמד" : "Scout"}: ${m.content}`)
       .join("\n");
-    onComplete(context, messagesRef.current.map((m) => ({ role: m.role, content: m.content })), convIdRef.current ?? undefined);
+    onComplete(context, messagesRef.current.map((m) => ({ role: m.role, content: m.content })), convIdRef.current ?? undefined, usage);
+  };
+
+  const handleCvChoice = (choice: CvUsage) => {
+    setCvUsage(choice);
+    handleStartSearch(choice);
   };
 
   const profileData = userProfile.parsedData;
@@ -296,10 +311,43 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
             </div>
           )}
 
-          {readyToSearch && !loading && (
+          {readyToSearch && !loading && needsCvChoice && (
+            <div className="flex flex-col items-center gap-4 pt-2 pb-4 px-2">
+              <p className="text-white/70 text-sm text-center">
+                {lang === "he"
+                  ? "יש לי שני מקורות מידע עליך — על מה לבסס את החיפוש?"
+                  : "I have two sources of info about you — what should I base the search on?"}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+                <button
+                  onClick={() => handleCvChoice("cv")}
+                  className="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-purple-400 text-white text-sm font-semibold px-4 py-3 rounded-xl transition"
+                >
+                  <span>📄</span>
+                  {lang === "he" ? "קורות חיים בלבד" : "CV only"}
+                </button>
+                <button
+                  onClick={() => handleCvChoice("text")}
+                  className="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-purple-400 text-white text-sm font-semibold px-4 py-3 rounded-xl transition"
+                >
+                  <span>💬</span>
+                  {lang === "he" ? "מה שאמרתי" : "What I said"}
+                </button>
+                <button
+                  onClick={() => handleCvChoice("both")}
+                  className="flex-1 flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-3 rounded-xl transition"
+                >
+                  <span>🔗</span>
+                  {lang === "he" ? "שניהם" : "Both"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {readyToSearch && !loading && !needsCvChoice && (
             <div className="flex justify-center pt-2 pb-4">
               <button
-                onClick={handleStartSearch}
+                onClick={() => handleStartSearch()}
                 className="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold px-8 py-4 rounded-2xl text-base sm:text-lg transition-all shadow-lg shadow-emerald-900/40 animate-pulse hover:animate-none"
               >
                 {lang === "he" ? "הבנתי הכל! בואו נתחיל בחיפוש 🚀" : "Got everything! Let's start searching 🚀"}
