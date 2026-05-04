@@ -1,24 +1,30 @@
 import type { AppMode } from "./types";
 
-let _pending: AppMode | null = null;
-let _advisorCtx: string | null = null;
+const AUTO_START_KEY = "wh_auto_start";
+const ADVISOR_CTX_KEY = "wh_advisor_ctx";
 
 export function queueAutoStart(mode: AppMode): void {
-  _pending = mode;
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem(AUTO_START_KEY, mode);
+  }
 }
 
 export function consumeAutoStart(): AppMode | null {
-  const m = _pending;
-  _pending = null;
+  if (typeof window === "undefined") return null;
+  const m = sessionStorage.getItem(AUTO_START_KEY) as AppMode | null;
+  if (m) sessionStorage.removeItem(AUTO_START_KEY);
   return m;
 }
 
 export function queueAdvisorScoutContext(ctx: string): void {
-  _advisorCtx = ctx;
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem(ADVISOR_CTX_KEY, ctx);
+  }
 }
 
 export function consumeAdvisorScoutContext(): string | null {
-  const c = _advisorCtx;
-  _advisorCtx = null;
+  if (typeof window === "undefined") return null;
+  const c = sessionStorage.getItem(ADVISOR_CTX_KEY);
+  if (c) sessionStorage.removeItem(ADVISOR_CTX_KEY);
   return c;
 }
