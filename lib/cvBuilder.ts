@@ -28,17 +28,22 @@ export interface CvMilitary {
   reserveDuty: boolean;
 }
 
-export type CvTemplate = "slate" | "minimal" | "accent" | "executive" | "tech" | "bold" | "elegant" | "gradient";
+export type CvTemplate = "slate" | "minimal" | "accent" | "executive" | "tech" | "bold" | "elegant" | "gradient" | "ats" | "clean" | "split" | "creative" | "exec2";
 
 export const CV_TEMPLATES: { id: CvTemplate; labelHe: string; labelEn: string; supportsPhoto?: boolean }[] = [
-  { id: "slate",     labelHe: "Nova",     labelEn: "Nova",     supportsPhoto: true  },
-  { id: "minimal",   labelHe: "Nordic",   labelEn: "Nordic",   supportsPhoto: true  },
-  { id: "accent",    labelHe: "Sidebar",  labelEn: "Sidebar",  supportsPhoto: true  },
-  { id: "executive", labelHe: "Classic",  labelEn: "Classic"                        },
-  { id: "tech",      labelHe: "Code",     labelEn: "Code"                           },
-  { id: "bold",      labelHe: "Impact",   labelEn: "Impact"                         },
-  { id: "elegant",   labelHe: "Timeline", labelEn: "Timeline", supportsPhoto: true  },
-  { id: "gradient",  labelHe: "Prism",    labelEn: "Prism"                          },
+  { id: "slate",     labelHe: "Nova",          labelEn: "Nova",          supportsPhoto: true  },
+  { id: "minimal",   labelHe: "Nordic",        labelEn: "Nordic",        supportsPhoto: true  },
+  { id: "accent",    labelHe: "Sidebar",       labelEn: "Sidebar",       supportsPhoto: true  },
+  { id: "executive", labelHe: "Classic",       labelEn: "Classic"                             },
+  { id: "tech",      labelHe: "Code",          labelEn: "Code"                                },
+  { id: "bold",      labelHe: "Impact",        labelEn: "Impact"                              },
+  { id: "elegant",   labelHe: "Timeline",      labelEn: "Timeline",      supportsPhoto: true  },
+  { id: "gradient",  labelHe: "Prism",         labelEn: "Prism"                               },
+  { id: "ats",       labelHe: "ATS",           labelEn: "ATS"                                 },
+  { id: "clean",     labelHe: "Minimalist",    labelEn: "Minimalist",    supportsPhoto: true  },
+  { id: "split",     labelHe: "Split",         labelEn: "Split",         supportsPhoto: true  },
+  { id: "creative",  labelHe: "Creative",      labelEn: "Creative",      supportsPhoto: true  },
+  { id: "exec2",     labelHe: "Executive Pro", labelEn: "Executive Pro", supportsPhoto: true  },
 ];
 
 export const CV_ACCENT_COLORS: { hex: string; labelHe: string; labelEn: string }[] = [

@@ -63,6 +63,11 @@ export default function CvPreview({ data }: Props) {
     case "bold":      return <ImpactTemplate {...props} />;
     case "elegant":   return <TimelineTemplate {...props} />;
     case "gradient":  return <PrismTemplate {...props} />;
+    case "ats":       return <AtsTemplate {...props} />;
+    case "clean":     return <MinimalistTemplate {...props} />;
+    case "split":     return <SplitTemplate {...props} />;
+    case "creative":  return <CreativeTemplate {...props} />;
+    case "exec2":     return <ExecutiveProTemplate {...props} />;
     default:          return <NovaTemplate {...props} />;
   }
 }
@@ -1213,5 +1218,642 @@ function PrismSection({ title, children, ac }: { title: string; children: React.
       </div>
       {children}
     </section>
+  );
+}
+
+// ─── Template 9: ATS (clean single-column, ATS-optimised) ─────────────────────
+
+function AtsTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering }: TemplateProps) {
+  const p = data.personal;
+  return (
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none" dir={dir} style={{ minHeight: 900 }}>
+      <div className="px-10 pt-10 pb-6 text-center border-b-2 border-slate-900">
+        <h1 className="text-[28px] font-bold text-slate-900 tracking-tight leading-tight mb-1">
+          {p.fullName || <span className="text-slate-300">{tx.cvPreviewEmptyName}</span>}
+        </h1>
+        {p.title && <p className="text-[13px] text-slate-700 mb-3">{p.title}</p>}
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-slate-600 text-[12px]">
+          {p.email    && <span dir="ltr">{p.email}</span>}
+          {p.email && (p.phone || p.location || p.linkedin) && <span className="text-slate-300">|</span>}
+          {p.phone    && <span dir="ltr">{p.phone}</span>}
+          {p.phone && (p.location || p.linkedin) && <span className="text-slate-300">|</span>}
+          {p.location && <span>{p.location}</span>}
+          {p.location && p.linkedin && <span className="text-slate-300">|</span>}
+          {p.linkedin && <span dir="ltr">{p.linkedin}</span>}
+        </div>
+      </div>
+
+      <div className="px-10 py-7 space-y-5">
+        {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+
+        {data.summary && (
+          <AtsSection title={tx.cvSecSummary}>
+            <p className="text-slate-700 text-[13px] leading-relaxed whitespace-pre-wrap">{data.summary}</p>
+          </AtsSection>
+        )}
+
+        {data.experiences.length > 0 && (
+          <AtsSection title={tx.cvSecExperience}>
+            <div className="space-y-4">
+              {data.experiences.map((exp) => (
+                <div key={exp.id}>
+                  <div className="flex justify-between items-baseline flex-wrap gap-1">
+                    <span className="font-bold text-slate-900 text-[13.5px]">{exp.role || "—"}</span>
+                    <span className="text-slate-500 text-[12px]" dir="ltr">{exp.start || "—"} – {exp.current ? tx.cvFieldPresent : exp.end || "—"}</span>
+                  </div>
+                  {exp.company && <div className="text-[12.5px] font-semibold text-slate-700 italic">{renderMixedText(exp.company)}{exp.location ? `, ${exp.location}` : ""}</div>}
+                  {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed mt-1 whitespace-pre-wrap">{exp.description}</p>}
+                </div>
+              ))}
+            </div>
+          </AtsSection>
+        )}
+
+        {data.educations.length > 0 && (
+          <AtsSection title={tx.cvSecEducation}>
+            <div className="space-y-3">
+              {data.educations.map((edu) => (
+                <div key={edu.id}>
+                  <div className="flex justify-between items-baseline flex-wrap gap-1">
+                    <span className="font-bold text-slate-900 text-[13.5px]">{edu.degree || "—"}</span>
+                    <span className="text-slate-500 text-[12px]" dir="ltr">{edu.start || "—"} – {edu.current ? tx.cvFieldPresent : edu.end || "—"}</span>
+                  </div>
+                  {edu.school && <div className="text-[12.5px] text-slate-700 italic">{renderMixedText(edu.school)}{edu.location ? `, ${edu.location}` : ""}</div>}
+                </div>
+              ))}
+            </div>
+          </AtsSection>
+        )}
+
+        {hasMilitary && (
+          <AtsSection title={tx.cvSecMilitary}>
+            <div className="flex justify-between items-baseline flex-wrap gap-1">
+              {data.military.role && <span className="font-bold text-slate-900 text-[13.5px]">{data.military.role}</span>}
+              {(data.military.start || data.military.end) && (
+                <span className="text-slate-500 text-[12px]" dir="ltr">{data.military.start || "—"} – {data.military.end || "—"}</span>
+              )}
+            </div>
+            {data.military.unit && <div className="text-[12.5px] text-slate-700 italic">{data.military.unit}</div>}
+            {data.military.reserveDuty && <div className="text-slate-600 text-[12.5px] mt-0.5">{tx.cvFieldMilReserve}</div>}
+          </AtsSection>
+        )}
+
+        {skillsList.length > 0 && (
+          <AtsSection title={tx.cvSecSkills}>
+            <p className="text-slate-700 text-[13px] leading-relaxed">{skillsList.join(" · ")}</p>
+          </AtsSection>
+        )}
+
+        {languagesList.length > 0 && (
+          <AtsSection title={tx.cvSecLanguages}>
+            <p className="text-slate-700 text-[13px]">{languagesList.join(" · ")}</p>
+          </AtsSection>
+        )}
+
+        {hasVolunteering && data.volunteering && (
+          <AtsSection title={tx.cvSecVolunteering}>
+            <p className="text-slate-700 text-[13px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+          </AtsSection>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AtsSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <h2 className="text-[11.5px] font-bold uppercase tracking-[0.1em] text-slate-900 mb-2 pb-1 border-b-2 border-slate-900">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+// ─── Template 10: Minimalist (ultra-clean, lots of whitespace) ─────────────────
+
+function MinimalistTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
+  const p = data.personal;
+  return (
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none" dir={dir} style={{ minHeight: 900 }}>
+      <div className="px-10 pt-12 pb-8">
+        <div className="flex items-end justify-between gap-6">
+          <div>
+            <h1 className="text-[42px] font-light text-slate-900 tracking-tight leading-none mb-2">
+              {p.fullName || <span className="text-slate-200">{tx.cvPreviewEmptyName}</span>}
+            </h1>
+            <p className="text-[14px] font-medium tracking-[0.1em]" style={{ color: ac }}>
+              {p.title || <span className="text-slate-200">{tx.cvPreviewEmptyTitle}</span>}
+            </p>
+          </div>
+          {p.photo && (
+            <img src={p.photo} className="w-[72px] h-[72px] rounded-full object-cover flex-shrink-0" style={{ border: `2px solid ${rgba(ac, 0.25)}` }} alt="" />
+          )}
+        </div>
+        <div className="flex flex-wrap gap-x-5 gap-y-1 mt-5 text-slate-400 text-[11.5px]">
+          {p.email    && <span dir="ltr">{p.email}</span>}
+          {p.phone    && <span dir="ltr">{p.phone}</span>}
+          {p.location && <span>{p.location}</span>}
+          {p.linkedin && <span dir="ltr">{p.linkedin}</span>}
+          {p.website  && <span dir="ltr">{p.website}</span>}
+        </div>
+      </div>
+
+      <div className="mx-10 mb-8" style={{ height: 1, backgroundColor: rgba(ac, 0.3) }} />
+
+      <div className="px-10 pb-10 space-y-8">
+        {isEmpty && <p className="text-slate-300 text-center py-10">{tx.cvPlaceholder}</p>}
+
+        {data.summary && (
+          <MinimalistSection title={tx.cvSecSummary} ac={ac}>
+            <p className="text-slate-500 text-[13.5px] leading-loose whitespace-pre-wrap">{data.summary}</p>
+          </MinimalistSection>
+        )}
+
+        {data.experiences.length > 0 && (
+          <MinimalistSection title={tx.cvSecExperience} ac={ac}>
+            <div className="space-y-6">
+              {data.experiences.map((exp) => (
+                <div key={exp.id}>
+                  <div className="flex justify-between items-baseline gap-2 flex-wrap mb-0.5">
+                    <h3 className="font-semibold text-slate-900 text-[14.5px]">{exp.role || "—"}</h3>
+                    <span className="text-slate-400 text-[11.5px]" dir="ltr">{exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}</span>
+                  </div>
+                  {exp.company && <div className="text-[12.5px] mb-1.5" style={{ color: ac }}>{renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                  {exp.description && <p className="text-slate-500 text-[13px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                </div>
+              ))}
+            </div>
+          </MinimalistSection>
+        )}
+
+        {data.educations.length > 0 && (
+          <MinimalistSection title={tx.cvSecEducation} ac={ac}>
+            <div className="space-y-4">
+              {data.educations.map((edu) => (
+                <div key={edu.id}>
+                  <div className="flex justify-between items-baseline gap-2 flex-wrap">
+                    <h3 className="font-semibold text-slate-900 text-[14px]">{edu.degree || "—"}</h3>
+                    <span className="text-slate-400 text-[11.5px]" dir="ltr">{edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}</span>
+                  </div>
+                  {edu.school && <div className="text-[12.5px]" style={{ color: ac }}>{renderMixedText(edu.school)}{edu.location ? ` · ${edu.location}` : ""}</div>}
+                </div>
+              ))}
+            </div>
+          </MinimalistSection>
+        )}
+
+        {hasMilitary && (
+          <MinimalistSection title={tx.cvSecMilitary} ac={ac}>
+            <div className="flex justify-between items-baseline gap-2 flex-wrap">
+              {data.military.role && <h3 className="font-semibold text-slate-900 text-[14px]">{data.military.role}</h3>}
+              {(data.military.start || data.military.end) && (
+                <span className="text-slate-400 text-[11.5px]" dir="ltr">{data.military.start} – {data.military.end}</span>
+              )}
+            </div>
+            {data.military.unit && <div className="text-[12.5px]" style={{ color: ac }}>{data.military.unit}</div>}
+            {data.military.reserveDuty && <div className="text-slate-400 text-[12px] mt-0.5">{tx.cvFieldMilReserve}</div>}
+          </MinimalistSection>
+        )}
+
+        <div className="grid grid-cols-2 gap-8">
+          {skillsList.length > 0 && (
+            <MinimalistSection title={tx.cvSecSkills} ac={ac}>
+              <div className="flex flex-wrap gap-2">
+                {skillsList.map((s, i) => (
+                  <span key={i} className="text-[11.5px] text-slate-600 px-3 py-1 rounded-full border border-slate-200">{s}</span>
+                ))}
+              </div>
+            </MinimalistSection>
+          )}
+          {languagesList.length > 0 && (
+            <MinimalistSection title={tx.cvSecLanguages} ac={ac}>
+              <div className="space-y-1">
+                {languagesList.map((l, i) => <div key={i} className="text-slate-500 text-[13px]">{l}</div>)}
+              </div>
+            </MinimalistSection>
+          )}
+          {hasVolunteering && data.volunteering && (
+            <MinimalistSection title={tx.cvSecVolunteering} ac={ac}>
+              <p className="text-slate-500 text-[13px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+            </MinimalistSection>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MinimalistSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <section>
+      <div className="flex items-center gap-3 mb-4">
+        <h2 className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">{title}</h2>
+        <div className="flex-1 h-px bg-slate-100" />
+      </div>
+      {children}
+    </section>
+  );
+}
+
+// ─── Template 11: Split (functional two-column with coloured header) ───────────
+
+function SplitTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
+  const p = data.personal;
+  const contactLabel = dir === "rtl" ? "פרטי קשר" : "Contact";
+  return (
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
+      <div className="px-8 pt-8 pb-7 text-white" style={{ background: `linear-gradient(120deg, ${ac} 0%, ${rgba(ac, 0.82)} 100%)` }}>
+        <div className="flex items-center gap-5">
+          {p.photo && (
+            <img src={p.photo} className="w-[78px] h-[78px] rounded-lg object-cover flex-shrink-0 shadow-lg" style={{ border: "2px solid rgba(255,255,255,0.35)" }} alt="" />
+          )}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-[28px] font-bold text-white leading-tight mb-1">
+              {p.fullName || <span className="opacity-40">{tx.cvPreviewEmptyName}</span>}
+            </h1>
+            <p className="text-white/75 text-[13px] font-medium">
+              {p.title || <span className="opacity-40">{tx.cvPreviewEmptyTitle}</span>}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex">
+        <div className="w-[37%] flex-shrink-0 bg-slate-50 border-e border-slate-100 px-5 py-7">
+          <SplitSideSection title={contactLabel} ac={ac}>
+            <div className="space-y-2">
+              {p.email    && <div className="flex items-center gap-2 text-slate-600 text-[11.5px]"><CIcon d={ICON_EMAIL} />{ltrSpan(p.email)}</div>}
+              {p.phone    && <div className="flex items-center gap-2 text-slate-600 text-[11.5px]"><CIcon d={ICON_PHONE} />{ltrSpan(p.phone)}</div>}
+              {p.location && <div className="flex items-center gap-2 text-slate-600 text-[11.5px]"><CIcon d={ICON_LOCATION} />{p.location}</div>}
+              {p.linkedin && <div className="flex items-start gap-2 text-slate-600 text-[11.5px]" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3 mt-0.5" /><span className="break-all">{p.linkedin}</span></div>}
+            </div>
+          </SplitSideSection>
+
+          {skillsList.length > 0 && (
+            <SplitSideSection title={tx.cvSecSkills} ac={ac}>
+              <div className="space-y-1.5">
+                {skillsList.map((s, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: ac }} />
+                    <span className="text-slate-600 text-[12px]">{s}</span>
+                  </div>
+                ))}
+              </div>
+            </SplitSideSection>
+          )}
+
+          {data.educations.length > 0 && (
+            <SplitSideSection title={tx.cvSecEducation} ac={ac}>
+              <div className="space-y-3">
+                {data.educations.map((edu) => (
+                  <div key={edu.id}>
+                    <div className="font-semibold text-slate-800 text-[12.5px]">{edu.degree || "—"}</div>
+                    {edu.school && <div className="text-[11.5px]" style={{ color: ac }}>{renderMixedText(edu.school)}</div>}
+                    {(edu.start || edu.end) && <div className="text-slate-400 text-[11px]" dir="ltr">{edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}</div>}
+                  </div>
+                ))}
+              </div>
+            </SplitSideSection>
+          )}
+
+          {languagesList.length > 0 && (
+            <SplitSideSection title={tx.cvSecLanguages} ac={ac}>
+              <div className="space-y-1">
+                {languagesList.map((l, i) => <div key={i} className="text-slate-600 text-[12px]">{l}</div>)}
+              </div>
+            </SplitSideSection>
+          )}
+
+          {hasMilitary && (
+            <SplitSideSection title={tx.cvSecMilitary} ac={ac}>
+              {data.military.role && <div className="font-semibold text-slate-800 text-[12.5px]">{data.military.role}</div>}
+              {data.military.unit && <div className="text-[11.5px]" style={{ color: ac }}>{data.military.unit}</div>}
+              {(data.military.start || data.military.end) && <div className="text-slate-400 text-[11px]" dir="ltr">{data.military.start} – {data.military.end}</div>}
+              {data.military.reserveDuty && <div className="text-slate-500 text-[11.5px] mt-0.5">{tx.cvFieldMilReserve}</div>}
+            </SplitSideSection>
+          )}
+        </div>
+
+        <div className="flex-1 px-7 py-7">
+          {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+
+          {data.summary && (
+            <SplitMainSection title={tx.cvSecSummary} ac={ac}>
+              <p className="text-slate-600 text-[13px] leading-relaxed whitespace-pre-wrap">{data.summary}</p>
+            </SplitMainSection>
+          )}
+
+          {data.experiences.length > 0 && (
+            <SplitMainSection title={tx.cvSecExperience} ac={ac}>
+              <div className="space-y-5">
+                {data.experiences.map((exp) => (
+                  <div key={exp.id}>
+                    <div className="flex justify-between items-start flex-wrap gap-1 mb-0.5">
+                      <h3 className="font-bold text-slate-900 text-[14px]">{exp.role || "—"}</h3>
+                      <span className="text-[11px] px-2 py-0.5 rounded whitespace-nowrap" style={{ backgroundColor: rgba(ac, 0.08), color: ac }} dir="ltr">
+                        {exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}
+                      </span>
+                    </div>
+                    {exp.company && <div className="text-[12.5px] font-semibold mb-1.5" style={{ color: ac }}>{renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                    {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                  </div>
+                ))}
+              </div>
+            </SplitMainSection>
+          )}
+
+          {hasVolunteering && data.volunteering && (
+            <SplitMainSection title={tx.cvSecVolunteering} ac={ac}>
+              <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+            </SplitMainSection>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SplitSideSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <div className="mb-6 last:mb-0">
+      <h2 className="text-[9.5px] font-black uppercase tracking-[0.16em] mb-2.5 pb-1.5 border-b" style={{ color: ac, borderColor: rgba(ac, 0.2) }}>{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function SplitMainSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <section className="mb-6 last:mb-0">
+      <h2 className="text-[10.5px] font-black uppercase tracking-[0.14em] mb-2" style={{ color: ac }}>{title}</h2>
+      <div className="h-px mb-3" style={{ backgroundColor: rgba(ac, 0.18) }} />
+      {children}
+    </section>
+  );
+}
+
+// ─── Template 12: Creative (rounded cards, soft palette) ──────────────────────
+
+function CreativeTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
+  const p = data.personal;
+  return (
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none" dir={dir} style={{ minHeight: 900 }}>
+      <div className="text-center px-10 pt-12 pb-8" style={{ background: `linear-gradient(180deg, ${rgba(ac, 0.07)} 0%, transparent 100%)` }}>
+        {p.photo ? (
+          <img src={p.photo} className="w-[88px] h-[88px] rounded-2xl object-cover mx-auto mb-4 shadow-lg" style={{ border: `3px solid ${rgba(ac, 0.25)}` }} alt="" />
+        ) : (
+          <div className="w-[72px] h-[72px] rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-white shadow-lg"
+            style={{ background: `linear-gradient(135deg, ${ac} 0%, ${rgba(ac, 0.7)} 100%)` }}>
+            {p.fullName ? p.fullName.charAt(0).toUpperCase() : "?"}
+          </div>
+        )}
+        <h1 className="text-[30px] font-bold text-slate-900 leading-tight mb-1.5">
+          {p.fullName || <span className="text-slate-300">{tx.cvPreviewEmptyName}</span>}
+        </h1>
+        <p className="text-[13px] font-semibold mb-5" style={{ color: ac }}>
+          {p.title || <span className="text-slate-300">{tx.cvPreviewEmptyTitle}</span>}
+        </p>
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5">
+          {p.email    && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_EMAIL} />{ltrSpan(p.email)}</span>}
+          {p.phone    && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_PHONE} />{ltrSpan(p.phone)}</span>}
+          {p.location && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]"><CIcon d={ICON_LOCATION} />{p.location}</span>}
+          {p.linkedin && <span className="flex items-center gap-1.5 text-slate-500 text-[12px]" dir="ltr"><CIcon d={ICON_LINK} />{p.linkedin}</span>}
+        </div>
+      </div>
+
+      <div className="px-8 pb-8 space-y-5">
+        {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+
+        {data.summary && (
+          <CreativeSection title={tx.cvSecSummary} ac={ac}>
+            <p className="text-slate-600 text-[13.5px] leading-relaxed whitespace-pre-wrap">{data.summary}</p>
+          </CreativeSection>
+        )}
+
+        {data.experiences.length > 0 && (
+          <CreativeSection title={tx.cvSecExperience} ac={ac}>
+            <div className="space-y-3">
+              {data.experiences.map((exp) => (
+                <div key={exp.id} className="rounded-xl p-4" style={{ backgroundColor: rgba(ac, 0.04), border: `1.5px solid ${rgba(ac, 0.12)}` }}>
+                  <div className="flex justify-between items-start flex-wrap gap-1 mb-0.5">
+                    <h3 className="font-bold text-slate-900 text-[14px]">{exp.role || "—"}</h3>
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-full font-medium whitespace-nowrap" style={{ backgroundColor: rgba(ac, 0.12), color: ac }} dir="ltr">
+                      {exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}
+                    </span>
+                  </div>
+                  {exp.company && <div className="text-[12.5px] font-semibold mb-1.5" style={{ color: ac }}>{renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                  {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                </div>
+              ))}
+            </div>
+          </CreativeSection>
+        )}
+
+        {data.educations.length > 0 && (
+          <CreativeSection title={tx.cvSecEducation} ac={ac}>
+            <div className="grid grid-cols-2 gap-3">
+              {data.educations.map((edu) => (
+                <div key={edu.id} className="rounded-xl p-4" style={{ backgroundColor: rgba(ac, 0.04), border: `1.5px solid ${rgba(ac, 0.12)}` }}>
+                  <h3 className="font-bold text-slate-900 text-[13.5px] mb-0.5">{edu.degree || "—"}</h3>
+                  {edu.school && <div className="text-[12px] font-semibold mb-1" style={{ color: ac }}>{renderMixedText(edu.school)}</div>}
+                  {(edu.start || edu.end) && <div className="text-slate-400 text-[11px]" dir="ltr">{edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}</div>}
+                </div>
+              ))}
+            </div>
+          </CreativeSection>
+        )}
+
+        {hasMilitary && (
+          <CreativeSection title={tx.cvSecMilitary} ac={ac}>
+            <div className="rounded-xl p-4" style={{ backgroundColor: rgba(ac, 0.04), border: `1.5px solid ${rgba(ac, 0.12)}` }}>
+              <div className="flex justify-between items-start flex-wrap gap-1">
+                {data.military.role && <h3 className="font-bold text-slate-900 text-[13.5px]">{data.military.role}</h3>}
+                {(data.military.start || data.military.end) && <span className="text-slate-400 text-[11px]" dir="ltr">{data.military.start} – {data.military.end}</span>}
+              </div>
+              {data.military.unit && <div className="text-[12px] font-semibold mt-0.5" style={{ color: ac }}>{data.military.unit}</div>}
+              {data.military.reserveDuty && <div className="text-slate-500 text-[12px] mt-1">{tx.cvFieldMilReserve}</div>}
+            </div>
+          </CreativeSection>
+        )}
+
+        <div className="grid grid-cols-2 gap-6">
+          {skillsList.length > 0 && (
+            <CreativeSection title={tx.cvSecSkills} ac={ac}>
+              <div className="flex flex-wrap gap-2">
+                {skillsList.map((s, i) => (
+                  <span key={i} className="text-[12px] font-semibold px-3 py-1.5 rounded-xl" style={{ backgroundColor: rgba(ac, 0.1), color: ac }}>{s}</span>
+                ))}
+              </div>
+            </CreativeSection>
+          )}
+          {languagesList.length > 0 && (
+            <CreativeSection title={tx.cvSecLanguages} ac={ac}>
+              <div className="flex flex-wrap gap-2">
+                {languagesList.map((l, i) => (
+                  <span key={i} className="text-[12px] text-slate-600 px-3 py-1.5 rounded-xl border border-slate-200">{l}</span>
+                ))}
+              </div>
+            </CreativeSection>
+          )}
+          {hasVolunteering && data.volunteering && (
+            <CreativeSection title={tx.cvSecVolunteering} ac={ac}>
+              <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+            </CreativeSection>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CreativeSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <section>
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: ac }} />
+        <h2 className="text-[10.5px] font-black uppercase tracking-[0.14em]" style={{ color: ac }}>{title}</h2>
+        <div className="flex-1 h-px" style={{ backgroundColor: rgba(ac, 0.18) }} />
+      </div>
+      {children}
+    </section>
+  );
+}
+
+// ─── Template 13: Executive Pro (dark header, timeline body, right sidebar) ────
+
+function ExecutiveProTemplate({ data, tx, dir, skillsList, languagesList, isEmpty, hasMilitary, hasVolunteering, ac }: TemplateProps) {
+  const p = data.personal;
+  return (
+    <div className="bg-white rounded-2xl shadow-2xl print:shadow-none overflow-hidden" dir={dir} style={{ minHeight: 900 }}>
+      <div className="bg-slate-900 px-8 pt-8 pb-7 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.07]"
+          style={{ backgroundImage: `radial-gradient(circle at 70% 50%, ${ac}, transparent 60%)` }} />
+        <div className="relative z-10 flex items-start justify-between gap-5">
+          <div className="flex-1">
+            <h1 className="text-[34px] font-black text-white leading-none mb-2 tracking-tight">
+              {p.fullName || <span className="opacity-30">{tx.cvPreviewEmptyName}</span>}
+            </h1>
+            <p className="text-[14px] font-medium mb-5" style={{ color: rgba(ac, 0.9) }}>
+              {p.title || <span className="text-white/30">{tx.cvPreviewEmptyTitle}</span>}
+            </p>
+            <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-white/55 text-[11.5px]">
+              {p.email    && <span className="flex items-center gap-1.5"><CIcon d={ICON_EMAIL} cls="w-3 h-3" />{ltrSpan(p.email)}</span>}
+              {p.phone    && <span className="flex items-center gap-1.5"><CIcon d={ICON_PHONE} cls="w-3 h-3" />{ltrSpan(p.phone)}</span>}
+              {p.location && <span className="flex items-center gap-1.5"><CIcon d={ICON_LOCATION} cls="w-3 h-3" />{p.location}</span>}
+              {p.linkedin && <span className="flex items-center gap-1.5" dir="ltr"><CIcon d={ICON_LINK} cls="w-3 h-3" />{p.linkedin}</span>}
+            </div>
+          </div>
+          {p.photo && (
+            <img src={p.photo} className="w-[80px] h-[80px] rounded-xl object-cover flex-shrink-0 shadow-xl" style={{ border: `2px solid ${rgba(ac, 0.45)}` }} alt="" />
+          )}
+        </div>
+      </div>
+      <div className="h-1" style={{ backgroundColor: ac }} />
+
+      <div className="flex">
+        <div className="flex-1 px-8 py-7">
+          {isEmpty && <p className="text-slate-400 text-center py-10">{tx.cvPlaceholder}</p>}
+
+          {data.summary && (
+            <ExecProSection title={tx.cvSecSummary} ac={ac}>
+              <p className="text-slate-600 text-[13.5px] leading-relaxed whitespace-pre-wrap">{data.summary}</p>
+            </ExecProSection>
+          )}
+
+          {data.experiences.length > 0 && (
+            <ExecProSection title={tx.cvSecExperience} ac={ac}>
+              <div className="space-y-5">
+                {data.experiences.map((exp) => (
+                  <div key={exp.id} className="relative ps-5 border-s-2" style={{ borderColor: rgba(ac, 0.3) }}>
+                    <div className="absolute -start-[7px] top-[5px] w-3 h-3 rounded-full" style={{ backgroundColor: ac }} />
+                    <div className="flex justify-between items-start flex-wrap gap-1">
+                      <h3 className="font-bold text-slate-900 text-[14.5px]">{exp.role || "—"}</h3>
+                      <span className="text-[11px] text-white font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap" style={{ backgroundColor: ac }} dir="ltr">
+                        {exp.start} – {exp.current ? tx.cvFieldPresent : exp.end}
+                      </span>
+                    </div>
+                    {exp.company && <div className="text-[12.5px] font-bold mt-0.5 mb-1.5 text-slate-500">{renderMixedText(exp.company)}{exp.location ? ` · ${exp.location}` : ""}</div>}
+                    {exp.description && <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{exp.description}</p>}
+                  </div>
+                ))}
+              </div>
+            </ExecProSection>
+          )}
+
+          {hasVolunteering && data.volunteering && (
+            <ExecProSection title={tx.cvSecVolunteering} ac={ac}>
+              <p className="text-slate-600 text-[12.5px] leading-relaxed whitespace-pre-wrap">{data.volunteering}</p>
+            </ExecProSection>
+          )}
+        </div>
+
+        <div className="w-[30%] flex-shrink-0 border-s border-slate-100 bg-slate-50/50 px-5 py-7">
+          {data.educations.length > 0 && (
+            <ExecProSideSection title={tx.cvSecEducation} ac={ac}>
+              <div className="space-y-3">
+                {data.educations.map((edu) => (
+                  <div key={edu.id}>
+                    <div className="font-bold text-slate-900 text-[12.5px]">{edu.degree || "—"}</div>
+                    {edu.school && <div className="text-[11.5px] font-semibold mt-0.5" style={{ color: ac }}>{renderMixedText(edu.school)}</div>}
+                    {(edu.start || edu.end) && <div className="text-slate-400 text-[11px] mt-0.5" dir="ltr">{edu.start} – {edu.current ? tx.cvFieldPresent : edu.end}</div>}
+                  </div>
+                ))}
+              </div>
+            </ExecProSideSection>
+          )}
+
+          {skillsList.length > 0 && (
+            <ExecProSideSection title={tx.cvSecSkills} ac={ac}>
+              <div className="space-y-1.5">
+                {skillsList.map((s, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: ac }} />
+                    <span className="text-slate-700 text-[12px]">{s}</span>
+                  </div>
+                ))}
+              </div>
+            </ExecProSideSection>
+          )}
+
+          {languagesList.length > 0 && (
+            <ExecProSideSection title={tx.cvSecLanguages} ac={ac}>
+              <div className="space-y-1.5">
+                {languagesList.map((l, i) => <div key={i} className="text-slate-600 text-[12px]">{l}</div>)}
+              </div>
+            </ExecProSideSection>
+          )}
+
+          {hasMilitary && (
+            <ExecProSideSection title={tx.cvSecMilitary} ac={ac}>
+              {data.military.role && <div className="font-bold text-slate-900 text-[12.5px]">{data.military.role}</div>}
+              {data.military.unit && <div className="text-[11.5px] font-semibold mt-0.5" style={{ color: ac }}>{data.military.unit}</div>}
+              {(data.military.start || data.military.end) && <div className="text-slate-400 text-[11px] mt-0.5" dir="ltr">{data.military.start} – {data.military.end}</div>}
+              {data.military.reserveDuty && <div className="text-slate-500 text-[11.5px] mt-1">{tx.cvFieldMilReserve}</div>}
+            </ExecProSideSection>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExecProSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <section className="mb-7 last:mb-0">
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-[10.5px] font-black uppercase tracking-[0.14em] text-slate-900">{title}</h2>
+        <div className="flex-1 h-px" style={{ backgroundColor: rgba(ac, 0.25) }} />
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function ExecProSideSection({ title, children, ac }: { title: string; children: React.ReactNode; ac: string }) {
+  return (
+    <div className="mb-6 last:mb-0">
+      <h2 className="text-[10px] font-black uppercase tracking-[0.14em] mb-2.5 pb-1.5 border-b" style={{ color: ac, borderColor: rgba(ac, 0.2) }}>{title}</h2>
+      {children}
+    </div>
   );
 }
