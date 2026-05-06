@@ -123,10 +123,15 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
         { id: userMsg.id, role: "user", content: firstMessage, timestamp: userMsg.timestamp },
       ];
 
+      // Strip rawText before serializing — garbled PDF text (lone surrogates)
+      // causes JSON.stringify to throw in the browser, killing the fetch silently.
+      const { rawText: _drop, ...safeProfile } = userProfile;
+      void _drop;
+
       fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: initMessages, userProfile, lang }),
+        body: JSON.stringify({ messages: initMessages, userProfile: safeProfile, lang }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -163,12 +168,14 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
     setLoading(true);
     try {
       const history = messages.map((m) => ({ id: m.id, role: m.role, content: m.content, timestamp: m.timestamp }));
+      const { rawText: _drop2, ...safeProfile2 } = userProfile;
+      void _drop2;
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [...history, { id: "tmp", role: "user", content: userText, timestamp: new Date() }],
-          userProfile,
+          userProfile: safeProfile2,
           lang,
         }),
       });
