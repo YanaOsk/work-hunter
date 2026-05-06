@@ -47,22 +47,55 @@ export const CV_TEMPLATES: { id: CvTemplate; labelHe: string; labelEn: string; s
 ];
 
 export const CV_ACCENT_COLORS: { hex: string; labelHe: string; labelEn: string }[] = [
-  { hex: "#7c3aed", labelHe: "סגול",      labelEn: "Purple"   },
-  { hex: "#2563eb", labelHe: "כחול",      labelEn: "Blue"     },
-  { hex: "#059669", labelHe: "ירוק",      labelEn: "Emerald"  },
-  { hex: "#e11d48", labelHe: "אדום",      labelEn: "Rose"     },
-  { hex: "#d97706", labelHe: "כתום",      labelEn: "Amber"    },
-  { hex: "#0891b2", labelHe: "ציאן",      labelEn: "Cyan"     },
-  { hex: "#6366f1", labelHe: "אינדיגו",   labelEn: "Indigo"   },
-  { hex: "#0f172a", labelHe: "כהה",       labelEn: "Slate"    },
-  { hex: "#ec4899", labelHe: "ורוד",      labelEn: "Pink"     },
-  { hex: "#ea580c", labelHe: "כתום כהה",  labelEn: "Orange"   },
-  { hex: "#0d9488", labelHe: "טורקיז",    labelEn: "Teal"     },
-  { hex: "#16a34a", labelHe: "ירוק כהה",  labelEn: "Green"    },
-  { hex: "#9333ea", labelHe: "סגול בהיר", labelEn: "Violet"   },
-  { hex: "#0369a1", labelHe: "כחול כהה",  labelEn: "Navy"     },
-  { hex: "#be123c", labelHe: "ארגמן",     labelEn: "Crimson"  },
-  { hex: "#92400e", labelHe: "ברונזה",    labelEn: "Bronze"   },
+  // Purples
+  { hex: "#7c3aed", labelHe: "סגול",           labelEn: "Purple"        },
+  { hex: "#9333ea", labelHe: "סגול בהיר",      labelEn: "Violet"        },
+  { hex: "#6366f1", labelHe: "אינדיגו",        labelEn: "Indigo"        },
+  { hex: "#a855f7", labelHe: "פוקסיה",         labelEn: "Fuchsia"       },
+  { hex: "#c026d3", labelHe: "מגנטה",          labelEn: "Magenta"       },
+  { hex: "#4f46e5", labelHe: "אינדיגו כהה",   labelEn: "Deep Indigo"   },
+  // Blues
+  { hex: "#2563eb", labelHe: "כחול",           labelEn: "Blue"          },
+  { hex: "#0369a1", labelHe: "כחול כהה",       labelEn: "Navy"          },
+  { hex: "#0ea5e9", labelHe: "כחול שמיים",     labelEn: "Sky Blue"      },
+  { hex: "#0891b2", labelHe: "ציאן",           labelEn: "Cyan"          },
+  { hex: "#1d4ed8", labelHe: "כחול עמוק",      labelEn: "Royal Blue"    },
+  { hex: "#38bdf8", labelHe: "תכלת",           labelEn: "Light Blue"    },
+  // Greens
+  { hex: "#059669", labelHe: "ירוק",           labelEn: "Emerald"       },
+  { hex: "#16a34a", labelHe: "ירוק כהה",       labelEn: "Green"         },
+  { hex: "#0d9488", labelHe: "טורקיז",         labelEn: "Teal"          },
+  { hex: "#65a30d", labelHe: "ירוק-צהוב",      labelEn: "Lime"          },
+  { hex: "#15803d", labelHe: "ירוק יער",       labelEn: "Forest"        },
+  { hex: "#2dd4bf", labelHe: "מנטה",           labelEn: "Mint"          },
+  // Reds & Pinks
+  { hex: "#e11d48", labelHe: "אדום",           labelEn: "Rose"          },
+  { hex: "#be123c", labelHe: "ארגמן",          labelEn: "Crimson"       },
+  { hex: "#ec4899", labelHe: "ורוד",           labelEn: "Pink"          },
+  { hex: "#f43f5e", labelHe: "אדום-ורוד",      labelEn: "Coral Red"     },
+  { hex: "#db2777", labelHe: "ורוד כהה",       labelEn: "Deep Pink"     },
+  { hex: "#fb7185", labelHe: "ורוד פסטל",      labelEn: "Pastel Pink"   },
+  // Oranges & Yellows
+  { hex: "#ea580c", labelHe: "כתום",           labelEn: "Orange"        },
+  { hex: "#d97706", labelHe: "ענבר",           labelEn: "Amber"         },
+  { hex: "#b45309", labelHe: "חום-כתום",       labelEn: "Burnt Orange"  },
+  { hex: "#92400e", labelHe: "ברונזה",         labelEn: "Bronze"        },
+  { hex: "#ca8a04", labelHe: "זהב",            labelEn: "Gold"          },
+  { hex: "#f59e0b", labelHe: "צהוב-כתום",      labelEn: "Yellow"        },
+  // Neutrals & Darks
+  { hex: "#0f172a", labelHe: "כחול-שחור",      labelEn: "Midnight"      },
+  { hex: "#1e293b", labelHe: "כחול כהה",       labelEn: "Slate Dark"    },
+  { hex: "#374151", labelHe: "אפור כהה",       labelEn: "Charcoal"      },
+  { hex: "#6b7280", labelHe: "אפור",           labelEn: "Gray"          },
+  { hex: "#9ca3af", labelHe: "אפור בהיר",      labelEn: "Silver"        },
+  { hex: "#111827", labelHe: "שחור",           labelEn: "Black"         },
+  { hex: "#ffffff", labelHe: "לבן",            labelEn: "White"         },
+  // Warm neutrals
+  { hex: "#78716c", labelHe: "חום-אפור",       labelEn: "Warm Gray"     },
+  { hex: "#a16207", labelHe: "חרדל",           labelEn: "Mustard"       },
+  { hex: "#7f1d1d", labelHe: "בורדו",          labelEn: "Burgundy"      },
+  { hex: "#134e4a", labelHe: "ירוק-כהה-טורק",  labelEn: "Dark Teal"     },
+  { hex: "#1e3a5f", labelHe: "כחול נייבי",     labelEn: "Deep Navy"     },
 ];
 
 export interface CvData {

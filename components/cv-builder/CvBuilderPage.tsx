@@ -733,14 +733,15 @@ export default function CvBuilderPage() {
           </div>
 
           {/* Accent color picker */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-white/50 text-xs me-1">{lang === "he" ? "צבע:" : "Color:"}</span>
+          <div className="flex items-start gap-2">
+            <span className="text-white/50 text-xs me-1 mt-1.5 flex-shrink-0">{lang === "he" ? "צבע:" : "Color:"}</span>
+            <div className="flex flex-wrap gap-2 max-h-[88px] overflow-y-auto pr-1" style={{ scrollbarWidth: "thin" }}>
             {CV_ACCENT_COLORS.map((c) => (
               <button
                 key={c.hex}
                 title={lang === "he" ? c.labelHe : c.labelEn}
                 onClick={() => setData((d) => ({ ...d, accentColor: c.hex }))}
-                className={`w-7 h-7 rounded-full transition-all border-2 ${
+                className={`w-7 h-7 rounded-full transition-all border-2 flex-shrink-0 ${
                   data.accentColor === c.hex
                     ? "scale-110 border-white shadow-lg"
                     : "border-white/20 hover:scale-110 hover:border-white/50"
@@ -748,6 +749,7 @@ export default function CvBuilderPage() {
                 style={{ backgroundColor: c.hex }}
               />
             ))}
+            </div>
           </div>
         </header>
 
