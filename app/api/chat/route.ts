@@ -36,10 +36,16 @@ export async function POST(request: NextRequest) {
     const gender = detectGender(messages, parsedData);
 
     const lastUserMsg = messages[messages.length - 1];
-    const CV_PASTE_RE = /(\bניסיון עבודה\b|\bהשכלה\b|\bכישורים\b|\bWork Experience\b|\bEducation\b|\bSkills\b|\bקורות חיים\b|\bResume\b)/i;
+    // \b doesn't work on Hebrew (Hebrew chars are \W), so no word boundaries on Hebrew terms
+    const CV_PASTE_RE = /(ניסיון עבודה|ניסיון מקצועי|השכלה|כישורים|קורות חיים|תפקיד נוכחי|Work Experience|Education|Skills|Resume|Summary|Employment History)/i;
+    // Also treat as CV when: first message is long AND parsedData was already populated (upload flow)
+    const isFirstMessageUpload = messages.length === 1 &&
+      lastUserMsg?.role === "user" &&
+      lastUserMsg.content.length > 350 &&
+      !!(parsedData.name || parsedData.currentRole || (parsedData.skills as string[] | undefined)?.length);
     const isPastedCV = lastUserMsg?.role === "user" &&
       lastUserMsg.content.length > 350 &&
-      CV_PASTE_RE.test(lastUserMsg.content);
+      (CV_PASTE_RE.test(lastUserMsg.content) || isFirstMessageUpload);
 
     const genderRule = gender === "female"
       ? 'פנה למשתמש בלשון נקבה: "את", "שלך", "אותך", "את מחפשת", "מה מדליק אותך".'
@@ -70,13 +76,22 @@ Optionally, when it makes sense, append 2-3 quick reply suggestions at the end i
 
     const rawIntro = (userProfile as Record<string, unknown>)?.rawText as string | undefined;
 
+    const cvSummary = [
+      parsedData.currentRole,
+      parsedData.yearsExperience != null ? `${parsedData.yearsExperience} שנות ניסיון` : null,
+      parsedData.location,
+      (parsedData.skills as string[] | undefined)?.slice(0, 4).join(", "),
+    ].filter(Boolean).join(" | ");
+
     const cvPasteInstruction = isPastedCV ? `
 
-═══ קורות חיים הודבקו לצ'אט ═══
-המשתמש הדביק קורות חיים ישירות לצ'אט. אל תשאל שאלות.
-1. חלץ מהטקסט: תפקיד נוכחי, שנות ניסיון, מיקום (אם קיים), מיומנויות בולטות.
-2. שקף בקצרה בשורה אחת: "ראיתי — [פרטים עיקריים]. עכשיו מתחיל לחפש."
-3. הוסף [SEARCH_NOW] מיד. אסור לשאול שאלה נוספת.
+═══ קורות חיים התקבלו ═══
+המשתמש שלח קורות חיים (הועלו כקובץ או הודבקו לצ'אט). המידע כבר חולץ אוטומטית.
+מידע שחולץ: ${cvSummary || "ראה parsedData למטה"}
+1. שקף בשורה אחת קצרה את הפרטים העיקריים שראית.
+2. שאל שאלה אחת בלבד לגבי מה שהם מחפשים (מיקום / שכר / תחום אם לא ברור).
+3. אחרי תשובה אחת — הוסף [SEARCH_NOW].
+אם כבר ברור גם המיקום וגם השכר מה-parsedData — הוסף [SEARCH_NOW] כבר עכשיו, בלי שאלות.
 If the CV is in English, respond in English with the same logic.
 ` : "";
 
