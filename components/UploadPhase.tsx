@@ -101,7 +101,7 @@ export default function UploadPhase({ onComplete }: Props) {
           </div>
 
           {/* Form card */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-6 sm:p-8 space-y-5">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-7 sm:p-10 space-y-6">
 
             {/* Advisor import banner */}
             {advisorProfile && (
@@ -142,9 +142,9 @@ export default function UploadPhase({ onComplete }: Props) {
               onDragLeave={() => setDragging(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`group border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+              className={`group border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all ${
                 dragging
-                  ? "border-purple-400 bg-purple-500/10"
+                  ? "border-purple-400 bg-purple-500/10 scale-[1.01]"
                   : "border-white/20 hover:border-purple-500 hover:bg-purple-500/8"
               }`}
             >
@@ -160,7 +160,7 @@ export default function UploadPhase({ onComplete }: Props) {
                 </div>
               ) : (
                 <>
-                  <svg className="w-10 h-10 mx-auto mb-3 text-white/30 group-hover:text-purple-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-12 h-12 mx-auto mb-4 text-white/30 group-hover:text-purple-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                   <p className="text-white/50 text-sm group-hover:text-white/80 transition-colors">{tx.dropPdf}</p>

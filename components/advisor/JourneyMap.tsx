@@ -268,6 +268,9 @@ export default function JourneyMap({
 
             return (
               <div key={stage} className="relative">
+                {i < STAGE_ORDER.length - 1 && (
+                  <div className="absolute start-[42px] top-[42px] bottom-[-12px] w-px bg-white/10 pointer-events-none" />
+                )}
                 <button
                   onClick={() => isClickable && onStartStage(stage)}
                   disabled={!isClickable}

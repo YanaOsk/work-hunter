@@ -150,8 +150,15 @@ export default function JobCard({ job, rank, saved = false, onToggleSave, onAppl
     if (!saved && onToggleSave) onToggleSave();
   };
 
+  const accentColor = job.matchScore >= 85
+    ? "bg-green-500/70"
+    : job.matchScore >= 70
+    ? "bg-yellow-500/60"
+    : "bg-red-400/50";
+
   return (
-    <div className="group bg-white/5 hover:bg-white/8 border border-white/10 hover:border-purple-500/40 rounded-2xl p-4 sm:p-5 transition-all duration-200">
+    <div className="group relative bg-white/5 hover:bg-white/8 border border-white/10 hover:border-purple-500/40 rounded-2xl p-4 sm:p-5 transition-all duration-200 overflow-hidden">
+      <div className={`absolute top-0 bottom-0 start-0 w-1 rounded-s-2xl ${accentColor}`} />
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">

@@ -263,7 +263,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
                 <div className={`max-w-[85vw] sm:max-w-lg rounded-2xl px-4 py-3 ${
                   msg.role === "user"
                     ? "bg-purple-600 text-white rounded-ee-sm"
-                    : "bg-white/10 text-white/90 rounded-es-sm border border-white/10"
+                    : "bg-purple-500/10 text-white/90 rounded-es-sm border border-purple-500/20"
                 }`}>
                   {msg.role === "user" && msg.content.length > 350 ? (
                     <div className="flex items-center gap-2">

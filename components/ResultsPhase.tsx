@@ -474,16 +474,17 @@ export default function ResultsPhase({
         ) : (
           <div className="grid gap-4">
             {visibleJobs.map((job, i) => (
-              <JobCard
-                key={job.id}
-                job={job}
-                rank={i + 1}
-                saved={savedIds.has(job.id)}
-                onToggleSave={() => toggleSave(job)}
-                onApplied={() => handleMarkApplied(job)}
-                onFindSimilar={onFindSimilar}
-                userSkills={userSkills}
-              />
+              <div key={job.id} className="animate-card-in" style={{ animationDelay: `${i * 55}ms` }}>
+                <JobCard
+                  job={job}
+                  rank={i + 1}
+                  saved={savedIds.has(job.id)}
+                  onToggleSave={() => toggleSave(job)}
+                  onApplied={() => handleMarkApplied(job)}
+                  onFindSimilar={onFindSimilar}
+                  userSkills={userSkills}
+                />
+              </div>
             ))}
 
             {isStreaming && jobs.length === 0 && (

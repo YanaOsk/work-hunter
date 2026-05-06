@@ -30,31 +30,9 @@ export default function HeroSection({ onChoose }: Props) {
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto text-center w-full">
-        {/* Pill badge */}
-        <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/25 text-purple-300 text-xs font-semibold px-4 py-2 rounded-full mb-8 md:mb-10">
-          <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-          {he ? "ייעוץ קריירה מבוסס בינה מלאכותית" : "AI-Powered Career Advisor"}
-        </div>
-
         {/* Headline */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-bold text-white leading-[1.12] mb-6 md:mb-7 tracking-tight">
-          {he ? (
-            <>
-              <span>המהלך הקרייריסטי הבא שלך</span>
-              <br />
-              <span className="bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
-                מעולם לא היה ברור יותר
-              </span>
-            </>
-          ) : (
-            <>
-              <span>Your next career move</span>
-              <br />
-              <span className="bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
-                has never been clearer
-              </span>
-            </>
-          )}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-bold leading-[1.12] mb-6 md:mb-7 tracking-tight bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
+          {tx.heroTitle}
         </h1>
 
         <p className="text-white/60 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-10 md:mb-12">
