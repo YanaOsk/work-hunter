@@ -40,14 +40,9 @@ export async function POST(request: NextRequest) {
     const isCvUpload = lastUserMsg?.role === "user" && lastUserMsg.content.startsWith("[CV_UPLOAD]");
     // \b doesn't work on Hebrew (Hebrew chars are \W), so no word boundaries on Hebrew terms
     const CV_PASTE_RE = /(ניסיון עבודה|ניסיון מקצועי|השכלה|כישורים|קורות חיים|תפקיד נוכחי|Work Experience|Education|Skills|Resume|Summary|Employment History)/i;
-    // Also treat as CV when: first message is long AND parsedData was already populated (upload flow)
-    const isFirstMessageUpload = messages.length === 1 &&
-      lastUserMsg?.role === "user" &&
-      lastUserMsg.content.length > 350 &&
-      !!(parsedData.name || parsedData.currentRole || (parsedData.skills as string[] | undefined)?.length);
     const isPastedCV = isCvUpload || (lastUserMsg?.role === "user" &&
       lastUserMsg.content.length > 350 &&
-      (CV_PASTE_RE.test(lastUserMsg.content) || isFirstMessageUpload));
+      CV_PASTE_RE.test(lastUserMsg.content));
 
     const genderRule = gender === "female"
       ? 'פנה למשתמש בלשון נקבה: "את", "שלך", "אותך", "את מחפשת", "מה מדליק אותך".'
@@ -122,12 +117,13 @@ Missing information: ${JSON.stringify(userProfile?.missingFields || [])}`;
     const sanitize = (s: string) => s.replace(/[\uD800-\uDFFF]/g, "?");
 
     const history = messages
+      .slice(-8)
       .map((m) => `${m.role === "user" ? "משתמש" : "Scout"}: ${sanitize(m.content)}`)
       .join("\n\n");
 
     const prompt = `${history}\n\nScout:`;
 
-    const agentResponse = await geminiChat(prompt, systemWithContext, 1200);
+    const agentResponse = await geminiChat(prompt, systemWithContext, 500);
 
     const shouldSearch = agentResponse.includes("[SEARCH_NOW]") || agentResponse.includes("[READY_TO_SEARCH]");
 
