@@ -61,8 +61,12 @@ export async function getAllUsers(): Promise<
 
 export async function deleteUser(id: string): Promise<boolean> {
   const db = sql();
-  const rows = await db`DELETE FROM users WHERE id = ${id} RETURNING id`;
-  return rows.length > 0;
+  // Email-based user: id is a UUID
+  const emailRows = await db`DELETE FROM users WHERE id = ${id} RETURNING id`;
+  if (emailRows.length > 0) return true;
+  // Google user: id is the email address
+  const googleRows = await db`DELETE FROM google_accounts WHERE email = ${id} RETURNING email`;
+  return googleRows.length > 0;
 }
 
 async function ensureResetTokensTable() {
