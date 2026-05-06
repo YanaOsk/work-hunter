@@ -76,7 +76,11 @@ export async function POST(request: NextRequest) {
       : `Respond in English only. Keep answers short — 1-3 sentences. One question at a time.
 Optionally, when it makes sense, append 2-3 quick reply suggestions at the end in this exact format: [QUICK: "Option A"|"Option B"|"Option C"]`;
 
-    const rawIntro = (userProfile as Record<string, unknown>)?.rawText as string | undefined;
+    // Don't include rawIntro when we have a clean [CV_UPLOAD] message:
+    // garbled PDF text (lone surrogates, invalid UTF-8) in the system prompt
+    // causes JSON.stringify to throw, making the entire route crash silently.
+    const rawIntroRaw = (userProfile as Record<string, unknown>)?.rawText as string | undefined;
+    const rawIntro = isCvUpload ? undefined : rawIntroRaw;
 
     const cvSummary = [
       parsedData.currentRole,
@@ -113,8 +117,11 @@ ${JSON.stringify(parsedData, null, 2)}
 ${rawIntro ? `Original intro from the user:\n"${rawIntro}"\n` : ""}
 Missing information: ${JSON.stringify(userProfile?.missingFields || [])}`;
 
+    // Strip lone surrogates that make JSON.stringify crash (garbled PDF text)
+    const sanitize = (s: string) => s.replace(/[\uD800-\uDFFF]/g, "?");
+
     const history = messages
-      .map((m) => `${m.role === "user" ? "משתמש" : "Scout"}: ${m.content}`)
+      .map((m) => `${m.role === "user" ? "משתמש" : "Scout"}: ${sanitize(m.content)}`)
       .join("\n\n");
 
     const prompt = `${history}\n\nScout:`;
