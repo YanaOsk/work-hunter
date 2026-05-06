@@ -79,7 +79,7 @@ function DotMenu({ items }: { items: { label: string; danger?: boolean; onClick:
         </svg>
       </button>
       {open && (
-        <div className="absolute end-0 top-8 z-20 min-w-[130px] bg-slate-800 border border-white/10 rounded-xl shadow-2xl py-1 overflow-hidden">
+        <div className="absolute end-0 bottom-full mb-1 z-20 min-w-[130px] bg-slate-800 border border-white/10 rounded-xl shadow-2xl py-1 overflow-hidden">
           {items.map((item, i) => (
             <button key={i} onClick={() => { setOpen(false); item.onClick(); }}
               className={`w-full text-start px-3 py-2 text-xs transition hover:bg-white/5 ${item.danger ? "text-rose-400" : "text-white/70"}`}>
