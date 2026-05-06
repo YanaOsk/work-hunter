@@ -5,7 +5,7 @@ import { PARSE_CV_SYSTEM_PROMPT } from "@/lib/prompts";
 
 async function extractWithPdfParse(buffer: Buffer): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pdfParse = require("pdf-parse");
+  const pdfParse = require("pdf-parse/lib/pdf-parse");
   const data = await pdfParse(buffer);
   return data.text ?? "";
 }
@@ -59,10 +59,13 @@ async function extractTextFromPDF(buffer: Buffer): Promise<string> {
 
   // Vision fallback (requires OPENAI_API_KEY) — skip gracefully if not available
   try {
-    return await extractPdfTextWithVision(buffer);
+    const visionText = await extractPdfTextWithVision(buffer);
+    if (visionText.trim().length > 20) return visionText;
   } catch {
-    return best;
+    // fall through
   }
+
+  return best;
 }
 
 async function extractTextFromDocx(buffer: Buffer): Promise<string> {
@@ -92,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!inputText.trim()) {
-      return NextResponse.json({ error: "No input provided" }, { status: 400 });
+      return NextResponse.json({ error: "לא הצלחנו לקרוא את הקובץ. אנא הדביקו את טקסט קורות החיים ישירות בתיבת הטקסט." }, { status: 400 });
     }
 
     // Strip lone surrogates from PDF extraction output.
