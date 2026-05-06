@@ -39,9 +39,12 @@ async function extractWithPdf2Json(buffer: Buffer): Promise<string> {
 }
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+  let best = "";
+
   try {
     const text = await extractWithPdfParse(buffer);
     if (text.trim().length > 50) return text;
+    if (text.trim().length > best.trim().length) best = text;
   } catch {
     // fall through
   }
@@ -49,12 +52,17 @@ async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
     const text = await extractWithPdf2Json(buffer);
     if (text.trim().length > 50) return text;
+    if (text.trim().length > best.trim().length) best = text;
   } catch {
     // fall through
   }
 
-  // Vision fallback for scanned/image-based PDFs
-  return extractPdfTextWithVision(buffer);
+  // Vision fallback (requires OPENAI_API_KEY) — skip gracefully if not available
+  try {
+    return await extractPdfTextWithVision(buffer);
+  } catch {
+    return best;
+  }
 }
 
 async function extractTextFromDocx(buffer: Buffer): Promise<string> {
