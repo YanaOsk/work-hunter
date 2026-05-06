@@ -87,7 +87,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No input provided" }, { status: 400 });
     }
 
-    const truncated = inputText.slice(0, 6000);
+    // Strip lone surrogates from PDF extraction output.
+    // Node.js serializes them fine, but browsers throw on JSON.stringify — causing
+    // silent fetch failures downstream. Clean at the source so no code path sees them.
+    // eslint-disable-next-line no-control-regex
+    const cleanText = inputText.replace(/[\uD800-\uDFFF]/g, "?").replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+
+    const truncated = cleanText.slice(0, 6000);
 
     const responseText = await geminiGenerate(
       `Please analyze this CV/bio and extract structured data. Write all clarifyingQuestions in English.\n\n${truncated}`,
@@ -110,7 +116,7 @@ export async function POST(request: NextRequest) {
       if (pd.constraints && !Array.isArray(pd.constraints)) pd.constraints = [String(pd.constraints)];
     }
 
-    return NextResponse.json({ rawText: inputText, ...parsed });
+    return NextResponse.json({ rawText: cleanText, ...parsed });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("parse-cv error:", msg);

@@ -236,6 +236,8 @@ export default function Home() {
   };
 
   const handleUploadComplete = (profile: UserProfile) => {
+    setResumeConv(null);
+    sessionStorage.removeItem("wh_conv_id");
     setState((s) => ({ ...s, phase: "interview", userProfile: profile }));
   };
 
