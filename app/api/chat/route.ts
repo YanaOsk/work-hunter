@@ -85,15 +85,21 @@ Optionally, when it makes sense, append 2-3 quick reply suggestions at the end i
       (parsedData.skills as string[] | undefined)?.slice(0, 4).join(", "),
     ].filter(Boolean).join(" | ");
 
+    console.log("[chat] isCvUpload:", isCvUpload, "isPastedCV:", isPastedCV, "cvSummary:", cvSummary || "(empty)", "firstMsgPreview:", lastUserMsg?.content?.slice(0, 80));
+
     const cvPasteInstruction = isPastedCV ? `
 
 ═══ קורות חיים התקבלו ═══
-המשתמש שלח קורות חיים (הועלו כקובץ או הודבקו לצ'אט). המידע כבר חולץ אוטומטית.
-מידע שחולץ: ${cvSummary || "ראה parsedData למטה"}
+המשתמש שלח קורות חיים (הועלו כקובץ או הודבקו לצ'אט).
+${cvSummary
+  ? `מידע שחולץ: ${cvSummary}
 1. שקף בשורה אחת קצרה את הפרטים העיקריים שראית.
 2. שאל שאלה אחת בלבד לגבי מה שהם מחפשים (מיקום / שכר / תחום אם לא ברור).
 3. אחרי תשובה אחת — הוסף [SEARCH_NOW].
-אם כבר ברור גם המיקום וגם השכר מה-parsedData — הוסף [SEARCH_NOW] כבר עכשיו, בלי שאלות.
+אם כבר ברור גם המיקום וגם השכר מה-parsedData — הוסף [SEARCH_NOW] כבר עכשיו, בלי שאלות.`
+  : `לא ניתן היה לחלץ פרטים מובנים מהקובץ.
+ענה: "העליתם קורות חיים — ספרו לי בקצרה: מה התפקיד הנוכחי שלכם ומה אתם מחפשים בתפקיד הבא?"
+לאחר שיתארו עצמם — שאל שאלה אחת על מיקום או שכר, ואז הוסף [SEARCH_NOW].`}
 If the CV is in English, respond in English with the same logic.
 ` : "";
 

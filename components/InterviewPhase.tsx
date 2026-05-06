@@ -88,27 +88,28 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
 
     const rawText = userProfile.rawText?.trim();
     const pd = userProfile.parsedData;
-    const hasParsedData = !!(pd?.name || pd?.currentRole || pd?.skills?.length);
 
-    // Build a clean structured summary when parsedData is available.
-    // Raw PDF text is often garbled in production (encoding issues) — Scout
-    // can't parse it, so we send structured data instead.
-    const buildCvMessage = () => {
+    // Always build structured CV message — NEVER send raw PDF text to Scout.
+    // Raw text is often garbled in production (encoding issues).
+    // [CV_UPLOAD] tag triggers CV-mode in the chat route regardless of parsedData content.
+    const buildCvMessage = (): string => {
       const lines: string[] = ["[CV_UPLOAD]"];
-      if (pd.name)            lines.push(`שם: ${pd.name}`);
-      if (pd.currentRole)     lines.push(`תפקיד נוכחי: ${pd.currentRole}`);
-      if (pd.yearsExperience != null) lines.push(`ניסיון: ${pd.yearsExperience} שנים`);
-      if (pd.skills?.length)  lines.push(`כישורים: ${pd.skills.slice(0, 6).join(", ")}`);
-      if (pd.location)        lines.push(`מיקום: ${pd.location}`);
-      if (pd.education)       lines.push(`השכלה: ${pd.education}`);
-      if (pd.salaryExpectation) lines.push(`ציפיית שכר: ${pd.salaryExpectation}`);
-      if (pd.workPreference)  lines.push(`מצב עבודה: ${pd.workPreference}`);
-      if (pd.constraints?.length) lines.push(`אילוצים: ${pd.constraints.join(", ")}`);
-      if (pd.additionalNotes) lines.push(`הערות: ${pd.additionalNotes}`);
+      if (pd?.name)            lines.push(`שם: ${pd.name}`);
+      if (pd?.currentRole)     lines.push(`תפקיד נוכחי: ${pd.currentRole}`);
+      if (pd?.yearsExperience != null) lines.push(`ניסיון: ${pd.yearsExperience} שנים`);
+      if (pd?.skills?.length)  lines.push(`כישורים: ${pd.skills!.slice(0, 6).join(", ")}`);
+      if (pd?.location)        lines.push(`מיקום: ${pd.location}`);
+      if (pd?.education)       lines.push(`השכלה: ${pd.education}`);
+      if (pd?.salaryExpectation) lines.push(`ציפיית שכר: ${pd.salaryExpectation}`);
+      if (pd?.workPreference)  lines.push(`מצב עבודה: ${pd.workPreference}`);
+      if (pd?.constraints?.length) lines.push(`אילוצים: ${pd.constraints!.join(", ")}`);
+      if (pd?.additionalNotes) lines.push(`הערות: ${pd.additionalNotes}`);
       return lines.join("\n");
     };
 
-    const firstMessage = hasParsedData ? buildCvMessage() : rawText;
+    // Send CV message whenever there's any user input (file upload or typed text).
+    // Fallback to greeting-only when no content at all.
+    const firstMessage = rawText ? buildCvMessage() : null;
 
     const fallbackGreeting = lang === "he"
       ? "היי! אני Scout. קראתי את מה שכתבתם ואני כאן כדי לעזור לכם למצוא את ההזדמנות הנכונה. מה הכי חשוב לכם בתפקיד הבא?"
