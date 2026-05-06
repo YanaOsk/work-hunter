@@ -87,16 +87,39 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
     }
 
     const rawText = userProfile.rawText?.trim();
+    const pd = userProfile.parsedData;
+    const hasParsedData = !!(pd?.name || pd?.currentRole || pd?.skills?.length);
+
+    // Build a clean structured summary when parsedData is available.
+    // Raw PDF text is often garbled in production (encoding issues) — Scout
+    // can't parse it, so we send structured data instead.
+    const buildCvMessage = () => {
+      const lines: string[] = ["[CV_UPLOAD]"];
+      if (pd.name)            lines.push(`שם: ${pd.name}`);
+      if (pd.currentRole)     lines.push(`תפקיד נוכחי: ${pd.currentRole}`);
+      if (pd.yearsExperience != null) lines.push(`ניסיון: ${pd.yearsExperience} שנים`);
+      if (pd.skills?.length)  lines.push(`כישורים: ${pd.skills.slice(0, 6).join(", ")}`);
+      if (pd.location)        lines.push(`מיקום: ${pd.location}`);
+      if (pd.education)       lines.push(`השכלה: ${pd.education}`);
+      if (pd.salaryExpectation) lines.push(`ציפיית שכר: ${pd.salaryExpectation}`);
+      if (pd.workPreference)  lines.push(`מצב עבודה: ${pd.workPreference}`);
+      if (pd.constraints?.length) lines.push(`אילוצים: ${pd.constraints.join(", ")}`);
+      if (pd.additionalNotes) lines.push(`הערות: ${pd.additionalNotes}`);
+      return lines.join("\n");
+    };
+
+    const firstMessage = hasParsedData ? buildCvMessage() : rawText;
+
     const fallbackGreeting = lang === "he"
       ? "היי! אני Scout. קראתי את מה שכתבתם ואני כאן כדי לעזור לכם למצוא את ההזדמנות הנכונה. מה הכי חשוב לכם בתפקיד הבא?"
       : "Hi! I'm Scout. I read your profile and I'm here to help you find the right opportunity. What matters most to you in your next role?";
 
-    if (rawText) {
-      const userMsg = addMessage("user", rawText);
+    if (firstMessage) {
+      const userMsg = addMessage("user", firstMessage);
       setLoading(true);
 
       const initMessages: ChatMessage[] = [
-        { id: userMsg.id, role: "user", content: rawText, timestamp: userMsg.timestamp },
+        { id: userMsg.id, role: "user", content: firstMessage, timestamp: userMsg.timestamp },
       ];
 
       fetch("/api/chat", {
@@ -111,7 +134,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
             suggestedReplies: data.suggestedReplies ?? [],
           });
           autoSave([
-            { role: "user", content: rawText },
+            { role: "user", content: firstMessage },
             { role: "assistant", content: data.message || fallbackGreeting },
           ]);
         })
@@ -265,7 +288,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
                     ? "bg-purple-600 text-white rounded-ee-sm"
                     : "bg-purple-500/10 text-white/90 rounded-es-sm border border-purple-500/20"
                 }`}>
-                  {msg.role === "user" && msg.content.length > 350 ? (
+                  {msg.role === "user" && (msg.content.length > 350 || msg.content.startsWith("[CV_UPLOAD]")) ? (
                     <div className="flex items-center gap-2">
                       <svg className="w-4 h-4 flex-shrink-0 text-purple-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

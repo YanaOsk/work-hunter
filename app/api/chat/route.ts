@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
     const gender = detectGender(messages, parsedData);
 
     const lastUserMsg = messages[messages.length - 1];
+    // Structured CV summary sent by InterviewPhase when parsedData is available
+    const isCvUpload = lastUserMsg?.role === "user" && lastUserMsg.content.startsWith("[CV_UPLOAD]");
     // \b doesn't work on Hebrew (Hebrew chars are \W), so no word boundaries on Hebrew terms
     const CV_PASTE_RE = /(ניסיון עבודה|ניסיון מקצועי|השכלה|כישורים|קורות חיים|תפקיד נוכחי|Work Experience|Education|Skills|Resume|Summary|Employment History)/i;
     // Also treat as CV when: first message is long AND parsedData was already populated (upload flow)
@@ -43,9 +45,9 @@ export async function POST(request: NextRequest) {
       lastUserMsg?.role === "user" &&
       lastUserMsg.content.length > 350 &&
       !!(parsedData.name || parsedData.currentRole || (parsedData.skills as string[] | undefined)?.length);
-    const isPastedCV = lastUserMsg?.role === "user" &&
+    const isPastedCV = isCvUpload || (lastUserMsg?.role === "user" &&
       lastUserMsg.content.length > 350 &&
-      (CV_PASTE_RE.test(lastUserMsg.content) || isFirstMessageUpload);
+      (CV_PASTE_RE.test(lastUserMsg.content) || isFirstMessageUpload));
 
     const genderRule = gender === "female"
       ? 'פנה למשתמש בלשון נקבה: "את", "שלך", "אותך", "את מחפשת", "מה מדליק אותך".'
