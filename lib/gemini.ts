@@ -147,23 +147,41 @@ async function callGroqFallback(
   if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
   messages.push({ role: "user", content: prompt });
 
-  const response = await getGroq().chat.completions.create({
-    model,
-    messages,
-    max_tokens: maxTokens,
-    ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
-  });
+  // Groq free tier: 6,000 TPM. Cap output to avoid burning through the limit.
+  const cappedTokens = Math.min(maxTokens, 600);
 
-  const text = response.choices[0]?.message?.content ?? "";
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const response = await getGroq().chat.completions.create({
+        model,
+        messages,
+        max_tokens: cappedTokens,
+        ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
+      });
 
-  if (jsonMode && text) {
-    try { JSON.parse(text); return text; } catch {
-      const repaired = tryRepairJson(text);
-      try { JSON.parse(repaired); return repaired; } catch { return repaired; }
+      const text = response.choices[0]?.message?.content ?? "";
+
+      if (jsonMode && text) {
+        try { JSON.parse(text); return text; } catch {
+          const repaired = tryRepairJson(text);
+          try { JSON.parse(repaired); return repaired; } catch { return repaired; }
+        }
+      }
+
+      return text;
+    } catch (err: unknown) {
+      lastErr = err;
+      const status = (err as { status?: number })?.status;
+      if (status === 429 && attempt < 2) {
+        // Rate-limited — wait 3 s then retry
+        await new Promise((r) => setTimeout(r, 3000 * (attempt + 1)));
+        continue;
+      }
+      throw err;
     }
   }
-
-  return text;
+  throw lastErr;
 }
 
 // Scout chat + fast tasks — gpt-4o-mini, Groq 70b fallback

@@ -93,17 +93,18 @@ Optionally, when it makes sense, append 2-3 quick reply suggestions at the end i
 
     const cvPasteInstruction = isPastedCV ? `
 
-═══ קורות חיים התקבלו ═══
-המשתמש שלח קורות חיים (הועלו כקובץ או הודבקו לצ'אט).
+IMPORTANT INSTRUCTION — CV RECEIVED:
 ${cvSummary
-  ? `מידע שחולץ: ${cvSummary}
-1. שקף בשורה אחת קצרה את הפרטים העיקריים שראית.
-2. שאל שאלה אחת בלבד לגבי מה שהם מחפשים (מיקום / שכר / תחום אם לא ברור).
-3. אחרי תשובה אחת — הוסף [SEARCH_NOW].
-אם כבר ברור גם המיקום וגם השכר מה-parsedData — הוסף [SEARCH_NOW] כבר עכשיו, בלי שאלות.`
-  : `לא ניתן היה לחלץ פרטים מובנים מהקובץ.
-ענה: "העליתם קורות חיים — ספרו לי בקצרה: מה התפקיד הנוכחי שלכם ומה אתם מחפשים בתפקיד הבא?"
-לאחר שיתארו עצמם — שאל שאלה אחת על מיקום או שכר, ואז הוסף [SEARCH_NOW].`}
+  ? `Extracted data: ${cvSummary}
+
+YOUR RESPONSE MUST follow this exact structure:
+Line 1: Mirror back the key facts in one sentence. Example: "ראיתי — ${cvSummary.split(" | ")[0] ?? "מומחה"} עם ${cvSummary.split(" | ")[1] ?? "ניסיון רב"} — מעניין."
+Line 2: Ask exactly ONE question about what is missing or unclear (location / salary / desired role).
+After the user replies once — add [SEARCH_NOW] at the end of your response.
+If location AND salary are already in parsedData — add [SEARCH_NOW] right now, no questions.`
+  : `Could not extract structured data from the CV.
+Say: "העליתם קורות חיים — ספרו לי בקצרה: מה התפקיד הנוכחי שלכם ומה אתם מחפשים בתפקיד הבא?"
+After they describe themselves — ask one question about location or salary, then add [SEARCH_NOW].`}
 If the CV is in English, respond in English with the same logic.
 ` : "";
 
