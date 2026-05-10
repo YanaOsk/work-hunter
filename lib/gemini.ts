@@ -1,3 +1,28 @@
+/**
+ * AI Model Routing — Work Hunter
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Despite the filename, this module does NOT call Google Gemini.
+ * All production calls go to OpenAI (primary) with Groq as fallback.
+ *
+ * Model selection guide:
+ *   gpt-4o-mini  — default for everything: Scout chat, CV parsing, job match
+ *                  scoring, search query generation, CV translation/upgrade.
+ *                  Fast, cheap, Hebrew-capable. Use unless you need deep reasoning.
+ *
+ *   gpt-4o       — reserved for high-stakes one-off tasks: prompt audits,
+ *                  counseling case analysis, complex multi-document synthesis.
+ *                  Use via a standalone script (see scripts/roast_review.py).
+ *                  NOT used in the live app to keep costs predictable.
+ *
+ *   llama-3.3-70b-versatile (Groq) — fallback when OpenAI is down or rate-limited.
+ *                  Capped at 600 output tokens (Groq free tier: 6K TPM).
+ *                  Suitable for short responses; avoid for CV parsing / long outputs.
+ *
+ *   Google Gemini API (AIzaSy...) — free-tier key, limited daily quota.
+ *                  Use only for offline audits / agent reviews, never in prod.
+ *                  Key lives in scripts/; not wired to the app.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 import OpenAI from "openai";
 import Groq from "groq-sdk";
 
@@ -228,7 +253,11 @@ export async function geminiChat(
     return await callOpenAI("gpt-4o-mini", prompt, systemPrompt, maxTokens, false);
   } catch {
     if (process.env.GROQ_API_KEY) {
-      return callGroqFallback("llama-3.3-70b-versatile", prompt, systemPrompt, maxTokens, false);
+      // Groq free tier: ~12k TPM. Truncate system prompt to stay under budget.
+      const groqSystem = systemPrompt && systemPrompt.length > 6000
+        ? systemPrompt.slice(0, 6000) + "\n[system prompt truncated for fallback model]"
+        : systemPrompt;
+      return callGroqFallback("llama-3.3-70b-versatile", prompt, groqSystem, maxTokens, false);
     }
     throw new Error("AI service unavailable.");
   }
