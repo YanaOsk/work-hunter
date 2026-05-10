@@ -4,71 +4,12 @@ import { AppMode } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import CountUp from "./CountUp";
+import HeroVisual from "./HeroVisual";
 
 interface Props {
   onChoose: (mode: AppMode) => void;
 }
 
-function HeroMockup({ he }: { he: boolean }) {
-  return (
-    <div className="relative w-full max-w-sm mx-auto select-none pointer-events-none" dir="ltr">
-      {/* Job match card */}
-      <div className="linear-card p-5 mb-3 animate-hero-in" style={{ animationDelay: "0.2s" }}>
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <p className="text-white text-sm font-semibold">{he ? "מנהל מוצר בכיר" : "Senior Product Manager"}</p>
-            <p className="text-white/40 text-[11px] mt-0.5">monday.com · Tel Aviv</p>
-          </div>
-          <span className="text-[11px] font-bold text-[#4ADE80] bg-[#4ADE80]/10 border border-[#4ADE80]/20 rounded-full px-2.5 py-0.5 flex-shrink-0">
-            94%
-          </span>
-        </div>
-        <div className="space-y-2.5">
-          {[
-            { label: he ? "התאמת כישורים" : "Skills match", pct: 94, color: "#5E6AD2" },
-            { label: he ? "ביקוש בשוק" : "Market demand", pct: 88, color: "#4ADE80" },
-          ].map(({ label, pct, color }) => (
-            <div key={label}>
-              <div className="flex justify-between mb-1">
-                <span className="text-white/40 text-[10px]">{label}</span>
-                <span className="text-[10px] font-semibold" style={{ color }}>{pct}%</span>
-              </div>
-              <div className="h-1 rounded-full bg-white/[0.06]">
-                <div className="h-1 rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* AI message card */}
-      <div className="linear-card p-4 animate-hero-in" style={{ animationDelay: "0.4s" }}>
-        <div className="flex items-center gap-2 mb-2.5">
-          <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(94,106,210,0.15)" }}>
-            <svg style={{ color: "#5E6AD2", width: "12px", height: "12px" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-          </div>
-          <p className="text-white/40 text-[10px] font-medium uppercase tracking-wide">
-            {he ? "יועץ קריירה AI" : "Career Advisor AI"}
-          </p>
-          <div className="ms-auto w-1.5 h-1.5 rounded-full bg-[#4ADE80] animate-pulse" />
-        </div>
-        <p className="text-white/65 text-xs leading-relaxed" dir={he ? "rtl" : "ltr"}>
-          {he
-            ? "\"על בסיס הניסיון שלך, זיהיתי 3 תפקידים עם התאמה מעל 90%...\""
-            : "\"Based on your background, I found 3 roles with over 90% match...\""}
-        </p>
-      </div>
-
-      {/* Decorative glow */}
-      <div className="absolute -inset-8 -z-10 opacity-30 pointer-events-none">
-        <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl" style={{ background: "rgba(94,106,210,0.15)" }} />
-        <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full blur-3xl" style={{ background: "rgba(74,222,128,0.10)" }} />
-      </div>
-    </div>
-  );
-}
 
 export default function HeroSection({ onChoose }: Props) {
   const { lang } = useLanguage();
@@ -140,9 +81,9 @@ export default function HeroSection({ onChoose }: Props) {
             </div>
           </div>
 
-          {/* ── Right: Product preview ── */}
+          {/* ── Right: Product visual ── */}
           <div className="hidden md:flex justify-center">
-            <HeroMockup he={he} />
+            <HeroVisual />
           </div>
         </div>
       </div>
