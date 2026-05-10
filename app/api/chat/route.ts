@@ -161,7 +161,8 @@ Missing information: ${JSON.stringify(userProfile?.missingFields || [])}`;
 
     return NextResponse.json({ message: finalMessage, readyToSearch: shouldSearch, suggestedReplies });
   } catch (error) {
-    console.error("chat error:", error);
-    return NextResponse.json({ error: "Chat failed. Check your GEMINI_API_KEY." }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("chat error:", msg);
+    return NextResponse.json({ error: `Chat failed: ${msg}` }, { status: 500 });
   }
 }
