@@ -107,12 +107,6 @@ export default function HeroSection({ onChoose }: Props) {
 
       {/* Text + CTAs */}
       <div className="relative z-10 max-w-4xl mx-auto text-center w-full animate-hero-in">
-        {/* Badge pill */}
-        <div className="inline-flex items-center gap-2 border border-white/10 bg-white/[0.04] backdrop-blur-sm rounded-full px-4 py-1.5 mb-8 text-xs text-white/55 tracking-wide">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-          {he ? "מופעל על ידי AI · אוצר הזדמנויות קריירה" : "AI-powered · Career opportunity scout"}
-        </div>
-
         {/* Headline */}
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-bold leading-[1.08] mb-6 md:mb-7 tracking-[-0.04em]">
           <span className="bg-gradient-to-b from-white via-white/95 to-white/65 bg-clip-text text-transparent">
