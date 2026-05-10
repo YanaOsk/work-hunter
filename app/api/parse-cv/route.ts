@@ -5,9 +5,11 @@ import { PARSE_CV_SYSTEM_PROMPT } from "@/lib/prompts";
 
 async function extractWithPdfParse(buffer: Buffer): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pdfParse = require("pdf-parse");
-  const data = await pdfParse(buffer);
-  return data.text ?? "";
+  const { PDFParse } = require("pdf-parse");
+  const parser = new PDFParse({ data: buffer });
+  const result = await parser.getText();
+  await parser.destroy();
+  return result.text ?? "";
 }
 
 async function extractWithPdf2Json(buffer: Buffer): Promise<string> {
