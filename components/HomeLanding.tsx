@@ -3,6 +3,7 @@
 import { AppMode } from "@/lib/types";
 import HeroSection from "./HeroSection";
 import FeaturesGrid from "./FeaturesGrid";
+import FeatureShowcase from "./FeatureShowcase";
 import HowItWorks from "./HowItWorks";
 import ServicesIntro from "./ServicesIntro";
 import ReviewMarquee from "./ReviewMarquee";
@@ -67,6 +68,11 @@ export default function HomeLanding({ onChoose }: Props) {
         <Divider />
         <FadeIn>
           <FeaturesGrid />
+        </FadeIn>
+
+        <Divider />
+        <FadeIn>
+          <FeatureShowcase />
         </FadeIn>
 
         <Divider />
