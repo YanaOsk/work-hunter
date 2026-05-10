@@ -549,6 +549,11 @@ Scoring weights (after constraints applied):
 
 LANGUAGE BONUS: If the candidate is fluent in a European language beyond English (German, French, Dutch, Spanish, Russian), AND the job description mentions that language OR the company clearly operates in that market: add +8 to matchScore and include in matchReasons: "שפת ה-[שפה] שלך היא יתרון ממשי כאן — רוב המועמדים לא מביאים אותה".
 
+THIN DESCRIPTION RULE: If the Full Description is shorter than 120 characters (typical of Facebook snippets or Serper truncations), treat it as LOW CONFIDENCE data. In this case:
+→ Do NOT infer details that are not stated. Do NOT assume remote, salary, or seniority requirements.
+→ Cap matchScore at 65 unless the title alone is an exact match to the candidate's target role.
+→ Add to matchNegatives: "תיאור המשרה קצר מדי לניתוח מדויק — מומלץ לפתוח ולקרוא לפני הגשה".
+
 Match reasons must be SPECIFIC to this candidate + this job description. Never generic.
 Bad: "Your skills match the requirements"
 Good: "The role's focus on customer onboarding aligns with your stated love for user-facing work"

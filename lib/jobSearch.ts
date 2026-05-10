@@ -1,6 +1,6 @@
 import { geminiAnalyze } from "@/lib/gemini";
-import { SEARCH_QUERY_PROMPT, MATCH_ANALYSIS_PROMPT, HIDDEN_MARKET_PROMPT } from "@/lib/prompts";
-import { JobResult } from "@/lib/types";
+import { SEARCH_QUERY_PROMPT, MATCH_ANALYSIS_PROMPT, HIDDEN_MARKET_PROMPT, ENTRY_PATH_PROMPT } from "@/lib/prompts";
+import { JobResult, EntryPathResult } from "@/lib/types";
 
 export interface HiddenMarketResult {
   intro: string;
@@ -28,6 +28,10 @@ interface SearchPlan {
   isTech: boolean;
   targetTitles: string[];
   searchRationale?: string;
+  requiresTraining?: boolean;
+  trainingBarrier?: string;
+  educationQueries?: string[];
+  entryTimeMonths?: number;
 }
 
 const MAIN_IL_SITES =
@@ -56,6 +60,15 @@ const GENERIC_PAGE_TITLE_PATTERNS = [
   /^דרושים$/, /^משרות$/, /^jobs?$/i, /^careers?$/i, /^all jobs/i,
   /כל המשרות/, /לוח דרושים/, /חיפוש משרות/, /job listings/i, /job board/i,
   /remote jobs/i, /משרות מרחוק$/, /משרות היום/,
+  // drushim.co.il category pages: "מצאנו 200 הצעות עבודה חדשות" / "27 משרות חדשות"
+  /מצאנו \d+ הצעות עבודה/,
+  /הצעות עבודה חדשות/,
+  /\d+ משרות חדשות/,
+  /משרות חדשות מתעדכנות/,
+  // alljobs.co.il category pages: "מגוון משרות מיידיות"
+  /מגוון משרות מיידיות/,
+  // drushim guides/articles (not job listings)
+  /המדריך המלא/,
 ];
 
 const GENERIC_PAGE_URL_PATTERNS = [
@@ -94,14 +107,16 @@ async function generateSearchPlan(profileText: string): Promise<SearchPlan> {
   return JSON.parse(clean);
 }
 
-async function serperSearch(query: string, sites: string, lang: string): Promise<SerperResult[]> {
+async function serperSearch(query: string, sites: string, lang: string, isTech = true): Promise<SerperResult[]> {
   const apiKey = process.env.SERPER_API_KEY;
   if (!apiKey || apiKey === "your_serper_api_key_here") return [];
+  // Non-tech boards have lower posting volume — use 3-month window instead of 1-month
+  const recency = isTech ? "qdr:m" : "qdr:m3";
   try {
     const response = await fetch("https://google.serper.dev/search", {
       method: "POST",
       headers: { "X-API-KEY": apiKey, "Content-Type": "application/json" },
-      body: JSON.stringify({ q: `${query} ${sites}`, gl: "il", hl: lang, num: 6, tbs: "qdr:m" }),
+      body: JSON.stringify({ q: `${query} ${sites}`, gl: "il", hl: lang, num: 6, tbs: recency }),
     });
     if (!response.ok) return [];
     const data = await response.json();
@@ -132,21 +147,37 @@ async function runSearches(plan: SearchPlan): Promise<TaggedResult[]> {
   ];
 
   const liQuery = plan.linkedinQuery || plan.englishQueries[0];
-  const linkedinSearches = plan.isTech
+  const isSeniorNonTech = !plan.isTech && plan.targetTitles.some(
+    (t) => /VP|Director|Head of|Senior|בכיר|מנהל בכיר|סמנכ"ל|מנכ"ל|ראש צוות|C-Level|Chief/i.test(t)
+  );
+  // Also use LinkedIn when Gemini explicitly provided a linkedinQuery for a professional non-tech role (HRBP, Finance, etc.)
+  const hasExplicitLinkedIn = !!plan.linkedinQuery;
+  const linkedinSearches = (plan.isTech || isSeniorNonTech || hasExplicitLinkedIn)
     ? [{ q: liQuery, lang: "en", nonObvious: false, sites: LINKEDIN_SITES }]
     : [];
 
   const allSearches = [...boardQueries, ...fbSearches, ...linkedinSearches];
   const results = await Promise.all(
     allSearches.map(({ q, lang, nonObvious, sites }) =>
-      serperSearch(q, sites, lang).then((r) => r.map((item) => ({ ...item, isNonObvious: nonObvious })))
+      serperSearch(q, sites, lang, plan.isTech).then((r) => r.map((item) => ({ ...item, isNonObvious: nonObvious })))
     )
   );
 
   const all = results.flat();
   const deduped = all.filter((r, i, arr) => arr.findIndex((x) => x.link === r.link) === i);
   const active = deduped.filter((r) => !isExpiredListing(r) && !isGenericLandingPage(r) && !isJobSeekerPost(r));
-  return active.slice(0, 18);
+
+  // Pre-rank: results whose title overlaps a targetTitle keyword score first
+  const titleWords = plan.targetTitles.flatMap((t) =>
+    t.toLowerCase().split(/[\s/\-–—,]+/).filter((w) => w.length > 2)
+  );
+  const scored = active.map((r) => {
+    const titleLower = r.title.toLowerCase();
+    const hits = titleWords.filter((w) => titleLower.includes(w)).length;
+    return { r, hits };
+  });
+  scored.sort((a, b) => b.hits - a.hits);
+  return scored.map(({ r }) => r).slice(0, 14);
 }
 
 // Fetch full job page content for richer match analysis
@@ -183,6 +214,26 @@ async function fetchJobContent(url: string): Promise<string | null> {
   }
 }
 
+function normalizeSerperDate(dateStr?: string): string | undefined {
+  if (!dateStr) return undefined;
+  const d = new Date(dateStr);
+  if (!isNaN(d.getTime())) return d.toISOString();
+  const lower = dateStr.toLowerCase().trim();
+  const now = Date.now();
+  let match: RegExpMatchArray | null;
+  if ((match = lower.match(/(\d+)\s*hour[s]?\s*ago/))) return new Date(now - +match[1] * 3_600_000).toISOString();
+  if ((match = lower.match(/(\d+)\s*day[s]?\s*ago/))) return new Date(now - +match[1] * 86_400_000).toISOString();
+  if ((match = lower.match(/(\d+)\s*week[s]?\s*ago/))) return new Date(now - +match[1] * 604_800_000).toISOString();
+  if ((match = lower.match(/(\d+)\s*month[s]?\s*ago/))) return new Date(now - +match[1] * 30 * 86_400_000).toISOString();
+  // Hebrew relative dates from Serper (e.g. "לפני 3 ימים")
+  if ((match = dateStr.match(/לפני\s+(\d+)\s+(שעה|שעות)/))) return new Date(now - +match[1] * 3_600_000).toISOString();
+  if ((match = dateStr.match(/לפני\s+(\d+)\s+(יום|ימים)/))) return new Date(now - +match[1] * 86_400_000).toISOString();
+  if ((match = dateStr.match(/לפני\s+(\d+)\s+(שבוע|שבועות)/))) return new Date(now - +match[1] * 604_800_000).toISOString();
+  if ((match = dateStr.match(/לפני\s+(\d+)\s+(חודש|חודשים)/))) return new Date(now - +match[1] * 30 * 86_400_000).toISOString();
+  if (/^(היום|today|just posted)$/i.test(dateStr.trim())) return new Date(now).toISOString();
+  return undefined;
+}
+
 async function analyzeMatch(profileText: string, job: TaggedResult, lang = "he"): Promise<JobResult> {
   const fullContent = await fetchJobContent(job.link);
   // Use full page content only when it's substantially richer than the snippet
@@ -205,13 +256,13 @@ async function analyzeMatch(profileText: string, job: TaggedResult, lang = "he")
       location: analysis.isRemote ? "מרחוק" : "ראה מודעה",
       url: job.link,
       description: job.snippet,
-      matchScore: analysis.matchScore || 70,
+      matchScore: analysis.matchScore ?? 0,
       matchReasons: analysis.matchReasons || [],
       matchNegatives: analysis.matchNegatives || [],
       isRemote: analysis.isRemote || false,
       salaryRange: analysis.salaryRange || undefined,
       salaryNote: analysis.salaryNote || undefined,
-      postedDate: job.date,
+      postedDate: normalizeSerperDate(job.date),
       source: getDomain(job.link),
       isNonObvious: job.isNonObvious,
     };
@@ -223,11 +274,11 @@ async function analyzeMatch(profileText: string, job: TaggedResult, lang = "he")
       location: "ראה מודעה",
       url: job.link,
       description: job.snippet,
-      matchScore: 40,
-      matchReasons: ["מתאים לפרופיל שלך"],
-      matchNegatives: [],
+      matchScore: 0,
+      matchReasons: [],
+      matchNegatives: ["לא ניתן לנתח את המשרה"],
       isRemote: false,
-      postedDate: job.date,
+      postedDate: normalizeSerperDate(job.date),
       source: getDomain(job.link),
       isNonObvious: job.isNonObvious,
     };
@@ -235,10 +286,17 @@ async function analyzeMatch(profileText: string, job: TaggedResult, lang = "he")
 }
 
 function extractCompany(title: string): string {
-  const parts = title.split(" - ");
-  if (parts.length > 1) return parts[parts.length - 1];
-  const atParts = title.split(" at ");
-  return atParts.length > 1 ? atParts[atParts.length - 1] : "ראה מודעה";
+  const separators = [" – ", " — ", " - ", " | ", " at ", " @ "];
+  for (const sep of separators) {
+    const idx = title.lastIndexOf(sep);
+    if (idx > 0) {
+      const candidate = title.slice(idx + sep.length)
+        .replace(/drushim.*|alljobs.*|jobmaster.*|gotfriends.*|comeet.*/i, "")
+        .trim();
+      if (candidate.length > 1) return candidate;
+    }
+  }
+  return "ראה מודעה";
 }
 
 function getDomain(url: string): string {
@@ -264,6 +322,41 @@ function getDomain(url: string): string {
     return domain;
   } catch {
     return "לוח דרושים";
+  }
+}
+
+async function searchEducationInstitutions(plan: SearchPlan, lang: string): Promise<EntryPathResult> {
+  const queries = (plan.educationQueries ?? []).slice(0, 3);
+  const rawResults = (
+    await Promise.all(queries.map((q) => serperSearch(q, "", lang)))
+  ).flat().slice(0, 8);
+
+  const field = plan.targetTitles?.[0] ?? plan.hebrewQueries?.[0] ?? "התחום";
+  const barrier = plan.trainingBarrier ?? "הכשרה מקצועית";
+  const months = plan.entryTimeMonths ?? 6;
+
+  try {
+    const text = await geminiAnalyze(
+      ENTRY_PATH_PROMPT(field, barrier, months, rawResults.map((r) => ({
+        title: r.title, link: r.link, snippet: r.snippet,
+      }))),
+      undefined, 800, true
+    );
+    const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    const parsed = JSON.parse(clean);
+    return {
+      message: parsed.message ?? "",
+      trainingBarrier: barrier,
+      entryTimeMonths: months,
+      institutions: (parsed.institutions ?? []).slice(0, 3),
+    };
+  } catch {
+    return {
+      message: `לא מצאתי משרה שמתאימה לך כרגע ללא ${barrier}. הנה 3 מקומות ללמוד את התחום — בעוד כ-${months} חודשים תוכל להתחיל לעבוד בזה.`,
+      trainingBarrier: barrier,
+      entryTimeMonths: months,
+      institutions: [],
+    };
   }
 }
 
@@ -305,14 +398,23 @@ function getMockJobs(profileText: string): JobResult[] {
 export async function runJobSearch(
   profileText: string,
   onJob?: (job: JobResult) => void,
-  lang = "he"
-): Promise<{ jobs: JobResult[]; demoMode: boolean }> {
+  lang = "he",
+  onEntryPath?: (path: EntryPathResult) => void,
+): Promise<{ jobs: JobResult[]; entryPath?: EntryPathResult; demoMode: boolean }> {
   const serperKey = process.env.SERPER_API_KEY;
   const hasRealSearch = serperKey && serperKey !== "your_serper_api_key_here";
 
   if (hasRealSearch) {
     const plan = await generateSearchPlan(profileText);
     const results = await runSearches(plan);
+
+    // No job results + profession requires training → switch to education path
+    if (results.length === 0 && plan.requiresTraining && (plan.educationQueries?.length ?? 0) > 0) {
+      const entryPath = await searchEducationInstitutions(plan, lang);
+      onEntryPath?.(entryPath);
+      return { jobs: [], entryPath, demoMode: false };
+    }
+
     const jobs: JobResult[] = [];
     await Promise.all(
       results.map(async (r) => {
