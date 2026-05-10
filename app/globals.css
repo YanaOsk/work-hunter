@@ -43,6 +43,14 @@ html.light {
   background-color: #FAFAFA;
 }
 
+/* ─── Light mode: fix aurora blobs ──────────────────────────────────── */
+html.light .aurora-blob { opacity: 0.25; }
+html.light .aurora-layer::before { background: radial-gradient(ellipse, rgba(94,106,210,0.05) 0%, transparent 70%); }
+html.light .aurora-layer::after  { background: radial-gradient(ellipse, rgba(74,222,128,0.03) 0%, transparent 70%); }
+
+/* ─── Light mode: canvas animation invisible ─────────────────────────── */
+html.light canvas { opacity: 0.15 !important; }
+
 /* ─── Page gradients → light neutral ─────────────────────────────────── */
 html.light .from-slate-900      { --tw-gradient-from: #f4f4f5 !important; }
 html.light .via-purple-950      { --tw-gradient-via:  #FAFAFA !important; }
@@ -324,15 +332,30 @@ html.light .aurora-blob { opacity: 0.3; }
 }
 
 html.light .linear-card {
-  background: rgba(255,255,255,0.92);
-  border-color: rgba(0,0,0,0.08);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.94) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
 }
 html.light .linear-card:hover {
-  background: rgba(255,255,255,1);
-  border-color: rgba(94,106,210,0.22);
-  box-shadow: 0 0 0 1px rgba(94,106,210,0.16), 0 4px 16px rgba(0,0,0,0.10);
+  background: rgba(255,255,255,1) !important;
+  border-color: rgba(94,106,210,0.22) !important;
+  box-shadow: 0 0 0 1px rgba(94,106,210,0.16), 0 4px 16px rgba(0,0,0,0.10) !important;
 }
+
+/* ─── Light mode: SearchingPhase and other pages with fixed bg ───────── */
+html.light [style*="background: #0C0C0D"],
+html.light [style*='background: "#0C0C0D"'] {
+  background: var(--background) !important;
+}
+html.light [style*="background: rgba(12,12,13"] {
+  background: rgba(255,255,255,0.88) !important;
+}
+
+/* ─── ReviewCarousel fade edge — adapt for light bg ─────────────────── */
+html.light .from-\[#0C0C0D\] { --tw-gradient-from: #FAFAFA !important; }
+
+/* ─── Scorecard tooltip bg ───────────────────────────────────────────── */
+html.light .bg-\[#141415\] { background-color: #ffffff !important; border-color: rgba(0,0,0,0.12) !important; }
 
 /* ── Linear border glow (on focus/active states) ────────────────────── */
 .linear-glow {

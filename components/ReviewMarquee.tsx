@@ -78,8 +78,8 @@ export default function ReviewMarquee() {
       {/* Row 1 — scrolls left */}
       <div className="pause-on-hover relative mb-3">
         {/* Fade edges */}
-        <div className="pointer-events-none absolute start-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-[#0C0C0D] to-transparent" />
-        <div className="pointer-events-none absolute end-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-[#0C0C0D] to-transparent" />
+        <div className="pointer-events-none absolute start-0 top-0 bottom-0 w-16 z-10" style={{ background: "linear-gradient(to right, var(--background), transparent)" }} />
+        <div className="pointer-events-none absolute end-0 top-0 bottom-0 w-16 z-10" style={{ background: "linear-gradient(to left, var(--background), transparent)" }} />
 
         <div className="flex animate-marquee">
           {[...row1, ...row1].map((r, i) => (

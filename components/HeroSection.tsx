@@ -4,6 +4,7 @@ import { AppMode } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import CountUp from "./CountUp";
+import HeroBgAnimation from "./HeroBgAnimation";
 
 interface Props {
   onChoose: (mode: AppMode) => void;
@@ -95,7 +96,10 @@ export default function HeroSection({ onChoose }: Props) {
 
   return (
     <section className="relative overflow-hidden min-h-[92vh] flex flex-col items-center justify-center px-4 pt-12 pb-16 md:py-28">
-      {/* Radial focus glow */}
+      {/* Canvas job-search network animation */}
+      <HeroBgAnimation />
+
+      {/* Radial focus glow — sits above canvas */}
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_35%_at_50%_18%,rgba(94,106,210,0.11),transparent)]" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-28 bg-gradient-to-b from-purple-400/25 to-transparent" />

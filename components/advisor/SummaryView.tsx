@@ -263,27 +263,37 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
 
       const canvas = await toCanvas(wrapper, {
         pixelRatio: 2,
-        backgroundColor: "#0f172a",
+        backgroundColor: "#0C0C0D",
         skipFonts: false,
+        style: { direction: "ltr" },
       });
 
       hidden.forEach((el) => el.style.removeProperty("display"));
 
       if (canvas.width === 0 || canvas.height === 0) throw new Error("Canvas is empty");
 
-      const imgData = canvas.toDataURL("image/jpeg", 0.95);
-      const pageW = 210;
-      const pageH = 297;
-      const ratio = pageW / canvas.width;
-      const totalH = canvas.height * ratio;
+      const pageW = 210; // mm
+      const pageH = 297; // mm
+      // pixels that fit on one A4 page at the same horizontal scale
+      const pageH_px = Math.floor((pageH / pageW) * canvas.width);
+      const pageCount = Math.ceil(canvas.height / pageH_px);
 
       const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-      let yOffset = 0;
-      let remaining = totalH;
-      while (remaining > 0) {
-        pdf.addImage(imgData, "JPEG", 0, -yOffset, pageW, totalH);
-        remaining -= pageH;
-        if (remaining > 0) { pdf.addPage(); yOffset += pageH; }
+
+      for (let p = 0; p < pageCount; p++) {
+        if (p > 0) pdf.addPage();
+        const srcY  = p * pageH_px;
+        const srcH  = Math.min(pageH_px, canvas.height - srcY);
+
+        const slice = document.createElement("canvas");
+        slice.width  = canvas.width;
+        slice.height = pageH_px;
+        const sctx = slice.getContext("2d")!;
+        sctx.fillStyle = "#0C0C0D";
+        sctx.fillRect(0, 0, slice.width, slice.height);
+        sctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+
+        pdf.addImage(slice.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, pageW, pageH);
       }
 
       pdf.save(`career-summary-${name || "advisor"}.pdf`);

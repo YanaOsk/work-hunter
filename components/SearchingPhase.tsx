@@ -22,7 +22,7 @@ export default function SearchingPhase() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#0C0C0D" }}>
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--background)" }}>
       {/* Linear-style progress beam at the very top */}
       <div className="relative h-[2px] overflow-hidden bg-white/[0.04]">
         <div
