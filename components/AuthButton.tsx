@@ -135,7 +135,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
 
         {/* Dropdown */}
         {open && (
-          <div className="absolute end-0 top-full mt-2 w-64 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/60 z-50 overflow-hidden" style={{ background: "rgba(18,18,20,0.97)" }}>
+          <div className="auth-dropdown absolute end-0 top-full mt-2 w-64 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/60 z-50 overflow-hidden">
             {/* User info header */}
             <div className="px-4 py-3.5 border-b border-white/10 flex items-center gap-3">
               {displayImage ? (

@@ -417,6 +417,21 @@ html.light [style*="background: rgba(12,12,13,0.60)"] {
 }
 
 
+/* ── Auth dropdown ───────────────────────────────────────────────────── */
+.auth-dropdown {
+  background: rgba(18,18,20,0.97);
+}
+html.light .auth-dropdown {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: rgba(0,0,0,0.10) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06) !important;
+}
+html.light .auth-dropdown .hover\:bg-white\/5:hover { background-color: rgba(0,0,0,0.04) !important; }
+html.light .auth-dropdown .bg-white\/10,
+html.light .auth-dropdown .h-px { border-color: rgba(0,0,0,0.08) !important; background-color: rgba(0,0,0,0.07) !important; }
+
 /* ── Linear border glow (on focus/active states) ────────────────────── */
 .linear-glow {
   box-shadow: 0 0 0 1px rgba(94,106,210,0.4), 0 0 16px rgba(94,106,210,0.15);
@@ -524,6 +539,11 @@ html.light [style*="background: rgba(12,12,13,0.60)"] {
 @keyframes counterUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
