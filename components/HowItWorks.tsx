@@ -8,103 +8,96 @@ export default function HowItWorks() {
   const tx = t[lang];
   const he = lang === "he";
 
-  const steps = [
-    {
-      num: "01",
-      title: tx.howStep1,
-      desc: tx.toolDiagnosisDesc,
-      icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
-      accent: "#5E6AD2",
-    },
-    {
-      num: "02",
-      title: tx.howStep2,
-      desc: tx.toolDirectionDesc,
-      icon: "M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7",
-      accent: "#4ADE80",
-    },
-    {
-      num: "03",
-      title: tx.howStep3,
-      desc: tx.toolCvDesc,
-      icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-      accent: "#5E6AD2",
-    },
-    {
-      num: "04",
-      title: tx.howStep5,
-      desc: tx.toolStrategyDesc,
-      icon: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
-      accent: "#4ADE80",
-    },
-  ];
+  const steps = he
+    ? [
+        {
+          num: "01",
+          title: "ספרו לנו עליכם",
+          desc: "מעלים קורות חיים או עונים על כמה שאלות קצרות. זה לוקח פחות מ-5 דקות.",
+          icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+          accent: "#5E6AD2",
+        },
+        {
+          num: "02",
+          title: "ה-AI מנתח ומאתר",
+          desc: "היועץ שלנו מבין את הפרופיל שלכם ומוצא משרות רלוונטיות עם ניתוח התאמה לכל אחת.",
+          icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
+          accent: "#4ADE80",
+        },
+        {
+          num: "03",
+          title: "יוצאים לדרך",
+          desc: "מקבלים תוכנית עבודה ברורה — קורות חיים, אסטרטגיה, ותפקידים שמחכים לכם.",
+          icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
+          accent: "#5E6AD2",
+        },
+      ]
+    : [
+        {
+          num: "01",
+          title: "Tell us about you",
+          desc: "Upload your CV or answer a few quick questions. Takes under 5 minutes.",
+          icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
+          accent: "#5E6AD2",
+        },
+        {
+          num: "02",
+          title: "AI matches & analyzes",
+          desc: "Our advisor understands your profile and finds relevant jobs with a fit score for each.",
+          icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
+          accent: "#4ADE80",
+        },
+        {
+          num: "03",
+          title: "Get to work",
+          desc: "You get a clear action plan — polished CV, search strategy, and roles ready to apply for.",
+          icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
+          accent: "#5E6AD2",
+        },
+      ];
 
   return (
-    <section className="py-14 md:py-24 px-4 md:px-6">
-      <div className="max-w-5xl mx-auto">
-
-        <div className="mb-10 md:mb-14" dir={he ? "rtl" : "ltr"}>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-[10px] font-mono font-semibold text-white/20 tracking-widest tabular-nums">2.0</span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/25">
-              {he ? "תהליך" : "PROCESS"}
-            </p>
-          </div>
+    <section className="py-14 md:py-20 px-4 md:px-6" id="how-it-works">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12" dir={he ? "rtl" : "ltr"}>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 tracking-[-0.03em]">
             {tx.howItWorksTitle}
           </h2>
-          <p className="text-white/45 text-sm sm:text-base max-w-lg leading-relaxed">
+          <p className="text-white/45 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
             {tx.howItWorksSubtitle}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {steps.map((s, i) => (
-            <div key={i} className="group relative linear-card p-5 md:p-6 overflow-hidden" style={{ animation: `staggerIn 0.5s ease both`, animationDelay: `${i * 100}ms` }}>
-              {/* Step number — faint watermark */}
-              <span
-                className="absolute top-4 end-4 text-5xl font-bold leading-none select-none"
-                style={{ color: s.accent + "0D" }}
-              >
-                {s.num}
-              </span>
+        {/* Steps — horizontal on desktop, vertical on mobile */}
+        <div className="relative" dir={he ? "rtl" : "ltr"}>
+          {/* Connector line (desktop) */}
+          <div className="hidden md:block absolute top-9 start-[calc(16.66%+18px)] end-[calc(16.66%+18px)] h-px bg-white/[0.07]" />
 
-              {/* Icon */}
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
-                style={{ background: s.accent + "15", border: `1px solid ${s.accent}22` }}
-              >
-                <svg
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.75}
-                  style={{ color: s.accent, width: "18px", height: "18px" }}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d={s.icon} />
-                </svg>
-              </div>
-
-              {/* Step label */}
-              <p className="text-[10px] font-semibold tracking-[0.1em] uppercase mb-1.5" style={{ color: s.accent + "90" }}>
-                {he ? "שלב" : "Step"} {s.num}
-              </p>
-
-              <h3 className="text-white font-semibold text-sm mb-2 tracking-[-0.01em] leading-snug">
-                {s.title}
-              </h3>
-              <p className="text-white/40 text-xs leading-relaxed">{s.desc}</p>
-
-              {/* Connector line on desktop — not last item */}
-              {i < steps.length - 1 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4">
+            {steps.map((s, i) => (
+              <div key={i} className="flex flex-col items-center md:items-center text-center relative">
+                {/* Circle number */}
                 <div
-                  className="hidden lg:block absolute top-[42px] start-full w-3 h-px opacity-20"
-                  style={{ background: s.accent }}
-                />
-              )}
-            </div>
-          ))}
+                  className="w-12 h-12 rounded-full flex items-center justify-center mb-4 relative z-10 border-2 text-sm font-bold transition-all duration-300"
+                  style={{
+                    background: i === 1 ? s.accent : "transparent",
+                    borderColor: s.accent,
+                    color: i === 1 ? "#0C0C0D" : s.accent,
+                  }}
+                >
+                  {s.num}
+                </div>
+
+                <h3 className="text-white font-semibold text-base mb-2 tracking-[-0.01em]">
+                  {s.title}
+                </h3>
+                <p className="text-white/40 text-sm leading-relaxed max-w-[200px]">
+                  {s.desc}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
