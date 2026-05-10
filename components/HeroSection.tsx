@@ -25,13 +25,6 @@ export default function HeroSection({ onChoose }: Props) {
         >
           {/* ── Left: Text ── */}
           <div className="animate-hero-in">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-3 py-1 mb-6 border"
-              style={{ background: "rgba(94,106,210,0.10)", borderColor: "rgba(94,106,210,0.22)", color: "#5E6AD2" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#5E6AD2] animate-pulse" />
-              {he ? "יועץ קריירה מבוסס AI · בעברית" : "AI Career Advisor · In Hebrew"}
-            </div>
-
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl md:text-[3.25rem] font-bold text-white leading-[1.1] tracking-[-0.03em] mb-5">
               {tx.heroTitle}

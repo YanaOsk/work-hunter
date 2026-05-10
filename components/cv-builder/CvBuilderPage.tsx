@@ -10,6 +10,7 @@ import CvEditor from "./CvEditor";
 import CvPreview from "./CvPreview";
 import CvUpgrader from "./CvUpgrader";
 import CvTranslator from "./CvTranslator";
+import CvExamplesContent from "./CvExamplesContent";
 import {
   CV_ACCENT_COLORS,
   CV_TEMPLATES,
@@ -23,6 +24,7 @@ import {
 import type { CvMeta } from "@/lib/cvs";
 
 type View = "list" | "editor";
+type ListTab = "my-cvs" | "examples";
 
 export default function CvBuilderPage() {
   const { lang } = useLanguage();
@@ -35,6 +37,7 @@ export default function CvBuilderPage() {
   const cvIdParam = searchParams.get("cvId");
 
   const [view, setView] = useState<View>("list");
+  const [listTab, setListTab] = useState<ListTab>("my-cvs");
   const [cvList, setCvList] = useState<CvMeta[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [activeCvId, setActiveCvId] = useState<string | null>(null);
@@ -77,6 +80,22 @@ export default function CvBuilderPage() {
   // Load CV list on mount (authenticated) or localStorage (guest)
   useEffect(() => {
     if (status === "loading") return;
+    // Sample CV from examples page takes priority
+    try {
+      const raw = sessionStorage.getItem("work_hunter_cv_sample");
+      if (raw) {
+        sessionStorage.removeItem("work_hunter_cv_sample");
+        const cvData: CvData = JSON.parse(raw);
+        setActiveCvId(null);
+        setCvName(lang === "he" ? `קורות חיים — ${cvData.personal.fullName}` : `Resume — ${cvData.personal.fullName}`);
+        setData(cvData);
+        setLoaded(true);
+        setSaveStatus("idle");
+        setListLoading(false);
+        setView("editor");
+        return;
+      }
+    } catch {}
     if (isLoggedIn) {
       fetchList();
     } else {
@@ -369,6 +388,28 @@ export default function CvBuilderPage() {
             </div>
           </div>
 
+          {/* Tab bar */}
+          <div className="flex gap-1 mb-8 border-b border-white/[0.07]">
+            {([["my-cvs", lang === "he" ? "הקורות חיים שלי" : "My Resumes"], ["examples", lang === "he" ? "דוגמאות" : "Examples"]] as const).map(([id, label]) => (
+              <button
+                key={id}
+                onClick={() => setListTab(id)}
+                className={`px-4 py-2.5 text-sm font-medium transition-all border-b-2 -mb-px ${
+                  listTab === id
+                    ? "border-[#5E6AD2] text-white"
+                    : "border-transparent text-white/40 hover:text-white/70"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Examples tab */}
+          {listTab === "examples" && (
+            <CvExamplesContent compact />
+          )}
+
           {/* Import modal */}
           {showImportModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -464,7 +505,7 @@ export default function CvBuilderPage() {
             </div>
           )}
 
-          {listLoading ? (
+          {listTab === "my-cvs" && (listLoading ? (
             <div className="flex justify-center py-20">
               <svg className="animate-spin w-8 h-8 text-white/30" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -522,7 +563,7 @@ export default function CvBuilderPage() {
                 </div>
               ))}
             </div>
-          )}
+          ))}
         </div>
         <SiteFooter />
       </div>

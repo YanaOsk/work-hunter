@@ -25,7 +25,6 @@ export default function SiteFooter() {
           links: [
             { href: "/advisor?profileId=default-advisor", label: "יועץ קריירה" },
             { href: "/cv-builder", label: "בונה קורות חיים" },
-            { href: "/cv-examples", label: "דוגמאות קורות חיים" },
             { href: "/tracker", label: "מעקב בקשות" },
           ],
         },
@@ -52,7 +51,6 @@ export default function SiteFooter() {
           links: [
             { href: "/advisor?profileId=default-advisor", label: "Career Advisor" },
             { href: "/cv-builder", label: "CV Builder" },
-            { href: "/cv-examples", label: "CV Examples" },
             { href: "/tracker", label: "Job Tracker" },
           ],
         },

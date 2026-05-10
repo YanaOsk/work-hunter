@@ -35,11 +35,11 @@ export default function AllFieldsSection() {
             {he ? "לכולם" : "FOR EVERYONE"}
           </p>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 tracking-[-0.03em]">
-            {he ? "לכל תחום. לכל רקע." : "Every field. Every background."}
+            {he ? "בכל תחום ומכל נקודת פתיחה." : "Every field. Every background."}
           </h2>
           <p className="text-white/45 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
             {he
-              ? "בין אם אתם מהנדסים, מורים, אנשי מכירות או עוזבים את השירות הצבאי — Work Hunter מכיר את שוק העבודה הישראלי בכל הסקטורים"
+              ? "זה לא משנה אם אתם משוחררים טריים, מורים, אנשי מכירות או מהנדסים – Work Hunter מכיר מקרוב את כל מה שקורה היום בשוק העבודה הישראלי."
               : "Engineers, teachers, salespeople, or career changers — Work Hunter knows the Israeli job market across every sector"}
           </p>
         </div>

@@ -2,6 +2,7 @@
 
 import { AppMode } from "@/lib/types";
 import HeroSection from "./HeroSection";
+import LiveStatsBar from "./LiveStatsBar";
 import HowItWorks from "./HowItWorks";
 import ServicesIntro from "./ServicesIntro";
 import ReviewCarousel from "./ReviewCarousel";
@@ -40,6 +41,7 @@ export default function HomeLanding({ onChoose }: Props) {
       {/* Content */}
       <div className="relative z-10">
         <HeroSection onChoose={onChoose} />
+        <LiveStatsBar />
 
         <Divider />
         <FadeIn>
