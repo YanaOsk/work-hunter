@@ -63,13 +63,19 @@ export default function FeaturesGrid() {
     <section className="py-14 md:py-24 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
 
-        {/* Section header — Linear style */}
-        <div className="mb-10 md:mb-14">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/30 mb-3">
-            {he ? "כלים" : "CAPABILITIES"}
-          </p>
+        {/* Section header — Linear numbered style */}
+        <div className="mb-10 md:mb-14" dir={he ? "rtl" : "ltr"}>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-[10px] font-mono font-semibold text-white/20 tracking-widest tabular-nums">
+              {he ? "1.0" : "1.0"}
+            </span>
+            <div className="flex-1 h-px bg-white/[0.06]" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/25">
+              {he ? "יכולות" : "CAPABILITIES"}
+            </p>
+          </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 tracking-[-0.03em]">
-            {he ? "כל הכלים. מקום אחד." : "All the tools. One place."}
+            {he ? "כל מה שצריך כדי להתקדם, במקום אחד." : "All the tools. One place."}
           </h2>
           <p className="text-white/45 text-sm sm:text-base max-w-lg leading-relaxed">
             {he

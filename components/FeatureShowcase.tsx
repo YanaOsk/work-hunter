@@ -160,6 +160,7 @@ function CvMockup() {
 /* ─── Feature block ──────────────────────────────────────────────────────── */
 interface FeatureBlockProps {
   overline: string;
+  sectionNum: string;
   headline: string;
   body: string;
   bullets: string[];
@@ -168,17 +169,23 @@ interface FeatureBlockProps {
   flip?: boolean;
 }
 
-function FeatureBlock({ overline, headline, body, bullets, accent, mockup, flip = false }: FeatureBlockProps) {
+function FeatureBlock({ overline, sectionNum, headline, body, bullets, accent, mockup, flip = false }: FeatureBlockProps) {
   return (
     <div className={`flex flex-col ${flip ? "md:flex-row-reverse" : "md:flex-row"} items-center gap-10 md:gap-16`}>
       {/* Text side */}
       <div className="flex-1 min-w-0">
-        <p
-          className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3"
-          style={{ color: accent + "99" }}
-        >
-          {overline}
-        </p>
+        <div className="flex items-center gap-2.5 mb-3">
+          <span className="text-[10px] font-mono font-semibold text-white/20 tracking-widest tabular-nums">
+            {sectionNum}
+          </span>
+          <div className="w-8 h-px" style={{ background: accent + "40" }} />
+          <p
+            className="text-[10px] font-semibold uppercase tracking-[0.14em]"
+            style={{ color: accent + "80" }}
+          >
+            {overline}
+          </p>
+        </div>
         <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4 tracking-[-0.03em] leading-tight">
           {headline}
         </h3>
@@ -215,8 +222,9 @@ export default function FeatureShowcase() {
   const blocks: FeatureBlockProps[] = [
     {
       overline: he ? "אבחון קריירה" : "CAREER DIAGNOSIS",
+      sectionNum: "1.1",
       headline: he
-        ? "שיחה אחת. תמונה מלאה של מי אתם."
+        ? "שיחה אחת קצרה, וסוף סוף תראו את התמונה המלאה."
         : "One conversation. A complete picture of who you are.",
       body: he
         ? "היועץ שואל את השאלות שאף מגייס לא ישאל — על ערכים, על סביבות עבודה, על מה שמפעיל אתכם. התוצאה: אבחון כתוב עם חוזקות, מיומנויות מועברות ועיוורונות שכדאי לדעת."
@@ -230,6 +238,7 @@ export default function FeatureShowcase() {
     },
     {
       overline: he ? "סקאוט משרות" : "JOB SCOUT",
+      sectionNum: "1.2",
       headline: he
         ? "הבינה המלאכותית מחפשת. אתם רק בוחרים."
         : "The AI scouts. You just choose.",
@@ -245,6 +254,7 @@ export default function FeatureShowcase() {
     },
     {
       overline: he ? "קורות חיים ולינקדאין" : "CV & LINKEDIN",
+      sectionNum: "1.3",
       headline: he
         ? "קורות חיים שמסבירים מי אתם, לא רק מה עשיתם."
         : "A CV that explains who you are, not just what you did.",

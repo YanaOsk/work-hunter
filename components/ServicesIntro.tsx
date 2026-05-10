@@ -16,6 +16,13 @@ export default function ServicesIntro({ onChoose }: Props) {
     <section className="py-10 md:py-20 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
+          <div className="flex items-center justify-center gap-2.5 mb-4">
+            <span className="text-[10px] font-mono font-semibold text-white/20 tracking-widest tabular-nums">3.0</span>
+            <div className="w-6 h-px bg-white/[0.06]" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/25">
+              {lang === "he" ? "שירותים" : "SERVICES"}
+            </p>
+          </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">{tx.servicesTitle}</h2>
           <p className="text-white/60">{tx.servicesSubtitle}</p>
         </div>

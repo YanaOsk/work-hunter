@@ -43,10 +43,14 @@ export default function HowItWorks() {
     <section className="py-14 md:py-24 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
 
-        <div className="mb-10 md:mb-14">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/30 mb-3">
-            {he ? "תהליך" : "PROCESS"}
-          </p>
+        <div className="mb-10 md:mb-14" dir={he ? "rtl" : "ltr"}>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-[10px] font-mono font-semibold text-white/20 tracking-widest tabular-nums">2.0</span>
+            <div className="flex-1 h-px bg-white/[0.06]" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/25">
+              {he ? "תהליך" : "PROCESS"}
+            </p>
+          </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 tracking-[-0.03em]">
             {tx.howItWorksTitle}
           </h2>
