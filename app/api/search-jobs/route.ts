@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { runJobSearch } from "@/lib/jobSearch";
-import { JobResult } from "@/lib/types";
+import { JobResult, EntryPathResult } from "@/lib/types";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -46,9 +46,22 @@ export async function POST(request: NextRequest) {
       };
 
       try {
-        const { demoMode } = await runJobSearch(profileText, (job: JobResult) => {
-          if (job.matchScore >= 38) send({ type: "job", job });
-        }, lang);
+        const wantsRemoteOnly =
+          profileText.includes('"workPreference":"remote"') ||
+          /"workPreference"\s*:\s*"remote"/.test(profileText) ||
+          /מרחוק מלא|עבודה מהבית בלבד|remote only|fully remote|רוצה לעבוד מהבית|"remote"|מרחוק/i.test(profileText);
+
+        const { demoMode } = await runJobSearch(
+          profileText,
+          (job: JobResult) => {
+            if (job.matchScore < 38) return;
+            // Hard filter: never send onsite jobs to remote-only candidates
+            if (wantsRemoteOnly && !job.isRemote) return;
+            send({ type: "job", job });
+          },
+          lang,
+          (entryPath: EntryPathResult) => { send({ type: "entryPath", data: entryPath }); },
+        );
         send({ type: "done", demoMode });
       } catch (err) {
         console.error("search-jobs stream error:", err);

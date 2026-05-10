@@ -15,4 +15,26 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   reporter: [["list"]],
+  projects: [
+    {
+      name: "prod-users",
+      testMatch: "**/prod-ui-test.spec.ts",
+      use: {
+        headless: false,
+        launchOptions: { slowMo: 200 },
+        viewport: { width: 1280, height: 900 },
+        storageState: { cookies: [], origins: [] },
+        video: "retain-on-failure",
+        screenshot: "on",
+        locale: "he-IL",
+      },
+    },
+    {
+      name: "default",
+      testIgnore: "**/prod-ui-test.spec.ts",
+      use: {
+        storageState: "tests/.auth.json",
+      },
+    },
+  ],
 });

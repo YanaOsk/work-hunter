@@ -27,7 +27,8 @@ export async function POST(request: NextRequest) {
     const parsed = safeParseJson<Record<string, unknown>>(raw, "diagnosis");
     return NextResponse.json({ ...parsed, completedAt: new Date().toISOString() });
   } catch (error) {
-    console.error("[diagnosis] failed:", String(error));
-    return NextResponse.json({ error: "Diagnosis failed." }, { status: 500 });
+    const detail = error instanceof Error ? error.message : String(error);
+    console.error("[diagnosis] failed:", detail);
+    return NextResponse.json({ error: "Diagnosis failed.", detail }, { status: 500 });
   }
 }
