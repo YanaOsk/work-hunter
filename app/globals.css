@@ -34,13 +34,13 @@ html, body {
 
 /* ── LIGHT ──────────────────────────────────────────────────────────────── */
 html.light {
-  --background: #FAFAFA;
-  --foreground: #1C1C1E;
+  --background: #EDF1FB;
+  --foreground: #111827;
   --surface:    #FFFFFF;
-  --surface-2:  #F4F4F5;
+  --surface-2:  #E4ECF8;
   --border:     rgba(0,0,0,0.08);
   --border-hover: rgba(0,0,0,0.14);
-  background-color: #FAFAFA;
+  background-color: #EDF1FB;
 }
 
 /* ─── Light mode: fix aurora blobs ──────────────────────────────────── */
@@ -53,13 +53,13 @@ html.light canvas { opacity: 0.15 !important; }
 
 /* ─── Page gradients → light neutral ─────────────────────────────────── */
 html.light .from-slate-900      { --tw-gradient-from: #f4f4f5 !important; }
-html.light .via-purple-950      { --tw-gradient-via:  #FAFAFA !important; }
-html.light .via-purple-950\/30  { --tw-gradient-via:  #FAFAFA !important; }
+html.light .via-purple-950      { --tw-gradient-via:  #EDF1FB !important; }
+html.light .via-purple-950\/30  { --tw-gradient-via:  #EDF1FB !important; }
 html.light .to-slate-900        { --tw-gradient-to:   #f4f4f5 !important; }
 html.light .from-slate-900\/80  { --tw-gradient-from: #f4f4f5 !important; }
 
 /* ─── Solid dark backgrounds → clean white surfaces ─────────────────── */
-html.light .bg-slate-900     { background-color: #FAFAFA !important; }
+html.light .bg-slate-900     { background-color: #EDF1FB !important; }
 html.light .bg-slate-900\/40 { background-color: rgba(255,255,255,0.85) !important; }
 html.light .bg-slate-900\/80 { background-color: rgba(255,255,255,0.96) !important; }
 html.light .bg-slate-900\/90 { background-color: rgba(255,255,255,0.97) !important; }
@@ -99,24 +99,24 @@ html.light .border-white\/20 { border-color: rgba(0,0,0,0.16) !important; }
 html.light .border-white\/30 { border-color: rgba(0,0,0,0.20) !important; }
 
 /* ─── Text: white → dark neutral ─────────────────────────────────────── */
-html.light .text-white     { color: #1C1C1E !important; }
-html.light .text-white\/90 { color: rgba(28,28,30,.95) !important; }
-html.light .text-white\/85 { color: rgba(28,28,30,.90) !important; }
-html.light .text-white\/80 { color: rgba(28,28,30,.85) !important; }
-html.light .text-white\/75 { color: rgba(28,28,30,.80) !important; }
-html.light .text-white\/70 { color: rgba(28,28,30,.75) !important; }
-html.light .text-white\/65 { color: rgba(28,28,30,.70) !important; }
-html.light .text-white\/60 { color: rgba(28,28,30,.65) !important; }
-html.light .text-white\/55 { color: rgba(28,28,30,.60) !important; }
-html.light .text-white\/50 { color: rgba(28,28,30,.55) !important; }
-html.light .text-white\/45 { color: rgba(28,28,30,.50) !important; }
-html.light .text-white\/40 { color: rgba(28,28,30,.46) !important; }
-html.light .text-white\/35 { color: rgba(28,28,30,.42) !important; }
-html.light .text-white\/30 { color: rgba(28,28,30,.38) !important; }
-html.light .text-white\/25 { color: rgba(28,28,30,.34) !important; }
-html.light .text-white\/20 { color: rgba(28,28,30,.30) !important; }
-html.light .text-white\/15 { color: rgba(28,28,30,.22) !important; }
-html.light .text-white\/10 { color: rgba(28,28,30,.16) !important; }
+html.light .text-white     { color: #111827 !important; }
+html.light .text-white\/90 { color: rgba(17,24,39,.95) !important; }
+html.light .text-white\/85 { color: rgba(17,24,39,.90) !important; }
+html.light .text-white\/80 { color: rgba(17,24,39,.85) !important; }
+html.light .text-white\/75 { color: rgba(17,24,39,.80) !important; }
+html.light .text-white\/70 { color: rgba(17,24,39,.75) !important; }
+html.light .text-white\/65 { color: rgba(17,24,39,.70) !important; }
+html.light .text-white\/60 { color: rgba(17,24,39,.65) !important; }
+html.light .text-white\/55 { color: rgba(17,24,39,.60) !important; }
+html.light .text-white\/50 { color: rgba(17,24,39,.55) !important; }
+html.light .text-white\/45 { color: rgba(17,24,39,.50) !important; }
+html.light .text-white\/40 { color: rgba(17,24,39,.46) !important; }
+html.light .text-white\/35 { color: rgba(17,24,39,.42) !important; }
+html.light .text-white\/30 { color: rgba(17,24,39,.38) !important; }
+html.light .text-white\/25 { color: rgba(17,24,39,.34) !important; }
+html.light .text-white\/20 { color: rgba(17,24,39,.30) !important; }
+html.light .text-white\/15 { color: rgba(17,24,39,.22) !important; }
+html.light .text-white\/10 { color: rgba(17,24,39,.16) !important; }
 
 /* ─── Exception: white text on colored bg ─────────────────────────────── */
 html.light .bg-purple-600.text-white,
@@ -189,9 +189,9 @@ html.light .border-amber-500\/30   { border-color: rgba(245,158,11,0.38) !import
 html.light .border-rose-500\/20    { border-color: rgba(244,63,94,0.34) !important; }
 
 /* ─── Placeholders / inputs ───────────────────────────────────────────── */
-html.light .placeholder-white\/30::placeholder { color: rgba(28,28,30,.42) !important; }
-html.light .placeholder-white\/40::placeholder { color: rgba(28,28,30,.52) !important; }
-html.light input, html.light textarea, html.light select { color: #1C1C1E !important; }
+html.light .placeholder-white\/30::placeholder { color: rgba(17,24,39,.42) !important; }
+html.light .placeholder-white\/40::placeholder { color: rgba(17,24,39,.52) !important; }
+html.light input, html.light textarea, html.light select { color: #111827 !important; }
 
 /* ─── Dividers ───────────────────────────────────────────────────────── */
 html.light .divide-white\/5  > * + * { border-color: rgba(0,0,0,0.06) !important; }
@@ -202,7 +202,7 @@ html.light .bg-slate-900\/90 { background-color: rgba(250,250,250,0.92) !importa
 html.light .bg-slate-900\/80 { background-color: rgba(250,250,250,0.84) !important; }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────────── */
-html.light ::-webkit-scrollbar-track { background: #FAFAFA; }
+html.light ::-webkit-scrollbar-track { background: #EDF1FB; }
 html.light ::-webkit-scrollbar-thumb { background: rgba(94,106,210,0.28); border-radius: 999px; }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -332,14 +332,17 @@ html.light .aurora-blob { opacity: 0.3; }
 }
 
 html.light .linear-card {
-  background: rgba(255,255,255,0.94) !important;
-  border-color: rgba(0,0,0,0.08) !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+  background: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 2px 12px rgba(17,24,39,0.08), 0 1px 3px rgba(17,24,39,0.05) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 html.light .linear-card:hover {
-  background: rgba(255,255,255,1) !important;
-  border-color: rgba(94,106,210,0.22) !important;
-  box-shadow: 0 0 0 1px rgba(94,106,210,0.16), 0 4px 16px rgba(0,0,0,0.10) !important;
+  background: #ffffff !important;
+  border-color: rgba(94,106,210,0.20) !important;
+  box-shadow: 0 4px 20px rgba(17,24,39,0.10), 0 1px 4px rgba(17,24,39,0.06) !important;
+  transform: translateY(-2px);
 }
 
 /* ─── Light mode: SearchingPhase and other pages with fixed bg ───────── */
@@ -357,19 +360,19 @@ html.light [style*="background: rgba(18,18,20"] {
 
 /* ─── Catch-all: inline rgba(255,255,255,X) text → dark neutral ──────── */
 html.light [style*="color: rgba(255,255,255"] {
-  color: rgba(28,28,30,0.75) !important;
+  color: rgba(17,24,39,0.75) !important;
 }
 
 /* ─── Gradient clip-text headlines → solid dark in light mode ────────── */
 html.light .bg-clip-text {
-  -webkit-text-fill-color: #1C1C1E !important;
+  -webkit-text-fill-color: #111827 !important;
   background-image: none !important;
 }
 
 /* ─── Missing text opacity variants ─────────────────────────────────── */
-html.light .text-white\/48 { color: rgba(28,28,30,0.58) !important; }
-html.light .text-white\/32 { color: rgba(28,28,30,0.42) !important; }
-html.light .text-white\/28 { color: rgba(28,28,30,0.36) !important; }
+html.light .text-white\/48 { color: rgba(17,24,39,0.58) !important; }
+html.light .text-white\/32 { color: rgba(17,24,39,0.42) !important; }
+html.light .text-white\/28 { color: rgba(17,24,39,0.36) !important; }
 
 /* ─── Missing background variants ───────────────────────────────────── */
 html.light .bg-white\/3  { background-color: rgba(255,255,255,0.85) !important; }
@@ -409,7 +412,7 @@ html.light .nav-glass {
   box-shadow: 0 1px 0 rgba(0,0,0,0.09) !important;
 }
 html.light [style*="background: rgba(12,12,13,0.60)"] {
-  background: rgba(246,246,248,0.99) !important;
+  background: #E4ECF8 !important;
   border-color: rgba(0,0,0,0.06) !important;
 }
 
