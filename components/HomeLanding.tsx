@@ -5,7 +5,7 @@ import HeroSection from "./HeroSection";
 import FeaturesGrid from "./FeaturesGrid";
 import HowItWorks from "./HowItWorks";
 import ServicesIntro from "./ServicesIntro";
-import HighlightedReviews from "./HighlightedReviews";
+import ReviewMarquee from "./ReviewMarquee";
 import FaqSection from "./FaqSection";
 import FinalCTA from "./FinalCTA";
 import SiteFooter from "./SiteFooter";
@@ -83,7 +83,7 @@ export default function HomeLanding({ onChoose }: Props) {
 
         <Divider />
         <FadeIn>
-          <HighlightedReviews />
+          <ReviewMarquee />
         </FadeIn>
 
         <Divider />

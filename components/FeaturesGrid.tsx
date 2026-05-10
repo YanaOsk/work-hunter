@@ -84,6 +84,7 @@ export default function FeaturesGrid() {
             <div
               key={i}
               className={`group relative linear-card overflow-hidden ${f.span} ${f.large ? "p-6 md:p-8" : "p-5 md:p-6"}`}
+              style={{ animation: `staggerIn 0.5s ease both`, animationDelay: `${i * 80}ms` }}
             >
               {/* Subtle accent glow behind icon */}
               <div

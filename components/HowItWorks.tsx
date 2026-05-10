@@ -57,7 +57,7 @@ export default function HowItWorks() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {steps.map((s, i) => (
-            <div key={i} className="group relative linear-card p-5 md:p-6 overflow-hidden">
+            <div key={i} className="group relative linear-card p-5 md:p-6 overflow-hidden" style={{ animation: `staggerIn 0.5s ease both`, animationDelay: `${i * 100}ms` }}>
               {/* Step number — faint watermark */}
               <span
                 className="absolute top-4 end-4 text-5xl font-bold leading-none select-none"
