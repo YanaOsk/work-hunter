@@ -137,8 +137,14 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: initMessages, userProfile: safeProfile, lang }, stripSurrogates),
       })
-        .then((res) => res.json())
-        .then((data) => {
+        .then((res) => res.json().then((data) => ({ data, ok: res.ok, status: res.status })))
+        .then(({ data, ok, status }) => {
+          if (!ok || data.error) {
+            const errMsg = `[שגיאה ${status}]: ${data.error || "תשובה לא צפויה מהשרת"}`;
+            addMessage("assistant", errMsg, { suggestedReplies: [] });
+            autoSave([{ role: "user", content: firstMessage }, { role: "assistant", content: errMsg }]);
+            return;
+          }
           if (data.readyToSearch) setReadyToSearch(true);
           addMessage("assistant", data.message || fallbackGreeting, {
             suggestedReplies: data.suggestedReplies ?? [],
@@ -148,7 +154,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
             { role: "assistant", content: data.message || fallbackGreeting },
           ]);
         })
-        .catch(() => addMessage("assistant", fallbackGreeting))
+        .catch((err) => addMessage("assistant", `[fetch error]: ${String(err)}`))
         .finally(() => setLoading(false));
     } else {
       const greeting = lang === "he"
