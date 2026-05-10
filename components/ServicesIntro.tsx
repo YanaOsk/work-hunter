@@ -72,18 +72,18 @@ function ServiceCard({ badge, title, intro, steps, bonus, result, cta, onClick, 
   const styles =
     variant === "advisor"
       ? {
-          badge: "bg-emerald-500/20 text-emerald-300",
-          icon: "bg-emerald-600/20 text-emerald-300",
-          bullet: "text-emerald-400",
-          cta: "bg-emerald-600 hover:bg-emerald-500 text-white",
-          resultWrap: "bg-emerald-500/5 border-emerald-500/20 text-emerald-200",
-        }
-      : {
           badge: "bg-purple-500/20 text-purple-300",
           icon: "bg-purple-600/20 text-purple-300",
           bullet: "text-purple-400",
-          cta: "bg-purple-600 hover:bg-purple-500 text-white",
+          cta: "text-white",
           resultWrap: "bg-purple-500/5 border-purple-500/20 text-purple-200",
+        }
+      : {
+          badge: "bg-[#4ADE80]/15 text-[#4ADE80]",
+          icon: "bg-[#4ADE80]/10 text-[#4ADE80]",
+          bullet: "text-[#4ADE80]",
+          cta: "text-white",
+          resultWrap: "bg-[#4ADE80]/5 border-[#4ADE80]/20 text-[#4ADE80]/80",
         };
 
   return (
@@ -123,6 +123,13 @@ function ServiceCard({ badge, title, intro, steps, bonus, result, cta, onClick, 
       <button
         onClick={onClick}
         className={`w-full py-3 rounded-xl font-semibold transition ${styles.cta}`}
+        style={{
+          background: variant === "advisor" ? "#5E6AD2" : "#4ADE80",
+          boxShadow: variant === "advisor"
+            ? "0 0 0 1px rgba(94,106,210,0.35), 0 2px 12px rgba(94,106,210,0.2)"
+            : "0 0 0 1px rgba(74,222,128,0.35), 0 2px 12px rgba(74,222,128,0.15)",
+          color: variant === "jobs" ? "#0C0C0D" : "#ffffff",
+        }}
       >
         {cta}
       </button>

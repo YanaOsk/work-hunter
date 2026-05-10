@@ -28,7 +28,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
   ];
 
   return (
-    <nav className="backdrop-blur-2xl border-b" style={{ background: "rgba(12,12,13,0.72)", borderColor: "rgba(255,255,255,0.07)" }}>
+    <nav className="backdrop-blur-2xl border-b border-white/[0.08]" style={{ background: "rgba(12,12,13,0.72)" }}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <a

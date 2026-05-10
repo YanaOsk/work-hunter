@@ -350,6 +350,10 @@ html.light [style*='background: "#0C0C0D"'] {
 html.light [style*="background: rgba(12,12,13"] {
   background: rgba(255,255,255,0.88) !important;
 }
+html.light [style*="background: rgba(18,18,20"] {
+  background: rgba(255,255,255,0.97) !important;
+  border-color: rgba(0,0,0,0.10) !important;
+}
 
 
 /* ── Linear border glow (on focus/active states) ────────────────────── */
