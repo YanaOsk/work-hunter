@@ -209,7 +209,7 @@ INSIGHT OVER DESCRIPTION: Don't say "you are organized." Say "Your ability to tu
 
 topMessage: One electric, memorable sentence — their professional identity. Must feel specific to THEM, not generic. Bad: "You are a creative thinker." Good: "הניסיון שלך בשירות אנשים + הדיוק שלך בפרטים = הדיאטנית שהמטופלים לא מפסיקים להמליץ עליה."
 
-topRoles: The 2 most RIGHT-FOR-THEM roles right now. Real job titles. Not categories. Must respect ALL hard filters. Should NOT default to tech or management unless clearly warranted.
+topRoles: The 2 most RIGHT-FOR-THEM roles right now. Be SPECIFIC — include seniority, industry context, and specialization where it matters. NOT "ספר" but "ספר מקצועי בסלון בוטיק"; NOT "מנהל פרויקטים" but "מנהל פרויקטים Junior בסטארטאפ"; NOT "מדריך כושר" but "מדריך כושר אישי עם התמחות TRX". A recruiter or a job title on LinkedIn is the benchmark. Must respect ALL hard filters. Must NOT default to tech or management unless clearly warranted by the profile.
 
 strengths: 3-5 strengths. Format: "כותרת: משפט אחד על הערך שלה בשוק."
 

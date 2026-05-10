@@ -58,7 +58,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
   // Ready to job-search: not on study path AND has reviewed CV or work experience
   const isReadyForJobs = !isStudyPath && (hasRelevantCV || hasExperience);
 
-  // DNA role like/dislike
+  // DNA role like/dislike — persisted via onUpdate
   const [likedRoles, setLikedRoles] = useState<Set<string>>(
     () => new Set(advisorState.likedRoles ?? [])
   );
@@ -66,20 +66,22 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
     () => new Set(advisorState.dislikedRoles ?? [])
   );
   const toggleLikeRole = (role: string) => {
-    setLikedRoles((prev) => {
-      const next = new Set(prev);
-      if (next.has(role)) { next.delete(role); }
-      else { next.add(role); setDislikedRoles((d) => { const nd = new Set(d); nd.delete(role); return nd; }); }
-      return next;
-    });
+    const newLiked = new Set(likedRoles);
+    const newDisliked = new Set(dislikedRoles);
+    if (newLiked.has(role)) { newLiked.delete(role); }
+    else { newLiked.add(role); newDisliked.delete(role); }
+    setLikedRoles(newLiked);
+    setDislikedRoles(newDisliked);
+    onUpdate?.({ ...advisorState, likedRoles: [...newLiked], dislikedRoles: [...newDisliked] });
   };
   const toggleDislikeRole = (role: string) => {
-    setDislikedRoles((prev) => {
-      const next = new Set(prev);
-      if (next.has(role)) { next.delete(role); }
-      else { next.add(role); setLikedRoles((d) => { const nd = new Set(d); nd.delete(role); return nd; }); }
-      return next;
-    });
+    const newLiked = new Set(likedRoles);
+    const newDisliked = new Set(dislikedRoles);
+    if (newDisliked.has(role)) { newDisliked.delete(role); }
+    else { newDisliked.add(role); newLiked.delete(role); }
+    setLikedRoles(newLiked);
+    setDislikedRoles(newDisliked);
+    onUpdate?.({ ...advisorState, likedRoles: [...newLiked], dislikedRoles: [...newDisliked] });
   };
 
   const checklist = buildChecklist(advisorState, lang);
@@ -1159,6 +1161,32 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               )}
             </div>
           </Section>
+        )}
+
+        {/* Study-path users: point to Transition Roadmap instead of job strategy */}
+        {isStudyPath && strategy && (
+          <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl px-5 py-4 mb-5">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              <div>
+                <p className="text-blue-300 text-sm font-semibold mb-1">
+                  {lang === "he" ? "אסטרטגיית הכניסה לתחום שלכם" : "Your field entry strategy"}
+                </p>
+                <p className="text-white/60 text-xs leading-relaxed">
+                  {lang === "he"
+                    ? "המסלול שבחרתם מתמקד בלימודים — מפת הדרכים שלכם למעבר הקריירה מפורטת בסעיף מפת הדרכים למעלה. כאשר תסיימו את ההכשרה, חיפוש העבודה יהיה הצעד הבא."
+                    : "Your chosen path focuses on studies — your career transition roadmap is detailed in the Roadmap section above. Once you complete training, job searching will be the next step."}
+                </p>
+                {strategy.topLine && (
+                  <p className="text-white/80 text-xs italic mt-2 border-t border-blue-500/20 pt-2">
+                    "{strategy.topLine}"
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Section 5: Search Strategy — only for job-ready users */}
