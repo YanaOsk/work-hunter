@@ -174,12 +174,14 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    BRANCH 5 — Culture, Leisure & Culinary:
    Events: event designer, set builder, DJ, expert bartender/mixologist, show manager
    Tourism: tour guide, adventure travel agent, yacht skipper, field chef
+   Hospitality Operations: restaurant manager, hotel operations coordinator, banquet manager, F&B supervisor, shift manager (chain hospitality)
 
    FEW-SHOT EXAMPLES — what to recommend and what to avoid:
    • Profile loves dogs + sport, no degree wanted → ❌ NOT "fitness trainer for dogs" (doesn't exist) ✓ YES: therapeutic dog handler / canine sport trainer (Agility) / active dog boarding manager
    • Profile loves building things, lives in northern Israel → ✓ YES: furniture carpenter / smart irrigation installer / green energy field technician
    • Profile creative + aesthetic, no experience → ❌ NOT "fashion designer" (very tough market) ✓ YES: brow & lash specialist / beauty salon manager / tattoo artist (after course)
    • Military logistics background, no degree → ✓ YES: procurement manager / logistics coordinator / heavy equipment operator (after certification)
+   • Profile with food/service experience, seeks management → ❌ NOT generic "chef" if already cooking ✓ YES: restaurant shift manager / F&B supervisor / banquet coordinator (no degree needed, internal promotion path)
 
    RULE: Before recommending any role — verify it exists in the Israeli market and is realistically accessible with the candidate's current background.
 
@@ -192,6 +194,25 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
 4. AGE & CONTEXT RESPECT: A 50-year-old with 25 years in one field is not a "career pivot to coding" candidate. A 22-year-old with no experience should not be suggested senior roles. Match reality.
 
 5. EQUAL WEIGHT: Age, location, physical constraints, education, interests, and dislikes are ALL equally critical. Don't optimize for "impressive" careers — optimize for fit.
+
+5B. TRADE & HANDS-ON TRANSITIONS: When a candidate has technical/hands-on experience (military, construction, kitchen, automotive, agricultural) and wants a similar pivot:
+   - ONLY suggest roles where training timeline ≤ 6 months if they show any financial pressure. A 3-year nursing degree is NOT a fast track for someone who needs income soon.
+   - For trade certifications (electrician, heavy equipment, plumbing, elevator tech): name the ACTUAL training provider in their region — NOT "any vocational school." Use specific institutions: Amitech (Haifa/North), ORT Makif (Rishon LeZion/Center), Beit Natan (South), Technician Institute Beer Sheva, Hadassah College (Jerusalem). Match region to candidate's location.
+   - Apprenticeship trades (carpenter, electrician, plumber) have a formal Economy Ministry apprenticeship track: 3–4 days work + 1 day school per week for 2 years, leads to a recognized certificate. Mention this when it applies — it is NOT classroom-only and allows income during training.
+
+5C. STABILITY/INCOME FLOOR CONSTRAINT OVERRIDES PERSONALITY:
+   - If the candidate explicitly states they need "fixed salary," "stability," "no uncertainty," "can't risk income," or mentions family/mortgage obligations — treat this as a HARD CONSTRAINT.
+   - This constraint overrides personality signals toward entrepreneurship, autonomy, or creativity. Even if they score high on independence — stability is the filter.
+   - NEVER suggest self-employment, freelance, or entrepreneur/startup as a PRIMARY path (topRoles[0] or careerPaths[0]) when stability is explicitly stated.
+   - You MAY mention it as a long-term option (3+ years horizon) only if the candidate themselves explicitly expressed entrepreneurial interest in their free-form intro.
+
+5D. FAST-TRACK vs. ASPIRATIONAL PATHS:
+   - If the profile mentions financial urgency, debt, "I need income quickly," or a hard deadline — run a TRIAGE before deciding careerPaths order:
+     1. IMMEDIATE (2–4 week hiring cycle): what can they realistically do THIS MONTH with zero additional training? → careerPaths[0]
+     2. SHORT-TERM (1–3 month training/certification): the fastest realistic upgrade path → careerPaths[1]
+     3. ASPIRATIONAL (6+ months): the longer-horizon target → careerPaths[2]
+   - Label each path clearly in the reasoning field with its timeline tier.
+   - If no viable immediate path exists for their background, state this honestly in realismNote rather than manufacturing a false fast-track.
 
 === CANDIDATE DATA ===
 
@@ -231,6 +252,15 @@ careerPaths: Exactly 3 paths. Each must come from the INTERSECTION of what they 
   - trainingNeeded: What training/certification is required to enter (e.g. "קורס של 3 חודשים", "ללא הכשרה נוספת", "תואר ראשון נדרש")
   - marketDemand: Current Israeli market demand: "גבוה" / "בינוני" / "נמוך"
   - timeToEntry: Realistic time until first paycheck in this role (e.g. "1–3 חודשים", "6–12 חודשים")
+
+=== CONSTRAINT VALIDATION — MANDATORY PRE-OUTPUT CHECK ===
+Before writing your JSON output, run through this checklist. If any check FAILS, revise the relevant fields before proceeding:
+☐ 1. Have I excluded every field/sector the candidate explicitly rejected? (Check topRoles, careerPaths, careerDirections)
+☐ 2. If they stated stability/fixed income need → is there zero freelance/self-employment in topRoles or careerPaths[0]?
+☐ 3. If they have a hard financial timeline → is careerPaths[0] a fast-track role with ≤ 4-week entry, not a long training program?
+☐ 4. If I suggested a trade/certification role → did I name a SPECIFIC institution in THEIR region (not "any vocational school")?
+☐ 5. Does every suggested role ACTUALLY EXIST in the Israeli job market with realistic hiring volume for their profile?
+If all 5 pass → write output. If any fail → fix before outputting.
 
 weekOneSteps: Exactly 3 concrete, specific actions for the FIRST WEEK — not generic advice. Each action should target a different day of the week:
 - Step 1 (Day 1 — tomorrow morning): The single most important first move. Name a real place, person, website, or phone call.
