@@ -99,17 +99,22 @@ export default function Home() {
     if (!window.location.search) return;
     const params = new URLSearchParams(window.location.search);
     const continueId = params.get("continueConv");
-    window.history.replaceState({}, "", "/");
-    if (!continueId) return;
+    if (!continueId) {
+      window.history.replaceState({}, "", "/");
+      return;
+    }
+    // Keep ?continueConv in the URL until the fetch completes so the redirect
+    // effect (which runs when auth resolves) sees it and skips the /profile redirect.
     fetch(`/api/conversations/${continueId}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((conv) => {
+        window.history.replaceState({}, "", "/");
         if (!conv || conv.error || !Array.isArray(conv.messages)) return;
         setResumeConv({ id: conv.id, messages: conv.messages });
         setState((s) => ({ ...s, phase: "interview", userProfile: emptyProfile }));
         setMode("jobs");
       })
-      .catch(() => {});
+      .catch(() => { window.history.replaceState({}, "", "/"); });
   }, []);
 
   useEffect(() => {
