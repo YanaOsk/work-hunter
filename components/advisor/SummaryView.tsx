@@ -58,30 +58,31 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
   // Ready to job-search: not on study path AND has reviewed CV or work experience
   const isReadyForJobs = !isStudyPath && (hasRelevantCV || hasExperience);
 
-  // DNA role like/dislike — persisted via onUpdate
-  const [likedRoles, setLikedRoles] = useState<Set<string>>(
-    () => new Set(advisorState.likedRoles ?? [])
-  );
-  const [dislikedRoles, setDislikedRoles] = useState<Set<string>>(
-    () => new Set(advisorState.dislikedRoles ?? [])
-  );
+  // DNA role like/dislike — single combined state to avoid cross-state sync issues
+  const [rolePrefs, setRolePrefs] = useState<{ liked: Set<string>; disliked: Set<string> }>(() => ({
+    liked: new Set(advisorState.likedRoles ?? []),
+    disliked: new Set(advisorState.dislikedRoles ?? []),
+  }));
+  const likedRoles = rolePrefs.liked;
+  const dislikedRoles = rolePrefs.disliked;
+
   const toggleLikeRole = (role: string) => {
-    const newLiked = new Set(likedRoles);
-    const newDisliked = new Set(dislikedRoles);
-    if (newLiked.has(role)) { newLiked.delete(role); }
-    else { newLiked.add(role); newDisliked.delete(role); }
-    setLikedRoles(newLiked);
-    setDislikedRoles(newDisliked);
-    onUpdate?.({ ...advisorState, likedRoles: [...newLiked], dislikedRoles: [...newDisliked] });
+    setRolePrefs((prev) => {
+      const liked = new Set(prev.liked);
+      const disliked = new Set(prev.disliked);
+      if (liked.has(role)) { liked.delete(role); } else { liked.add(role); disliked.delete(role); }
+      onUpdate?.({ ...advisorState, likedRoles: [...liked], dislikedRoles: [...disliked] });
+      return { liked, disliked };
+    });
   };
   const toggleDislikeRole = (role: string) => {
-    const newLiked = new Set(likedRoles);
-    const newDisliked = new Set(dislikedRoles);
-    if (newDisliked.has(role)) { newDisliked.delete(role); }
-    else { newDisliked.add(role); newLiked.delete(role); }
-    setLikedRoles(newLiked);
-    setDislikedRoles(newDisliked);
-    onUpdate?.({ ...advisorState, likedRoles: [...newLiked], dislikedRoles: [...newDisliked] });
+    setRolePrefs((prev) => {
+      const liked = new Set(prev.liked);
+      const disliked = new Set(prev.disliked);
+      if (disliked.has(role)) { disliked.delete(role); } else { disliked.add(role); liked.delete(role); }
+      onUpdate?.({ ...advisorState, likedRoles: [...liked], dislikedRoles: [...disliked] });
+      return { liked, disliked };
+    });
   };
 
   const checklist = buildChecklist(advisorState, lang);
