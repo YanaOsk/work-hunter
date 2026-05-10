@@ -396,8 +396,13 @@ html.light [style*="background: rgb(74,222,128)"] [style*="color: rgba(255,255,2
   color: inherit !important;
 }
 
+/* ─── NavBar glass base ──────────────────────────────────────────────── */
+.nav-glass {
+  background: rgba(12,12,13,0.72);
+}
+
 /* ─── NavBar: solid white in light mode, no blur ─────────────────────── */
-html.light [style*="background: rgba(12,12,13,0.72)"] {
+html.light .nav-glass {
   background: #ffffff !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
