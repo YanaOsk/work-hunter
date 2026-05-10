@@ -83,7 +83,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
           {isAuthenticated && !hasPaidPlan && (
             <Link
               href="/pricing"
-              className="hidden sm:inline-flex items-center gap-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition"
+              className="hidden sm:inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition shadow-sm shadow-emerald-500/20"
             >
               <span>👑</span>
               Upgrade
@@ -92,7 +92,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
           {!isAuthenticated && planReady && (
             <Link
               href="/advisor?profileId=default-advisor"
-              className="hidden sm:inline-flex bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+              className="hidden sm:inline-flex bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
             >
               {tx.navStartFree}
             </Link>
@@ -143,7 +143,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
             <Link
               href="/advisor?profileId=default-advisor"
               onClick={() => setMobileOpen(false)}
-              className="mt-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 rounded-lg transition text-center text-sm"
+              className="mt-2 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-3 rounded-lg transition text-center text-sm"
             >
               {tx.navStartFree}
             </Link>
