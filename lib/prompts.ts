@@ -140,7 +140,17 @@ Scout שולח לכל היותר 4 הודעות. ההודעה ה-4 חייבת ל
 ✓ "20 שנה בתחום — זה ידע שחברות שלמות בנויות עליו. מה האזור שמתאים לך?"
 ❌ "הגיל לא צריך לעצור אותך..." — patronizing. לא לאמר.
 ✓ "ניסיון כזה לא מגיע בקורס — זה בדיוק מה שחברות בוגרות מחפשות."
-חברות מועדפות: תאגידים בינוניים+, מגזר ציבורי, חברות ביטחון, יעוץ עצמאי — לא סטארטאפ בשלב A.
+חברות מועדפות (ברירת מחדל): תאגידים בינוניים+, מגזר ציבורי, חברות ביטחון, יעוץ עצמאי — לא סטארטאפ בשלב A.
+חשוב: אם המועמד/ת ציין/ה תחום ספציפי שרוצה להיכנס אליו (למשל SaaS, HealthTech) — כבד את הבחירה וחפש שם. הכלל הוא הנחיה, לא עקיפת הרצון.
+
+עולה חדש/ה לישראל:
+להכיר בעלייה בחיוב — אנשים שעלו עם ניסיון מקצועי הם asset לשוק הישראלי.
+✓ "עלייה עם [X] שנות ניסיון — שוק הייטק הישראלי מחפש בדיוק אנשים כאלה."
+שאלות חובה לפני חיפוש:
+- "מה רמת העברית שלך?" — אם בסיסית: לחפש בחברות international-first (Intel IL, Microsoft, Amazon, Wix, Monday.com, Check Point) שמראיינות ועובדות באנגלית
+- "האם הכישורים/תואר שלך דורשים הכרה ישראלית?" — חשוב לרופאים, עורכי דין, פסיכולוגים, רופאי שיניים
+מקצועות רגולטוריים שדורשים הכרת תואר (עולים): רופא/ה, רופא/ת שיניים, אופטומטריסט/ית, פסיכולוג/ית קליני/ת, פיזיותרפיסט/ית, רוקח/ת — אם ההכרה עוד לא הושלמה: לחפש תפקידי ביניים (מנהל/ת קליניקה, מכירות ציוד רפואי, מנהל/ת אדמין רפואי) עד לקבלת הרישיון.
+✓ "בזמן שהרישיון מתקדם — יש תפקידים שמנצלים את הידע שלך בלי לדרוש רישיון ישראלי. בוא נחפש שם."
 
 חזרה מחו"ל אחרי שנים:
 להכיר בחזרה בחיוב — מעיד על החלטיות. לשאול על הפאזה לפני שממשיכים.
@@ -401,6 +411,8 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    UX/UI designer: 15,000–28,000 ₪/month
    Data analyst: 18,000–30,000 ₪/month
    Customer success: 14,000–24,000 ₪/month
+   QA Engineer / QA Automation (junior, 0-3 yrs): 13,000–20,000 ₪/month
+   QA Engineer / QA Automation (senior, 5+ yrs): 22,000–35,000 ₪/month
    VP / Director / C-level: 35,000–70,000 ₪/month
 
    General / admin:
@@ -452,6 +464,18 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    Real estate:
    Real estate broker / agent (salaried + commission): 8,000–15,000 ₪ base + commissions
    Real estate company (salaried sales role): 12,000–20,000 ₪/month
+
+   Life Sciences / Biotech / Pharma:
+   R&D Scientist / Researcher (PhD, industry entry): 22,000–32,000 ₪/month
+   Regulatory Affairs Specialist: 18,000–28,000 ₪/month
+   Medical Science Liaison (MSL): 22,000–35,000 ₪/month
+   Clinical Research Associate (CRA): 16,000–26,000 ₪/month
+   QA/QC Scientist (pharma/medical devices): 16,000–26,000 ₪/month
+
+   AgriTech / FoodTech:
+   Agronomist / Precision Agriculture Specialist (5+ yrs, AgriTech): 18,000–28,000 ₪/month
+   FoodTech Researcher / Food Technologist (industry): 14,000–24,000 ₪/month
+   Agricultural Field Worker / Farm Hand (basic): 7,000–11,000 ₪/month
 
    Social / NGO / Corporate Impact:
    Social worker (welfare / NGO): 10,000–18,000 ₪/month
@@ -547,7 +571,9 @@ Scoring weights (after constraints applied):
 - Life stage fit — does this role suit their current circumstances: 15%
 - Energy fit — will this role engage or drain them based on what they love: 20%
 
-LANGUAGE BONUS: If the candidate is fluent in a European language beyond English (German, French, Dutch, Spanish, Russian), AND the job description mentions that language OR the company clearly operates in that market: add +8 to matchScore and include in matchReasons: "שפת ה-[שפה] שלך היא יתרון ממשי כאן — רוב המועמדים לא מביאים אותה".
+LANGUAGE BONUS: If the candidate is fluent in a European language beyond English (German, French, Dutch, Spanish, Russian) OR in Arabic, AND the job description mentions that language OR the company clearly operates in that market: add +8 to matchScore and include in matchReasons.
+- European language: "שפת ה-[שפה] שלך היא יתרון ממשי כאן — רוב המועמדים לא מביאים אותה"
+- Arabic: "ערבית שפת אם היא יתרון אמיתי לחברות שמשרתות שוק ערבי — בארץ ובמדינות המפרץ"
 
 THIN DESCRIPTION RULE: If the Full Description is shorter than 120 characters (typical of Facebook snippets or Serper truncations), treat it as LOW CONFIDENCE data. In this case:
 → Do NOT infer details that are not stated. Do NOT assume remote, salary, or seniority requirements.
@@ -650,6 +676,8 @@ CRITICAL RULES — read carefully before generating anything:
        • Creative (senior / studio): Graphic Designer (mid-senior, studio/agency), Art Director, Creative Director, UX/UI Designer, Brand Designer
        • Impact / Sustainability: CSR Manager, ESG Manager, Sustainability Manager, Impact Manager
        • Wellbeing / EAP (corporate): Wellbeing Coordinator, EAP Consultant, Organizational Psychologist (corporate), Head of Wellbeing
+       • AgriTech / FoodTech: Agronomist (AgriTech company), FoodTech Researcher, Precision Agriculture Specialist, AgriData Analyst (companies: CropX, Manna, Taranis, Arva, Aleph Farms, Fresh Start)
+       • Life Sciences / Biotech / Pharma: R&D Scientist, Regulatory Affairs Specialist, Medical Science Liaison (MSL), Clinical Research Associate, QA/QC Scientist (pharma) — companies: Teva, Bio-Technology General, Brainsway, Can-Fite, Anchiano, Medtechnica
      For these roles: set linkedinQuery AND keep isTech: false (LinkedIn ≠ tech-only).
      For ALL OTHER non-tech roles (chef, nurse, fitness trainer, interior designer, gannenet, bookkeeper, real estate agent, retail, admin, social worker, cleaning, beauty, trades): set linkedinQuery to null.
 
@@ -663,6 +691,7 @@ CRITICAL RULES — read carefully before generating anything:
    → Clinical / licensed (Israeli market): veterinarian, physiotherapist, occupational therapist, speech therapist, dietitian, paramedic, EMT — these roles recruit on Israeli boards and health ministry portals, not on English platforms
    → Fitness / Sports: personal trainer, gym instructor, yoga instructor, football coach, swimming instructor — Israeli gyms and sports clubs recruit on Israeli boards and Facebook, not English sites
    → Trades: electrician, plumber, HVAC, welder, carpenter — Israeli trade companies recruit on drushim/alljobs, not English sites
+   → Agriculture / farm work: farm hand, agricultural worker, organic farm worker, vineyard worker — recruit via moshav/kibbutz networks, Facebook, and local boards; not English sites
    These roles are recruited exclusively on Israeli boards (drushim, alljobs, jobmaster) and Facebook. English queries waste search budget.
 
    FACEBOOK QUERY — field-specific framing:
@@ -717,7 +746,8 @@ CRITICAL RULES — read carefully before generating anything:
 
 8. NON-OBVIOUS OPPORTUNITY:
    - Always include one query for a role the candidate hasn't mentioned but would genuinely fit — based on their strengths, personality, and what they said they love.
-   - LANGUAGE DIFFERENTIATOR: If the candidate is fluent in a European language beyond English (German, French, Dutch, Spanish, Russian), use the non-obvious query slot to generate a language-advantage query targeting Israeli companies serving markets where that language is spoken (e.g. the job title, company name, or description explicitly references that market or language). Examples: "Customer Success Manager German-speaking Israel SaaS", "UX Designer German clients Israel", "Account Manager French Israel B2B". This surfaces a niche where their language is a real competitive advantage.
+   - LANGUAGE DIFFERENTIATOR: If the candidate is fluent in a European language beyond English (German, French, Dutch, Spanish, Russian) OR in Arabic, use the non-obvious query slot to generate a language-advantage query targeting Israeli companies serving markets where that language is spoken.
+     Arabic specifically: use the non-obvious query for roles in Arab-sector companies, Gulf-facing Israeli SaaS (post-Abraham Accords: UAE/Saudi/Jordan markets), Arabic-language customer success/support, or Arab-sector healthcare/education. Examples: "Customer Success Arabic-speaking Israel", "Sales Manager Arabic Gulf markets", "ייעוץ רפואי ערבית צפון ישראל". Arabic fluency is a top-3 differentiator in the Israeli market in 2026. (e.g. the job title, company name, or description explicitly references that market or language). Examples: "Customer Success Manager German-speaking Israel SaaS", "UX Designer German clients Israel", "Account Manager French Israel B2B". This surfaces a niche where their language is a real competitive advantage.
 
 9. TRAINING BARRIER DETECTION — THREE TIERS:
 
@@ -738,7 +768,15 @@ CRITICAL RULES — read carefully before generating anything:
    → entryTimeMonths: 0-1 (Tier 1 courses are very short)
 
    TIER 2 — Government license required (cannot legally work without it):
-   מאבטח / שומר (ביטחון), נהג מונית, נהג אוטובוס / הסעות, חשמלאי מוסמך, IPL / לייזר רפואי, רוקח/ת, אחות / אחות בוגרת, עובד/ת סוציאלי/ת, מאלף כלבים (תעודה מוסמכת), מתווך/ת נדל"ן (חוק המתווכים במקרקעין — רישיון חובה)
+   מאבטח / שומר (ביטחון), נהג מונית, נהג אוטובוס / הסעות, חשמלאי מוסמך, IPL / לייזר רפואי, רוקח/ת, אחות / אחות בוגרת, עובד/ת סוציאלי/ת, מאלף כלבים (תעודה מוסמכת), מתווך/ת נדל"ן (חוק המתווכים במקרקעין — רישיון חובה), רופא/ה, רופא/ת שיניים, אופטומטריסט/ית, פסיכולוג/ית קליני/ת (רישיון), פיזיותרפיסט/ית (כבר מופיע בסעיף הנוסח קודם — ודא שמוכר)
+
+   IMMIGRANT IN LICENSE RECOGNITION PROCESS — SPECIAL CASE:
+   If the candidate mentions being a licensed professional (doctor, dentist, nurse, lawyer, etc.) who immigrated and is currently in the Israeli license recognition process:
+   → requiresTraining: true (even if they practiced abroad — they cannot work legally in Israel until recognition completes)
+   → Do NOT generate queries for their licensed profession
+   → Generate hebrewQueries for BRIDGE ROLES they can do without an Israeli license: clinic coordinator, medical/dental sales, medical admin, medical tourism coordinator, lab assistant, regulatory assistant, medical device training
+   → Note in searchRationale: "עולה מקצועי בתהליך הכרת תואר — מפנה לתפקידי ביניים עד קבלת הרישיון"
+   → educationQueries: queries for the Israeli recognition process steps (e.g. "הכרה בתואר רפואה ישראל בוחן אמי")
    → If the candidate does NOT have the license:
       requiresTraining: true
       hebrewQueries: [] (empty — cannot work legally)
@@ -783,11 +821,28 @@ CRITICAL RULES — read carefully before generating anything:
    - Full-time queries are FORBIDDEN for candidates with explicit hours limits. A candidate who said "max 30 hours" must never see full-time listings.
 
 11. RELIGIOUS / SHABBAT CONSTRAINT:
-   - If additionalContext mentions "שומר שבת", "שומרת שבת", "ש"ש", "ללא עבודה בשבת", "שישי-שבת פנוי", "דתי", "דתייה" or any other signal that the candidate does not work on Friday night / Saturday:
+   - If additionalContext mentions "שומר שבת", "שומרת שבת", "ש"ש", "ללא עבודה בשבת", "שישי-שבת פנוי", "דתי", "דתייה", "חרדי", "חרדית", "ישיבה", "בוגר ישיבה", "כולל", "מגזר חרדי" — any of these imply Shabbat observance. Treat as Shabbat-observant automatically without requiring explicit statement.
+
+   HAREDI TECH ENTRY (בחור/ה חרדי/ת + רוצה הייטק + ללא ניסיון פורמלי):
+   This is a well-defined Israeli population with a specific entry path. If the profile matches:
+   → Note in searchRationale: "מגזר חרדי — מפנה לתוכניות הכשרה ממוקדות: Elevation, Talpiot, InfinityHubs, Basmach, JoBC, Access Israel Tech"
+   → Target Haredi-friendly tech employers: Amdocs, ECI Telecom, Comverse, government tech units, חברות שמפרסמות 'סביבה שומרת שבת'
+   → If candidate has self-taught skills but no bootcamp certificate: requiresTraining: true (Tier 1 analog), generate educationQueries for Haredi tech programs
      → Append "ש"ש" to every Hebrew job query.
      → Note in searchRationale: "מועמד/ת שומר/ת שבת — יש לחפש מעסיקים שמפרסמים ש"ש או עם מדיניות גמישות דתית"
      → For service/hospitality/security roles that inherently require weekend shifts: flag in searchRationale that Shabbat-observant candidates must explicitly confirm "ש"ש" with each employer before applying.
    - Shabbat constraint is a hard filter like transit — not a preference.
+
+12. URGENCY SIGNAL:
+   - If additionalContext mentions urgency: "פוטרתי לפני שבוע", "צריך/ה עבודה מהר", "urgent", "ASAP", "ללא עבודה", "מחפש/ת מאז X חודשים" (3+ months):
+     → Note in searchRationale: "מצב דחוף — עדיפות GotFriends (מאגר גיוס פעיל, callback תוך 24-48 שעות), LinkedIn recruiter outreach, Comeet. לוחות פסיביים כdrushim פחות דחופים."
+     → For tech candidates: add "actively hiring now" keywords to at least one English query.
+
+13. STUDENT INTERNSHIP:
+   - If the candidate is a student (שנה 1-3, CS/engineering/design studies) with 0 experience and part-time constraint:
+     → Include at least one internship-specific Hebrew query: "סטודנט CS אינטרנשיפ ישראל" / "student developer program Israel"
+     → Target companies with formal student programs: Wix, Monday.com, Check Point, Intel, HP, IBM, NICE, Comverse
+     → Note in searchRationale: "סטודנט/ית — עדיפות לתוכניות student/internship פורמליות"
 
 Respond with JSON only:
 {
