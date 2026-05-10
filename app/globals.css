@@ -396,10 +396,12 @@ html.light [style*="background: rgb(74,222,128)"] [style*="color: rgba(255,255,2
   color: inherit !important;
 }
 
-/* ─── NavBar + Footer: dark glass → white surface in light mode ──────── */
+/* ─── NavBar: solid white in light mode, no blur ─────────────────────── */
 html.light [style*="background: rgba(12,12,13,0.72)"] {
-  background: rgba(255,255,255,0.92) !important;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.08) !important;
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.09) !important;
 }
 html.light [style*="background: rgba(12,12,13,0.60)"] {
   background: rgba(246,246,248,0.99) !important;
