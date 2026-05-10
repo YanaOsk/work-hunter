@@ -103,12 +103,22 @@ After they describe themselves — ask one question about location or salary, th
 If the CV is in English, respond in English with the same logic.
 ` : "";
 
+    // Sanitize parsedData before embedding in system prompt — lone surrogates in
+    // AI-generated field values cause JSON.stringify to throw in Node 20+.
+    const sanitizeObj = (v: unknown): unknown => {
+      if (typeof v === "string") return v.replace(/[\uD800-\uDFFF]/g, "?");
+      if (Array.isArray(v)) return v.map(sanitizeObj);
+      if (v && typeof v === "object") return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, val]) => [k, sanitizeObj(val)]));
+      return v;
+    };
+    const safeParsedData = sanitizeObj(parsedData);
+
     const systemWithContext = `${CHAT_SYSTEM_PROMPT}
 ${cvPasteInstruction}
 ${langInstruction}
 
 Current user profile (what we know so far):
-${JSON.stringify(parsedData, null, 2)}
+${JSON.stringify(safeParsedData, null, 2)}
 
 ${rawIntro ? `Original intro from the user:\n"${rawIntro}"\n` : ""}
 Missing information: ${JSON.stringify(userProfile?.missingFields || [])}`;

@@ -5,10 +5,8 @@ import { PARSE_CV_SYSTEM_PROMPT } from "@/lib/prompts";
 
 async function extractWithPdfParse(buffer: Buffer): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { PDFParse } = require("pdf-parse");
-  const parser = new PDFParse({ data: buffer });
-  const result = await parser.getText();
-  await parser.destroy();
+  const pdfParse = require("pdf-parse");
+  const result = await pdfParse(buffer);
   return result.text ?? "";
 }
 
