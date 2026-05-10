@@ -75,6 +75,7 @@ export default function Home() {
   const [demoMode, setDemoMode] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [hadFileUpload, setHadFileUpload] = useState(false);
   const [resumeConv, setResumeConv] = useState<{
     id: string;
     messages: Array<{ role: "user" | "assistant"; content: string }>;
@@ -234,9 +235,10 @@ export default function Home() {
     setMode(chosen);
   };
 
-  const handleUploadComplete = (profile: UserProfile) => {
+  const handleUploadComplete = (profile: UserProfile, hadFile: boolean) => {
     setResumeConv(null);
     sessionStorage.removeItem("wh_conv_id");
+    setHadFileUpload(hadFile);
     setState((s) => ({ ...s, phase: "interview", userProfile: profile }));
   };
 
@@ -438,6 +440,7 @@ export default function Home() {
           initialMessages={resumeConv?.messages}
           initialConvId={resumeConv?.id}
           initialReadyToSearch={resumeConv !== null && state.jobResults.length > 0}
+          hadFileUpload={hadFileUpload}
         />
       );
     case "searching":

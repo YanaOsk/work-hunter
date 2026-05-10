@@ -20,9 +20,10 @@ interface Props {
   initialMessages?: Array<{ role: "user" | "assistant"; content: string }>;
   initialConvId?: string;
   initialReadyToSearch?: boolean;
+  hadFileUpload?: boolean;
 }
 
-export default function InterviewPhase({ userProfile, onComplete, onBack, initialMessages, initialConvId, initialReadyToSearch }: Props) {
+export default function InterviewPhase({ userProfile, onComplete, onBack, initialMessages, initialConvId, initialReadyToSearch, hadFileUpload }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
   const [messages, setMessages] = useState<EnrichedMessage[]>([]);
@@ -107,9 +108,9 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
       return lines.join("\n");
     };
 
-    // Send CV message whenever there's any user input (file upload or typed text).
-    // Fallback to greeting-only when no content at all.
-    const firstMessage = rawText ? buildCvMessage() : null;
+    // Use structured [CV_UPLOAD] format only when the user actually uploaded a file.
+    // Typed conversational text is sent as-is — Scout still has parsedData in its system prompt.
+    const firstMessage = rawText ? (hadFileUpload ? buildCvMessage() : rawText) : null;
 
     const fallbackGreeting = lang === "he"
       ? "היי! אני Scout. קראתי את מה שכתבתם ואני כאן כדי לעזור לכם למצוא את ההזדמנות הנכונה. מה הכי חשוב לכם בתפקיד הבא?"

@@ -11,7 +11,7 @@ import FaqSection from "./FaqSection";
 import SiteFooter from "./SiteFooter";
 
 interface Props {
-  onComplete: (profile: UserProfile) => void;
+  onComplete: (profile: UserProfile, hadFile: boolean) => void;
 }
 
 export default function UploadPhase({ onComplete }: Props) {
@@ -64,7 +64,7 @@ export default function UploadPhase({ onComplete }: Props) {
       const res = await fetch("/api/parse-cv", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Server error ${res.status}`);
-      onComplete(data as UserProfile);
+      onComplete(data as UserProfile, !!file);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -111,7 +111,7 @@ export default function UploadPhase({ onComplete }: Props) {
                   <p className="text-white/50 text-xs truncate">{advisorProfile.parsedData?.name}</p>
                 </div>
                 <button
-                  onClick={() => onComplete(advisorProfile)}
+                  onClick={() => onComplete(advisorProfile, false)}
                   className="flex-shrink-0 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition"
                 >
                   {tx.scoutAdvisorImport}
