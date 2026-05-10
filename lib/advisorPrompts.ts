@@ -7,18 +7,17 @@ export interface DiagnosisQuestionDef {
 export const DIAGNOSIS_QUESTIONS_HE: DiagnosisQuestionDef[] = [
   {
     id: "energy",
-    question: "איזה סביבה מוציאה ממך את הטוב ביותר?",
+    question: "איזה סביבה מוציאה מכם את הטוב ביותר?",
     options: [
       "עבודה עצמאית עם ראש שקט — כשנותנים לי פרויקט ואני צולל פנימה עד לתוצאה",
       "סביבה של צוות ורעיונות — כשחושבים יחד ומזיזים דברים בשיתוף פעולה",
       "קצב מהיר ואקשן — כשהלו\"ז משתנה, יש עניין וצריך להגיב מהר למה שקורה בשטח",
       "סדר, הגדרות ומטרות ברורות — כשיודעים בדיוק מה צריך לעשות ואיך נמדדת ההצלחה",
-      "גם וגם — אני מתאים את עצמי למה שהמצב דורש, בין אם זה שקט או רעש",
     ],
   },
   {
     id: "decision",
-    question: "כשעומד/ת בפני בחירה משמעותית — מה מנחה אותך?",
+    question: "כשעומדים בפני בחירה משמעותית — מה מנחה אתכם?",
     options: [
       "נתונים ורציונליות",
       "אינטואיציה וערכים",
@@ -28,18 +27,17 @@ export const DIAGNOSIS_QUESTIONS_HE: DiagnosisQuestionDef[] = [
   },
   {
     id: "structure",
-    question: "איזה מבנה עבודה מוציא ממך את הטוב ביותר?",
+    question: "איזה מבנה עבודה מוציא מכם את הטוב ביותר?",
     options: [
       "מסגרת ברורה, תהליכים מוגדרים ומטרות מדידות",
       "גמישות מלאה — אני מגדיר/ה את הדרך בעצמי",
       "אוטונומיה גבוהה עם מטרה ברורה מלמעלה",
       "שגרה יציבה עם מרחב ליצירתיות",
-      "תלוי בפרויקט ובשלב",
     ],
   },
   {
     id: "focus",
-    question: "באיזו צורת עשייה את/ה בשיאך?",
+    question: "באיזו צורת עשייה אתם בשיאכם?",
     options: [
       "לייעל ולשפר תהליכים קיימים",
       "לבנות מאפס — ראייה, יצירה והשקה",
@@ -874,7 +872,7 @@ Rules:
 - negotiationTip: specific to their profile (years of experience, location, education)
 - No extra text outside the JSON`;
 
-export const TRANSITION_ROADMAP_PROMPT = (currentRole: string, targetRoles: string[], chosenPath: string, skills: string[], lang: string) => `You are a senior career transition coach in Israel who has helped hundreds of people successfully change careers. You are known for being honest and realistic — you don't sugarcoat timelines.
+export const TRANSITION_ROADMAP_PROMPT = (currentRole: string, targetRoles: string[], chosenPath: string, skills: string[], lang: string) => `You are a senior career transition coach in Israel who has helped hundreds of people successfully change careers. You are known for being honest and realistic — you don't sugarcoat timelines or risks.
 
 Current role/background: ${currentRole || "N/A"}
 Target roles: ${targetRoles.join(", ")}
@@ -890,18 +888,51 @@ Return ONLY this JSON:
       "name": "Phase name",
       "duration": "X weeks/months",
       "actions": ["Action 1", "Action 2", "Action 3"],
-      "milestone": "What success looks like at the end of this phase"
+      "milestone": "Concrete, measurable indicator the phase is complete",
+      "financialNote": "What to expect financially during this phase — savings needed, training costs, whether part-time work is feasible",
+      "mindsetChallenge": "The specific psychological challenge most people face in this phase — and one concrete way to handle it"
     }
   ],
-  "honestNote": "1-2 sentences of honest reality check — what most people underestimate about this transition"
+  "criticalSkills": [
+    {
+      "skill": "Skill name (2-4 words)",
+      "why": "Why this skill is a gate-opener for the target role — what doors it unlocks",
+      "howToLearn": "The fastest realistic way to acquire it in Israel — name a specific course, platform, or method",
+      "timeToAcquire": "Realistic time to functional proficiency (e.g. '6 weeks', '3 months')"
+    }
+  ],
+  "transferableStrengths": [
+    {
+      "strength": "A specific strength from their ACTUAL background — reference real details from their profile",
+      "howItApplies": "One sentence: how this strength directly creates value in the target role/industry"
+    },
+    {
+      "strength": "Another specific transferable strength pulled from their actual background",
+      "howItApplies": "One sentence: the bridge between this strength and the new field"
+    },
+    {
+      "strength": "A third transferable asset — a skill, habit, or network from their current field",
+      "howItApplies": "One sentence: why this gives them a concrete edge over other career changers"
+    }
+  ],
+  "biggestRisk": "The #1 most likely reason people with this specific background fail this specific transition — name it directly, no sugarcoating",
+  "mitigationStrategy": "One concrete, specific action they can take NOW to reduce the biggest risk before it materializes",
+  "honestNote": "2-3 sentences of honest reality check — include realistic financial expectations, total time investment, and the one thing most people underestimate going in",
+  "israeliContext": "1-2 sentences about anything specific to the Israeli market for this transition — army reserve duty impact, geographic availability of jobs in this field, Hebrew language requirements, or unique Israeli industry culture norms"
 }
 
 Rules:
-- totalDuration: be realistic and honest (a career change from lawyer to chef might take 12-18 months; from accountant to bookkeeper could take 2-3 months)
-- phases: 3-4 phases covering the full transition arc
-- Each phase has 3 specific, actionable items — not generic advice
-- milestone: concrete, measurable indicator the phase is complete
-- honestNote: the ONE thing people consistently underestimate or get wrong — be direct
-- Adapt timeline to Israeli market realities
-- No extra text outside the JSON
+- totalDuration: be realistic (lawyer → chef: 12–18 months; accountant → bookkeeper: 2–3 months; military logistics → procurement: 3–6 months)
+- phases: exactly 3–4 phases covering the full arc from "still in old job" to "earning in new field"
+- Each phase: 3 specific, actionable items — name real platforms, organizations, or steps; no generic advice
+- milestone: must be something they can actually measure or observe (not "feel confident" — use "completed X course", "landed first paying client", "got first interview callback")
+- financialNote: be honest — mention savings runway needed, cost of required training, whether they can moonlight or must quit first
+- mindsetChallenge: each phase has a different psychological hurdle — name it specifically (e.g. "imposter syndrome when applying without experience", "fear of income drop", "identity loss from leaving a senior role")
+- criticalSkills: 2–3 skills MAX — only true gate-keepers, not nice-to-haves; for trade roles (chef, trainer, electrician) list certifications over soft skills
+- transferableStrengths: pull ONLY from their actual provided background — no generic "you're a hard worker" statements; each entry must include howItApplies bridging the strength to the new field
+- biggestRisk: one specific failure mode — not vague platitudes (bad: "lack of commitment"; good: "applicants with no portfolio get screened out in the first 10 seconds — build one before applying")
+- mitigationStrategy: one immediate, concrete action — not generic advice; must directly address the biggestRisk
+- honestNote: the one painful truth most people discover too late — financial, emotional, or logistical
+- israeliContext: mention army reserve duty, geographic job availability, Hebrew/Arabic requirements, or Israeli industry culture only if genuinely relevant to THIS transition
+- Adapt all timelines and advice to Israeli market realities (2024–2025)
 - No extra text outside the JSON`;
