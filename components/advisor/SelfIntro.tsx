@@ -242,7 +242,7 @@ export default function SelfIntro({ advisorState, onBack, onComplete }: Props) {
                   onClick={() => setStep(steps[currentIdx - 1])}
                   className="text-white/40 hover:text-white/70 text-sm"
                 >
-                  {lang === "he" ? "← חזור" : "← Back"}
+                  {lang === "he" ? "חזור" : "Back"}
                 </button>
                 <button
                   onClick={next}

@@ -241,8 +241,6 @@ Examples of BAD steps: "עדכן לינקדאין", "חקור אפשרויות",
 
 realismNote: A short, honest sentence that keeps expectations grounded. If they want physical work — say so is valid. If a field they love has low pay — mention it honestly. If a transition needs a course — say it. NO false promises. Example: "מדריכי כושר מרוויחים 6,000-12,000 ש"ח בתחילת הדרך — זה לא הייטק, אבל זו עבודה שנותנת אנרגיה."
 
-IF THE USER'S PROFILE IS IN HEBREW, respond ENTIRELY in Hebrew. Otherwise English.
-
 Respond with JSON only — no markdown, no explanation:
 {
   "mbtiType": "XXXX",
@@ -315,8 +313,6 @@ For each path, also provide:
 
 These scores should differ meaningfully between paths — don't make them all similar.
 
-IF THE USER WROTE IN HEBREW, respond in Hebrew. Otherwise English.
-
 Respond with JSON only:
 {
   "recommendedPath": "employee" | "entrepreneur" | "studies",
@@ -375,8 +371,6 @@ For improvements: be SPECIFIC. Don't say "add more detail" — quote what to cha
 
 rewrittenSummary: write a strong 3-4 line professional summary tailored to this person that they can paste at the top of their CV.
 
-IF the candidate background indicates Hebrew, respond in Hebrew. Otherwise English.
-
 Respond with JSON only:
 {
   "overallScore": 72,
@@ -408,8 +402,6 @@ Rules:
 - experienceBullets: 5-6 bullets for their CURRENT or most recent role. Each starts with a strong verb, includes a metric or outcome when possible.
 - skills: 10 keywords recruiters actually search for in this field.
 - keywords: 5 differentiating keywords that would help them stand out (not generic).
-
-IF the candidate is Hebrew-native OR profile is in Hebrew, respond in Hebrew. Otherwise English.
 
 Respond with JSON only:
 {
@@ -487,8 +479,6 @@ thirtyDayPlan: 5-7 specific, calendar-ready action items for the next 30 days. N
 - Sequence them logically (build presence → warm up → reach out → follow up)
 
 topLine: The single sharpest, most memorable sentence of the entire career plan. It should crystallize their unique competitive advantage AND the #1 thing they should do first. This is the sentence they'll still remember when they wake up on Monday morning. It should feel personal — not like a motivational poster. Think: "שילוב הניסיון שלך בX עם Y הוא בדיוק מה שחברות Z מחפשות עכשיו — פנה ישירות למנהלי X בלינקדאין השבוע."
-
-IF the candidate is Hebrew-speaking, respond ENTIRELY in Hebrew. Otherwise English.
 
 Respond with JSON only:
 {
@@ -574,7 +564,7 @@ ${directionSummary}
 - 6-8 שאלות סה"כ. אחרי השאלה האחרונה שקיבלה תשובה, אמור בדיוק: [INTERVIEW_COMPLETE]
 - טון: מקצועי, ממוקד, חם אבל לא רך. כמו מראיין אמיתי.
 
-IF THE USER RESPONDS IN ENGLISH, switch to English. Otherwise Hebrew.`;
+`;
 
 export const MOCK_INTERVIEW_FEEDBACK_PROMPT = (profile: string, role: string, transcript: string) => `You are a senior interview coach in Israel. Review this mock interview transcript and give the candidate structured feedback.
 
@@ -595,7 +585,7 @@ Be specific and honest. No flattery. If they did well, say why concretely. If th
 
 Write 300-400 words. Structured with clear headings.
 
-IF the transcript is in Hebrew, respond in Hebrew. Otherwise English.`;
+`;
 
 export const COVER_LETTER_PROMPT = (profile: string, diagnosis: string, jobDescription: string, lang: string) => `You are a senior career writer in Israel. Write a personalized, compelling cover letter for this specific job application.
 
@@ -614,7 +604,6 @@ ${jobDescription}
 3. PARAGRAPH 2 (Proof): Highlight 1-2 specific achievements or experiences that directly address the job requirements. Use numbers or outcomes where possible. Do NOT list everything on the CV — pick the most relevant.
 4. PARAGRAPH 3 (Forward + ask): Brief and confident. What they bring to this specific team. End with a direct, clear call to action — not "I hope to hear from you."
 5. TONE: Professional but human. First person. No buzzwords, no "passionate about", no "team player."
-6. If the profile/job is in Hebrew → write in Hebrew. Otherwise English.
 
 Respond with JSON only:
 {
