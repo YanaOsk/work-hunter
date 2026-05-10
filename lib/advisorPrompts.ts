@@ -168,6 +168,7 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    Data & AI: Data Scientist, ML Engineer, AI researcher, Prompt Engineer, Big Data
    Product: Product Manager, UX/UI designer, חוקר משתמשים, QA engineer, tech project manager
    Digital Marketing: SEO, PPC, מנהל רשתות חברתיות, מנהל שיווק דיגיטלי, CSM, Affiliate Manager
+   Creator Economy / Web3: מנהל קהילת גיימינג, מפיק פודקאסטים, Ghostwriter, מנהל קורסים דיגיטליים, מנהל Etsy — ⚠️ INCOME VOLATILITY WARNING: crypto trading, NFT art, and streaming (Twitch) are NOT stable career paths in the Israeli market. These generate income for <3% of practitioners. NEVER suggest these as primary career paths unless the profile shows existing proven revenue. May be mentioned as side-income alongside a stable primary path only.
 
    BRANCH 3 — שירותים מקצועיים: כספים, משפטים וניהול (Finance, Law & Management):
    Finance: מנהל חשבונות (סוג 1–3), חשב שכר, יועץ מס, רואה חשבון, יועץ פנסיוני, יועץ משכנתאות
@@ -187,15 +188,17 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    Medical: רופא, רופא שיניים, שיננית, טכנאי שיניים, פרמדיק, חובש, וטרינר
    Nursing/Care: אח/אחות, אחות מעשית LPN (⚡ תוכנית 12 חודשים → מסלול לרישיון סיעוד מלא), מיילדת, מטפל סיעודי, דולה, יועצת הנקה, יועצת שינה לתינוקות
    Para-medical: פיזיותרפיסט, קלינאי תקשורת, מרפא בעיסוק, תזונאית, אופטומטריסט, אופטיקאי
-   Alternative: נטורופת, מדקר, רפלקסולוגית, ארומתרפיסטית, מטפל ברפואה סינית, הומיאופת
+   Alternative: נטורופת, מדקר, רפלקסולוגית, ארומתרפיסטית, מטפל ברפואה סינית, הומיאופת, מטפל פלדנקרייז (4-year training program), מטפל שיאצו (200-hour certification), מטפל הידרותרפיה, ליצן רפואי — CERTIFICATION SPECTRUM NOTE: alternative therapy certifications in Israel range from zero regulation (ריקי, הומיאופתיה — anyone can practice) to structured programs (פלדנקרייז — 4 years; נטורופתיה — 3 years at recognized colleges). Always verify the specific credential required before recommending a path.
    Fitness/Wellness: מאמן כושר אישי, מורה ליוגה, מורה לפילאטיס, פיזיולוג מאמץ
 
    BRANCH 6 — חינוך, הדרכה ואימון (Education, Training & Coaching):
    Formal (degree required): מורה (ביסודי/תיכון/חינוך מיוחד), גננת, מנהל בית ספר, מרצה אוניברסיטה
    Specialized Teaching: מורה פרטי, מורה לנגינה, מורה לשפות, מדריך פסיכומטרי, מורה לנהיגה
    Coaching/Development: Life Coach, מנחה קבוצות, מפתח הדרכה, כותב לומדות, מנהל הדרכה
+   Cultural/Museum: אוצר מוזיאון, מדריך מוזיאון, ספרן/ית, ארכיבר, מנהל מרכז תרבות, מנחה סיורים היסטוריים (good dual-branch with Branch 7 Arts)
    Sport/Outdoor: מדריך שחייה, מציל, מדריך צלילה, מדריך טיולים, מדריך טיפוס, מדריך של"ח
    Informal/Community (no degree needed): רכז נוער ברשות מקומית, מנהל תחנת נוער, מדריך תנועת נוער (מקצועי), רכז קהילתי, מנהל מרכז קהילתי, רכז פדגוגי בעמותה, עובד רווחה קהילתי
+   Religious Roles (require specific religious background/ordination — not open-access): רב, חזן, שוחט, מוהל, סופר סת"ם — verify candidate's religious background before suggesting. These careers require recognized rabbinical or Halachic certification (סמיכה) or specific training from religious authorities.
 
    BRANCH 7 — אמנות, עיצוב ותקשורת (Arts, Design & Media):
    Design: מעצב גרפי, מעצב מוצר תעשייתי, מעצב לוגואים, מומחה מיתוג, Art Director, מעצב אריזות
@@ -793,6 +796,7 @@ export const ADVISOR_CHAT_SYSTEM_PROMPT = `אתה יועץ תעסוקתי בכי
 ענף 2 — הייטק, תוכנה ודיגיטל:
 ⚠️ רק כשיש ניסיון/תואר טכנולוגי מפורש בפרופיל
 Full Stack/Frontend/Backend/iOS/Android, DevOps, Cloud, סייבר, SOC — Data Scientist, ML, AI, Prompt Engineer — מנהל מוצר, UX/UI, QA — SEO, PPC, שיווק דיגיטלי, CSM
+כלכלת יוצרים: מפיק פודקאסטים, מנהל קורסים דיגיטליים, מנהל Etsy, Ghostwriter — ⚠️ סחר קריפטו, NFT, ו-Twitch אינם קריירות יציבות בשוק ישראל — רק פחות מ-3% מרוויחים מהם. הזכר אותם לכל היותר כהכנסה נוספת, לא כקריירה עיקרית.
 
 ענף 3 — שירותים מקצועיים: כספים, משפטים וניהול:
 מנהל חשבונות (סוג 1–3), חשב שכר, יועץ מס, יועץ פנסיוני, יועץ משכנתאות — סוכן ביטוח, חתם, שמאי מקרקעין/רכב — עורך דין (ענפים שונים), נוטריון, מגשר, מזכירה משפטית — מגייס, הד האנטר, מנהל משאבי אנוש — מנהל רכש, קניין, מנהל לוגיסטיקה, מנהל שרשרת אספקה
@@ -801,10 +805,11 @@ Full Stack/Frontend/Backend/iOS/Android, DevOps, Cloud, סייבר, SOC — Data
 אדריכל, מעצב פנים, הנדסאי בניין, קונסטרוקטור — חשמלאי מוסמך, אינסטלטור, טכנאי מיזוג, טכנאי גז — נגר מטבחים/רהיטים, רתך, מסגר, מנעולן, חרט, מפעיל CNC — מנופאי, מפעיל צמ"ה/בובקט — טכנאי בתים חכמים, מתקין מצלמות, טכנאי מעליות, הנדימן
 
 ענף 5 — בריאות, רפואה וטיפול:
-רופא, שיניים, שיננית, טכנאי שיניים, פרמדיק, חובש, וטרינר — אח/אחות, אחות מעשית LPN (⚡ תוכנית 12 חודשים), מיילדת, דולה, יועצת הנקה — פיזיותרפיסט, קלינאי תקשורת, תזונאית, אופטומטריסט — נטורופת, מדקר, רפלקסולוגית, מטפל ברפואה סינית — מאמן כושר, מורה ליוגה/פילאטיס
+רופא, שיניים, שיננית, טכנאי שיניים, פרמדיק, חובש, וטרינר — אח/אחות, אחות מעשית LPN (⚡ תוכנית 12 חודשים), מיילדת, דולה, יועצת הנקה — פיזיותרפיסט, קלינאי תקשורת, תזונאית, אופטומטריסט — נטורופת, מדקר, רפלקסולוגית, מטפל ברפואה סינית, פלדנקרייז (4 שנות הכשרה), שיאצו (200 שעות) — מאמן כושר, מורה ליוגה/פילאטיס
+הערה: טיפולים אלטרנטיביים בישראל — ספקטרום הסמכות: ריקי/הומיאופתיה — ללא רגולציה; פלדנקרייז/נטורופתיה — תוכניות הכשרה מוכרות. תמיד בדוק מה נדרש לתפקיד הספציפי.
 
 ענף 6 — חינוך, הדרכה ואימון:
-מורה (ביסודי/תיכון/חינוך מיוחד — דורש תעודת הוראה), גננת, מרצה — מורה פרטי, מורה לנגינה/שפות, מדריך פסיכומטרי — Life Coach, מנחה קבוצות, מפתח הדרכה, כותב לומדות — מדריך שחייה, מציל, מדריך צלילה, מדריך טיולים — חינוך בלתי פורמלי (ללא תואר): רכז נוער ברשות, מנהל תחנת נוער, רכז קהילתי, מנהל מרכז קהילתי, רכז פדגוגי בעמותה
+מורה (ביסודי/תיכון/חינוך מיוחד — דורש תעודת הוראה), גננת, מרצה — מורה פרטי, מורה לנגינה/שפות, מדריך פסיכומטרי — Life Coach, מנחה קבוצות, מפתח הדרכה, כותב לומדות — מדריך שחייה, מציל, מדריך צלילה, מדריך טיולים — אוצר מוזיאון, מדריך מוזיאון, ספרן/ית, ארכיבר, מנחה סיורים היסטוריים — חינוך בלתי פורמלי (ללא תואר): רכז נוער ברשות, מנהל תחנת נוער, רכז קהילתי, מנהל מרכז קהילתי, רכז פדגוגי בעמותה — תפקידים דתיים (דורשים רקע ורישיון דתי ספציפי): רב, חזן, שוחט — אל תמליץ אלא אם הפרופיל מראה רקע דתי מתאים
 
 ענף 7 — אמנות, עיצוב ותקשורת:
 מעצב גרפי, מעצב מוצר, מומחה מיתוג, Art Director — צלם, עורך וידאו, במאי, צלם רחפן (⚠️ אינסטגרם לא = ביקוש שוק — רק הופעות בתשלום נחשבות) — זמר/ת לאירועים (כניסה ריאלית) / זמר/ת מקצועי (⚠️ עוקבים ברשתות לא = הוכחת שוק; רק הופעות בתשלום נחשבות), נגן, מפיק מוזיקלי, DJ, קריין, מדובב, מנחה סדנאות שירה — עיתונאי, קופירייטר, כותב תוכן, מתרגם, Ghostwriter — מנהל יח"צ, מארגן חתונות, מפיק אירועים
