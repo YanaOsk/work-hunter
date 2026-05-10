@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { ChatMessage, UserProfile } from "@/lib/types";
@@ -244,7 +244,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
   const profileData = userProfile.parsedData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex flex-col">
+    <div style={{ background: "var(--background)" }} className="min-h-screen flex flex-col">
       {/* Header */}
       <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm px-3 sm:px-6 py-3">
         <div className="max-w-3xl mx-auto flex items-center justify-between">

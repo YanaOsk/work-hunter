@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState } from "react";
 import Link from "next/link";
@@ -73,7 +73,7 @@ export default function CVReviewTool({ advisorState, onBack, onComplete, onSkip 
 
   if (phase === "input") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 p-6">
+      <div style={{ background: "var(--background)" }} className="min-h-screen p-6">
         <div className="max-w-2xl mx-auto">
           <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">
             {tx.backToAdvisor}
@@ -178,7 +178,7 @@ export default function CVReviewTool({ advisorState, onBack, onComplete, onSkip 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 p-6">
+    <div style={{ background: "var(--background)" }} className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         <button onClick={onBack} className="text-white/50 hover:text-white text-sm mb-6">
           {tx.backToAdvisor}
@@ -227,7 +227,7 @@ export default function CVReviewTool({ advisorState, onBack, onComplete, onSkip 
 
 function LoadingScreen({ label }: { label: string }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center p-6">
+    <div style={{ background: "var(--background)" }} className="min-h-screen flex items-center justify-center p-6">
       <div className="text-center">
         <svg className="animate-spin w-10 h-10 text-purple-400 mx-auto mb-4" viewBox="0 0 24 24" fill="none">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

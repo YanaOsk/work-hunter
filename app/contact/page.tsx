@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
@@ -37,7 +37,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+    <div style={{ background: "var(--background)" }} className="min-h-screen ">
       <div className="max-w-2xl mx-auto px-4 py-16 sm:py-24">
 
         {/* Back */}

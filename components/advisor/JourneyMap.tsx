@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AdvisorStage, AdvisorState, STAGE_ORDER } from "@/lib/types";
 import { CompletionSnapshot } from "@/lib/advisorState";
@@ -156,7 +156,7 @@ export default function JourneyMap({
   const progressPct = isDone ? 100 : Math.round((completedCount / STAGE_ORDER.length) * 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 p-4 md:p-6 pb-16">
+    <div style={{ background: "var(--background)" }} className="min-h-screen p-4 md:p-6 pb-16">
       <div className="max-w-3xl mx-auto mt-4 md:mt-8">
         {/* Top bar */}
         <div className="flex items-center justify-between mb-8">

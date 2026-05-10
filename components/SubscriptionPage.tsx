@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -112,7 +112,7 @@ export default function SubscriptionPage() {
   return (
     <div
       dir={he ? "rtl" : "ltr"}
-      className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900"
+      style={{ background: "var(--background)" }} className="min-h-screen "
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-8 py-12">
 

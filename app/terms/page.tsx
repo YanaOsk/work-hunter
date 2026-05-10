@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
 
@@ -14,7 +14,7 @@ const EMAIL = "yanaoskin35@gmail.com";
 export default function TermsPage() {
   return (
     <>
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/20 to-slate-900">
+    <div style={{ background: "var(--background)" }} className="min-h-screen ">
       <div className="max-w-3xl mx-auto px-5 py-16 sm:py-24" dir="rtl">
 
         <Link href="/" className="text-purple-400 hover:text-purple-300 text-sm transition mb-10 inline-block">

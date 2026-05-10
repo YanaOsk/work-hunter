@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -43,7 +43,7 @@ export default function ConversationPage() {
   }, [params.id]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+    <div style={{ background: "var(--background)" }} className="min-h-screen ">
       {/* Header */}
       <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm px-6 py-4 sticky top-0 z-10">
         <div className="max-w-3xl mx-auto flex items-center gap-3">

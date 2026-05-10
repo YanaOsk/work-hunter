@@ -52,7 +52,7 @@ function AuthErrorContent() {
 
 export default function AuthErrorPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+    <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <Suspense fallback={<div className="min-h-[70vh]" />}>
         <AuthErrorContent />
       </Suspense>

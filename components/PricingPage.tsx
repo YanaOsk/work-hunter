@@ -30,7 +30,7 @@ export default function PricingPage() {
   }, [status, router]);
 
   if (status === "loading" || status === "unauthenticated") {
-    return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
+    return <div className="min-h-screen" style={{ background: "var(--background)" }} />;
   }
 
   const faqs = [
@@ -46,7 +46,7 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+    <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8">
 
 

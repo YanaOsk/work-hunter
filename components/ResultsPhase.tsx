@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
@@ -245,7 +245,7 @@ export default function ResultsPhase({
 
   if (entryPath && jobs.length === 0 && !isStreaming) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+      <div style={{ background: "var(--background)" }} className="min-h-screen ">
         <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm sticky top-0 z-10">
           <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
             <h1 className="text-white font-bold text-sm sm:text-base">מסלול כניסה לתחום</h1>
@@ -333,7 +333,7 @@ export default function ResultsPhase({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+    <div style={{ background: "var(--background)" }} className="min-h-screen ">
       <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="min-w-0">

@@ -92,7 +92,7 @@ export default function SettingsPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--background)" }}>
         <div className="w-6 h-6 border-2 border-purple-500/40 border-t-purple-400 rounded-full animate-spin" />
       </div>
     );
@@ -105,7 +105,7 @@ export default function SettingsPage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+    <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <div className="max-w-2xl mx-auto px-4 py-10 space-y-5">
 
         {/* Header */}

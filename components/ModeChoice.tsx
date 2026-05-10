@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AppMode } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
@@ -13,7 +13,7 @@ export default function ModeChoice({ onChoose }: Props) {
   const tx = t[lang];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center p-4">
+    <div style={{ background: "var(--background)" }} className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-3xl">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-600 mb-4">

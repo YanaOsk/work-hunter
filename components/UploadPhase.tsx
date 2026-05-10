@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, DragEvent } from "react";
 import { useSession } from "next-auth/react";
@@ -73,7 +73,7 @@ export default function UploadPhase({ onComplete }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex flex-col">
+    <div style={{ background: "var(--background)" }} className="min-h-screen flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
       <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center gap-3 sm:gap-8 lg:gap-16">
 

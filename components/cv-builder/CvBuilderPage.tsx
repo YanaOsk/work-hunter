@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -323,13 +323,13 @@ export default function CvBuilderPage() {
 
   // ---------- SESSION LOADING ----------
   if (status === "loading") {
-    return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
+    return <div style={{ background: "var(--background)" }} className="min-h-screen " />;
   }
 
   // ---------- LIST VIEW ----------
   if (isLoggedIn && view === "list") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+      <div style={{ background: "var(--background)" }} className="min-h-screen ">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
             <div>
@@ -531,7 +531,7 @@ export default function CvBuilderPage() {
 
   // ---------- EDITOR VIEW ----------
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+    <div style={{ background: "var(--background)" }} className="min-h-screen ">
 
       {/* Advisor CV import banner */}
       {advisorImport && (

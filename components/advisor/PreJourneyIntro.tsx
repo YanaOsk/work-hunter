@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
@@ -29,7 +29,7 @@ export default function PreJourneyIntro({ onStart, onExit }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 p-6">
+    <div style={{ background: "var(--background)" }} className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         <button onClick={onExit} className="text-white/50 hover:text-white text-sm mb-6">
           {tx.newSearch}

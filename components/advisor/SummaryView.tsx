@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -337,7 +337,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
   const otherOptions = direction?.options?.filter((o) => o.path !== chosenPath) ?? [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 p-4 md:p-6">
+    <div style={{ background: "var(--background)" }} className="min-h-screen p-4 md:p-6">
       <div className="max-w-4xl mx-auto" ref={contentRef}>
         {/* Nav */}
         <div className="flex items-center justify-between mb-8">

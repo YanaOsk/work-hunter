@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { useSession, signOut } from "next-auth/react";
@@ -476,14 +476,14 @@ export default function AdminPage() {
 
   if (status === "loading" || !isAdmin) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center">
+      <div style={{ background: "var(--background)" }} className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 text-white">
+    <div style={{ background: "var(--background)" }} className="min-h-screen text-white">
       {/* Header */}
       <div className="border-b border-white/10 bg-slate-900/80 backdrop-blur-sm px-4 sm:px-6 py-4 sm:py-5">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">

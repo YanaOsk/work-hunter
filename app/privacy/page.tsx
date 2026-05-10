@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
   if (!he) {
     return (
       <>
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/20 to-slate-900">
+      <div style={{ background: "var(--background)" }} className="min-h-screen ">
         <div className="max-w-3xl mx-auto px-5 py-16 sm:py-24" dir="ltr">
           <Link href="/" className="text-purple-400 hover:text-purple-300 text-sm transition mb-10 inline-block">← Back</Link>
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Privacy Policy</h1>
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
 
   return (
     <>
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/20 to-slate-900">
+    <div style={{ background: "var(--background)" }} className="min-h-screen ">
       <div className="max-w-3xl mx-auto px-5 py-16 sm:py-24" dir="rtl">
 
         <Link href="/" className="text-purple-400 hover:text-purple-300 text-sm transition mb-10 inline-block">

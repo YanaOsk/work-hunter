@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
@@ -69,7 +69,7 @@ export default function CheckoutPage({ planId, returnTo }: { planId: string; ret
 
   if (status === "loading" || !session) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center">
+      <div style={{ background: "var(--background)" }} className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -77,7 +77,7 @@ export default function CheckoutPage({ planId, returnTo }: { planId: string; ret
 
   if (!plan) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex flex-col items-center justify-center gap-4 text-white">
+      <div style={{ background: "var(--background)" }} className="min-h-screen flex flex-col items-center justify-center gap-4 text-white">
         <p className="text-lg">מסלול לא נמצא</p>
         <button onClick={() => router.push("/pricing")} className="text-purple-400 hover:text-purple-300 transition">
           חזרה לתמחור
@@ -121,7 +121,7 @@ export default function CheckoutPage({ planId, returnTo }: { planId: string; ret
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 flex items-center justify-center px-4">
+      <div style={{ background: "var(--background)" }} className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-lg w-full text-center">
           {/* Confirmation badge */}
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-green-400 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30">
@@ -211,7 +211,7 @@ export default function CheckoutPage({ planId, returnTo }: { planId: string; ret
       : `${plan.displayPrice}${plan.per ? ` ${plan.per}` : ""}`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 py-10 px-4" dir="rtl">
+    <div style={{ background: "var(--background)" }} className="min-h-screen py-10 px-4" dir="rtl">
       <div className="max-w-lg mx-auto space-y-5">
 
         {/* Header */}

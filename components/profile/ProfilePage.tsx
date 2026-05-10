@@ -465,27 +465,27 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/20 to-slate-900">
+    <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-16">
         <div className="flex gap-6 lg:gap-8 items-start">
 
           {/* ─── Sidebar ─────────────────────────────────────────────────── */}
-          <aside className="hidden lg:flex flex-col w-56 xl:w-60 flex-shrink-0 sticky top-20 gap-1.5">
+          <aside className="hidden lg:flex flex-col w-56 xl:w-60 flex-shrink-0 sticky top-20 gap-1">
 
             {/* Avatar card */}
-            <div className="bg-white/[0.04] border border-white/8 rounded-2xl p-4 mb-2">
-              <div className="flex items-center gap-3 mb-3">
+            <div className="linear-card p-4 mb-3">
+              <div className="flex items-center gap-3 mb-4">
                 <div className="relative group cursor-pointer flex-shrink-0" onClick={() => avatarInputRef.current?.click()}>
                   <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
                   {displayImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={displayImage} alt="" className="w-11 h-11 rounded-xl object-cover" />
+                    <img src={displayImage} alt="" className="w-12 h-12 rounded-xl object-cover ring-2 ring-white/10" />
                   ) : (
-                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500 to-violet-700 flex items-center justify-center text-white font-black text-sm select-none">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-black text-sm select-none" style={{ background: "linear-gradient(135deg, #5E6AD2, #7C3AED)" }}>
                       {initials}
                     </div>
                   )}
-                  <div className={`absolute inset-0 rounded-xl flex items-center justify-center transition-all ${uploadingAvatar ? "bg-black/60" : "bg-black/0 group-hover:bg-black/50"}`}>
+                  <div className={`absolute inset-0 rounded-xl flex items-center justify-center transition-all ${uploadingAvatar ? "bg-black/60" : "bg-black/0 group-hover:bg-black/55"}`}>
                     {uploadingAvatar
                       ? <svg className="w-3.5 h-3.5 text-white animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
                       : <svg className="w-3 h-3 text-white opacity-0 group-hover:opacity-100 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -494,16 +494,43 @@ export default function ProfilePage() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-white font-semibold text-sm truncate leading-tight">{user?.name || "—"}</p>
-                  <p className="text-white/35 text-xs truncate mt-0.5">{user?.email}</p>
+                  <p className="text-white/40 text-xs truncate mt-0.5">{user?.email}</p>
                 </div>
               </div>
+
+              {/* Advisor mini-progress */}
+              {advisorStarted && (
+                <div className="mb-3 pb-3 border-b border-white/[0.06]">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-white/35 text-[10px] uppercase tracking-wide">{he ? "ייעוץ" : "Advisor"}</span>
+                    <span className="text-[10px] font-bold" style={{ color: advisorDone ? "#4ADE80" : "#5E6AD2" }}>
+                      {advisorDone ? (he ? "הושלם" : "Done") : `${completedCount}/${STAGE_ORDER.length}`}
+                    </span>
+                  </div>
+                  <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                    <div
+                      className="h-1 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${advisorDone ? 100 : Math.round((completedCount / STAGE_ORDER.length) * 100)}%`,
+                        background: advisorDone ? "#4ADE80" : "#5E6AD2",
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
               {plan === "free" ? (
-                <Link href="/pricing" className="flex items-center justify-center gap-1.5 w-full text-xs font-semibold text-purple-300 hover:text-purple-200 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/25 hover:border-purple-500/40 py-1.5 rounded-lg transition">
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                <Link
+                  href="/pricing"
+                  className="flex items-center justify-center gap-1.5 w-full text-xs font-semibold text-white py-2 rounded-lg transition"
+                  style={{ background: "#5E6AD2", boxShadow: "0 0 0 1px rgba(94,106,210,0.35)" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "#6D79DB")}
+                  onMouseLeave={e => (e.currentTarget.style.background = "#5E6AD2")}
+                >
                   {he ? "שדרג לפרמיום" : "Upgrade to Premium"}
                 </Link>
               ) : (
-                <div className="flex items-center gap-1.5 text-emerald-400 text-xs">
+                <div className="flex items-center gap-1.5 text-emerald-400 text-xs px-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   {he ? "מנוי פעיל" : "Active plan"}
                 </div>
@@ -518,16 +545,18 @@ export default function ProfilePage() {
                   <button key={item.id} onClick={() => setActiveSection(item.id)}
                     className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-start group ${
                       active
-                        ? "bg-white/8 text-white border border-white/10"
-                        : "text-white/45 hover:text-white/80 hover:bg-white/4"
+                        ? "text-white"
+                        : "text-white/45 hover:text-white/80 hover:bg-white/[0.04]"
                     }`}
+                    style={active ? { background: "rgba(94,106,210,0.12)", border: "1px solid rgba(94,106,210,0.22)" } : undefined}
                   >
-                    <span className={active ? "text-purple-400" : "text-white/25 group-hover:text-white/50 transition-colors"}>
+                    <span style={{ color: active ? "#5E6AD2" : undefined }} className={active ? "" : "text-white/25 group-hover:text-white/50 transition-colors"}>
                       {item.icon}
                     </span>
                     <span className="flex-1 truncate">{he ? item.labelHe : item.labelEn}</span>
                     {item.badge ? (
-                      <span className={`text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center ${active ? "bg-purple-500/30 text-purple-300" : "bg-white/8 text-white/35"}`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full min-w-[18px] text-center font-semibold ${active ? "text-purple-300" : "bg-white/8 text-white/35"}`}
+                        style={active ? { background: "rgba(94,106,210,0.25)" } : undefined}>
                         {item.badge}
                       </span>
                     ) : null}
@@ -537,9 +566,9 @@ export default function ProfilePage() {
             </nav>
 
             {/* Bottom */}
-            <div className="mt-2 pt-2 border-t border-white/5">
+            <div className="mt-1 pt-2 border-t border-white/[0.05]">
               <Link href="/settings"
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/35 hover:text-white/70 hover:bg-white/4 transition w-full">
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/30 hover:text-white/65 hover:bg-white/[0.04] transition w-full group">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -559,10 +588,11 @@ export default function ProfilePage() {
                 return (
                   <button key={item.id} onClick={() => setActiveSection(item.id)}
                     className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
-                      active ? "bg-white/10 text-white border border-white/15" : "text-white/45 bg-white/4 hover:bg-white/7"
+                      active ? "text-white" : "text-white/45 bg-white/[0.04] hover:bg-white/[0.07]"
                     }`}
+                    style={active ? { background: "rgba(94,106,210,0.15)", border: "1px solid rgba(94,106,210,0.3)" } : undefined}
                   >
-                    <span className={active ? "text-purple-400" : "text-white/25"}>{item.icon}</span>
+                    <span style={{ color: active ? "#5E6AD2" : undefined }} className={active ? "" : "text-white/25"}>{item.icon}</span>
                     {he ? item.labelHe : item.labelEn}
                     {item.badge ? <span className="text-[10px] bg-white/10 px-1.5 rounded-full">{item.badge}</span> : null}
                   </button>

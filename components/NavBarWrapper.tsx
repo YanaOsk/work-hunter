@@ -39,8 +39,12 @@ export default function NavBarWrapper() {
   const hasPaidPlan = plan !== "free";
 
   return (
-    <div className="print:hidden sticky top-0 z-50">
-      <NavBar hasPaidPlan={hasPaidPlan} plan={plan} planReady={subChecked} />
-    </div>
+    <>
+      <div className="print:hidden fixed top-0 inset-x-0 z-50">
+        <NavBar hasPaidPlan={hasPaidPlan} plan={plan} planReady={subChecked} />
+      </div>
+      {/* Spacer so content doesn't hide behind the fixed navbar */}
+      <div className="h-14 md:h-16 print:hidden" />
+    </>
   );
 }

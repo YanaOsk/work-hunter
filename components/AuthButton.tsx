@@ -135,7 +135,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
 
         {/* Dropdown */}
         {open && (
-          <div className="absolute end-0 top-full mt-2 w-64 bg-slate-800/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/60 z-50 overflow-hidden">
+          <div className="absolute end-0 top-full mt-2 w-64 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/60 z-50 overflow-hidden" style={{ background: "rgba(18,18,20,0.97)" }}>
             {/* User info header */}
             <div className="px-4 py-3.5 border-b border-white/10 flex items-center gap-3">
               {displayImage ? (
@@ -213,7 +213,13 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
   return (
     <Link
       href="/auth/signin"
-      className="h-9 inline-flex items-center px-4 text-sm font-medium text-white/80 hover:text-white border border-white/15 hover:border-white/30 rounded-lg transition"
+      className="h-9 inline-flex items-center px-4 text-sm font-semibold text-white rounded-lg transition"
+      style={{
+        background: "#5E6AD2",
+        boxShadow: "0 0 0 1px rgba(94,106,210,0.4), 0 2px 12px rgba(94,106,210,0.2)",
+      }}
+      onMouseEnter={e => (e.currentTarget.style.background = "#6D79DB")}
+      onMouseLeave={e => (e.currentTarget.style.background = "#5E6AD2")}
     >
       {tx.signIn}
     </Link>

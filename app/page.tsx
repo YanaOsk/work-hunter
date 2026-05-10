@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { AppState, AppMode, UserProfile, JobResult } from "@/lib/types";
+import { AppState, AppMode, UserProfile, JobResult, EntryPathResult } from "@/lib/types";
 import { saveProfile } from "@/lib/profiles";
 import { DEFAULT_ADVISOR_ID, getOrCreateAdvisorState } from "@/lib/advisorState";
 import { consumeAutoStart, consumeAdvisorScoutContext } from "@/lib/autoStart";
@@ -20,6 +20,7 @@ const initialState: AppState = {
   userProfile: null,
   chatMessages: [],
   jobResults: [],
+  entryPath: null,
   isLoading: false,
   error: null,
 };
@@ -34,7 +35,8 @@ const emptyProfile: UserProfile = {
 async function readSearchStream(
   res: Response,
   onJob: (job: JobResult) => void,
-  onDone: (demoMode: boolean) => void
+  onDone: (demoMode: boolean) => void,
+  onEntryPath?: (path: EntryPathResult) => void,
 ) {
   if (!res.body) return;
   const reader = res.body.getReader();
@@ -53,6 +55,7 @@ async function readSearchStream(
         try {
           const data = JSON.parse(line.slice(6));
           if (data.type === "job") onJob(data.job);
+          else if (data.type === "entryPath") onEntryPath?.(data.data);
           else if (data.type === "done") onDone(data.demoMode ?? false);
         } catch {}
       }
@@ -199,26 +202,19 @@ export default function Home() {
               collectedJobs.push(job);
               if (!streamStarted) {
                 streamStarted = true;
-                setState({
-                  ...initialState,
-                  phase: "results",
-                  jobResults: [job],
-                  userProfile: emptyProfile,
-                });
+                setState({ ...initialState, phase: "results", jobResults: [job], userProfile: emptyProfile });
               } else {
-                setState((s) => ({
-                  ...s,
-                  jobResults: [...s.jobResults, job].sort((a, b) => b.matchScore - a.matchScore),
-                }));
+                setState((s) => ({ ...s, jobResults: [...s.jobResults, job].sort((a, b) => b.matchScore - a.matchScore) }));
               }
             },
             (demo) => {
               setDemoMode(demo);
-              setState((s) => ({
-                ...s,
-                jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore),
-              }));
-            }
+              setState((s) => ({ ...s, jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore) }));
+            },
+            (path) => {
+              streamStarted = true;
+              setState({ ...initialState, phase: "results", jobResults: [], entryPath: path, userProfile: emptyProfile });
+            },
           );
         } catch {
           if (!streamStarted) {
@@ -320,30 +316,23 @@ export default function Home() {
           collectedJobs.push(job);
           if (!streamStarted) {
             streamStarted = true;
-            setState((s) => ({ ...s, phase: "results", jobResults: [job] }));
+            setState((s) => ({ ...s, phase: "results", jobResults: [job], entryPath: null }));
           } else {
-            setState((s) => ({
-              ...s,
-              jobResults: [...s.jobResults, job].sort((a, b) => b.matchScore - a.matchScore),
-            }));
+            setState((s) => ({ ...s, jobResults: [...s.jobResults, job].sort((a, b) => b.matchScore - a.matchScore) }));
           }
         },
         (demo) => {
           setDemoMode(demo);
-          setState((s) => ({
-            ...s,
-            jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore),
-          }));
-        }
+          setState((s) => ({ ...s, jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore) }));
+        },
+        (path) => {
+          streamStarted = true;
+          setState((s) => ({ ...s, phase: "results", jobResults: [], entryPath: path }));
+        },
       );
     } catch {
       if (!streamStarted) {
-        setState((s) => ({
-          ...s,
-          phase: "results",
-          jobResults: [],
-          error: "Search failed. Check your API keys.",
-        }));
+        setState((s) => ({ ...s, phase: "results", jobResults: [], error: "Search failed. Check your API keys." }));
       }
     } finally {
       setIsStreaming(false);
@@ -388,21 +377,15 @@ export default function Home() {
           collectedJobs.push(j);
           if (!streamStarted) {
             streamStarted = true;
-            setState((s) => ({ ...s, phase: "results", jobResults: [j] }));
+            setState((s) => ({ ...s, phase: "results", jobResults: [j], entryPath: null }));
           } else {
-            setState((s) => ({
-              ...s,
-              jobResults: [...s.jobResults, j].sort((a, b) => b.matchScore - a.matchScore),
-            }));
+            setState((s) => ({ ...s, jobResults: [...s.jobResults, j].sort((a, b) => b.matchScore - a.matchScore) }));
           }
         },
         (demo) => {
           setDemoMode(demo);
-          setState((s) => ({
-            ...s,
-            jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore),
-          }));
-        }
+          setState((s) => ({ ...s, jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore) }));
+        },
       );
     } catch {
       if (!streamStarted) {
@@ -423,7 +406,7 @@ export default function Home() {
 
   if (mode === null) {
     if (pendingAutoMode || status === "loading") {
-      return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
+      return <div style={{ background: "var(--background)" }} className="min-h-screen " />;
     }
     if (showWelcome && session?.user) {
       return (
@@ -434,7 +417,7 @@ export default function Home() {
       );
     }
     if (status === "authenticated") {
-      return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
+      return <div style={{ background: "var(--background)" }} className="min-h-screen " />;
     }
     return <HomeLanding onChoose={handleModeChoice} />;
   }
@@ -463,6 +446,7 @@ export default function Home() {
       return (
         <ResultsPhase
           jobs={state.jobResults}
+          entryPath={state.entryPath}
           userProfile={state.userProfile!}
           demoMode={demoMode}
           isSubscribed={isSubscribed}

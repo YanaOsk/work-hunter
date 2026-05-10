@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -179,7 +179,7 @@ export default function AdvisorPageInner() {
   }, [session?.user?.email, profileId]);
 
   if (!advisorState || !profileId) {
-    return <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900" />;
+    return <div style={{ background: "var(--background)" }} className="min-h-screen " />;
   }
 
   const persist = (next: AdvisorState) => {

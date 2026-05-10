@@ -32,7 +32,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <a
-            href="/"
+            href={isAuthenticated ? "/profile" : "/"}
             className="flex items-center gap-2.5 flex-shrink-0 hover:opacity-90 transition"
           >
             <LogoMark size="sm" />
@@ -83,16 +83,27 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
           {isAuthenticated && !hasPaidPlan && (
             <Link
               href="/pricing"
-              className="hidden sm:inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition shadow-sm shadow-emerald-500/20"
+              className="hidden sm:inline-flex items-center gap-1.5 text-white text-sm font-semibold px-3.5 py-1.5 rounded-lg transition"
+              style={{
+                background: "#5E6AD2",
+                boxShadow: "0 0 0 1px rgba(94,106,210,0.4), 0 2px 12px rgba(94,106,210,0.25)",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = "#6D79DB")}
+              onMouseLeave={e => (e.currentTarget.style.background = "#5E6AD2")}
             >
-              <span>👑</span>
               Upgrade
             </Link>
           )}
           {!isAuthenticated && planReady && (
             <Link
               href="/advisor?profileId=default-advisor"
-              className="hidden sm:inline-flex bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+              className="hidden sm:inline-flex text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition"
+              style={{
+                background: "#5E6AD2",
+                boxShadow: "0 0 0 1px rgba(94,106,210,0.4), 0 2px 12px rgba(94,106,210,0.25)",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = "#6D79DB")}
+              onMouseLeave={e => (e.currentTarget.style.background = "#5E6AD2")}
             >
               {tx.navStartFree}
             </Link>
@@ -143,7 +154,8 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
             <Link
               href="/advisor?profileId=default-advisor"
               onClick={() => setMobileOpen(false)}
-              className="mt-2 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-3 rounded-lg transition text-center text-sm"
+              className="mt-2 text-white font-semibold py-3 rounded-lg transition text-center text-sm"
+              style={{ background: "#5E6AD2" }}
             >
               {tx.navStartFree}
             </Link>
