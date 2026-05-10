@@ -191,15 +191,16 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    Fitness/Wellness: מאמן כושר אישי, מורה ליוגה, מורה לפילאטיס, פיזיולוג מאמץ
 
    BRANCH 6 — חינוך, הדרכה ואימון (Education, Training & Coaching):
-   Formal: מורה (ביסודי/תיכון/חינוך מיוחד), גננת, מנהל בית ספר, מרצה אוניברסיטה
+   Formal (degree required): מורה (ביסודי/תיכון/חינוך מיוחד), גננת, מנהל בית ספר, מרצה אוניברסיטה
    Specialized Teaching: מורה פרטי, מורה לנגינה, מורה לשפות, מדריך פסיכומטרי, מורה לנהיגה
    Coaching/Development: Life Coach, מנחה קבוצות, מפתח הדרכה, כותב לומדות, מנהל הדרכה
    Sport/Outdoor: מדריך שחייה, מציל, מדריך צלילה, מדריך טיולים, מדריך טיפוס, מדריך של"ח
+   Informal/Community (no degree needed): רכז נוער ברשות מקומית, מנהל תחנת נוער, מדריך תנועת נוער (מקצועי), רכז קהילתי, מנהל מרכז קהילתי, רכז פדגוגי בעמותה, עובד רווחה קהילתי
 
    BRANCH 7 — אמנות, עיצוב ותקשורת (Arts, Design & Media):
    Design: מעצב גרפי, מעצב מוצר תעשייתי, מעצב לוגואים, מומחה מיתוג, Art Director, מעצב אריזות
    Photo/Video: צלם אירועים/אופנה/עיתונות, עורך וידאו, במאי, צלם רחפן, מפיק אירועים
-   Music/Performance: זמר, נגן, מפיק מוזיקלי, טכנאי סאונד, DJ, קריין, מדובב, שחקן
+   Music/Performance: זמר/ת לאירועים (realistic entry) / זמר/ת מקצועי (⚠️ portfolio + market entry required), נגן, מפיק מוזיקלי, טכנאי סאונד, DJ, קריין, מדובב, מנחה סדנאות שירה, מורה לשירה
    Writing/Media: עיתונאי, כתב, קופירייטר, כותב תוכן, מתרגם, עורך ספרותי, Ghostwriter
    PR/Events: מנהל יח"צ, דובר, מארגן חתונות, מפיק אירועים, אוצר תערוכות
 
@@ -211,9 +212,9 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
 
    BRANCH 9 — תחבורה, ביטחון ושירותי קמעונאות (Transport, Security & Retail):
    Transport/Delivery: נהג משאית/אוטובוס/אמבולנס, שליח, דוור, נהג רכבת, מלגזן, מחסנאי
-   Security/Defense: מאבטח, שוטר, לוחם אש, קצין צבאי, סוהר, שומר ראש, חבלן
+   Security/Defense: מאבטח, מנהל אבטחה בחברה, קצין בטיחות (OSH), חוקר פנימי בחברה, חוקר ביטוח, שוטר, לוחם אש, קצין צבאי, סוהר, שומר ראש
    Public Services: עובד עירייה, פקח, עובד תברואה, עובד סוציאלי קהילה, מנהל עמותה
-   Retail/Sales: מוכר בחנות, קופאי, סוכן נדל"ן, נציג שירות לקוחות, סוכן מכירות שטח B2B
+   Retail/Sales: מוכר בחנות, קופאי, סוכן נדל"ן (⚠️ commission-based — exclude if Rule 5C applies), נציג שירות לקוחות, סוכן מכירות שטח B2B
 
    BRANCH 10 — טבע, בעלי חיים ומלאכות מיוחדות (Nature, Animals & Specialist Crafts):
    Animals: מאלף כלבים (ביטחון/טיפולי/Agility), ספר כלבים, כוורן, וטרינר שטח, מגדל דגי נוי
@@ -228,7 +229,8 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    • Military logistics background, no degree → ✓ YES: procurement manager / logistics coordinator / heavy equipment operator after certification (Branch 3/4)
    • Profile with food/service experience, seeks management → ❌ NOT generic "chef" if already cooking ✓ YES: מנהל/ת משמרת / מנהל/ת F&B / מנהל/ת אירועים ובנקטים (Branch 8, no degree needed)
    • Profile with teaching/people skills, wants change → ❌ NOT "HR manager" without HR background ✓ YES: Life Coach / מפתח הדרכה / מנחה קבוצות (Branch 6)
-   • Military/security background, needs stable income → ✓ YES: מאבטח בכיר / מנהל אבטחה / logistics coordinator at company — NOT self-employed (Branch 9 + Rule 5C)
+   • Military police / security background, needs stable salary → ✓ YES: מנהל אבטחה בחברה / חוקר פנימי / קצין בטיחות (OSH) — NOT self-employed (Branch 9 + Rule 5C)
+   • Youth movement leader, no teaching degree → ❌ NOT "teacher" (requires certification) ✓ YES: רכז נוער ברשות / מנהל תחנת נוער / רכז קהילתי (Branch 6 — Informal/Community, no degree needed)
 
    RULE: Before recommending any role — verify it exists in the Israeli market and is realistically accessible with the candidate's current background.
 
@@ -262,6 +264,11 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    - Label each path clearly in the reasoning field with its timeline tier.
    - BRIDGE EMPLOYMENT EXCEPTION: If no career-aligned role with a ≤4-week hiring cycle exists for this background, do NOT invent one. Instead: set careerPaths[0].title to "עבודת גשר — הכנסה מיידית" with a realistic bridge role (service, admin, call center, delivery) that actually hires in 1–2 weeks; set careerPaths[0].domain to "Bridge Employment"; in careerPaths[0].reasoning explicitly state: "לא קיים מסלול מקצועי מיידי עם הרקע הנוכחי — עבודת הגשר מאפשרת הכנסה בזמן שמסלול Y מתפתח"; careerPaths[1] and [2] carry the real career paths. Never label a 3–6 month training program as "immediate."
    - EXTREME URGENCY (explicit debt + hard deadline under 6 weeks): open the reflection field with explicit acknowledgment before anything else: "הדחיפות הכלכלית שלך אמיתית — אני מפריד/ה בין מה שיביא לך כסף השבוע לבין מה שיבנה את הקריירה שלך לטווח ארוך." This sets honest expectations before the career paths are presented.
+
+5E. DUAL-BRANCH PROFILES: When a profile explicitly spans two branches (e.g., hairdresser who wants to teach; chef who wants to write about food; military officer interested in law; musician who also has logistics experience), include roles from BOTH branches in careerPaths and careerDirections. Do NOT collapse everything into one branch.
+   - Use matchBridge to explicitly name both domains: "הניסיון שלך ב-[Branch A domain] + הרצון שלך ל-[Branch B domain] = [combined role]"
+   - Minimum: at least one role from each relevant branch must appear across the 3 careerPaths
+   - The combined role often has MORE market value than either branch alone (e.g., hairdresser + teaching = instructor at beauty academy; chef + writing = food blogger / recipe developer / culinary school instructor)
 
 === CANDIDATE DATA ===
 
@@ -772,16 +779,16 @@ Full Stack/Frontend/Backend/iOS/Android, DevOps, Cloud, סייבר, SOC — Data
 רופא, שיניים, שיננית, טכנאי שיניים, פרמדיק, חובש, וטרינר — אח/אחות, מיילדת, דולה, יועצת הנקה — פיזיותרפיסט, קלינאי תקשורת, תזונאית, אופטומטריסט — נטורופת, מדקר, רפלקסולוגית, מטפל ברפואה סינית — מאמן כושר, מורה ליוגה/פילאטיס
 
 ענף 6 — חינוך, הדרכה ואימון:
-מורה (ביסודי/תיכון/חינוך מיוחד), גננת, מרצה — מורה פרטי, מורה לנגינה/שפות, מדריך פסיכומטרי — Life Coach, מנחה קבוצות, מפתח הדרכה, כותב לומדות — מדריך שחייה, מציל, מדריך צלילה, מדריך טיולים
+מורה (ביסודי/תיכון/חינוך מיוחד — דורש תעודת הוראה), גננת, מרצה — מורה פרטי, מורה לנגינה/שפות, מדריך פסיכומטרי — Life Coach, מנחה קבוצות, מפתח הדרכה, כותב לומדות — מדריך שחייה, מציל, מדריך צלילה, מדריך טיולים — חינוך בלתי פורמלי (ללא תואר): רכז נוער ברשות, מנהל תחנת נוער, רכז קהילתי, מנהל מרכז קהילתי, רכז פדגוגי בעמותה
 
 ענף 7 — אמנות, עיצוב ותקשורת:
-מעצב גרפי, מעצב מוצר, מומחה מיתוג, Art Director — צלם, עורך וידאו, במאי, צלם רחפן — זמר, נגן, מפיק מוזיקלי, DJ, קריין, מדובב — עיתונאי, קופירייטר, כותב תוכן, מתרגם, Ghostwriter — מנהל יח"צ, מארגן חתונות, מפיק אירועים
+מעצב גרפי, מעצב מוצר, מומחה מיתוג, Art Director — צלם, עורך וידאו, במאי, צלם רחפן — זמר/ת לאירועים (כניסה ריאלית) / זמר/ת מקצועי (⚠️ דורש פורטפוליו + כניסה לשוק), נגן, מפיק מוזיקלי, DJ, קריין, מדובב, מנחה סדנאות שירה — עיתונאי, קופירייטר, כותב תוכן, מתרגם, Ghostwriter — מנהל יח"צ, מארגן חתונות, מפיק אירועים
 
 ענף 8 — מזון, אירוח ותיירות:
 שף, קונדיטור, אופה, ברמן/מיקסולוג, בריסטה, סומלייה — מנהל/ת מסעדה, מנהל/ת F&B, מנהל/ת משמרת (רשת), מנהל/ת אירועים ובנקטים — סוכן נסיעות, מדריך טיולים, דייל אוויר, מנהל בית מלון — חקלאי, כורם, טכנולוג מזון, משגיח כשרות
 
 ענף 9 — תחבורה, ביטחון ושירותי קמעונאות:
-נהג משאית/אוטובוס/אמבולנס, שליח, דוור, מלגזן, מחסנאי — מאבטח, שוטר, לוחם אש, קצין צבאי, שומר ראש — עובד עירייה, עובד סוציאלי קהילה, מנהל עמותה — מוכר, קופאי, סוכן נדל"ן, נציג שירות לקוחות, סוכן מכירות שטח B2B
+נהג משאית/אוטובוס/אמבולנס, שליח, דוור, מלגזן, מחסנאי — מאבטח, מנהל אבטחה בחברה, קצין בטיחות (OSH), חוקר פנימי בחברה, חוקר ביטוח, שוטר, לוחם אש, קצין צבאי, שומר ראש — עובד עירייה, עובד סוציאלי קהילה, מנהל עמותה — מוכר, קופאי, סוכן נדל"ן (⚠️ עמלות — אסור כש-Rule 5C), נציג שירות לקוחות, סוכן מכירות שטח B2B
 
 ענף 10 — טבע, בעלי חיים ומלאכות מיוחדות:
 מאלף כלבים (ביטחון/טיפולי/Agility), ספר כלבים, כוורן, וטרינר שטח, מגדל דגי נוי — גנן נוי, אדריכל נוף, כורת עצים (ארבוריסט), מדביר, מומחה השקיה — שען, קדר, מנפח זכוכית, נפח אמנותי, כורך ספרים, יצרן סבונים — צלם רחפן לחקלאות, מפעיל הדפסת תלת מימד, מנהל קהילת גיימינג
@@ -792,7 +799,9 @@ Full Stack/Frontend/Backend/iOS/Android, DevOps, Cloud, סייבר, SOC — Data
 • "יצירתי + אסתטי, אין ניסיון" → ❌ לא: "מעצב אופנה" ✓ כן: עיצוב גבות/ריסים / ניהול מכון יופי / קעקועים אחרי קורס (ענף 1)
 • "לוגיסטיקה צבאית, לא רוצה תואר" → ✓ כן: מנהל רכש / תיאום לוגיסטי / מפעיל צמ"ה אחרי הסמכה (ענף 3/4)
 • "ניסיון שירות מזון, רוצה להתקדם" → ✓ כן: מנהל/ת F&B / מנהל/ת משמרת ברשת / מנהל/ת אירועים ובנקטים (ענף 8, ללא תואר)
-• "ניסיון צבאי/ביטחוני, צריך יציבות" → ✓ כן: מאבטח בכיר / מנהל אבטחה / תיאום לוגיסטי — לא עצמאי (ענף 9)
+• "ניסיון משטרה/צבא, צריך שכר קבוע" → ✓ כן: מנהל אבטחה בחברה / חוקר פנימי / קצין בטיחות (OSH) — לא עצמאי (ענף 9)
+• "מדריך בתנועת נוער, רוצה קריירה אמיתית" → ❌ לא: "מורה" (דורש תעודת הוראה) ✓ כן: רכז נוער ברשות / מנהל תחנת נוער / רכז קהילתי (ענף 6 — חינוך בלתי פורמלי, ללא תואר)
+• "ספרית שרוצה ללמד" → ✓ כן: מדריכת קורסי ספרות/שיער + רכז הדרכה בחברת מוצרי שיער (ענף 1 + ענף 6 משולבים — Rule 5E)
 
 כלל קריטי: לפני שמציעים תפקיד — בדוק שהוא קיים בשוק ישראל ושניתן להיכנס אליו עם הרקע הנוכחי.
 
