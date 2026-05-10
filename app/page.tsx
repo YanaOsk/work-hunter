@@ -111,7 +111,7 @@ export default function Home() {
   useEffect(() => {
     if (status === "authenticated" && mode === null && !pendingAutoMode) {
       const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-      if (nav?.type === "reload") {
+      if (nav?.type === "reload" || nav?.type === "back_forward") {
         const saved = sessionStorage.getItem("wh_mode");
         if (saved === "jobs") {
           const email = session?.user?.email;
@@ -143,6 +143,9 @@ export default function Home() {
 
   useEffect(() => {
     if (status === "authenticated" && session?.user?.email && mode === null && !pendingAutoMode) {
+      // Don't redirect if another effect is about to restore a conversation
+      if (new URLSearchParams(window.location.search).get("continueConv")) return;
+      if (sessionStorage.getItem("wh_mode") === "jobs") return;
       const key = `wh_welcomed_${session.user.email}`;
       if (!localStorage.getItem(key)) {
         setShowWelcome(true);
