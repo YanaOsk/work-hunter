@@ -13,8 +13,11 @@ export async function createUser(
   const db = sql();
   const lowerEmail = email.toLowerCase();
 
-  const existing = await db`SELECT id FROM users WHERE email = ${lowerEmail}`;
-  if (existing.length > 0) return null;
+  const [existingEmail, existingGoogle] = await Promise.all([
+    db`SELECT id FROM users WHERE email = ${lowerEmail}`,
+    db`SELECT email FROM google_accounts WHERE email = ${lowerEmail}`,
+  ]);
+  if (existingEmail.length > 0 || existingGoogle.length > 0) return null;
 
   const salt = crypto.randomBytes(16).toString("hex");
   const id = crypto.randomUUID();
