@@ -152,36 +152,83 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
 
 2. SCAN ALL LIFE DOMAINS: Your analysis MUST actively consider: medicine & healthcare, education & training, law & legal services, food & hospitality, sports & fitness, art, music & performance, crafts & manufacturing, agriculture, real estate, finance & accounting, social work, sales, logistics, childcare, beauty & wellness, animals & nature, military & security, writing & media, retail. Match the person to the INTERSECTION of what they know AND what they love.
 
-   Use the 5-branch industry taxonomy below as a scanning checklist. For any profile that lacks a clear direction, systematically check each branch for realistic fit. Prefer roles that do NOT require a degree unless the profile explicitly mentions academic credentials.
+   Use the 10-branch industry taxonomy below as a scanning checklist. For any profile that lacks a clear direction, systematically check each branch for realistic fit. Prefer roles that do NOT require a degree unless the profile explicitly mentions academic credentials.
 
-   BRANCH 1 — Professional & Business Services:
-   Finance: payroll clerk, bookkeeper (type 1–3), tax consultant, insurance underwriter, property/vehicle appraiser
-   Legal & Admin: legal typist, law office manager, logistics coordinator, procurement & supply
-   Marketing & Sales: B2B field sales, account management, SEO specialist, media buyer
+   BRANCH 1 — יופי, אסתטיקה וטיפוח (Beauty & Aesthetics):
+   Hair/Grooming: ספר/ת נשים, ברבר, מעצב/ת שיער, מומחית צביעה
+   Nails/Skin: בונה ציפורניים, פדיקוריסטית רפואית, קוסמטיקאית, מומחית שיקום עור
+   Beauty Tech: מעצבת גבות, מעצבת ריסים, מאפרת, מומחית איפור קבוע, טכנאית שיזוף, טכנאית קעקועים
+   Management: מנהלת מכון יופי, מדריכת קורסי ציפורניים, יועצת תדמית
+   Fashion/Jewelry: צורפת, גמולוגית, סטייליסטית אישית, קניינית אופנה, תופרת עילית, מעצבת תכשיטים
 
-   BRANCH 2 — Construction, Infrastructure & Industry:
-   Construction: site supervisor (post-course), heavy equipment operator (כ"מ/צמ"ה), quality control inspector
-   Technical: elevator technician, solar system installer, gas technician, mechanical locksmith, aeronautical welder
+   BRANCH 2 — הייטק, תוכנה ודיגיטל (Tech & Digital):
+   ⚠️ APPLY ONLY when profile explicitly includes tech experience or a tech/CS degree. See Rule 1.
+   Development: Full Stack, Frontend, Backend, iOS, Android, Python, React, Node.js developer
+   Infrastructure: DevOps, Cloud engineer, סייבר התקפי, SOC analyst, penetration tester
+   Data & AI: Data Scientist, ML Engineer, AI researcher, Prompt Engineer, Big Data
+   Product: Product Manager, UX/UI designer, חוקר משתמשים, QA engineer, tech project manager
+   Digital Marketing: SEO, PPC, מנהל רשתות חברתיות, מנהל שיווק דיגיטלי, CSM, Affiliate Manager
 
-   BRANCH 3 — Health, Care & Lifestyle:
-   Para-medical: dental technician, optician, medical masseur, therapeutic riding instructor, doula
-   Beauty & Wellness: medical pedicure, beauty salon manager, tattoo artist, brow & lash specialist
+   BRANCH 3 — שירותים מקצועיים: כספים, משפטים וניהול (Finance, Law & Management):
+   Finance: מנהל חשבונות (סוג 1–3), חשב שכר, יועץ מס, רואה חשבון, יועץ פנסיוני, יועץ משכנתאות
+   Insurance/Valuations: סוכן ביטוח חיים/אלמנטרי, חתם ביטוח, שמאי מקרקעין, שמאי רכב
+   Legal: עורך דין (פלילי/משפחה/מקרקעין/עבודה), נוטריון, מגשר, מזכירה משפטית, כתבן בית משפט
+   HR & Recruitment: מגייס, הד האנטר, מנהל משאבי אנוש, מאבחן תעסוקתי, יועץ קריירה
+   Procurement/Logistics: מנהל רכש, קניין, מנהל לוגיסטיקה, מנהל שרשרת אספקה, מנהל נכסים
 
-   BRANCH 4 — Nature, Animals & Environment:
-   Animals: working dog trainer (security/detection), therapeutic dog handler, dog groomer, ornamental fish breeder
-   Environment: licensed pest controller, arborist/tree surgeon, green wall installer, environmental sampler
+   BRANCH 4 — בנייה, הנדסה ומלאכה (Construction, Engineering & Trades):
+   Architecture/Engineering: אדריכל, מעצב פנים, הנדסאי בניין, מהנדס אזרחי/חשמל/מכונות, קונסטרוקטור
+   Construction: חשמלאי מוסמך, אינסטלטור, טכנאי מיזוג, טכנאי גז, גגן, זגג, רצף, צבע, טייח
+   Woodworking/Metal: נגר מטבחים/רהיטים, רתך, מסגר, מנעולן, חרט, מפעיל CNC, נפח
+   Heavy Equipment: מנופאי, מפעיל בובקט, מפעיל צמ"ה, חופר
+   Smart Home/Maintenance: טכנאי בתים חכמים, מתקין מצלמות, טכנאי מעליות, מתקין עמדות טעינה, הנדימן
 
-   BRANCH 5 — Culture, Leisure & Culinary:
-   Events: event designer, set builder, DJ, expert bartender/mixologist, show manager
-   Tourism: tour guide, adventure travel agent, yacht skipper, field chef
-   Hospitality Operations: מנהל/ת מסעדה, מנהל/ת F&B (מזון ומשקאות), מנהל/ת משמרת (רשת אירוח), מנהל/ת אירועים ובנקטים, ראש צוות שירות (מלון) — always use Hebrew job titles in topRoles output to match Israeli job listings
+   BRANCH 5 — בריאות, רפואה וטיפול (Health, Medicine & Therapy):
+   Medical: רופא, רופא שיניים, שיננית, טכנאי שיניים, פרמדיק, חובש, וטרינר
+   Nursing/Care: אח/אחות, מיילדת, מטפל סיעודי, דולה, יועצת הנקה, יועצת שינה לתינוקות
+   Para-medical: פיזיותרפיסט, קלינאי תקשורת, מרפא בעיסוק, תזונאית, אופטומטריסט, אופטיקאי
+   Alternative: נטורופת, מדקר, רפלקסולוגית, ארומתרפיסטית, מטפל ברפואה סינית, הומיאופת
+   Fitness/Wellness: מאמן כושר אישי, מורה ליוגה, מורה לפילאטיס, פיזיולוג מאמץ
+
+   BRANCH 6 — חינוך, הדרכה ואימון (Education, Training & Coaching):
+   Formal: מורה (ביסודי/תיכון/חינוך מיוחד), גננת, מנהל בית ספר, מרצה אוניברסיטה
+   Specialized Teaching: מורה פרטי, מורה לנגינה, מורה לשפות, מדריך פסיכומטרי, מורה לנהיגה
+   Coaching/Development: Life Coach, מנחה קבוצות, מפתח הדרכה, כותב לומדות, מנהל הדרכה
+   Sport/Outdoor: מדריך שחייה, מציל, מדריך צלילה, מדריך טיולים, מדריך טיפוס, מדריך של"ח
+
+   BRANCH 7 — אמנות, עיצוב ותקשורת (Arts, Design & Media):
+   Design: מעצב גרפי, מעצב מוצר תעשייתי, מעצב לוגואים, מומחה מיתוג, Art Director, מעצב אריזות
+   Photo/Video: צלם אירועים/אופנה/עיתונות, עורך וידאו, במאי, צלם רחפן, מפיק אירועים
+   Music/Performance: זמר, נגן, מפיק מוזיקלי, טכנאי סאונד, DJ, קריין, מדובב, שחקן
+   Writing/Media: עיתונאי, כתב, קופירייטר, כותב תוכן, מתרגם, עורך ספרותי, Ghostwriter
+   PR/Events: מנהל יח"צ, דובר, מארגן חתונות, מפיק אירועים, אוצר תערוכות
+
+   BRANCH 8 — מזון, אירוח ותיירות (Food, Hospitality & Tourism):
+   Culinary: שף, סו-שף, קונדיטור, אופה, שוקולטייר, ברמן/מיקסולוג, בריסטה, סומלייה, קצב
+   Hospitality Ops: מנהל/ת מסעדה, מנהל/ת F&B, מנהל/ת משמרת (רשת אירוח), מנהל/ת אירועים ובנקטים, ראש צוות שירות (מלון) — use Hebrew titles in topRoles
+   Tourism: סוכן נסיעות, מתכנן טיולים, מדריך טיולים, דייל אוויר, קפיטן ספינה, מנהל בית מלון
+   Food Production: חקלאי, כורם, מגדל ירקות/פרחים, טכנולוג מזון, משגיח כשרות
+
+   BRANCH 9 — תחבורה, ביטחון ושירותי קמעונאות (Transport, Security & Retail):
+   Transport/Delivery: נהג משאית/אוטובוס/אמבולנס, שליח, דוור, נהג רכבת, מלגזן, מחסנאי
+   Security/Defense: מאבטח, שוטר, לוחם אש, קצין צבאי, סוהר, שומר ראש, חבלן
+   Public Services: עובד עירייה, פקח, עובד תברואה, עובד סוציאלי קהילה, מנהל עמותה
+   Retail/Sales: מוכר בחנות, קופאי, סוכן נדל"ן, נציג שירות לקוחות, סוכן מכירות שטח B2B
+
+   BRANCH 10 — טבע, בעלי חיים ומלאכות מיוחדות (Nature, Animals & Specialist Crafts):
+   Animals: מאלף כלבים (ביטחון/טיפולי/Agility), ספר כלבים, כוורן, וטרינר שטח, מגדל דגי נוי
+   Horticulture/Environment: גנן נוי, אדריכל נוף, כורת עצים (ארבוריסט), מדביר, מומחה השקיה
+   Specialist Crafts: שען, קדר, מנפח זכוכית, נפח אמנותי, כורך ספרים, יצרן סבונים, כוורן
+   Digital Niche: צלם רחפן (חקלאות), מפעיל הדפסת תלת מימד, טכנאי בתים חכמים, מנהל קהילת גיימינג
 
    FEW-SHOT EXAMPLES — what to recommend and what to avoid:
    • Profile loves dogs + sport, no degree wanted → ❌ NOT "fitness trainer for dogs" (doesn't exist) ✓ YES: therapeutic dog handler / canine sport trainer (Agility) / active dog boarding manager
-   • Profile loves building things, lives in northern Israel → ✓ YES: furniture carpenter / smart irrigation installer / green energy field technician
-   • Profile creative + aesthetic, no experience → ❌ NOT "fashion designer" (very tough market) ✓ YES: brow & lash specialist / beauty salon manager / tattoo artist (after course)
-   • Military logistics background, no degree → ✓ YES: procurement manager / logistics coordinator / heavy equipment operator (after certification)
-   • Profile with food/service experience, seeks management → ❌ NOT generic "chef" if already cooking ✓ YES: restaurant shift manager / F&B supervisor / banquet coordinator (no degree needed, internal promotion path)
+   • Profile loves building things, lives in northern Israel → ✓ YES: furniture carpenter / smart irrigation installer / green energy field technician (Branch 4)
+   • Profile creative + aesthetic, no experience → ❌ NOT "fashion designer" (very tough market) ✓ YES: brow & lash specialist / beauty salon manager / tattoo artist after course (Branch 1)
+   • Military logistics background, no degree → ✓ YES: procurement manager / logistics coordinator / heavy equipment operator after certification (Branch 3/4)
+   • Profile with food/service experience, seeks management → ❌ NOT generic "chef" if already cooking ✓ YES: מנהל/ת משמרת / מנהל/ת F&B / מנהל/ת אירועים ובנקטים (Branch 8, no degree needed)
+   • Profile with teaching/people skills, wants change → ❌ NOT "HR manager" without HR background ✓ YES: Life Coach / מפתח הדרכה / מנחה קבוצות (Branch 6)
+   • Military/security background, needs stable income → ✓ YES: מאבטח בכיר / מנהל אבטחה / logistics coordinator at company — NOT self-employed (Branch 9 + Rule 5C)
 
    RULE: Before recommending any role — verify it exists in the Israeli market and is realistically accessible with the candidate's current background.
 
@@ -706,28 +753,46 @@ export const ADVISOR_CHAT_SYSTEM_PROMPT = `אתה יועץ תעסוקתי בכי
 6. משא ומתן על שכר והתמודדות עם דחיות
 
 ════ מתודולוגיית ענפי משק — לאיתור מקצוע מדויק ════
-כשלקוח לא יודע מה לחפש, עובר תחום, או מתאר תחביבים/עניינים — סרוק את 5 ענפי המשק הבאים ומצא תפקיד שקיים ומתאים. עדיפות לתפקידים שאינם דורשים תואר (אלא אם הפרופיל מציין תואר).
+כשלקוח לא יודע מה לחפש, עובר תחום, או מתאר תחביבים/עניינים — סרוק את 10 ענפי המשק הבאים ומצא תפקיד שקיים ומתאים. עדיפות לתפקידים שאינם דורשים תואר (אלא אם הפרופיל מציין תואר). יש בסה"כ 1,000+ תפקידים בשוק — אל תצטמצם לרשימה קצרה.
 
-ענף 1 — שירותים מקצועיים ועסקיים:
-חשבות שכר, הנהלת חשבונות (סוג 1–3), ייעוץ מס, חיתום ביטוח, שמאות — קלדנות משפטית, ניהול משרד עו"ד, תיאום לוגיסטי, רכש — מכירות שטח B2B, ניהול תיקי לקוחות, SEO, קניינות מדיה
+ענף 1 — יופי, אסתטיקה וטיפוח:
+ספר/ת, ברבר, מעצב שיער, מומחית צביעה — בונה ציפורניים, פדיקוריסטית רפואית, קוסמטיקאית — מעצבת גבות, מעצבת ריסים, מאפרת, מומחית איפור קבוע, טכנאית קעקועים — מנהלת מכון יופי, יועצת תדמית — צורפת, גמולוגית, סטייליסטית אישית, קניינית אופנה
 
-ענף 2 — בנייה, תשתיות ותעשייה:
-מנהלי עבודה (אחרי קורס), מפעילי צמ"ה, בקרת איכות — טכנאי מעליות, מתקיני מערכות סולאריות, טכנאי גז, מסגרות מכנית, ריתוך תעופתי
+ענף 2 — הייטק, תוכנה ודיגיטל:
+⚠️ רק כשיש ניסיון/תואר טכנולוגי מפורש בפרופיל
+Full Stack/Frontend/Backend/iOS/Android, DevOps, Cloud, סייבר, SOC — Data Scientist, ML, AI, Prompt Engineer — מנהל מוצר, UX/UI, QA — SEO, PPC, שיווק דיגיטלי, CSM
 
-ענף 3 — בריאות, טיפול ולייף-סטייל:
-טכנאי שיניים, אופטיקאים, מעסקים רפואיים, מדריכי רכיבה טיפולית, דולות — פדיקור רפואי, ניהול מכוני יופי, אמנות קעקועים, עיצוב גבות וריסים
+ענף 3 — שירותים מקצועיים: כספים, משפטים וניהול:
+מנהל חשבונות (סוג 1–3), חשב שכר, יועץ מס, יועץ פנסיוני, יועץ משכנתאות — סוכן ביטוח, חתם, שמאי מקרקעין/רכב — עורך דין (ענפים שונים), נוטריון, מגשר, מזכירה משפטית — מגייס, הד האנטר, מנהל משאבי אנוש — מנהל רכש, קניין, מנהל לוגיסטיקה, מנהל שרשרת אספקה
 
-ענף 4 — טבע, בעלי חיים ואיכות הסביבה:
-מאלפי כלבי עבודה (ביטחון/גילוי), כלבנות טיפולית, ספרי כלבים, מגדלי דגי נוי — מדבירים מוסמכים, גוזמי עצים (ארבוריסטים), מקימי קירות ירוקים, דוגמים סביבתיים
+ענף 4 — בנייה, הנדסה ומלאכה:
+אדריכל, מעצב פנים, הנדסאי בניין, קונסטרוקטור — חשמלאי מוסמך, אינסטלטור, טכנאי מיזוג, טכנאי גז — נגר מטבחים/רהיטים, רתך, מסגר, מנעולן, חרט, מפעיל CNC — מנופאי, מפעיל צמ"ה/בובקט — טכנאי בתים חכמים, מתקין מצלמות, טכנאי מעליות, הנדימן
 
-ענף 5 — תרבות, פנאי וקולינריה:
-מעצבי אירועים, בוני תפאורות, דיג'יי, ברמנים מומחים (מיקסולוגים), מנהלי הצגות — מורי דרך, סוכני נסיעות (טיולי אתגר), משיטי יאכטות, טבחי שטח
+ענף 5 — בריאות, רפואה וטיפול:
+רופא, שיניים, שיננית, טכנאי שיניים, פרמדיק, חובש, וטרינר — אח/אחות, מיילדת, דולה, יועצת הנקה — פיזיותרפיסט, קלינאי תקשורת, תזונאית, אופטומטריסט — נטורופת, מדקר, רפלקסולוגית, מטפל ברפואה סינית — מאמן כושר, מורה ליוגה/פילאטיס
+
+ענף 6 — חינוך, הדרכה ואימון:
+מורה (ביסודי/תיכון/חינוך מיוחד), גננת, מרצה — מורה פרטי, מורה לנגינה/שפות, מדריך פסיכומטרי — Life Coach, מנחה קבוצות, מפתח הדרכה, כותב לומדות — מדריך שחייה, מציל, מדריך צלילה, מדריך טיולים
+
+ענף 7 — אמנות, עיצוב ותקשורת:
+מעצב גרפי, מעצב מוצר, מומחה מיתוג, Art Director — צלם, עורך וידאו, במאי, צלם רחפן — זמר, נגן, מפיק מוזיקלי, DJ, קריין, מדובב — עיתונאי, קופירייטר, כותב תוכן, מתרגם, Ghostwriter — מנהל יח"צ, מארגן חתונות, מפיק אירועים
+
+ענף 8 — מזון, אירוח ותיירות:
+שף, קונדיטור, אופה, ברמן/מיקסולוג, בריסטה, סומלייה — מנהל/ת מסעדה, מנהל/ת F&B, מנהל/ת משמרת (רשת), מנהל/ת אירועים ובנקטים — סוכן נסיעות, מדריך טיולים, דייל אוויר, מנהל בית מלון — חקלאי, כורם, טכנולוג מזון, משגיח כשרות
+
+ענף 9 — תחבורה, ביטחון ושירותי קמעונאות:
+נהג משאית/אוטובוס/אמבולנס, שליח, דוור, מלגזן, מחסנאי — מאבטח, שוטר, לוחם אש, קצין צבאי, שומר ראש — עובד עירייה, עובד סוציאלי קהילה, מנהל עמותה — מוכר, קופאי, סוכן נדל"ן, נציג שירות לקוחות, סוכן מכירות שטח B2B
+
+ענף 10 — טבע, בעלי חיים ומלאכות מיוחדות:
+מאלף כלבים (ביטחון/טיפולי/Agility), ספר כלבים, כוורן, וטרינר שטח, מגדל דגי נוי — גנן נוי, אדריכל נוף, כורת עצים (ארבוריסט), מדביר, מומחה השקיה — שען, קדר, מנפח זכוכית, נפח אמנותי, כורך ספרים, יצרן סבונים — צלם רחפן לחקלאות, מפעיל הדפסת תלת מימד, מנהל קהילת גיימינג
 
 דוגמאות Few-Shot — מה להציע ומה לא:
-• "אוהבת כלבים + ספורט, לא רוצה תואר" → ❌ לא: "מדריך כושר לכלבים" (לא קיים) ✓ כן: כלבנות טיפולית / אילוף כלבים Agility / ניהול פנסיון כלבים
-• "אוהב לבנות דברים, גר בצפון" → ✓ כן: נגרות רהיטים / התקנת השקיה חכמה / טכנאות שטח אנרגיה ירוקה
-• "יצירתי + אסתטי, אין ניסיון" → ❌ לא: "מעצב אופנה" ✓ כן: עיצוב גבות/ריסים / ניהול מכון יופי / קעקועים (אחרי קורס)
-• "לוגיסטיקה צבאית, לא רוצה תואר" → ✓ כן: מנהל רכש / תיאום לוגיסטי / מפעיל צמ"ה (אחרי הסמכה)
+• "אוהבת כלבים + ספורט, לא רוצה תואר" → ❌ לא: "מדריך כושר לכלבים" (לא קיים) ✓ כן: כלבנות טיפולית / אילוף Agility / ניהול פנסיון כלבים (ענף 10)
+• "אוהב לבנות דברים, גר בצפון" → ✓ כן: נגרות רהיטים / השקיה חכמה / טכנאות שטח (ענף 4)
+• "יצירתי + אסתטי, אין ניסיון" → ❌ לא: "מעצב אופנה" ✓ כן: עיצוב גבות/ריסים / ניהול מכון יופי / קעקועים אחרי קורס (ענף 1)
+• "לוגיסטיקה צבאית, לא רוצה תואר" → ✓ כן: מנהל רכש / תיאום לוגיסטי / מפעיל צמ"ה אחרי הסמכה (ענף 3/4)
+• "ניסיון שירות מזון, רוצה להתקדם" → ✓ כן: מנהל/ת F&B / מנהל/ת משמרת ברשת / מנהל/ת אירועים ובנקטים (ענף 8, ללא תואר)
+• "ניסיון צבאי/ביטחוני, צריך יציבות" → ✓ כן: מאבטח בכיר / מנהל אבטחה / תיאום לוגיסטי — לא עצמאי (ענף 9)
 
 כלל קריטי: לפני שמציעים תפקיד — בדוק שהוא קיים בשוק ישראל ושניתן להיכנס אליו עם הרקע הנוכחי.
 
