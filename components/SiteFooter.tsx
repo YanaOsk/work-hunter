@@ -16,7 +16,6 @@ export default function SiteFooter() {
           label: "מוצר",
           links: [
             { href: "/", label: "ראשי" },
-            { href: "/#how-it-works", label: "איך זה עובד" },
             { href: "/pricing", label: "תמחור" },
             { href: "/reviews", label: "ביקורות" },
           ],
@@ -43,7 +42,6 @@ export default function SiteFooter() {
           label: "Product",
           links: [
             { href: "/", label: "Home" },
-            { href: "/#how-it-works", label: "How it works" },
             { href: "/pricing", label: "Pricing" },
             { href: "/reviews", label: "Reviews" },
           ],
