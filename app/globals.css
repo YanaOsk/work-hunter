@@ -351,11 +351,6 @@ html.light [style*="background: rgba(12,12,13"] {
   background: rgba(255,255,255,0.88) !important;
 }
 
-/* ─── ReviewCarousel fade edge — adapt for light bg ─────────────────── */
-html.light .from-\[#0C0C0D\] { --tw-gradient-from: #FAFAFA !important; }
-
-/* ─── Scorecard tooltip bg ───────────────────────────────────────────── */
-html.light .bg-\[#141415\] { background-color: #ffffff !important; border-color: rgba(0,0,0,0.12) !important; }
 
 /* ── Linear border glow (on focus/active states) ────────────────────── */
 .linear-glow {
