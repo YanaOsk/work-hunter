@@ -93,14 +93,14 @@ function EmailModal({
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full md:max-w-sm bg-slate-900 border border-white/15 rounded-t-3xl md:rounded-3xl p-6 shadow-2xl">
-        <button onClick={onClose} className="absolute top-4 end-4 text-white/40 hover:text-white transition">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="relative w-full md:max-w-sm bg-slate-800 border border-white/[0.1] rounded-t-[10px] md:rounded-[10px] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_8px_32px_rgba(0,0,0,0.6)] animate-slide-up">
+        <button onClick={onClose} className="absolute top-4 end-4 text-white/30 hover:text-white/70 transition-colors duration-150">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <h2 className="text-white font-bold text-base mb-1">{tx.scoutEmailTitle}</h2>
-        <p className="text-white/50 text-xs mb-4">
+        <h2 className="text-white font-semibold text-sm mb-1">{tx.scoutEmailTitle}</h2>
+        <p className="text-white/40 text-xs mb-4">
           {lang === "he"
             ? `שולח ${jobs.length} משרות לתיבת הדואר שלכם`
             : `Sending ${jobs.length} jobs to your inbox`}
@@ -114,15 +114,15 @@ function EmailModal({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={tx.scoutEmailInput}
-              className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-purple-500 text-sm mb-3"
+              className="w-full bg-white/[0.04] border border-white/[0.1] rounded-[6px] px-4 py-2.5 text-white text-sm placeholder-white/25 focus:outline-none focus:border-[#5e6ad2]/50 mb-3 transition-colors duration-150"
             />
             {status === "error" && (
-              <p className="text-rose-400 text-xs mb-2">{tx.scoutEmailFailed}</p>
+              <p className="text-red-400 text-xs mb-2">{tx.scoutEmailFailed}</p>
             )}
             <button
               onClick={send}
               disabled={!email.trim() || status === "sending"}
-              className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 text-sm"
+              className="w-full bg-[#5e6ad2] hover:bg-[#6d79e8] disabled:opacity-40 text-white font-medium py-2.5 rounded-[6px] transition-colors duration-150 flex items-center justify-center gap-2 text-sm"
             >
               {status === "sending" ? (
                 <>
@@ -245,17 +245,17 @@ export default function ResultsPhase({
 
   if (entryPath && jobs.length === 0 && !isStreaming) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
-        <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm sticky top-0 z-10">
+      <div className="min-h-screen">
+        <div className="border-b border-white/[0.07] bg-slate-900/90 backdrop-blur-md sticky top-0 z-10">
           <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-            <h1 className="text-white font-bold text-sm sm:text-base">מסלול כניסה לתחום</h1>
+            <h1 className="text-white font-semibold text-sm">מסלול כניסה לתחום</h1>
             <div className="flex items-center gap-2">
               {onRefine && (
-                <button onClick={onRefine} className="text-purple-300 hover:text-purple-200 text-xs border border-purple-500/30 hover:border-purple-500/60 bg-purple-500/10 px-2.5 py-1.5 rounded-xl transition">
+                <button onClick={onRefine} className="text-[#818cf8]/70 hover:text-[#818cf8] text-xs border border-[#5e6ad2]/20 hover:border-[#5e6ad2]/40 bg-[#5e6ad2]/8 hover:bg-[#5e6ad2]/12 px-2.5 py-1.5 rounded-[6px] transition-all duration-150">
                   שנה חיפוש
                 </button>
               )}
-              <button onClick={onReset} className="text-white/50 hover:text-white text-xs border border-white/15 hover:border-white/30 px-2.5 py-1.5 rounded-xl transition">
+              <button onClick={onReset} className="text-white/40 hover:text-white/80 text-xs border border-white/[0.08] hover:border-white/[0.16] px-2.5 py-1.5 rounded-[6px] transition-all duration-150">
                 התחל מחדש
               </button>
             </div>
@@ -333,20 +333,20 @@ export default function ResultsPhase({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
-      <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm sticky top-0 z-10">
+    <div className="min-h-screen">
+      <div className="border-b border-white/[0.07] bg-slate-900/90 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
             <h1 className="text-white font-bold text-sm sm:text-lg truncate flex items-center gap-2">
               {isStreaming && (
-                <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse inline-block flex-shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5e6ad2] animate-linear-pulse inline-block flex-shrink-0" />
               )}
               {deduped.length} {tx.jobsFound}
               {!isStreaming && deduped.length < jobs.length && (
                 <span className="text-white/30 text-xs font-normal">({jobs.length - deduped.length} {lang === "he" ? "כפילויות הוסרו" : "dupes removed"})</span>
               )}
               {isStreaming ? "..." : (
-                profile?.name && <span className="text-purple-400 hidden sm:inline"> — {profile.name}</span>
+                profile?.name && <span className="text-[#818cf8]/70 hidden sm:inline"> — {profile.name}</span>
               )}
             </h1>
             <p className="text-white/40 text-xs">

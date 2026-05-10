@@ -34,20 +34,14 @@ export default function ThemeToggle() {
   };
 
   if (!mounted) {
-    return <div className="w-9 h-9 rounded-xl" />;
+    return <div className="w-8 h-8 rounded-[6px]" />;
   }
 
   return (
     <button
       onClick={toggle}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      className={`
-        w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
-        ${isDark
-          ? "bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-amber-300"
-          : "bg-white/70 hover:bg-white/90 border border-purple-200/60 hover:border-purple-300 text-violet-600 hover:text-violet-700 shadow-sm"
-        }
-      `}
+      className="w-8 h-8 rounded-[6px] flex items-center justify-center transition-all duration-150 text-white/40 hover:text-white/80 hover:bg-white/5 border border-transparent hover:border-white/[0.08]"
     >
       <span
         className="flex items-center justify-center"
