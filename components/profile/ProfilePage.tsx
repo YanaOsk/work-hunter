@@ -120,7 +120,7 @@ function CvCard({ cv, he, onDelete }: { cv: CvMeta; he: boolean; onDelete: () =>
       <div className="px-3 py-2.5 flex items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="text-white/90 text-sm font-medium truncate">{cv.name}</p>
-          <p className="text-white/35 text-xs">{timeAgo(cv.updatedAt, he)}</p>
+          <p className="text-white/60 text-xs">{timeAgo(cv.updatedAt, he)}</p>
         </div>
         <DotMenu items={[
           { label: he ? "מחק" : "Delete", danger: true, onClick: onDelete },
@@ -141,7 +141,7 @@ function NewCard({ label, onClick }: { label: string; onClick: () => void }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
         </svg>
       </div>
-      <span className="text-white/35 group-hover:text-purple-300 text-xs font-medium transition-colors">{label}</span>
+      <span className="text-white/60 group-hover:text-purple-300 text-xs font-medium transition-colors">{label}</span>
     </button>
   );
 }
@@ -202,7 +202,7 @@ function ConvCard({
                 {conv.title ?? (he ? "שיחה עם Scout" : "Scout conversation")}
               </p>
             )}
-            <p className="text-white/35 text-xs mt-0.5">{timeAgo(conv.createdAt, he)}</p>
+            <p className="text-white/60 text-xs mt-0.5">{timeAgo(conv.createdAt, he)}</p>
           </div>
         </div>
         {jobs.length > 0 && (
@@ -494,7 +494,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-white font-semibold text-sm truncate leading-tight">{user?.name || "—"}</p>
-                  <p className="text-white/40 text-xs truncate mt-0.5">{user?.email}</p>
+                  <p className="text-white/60 text-xs truncate mt-0.5">{user?.email}</p>
                 </div>
               </div>
 
@@ -546,16 +546,16 @@ export default function ProfilePage() {
                     className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-start group ${
                       active
                         ? "text-white"
-                        : "text-white/45 hover:text-white/80 hover:bg-white/[0.04]"
+                        : "text-white/65 hover:text-white/90 hover:bg-white/[0.04]"
                     }`}
                     style={active ? { background: "rgba(94,106,210,0.12)", border: "1px solid rgba(94,106,210,0.22)" } : undefined}
                   >
-                    <span style={{ color: active ? "#5E6AD2" : undefined }} className={active ? "" : "text-white/25 group-hover:text-white/50 transition-colors"}>
+                    <span style={{ color: active ? "#5E6AD2" : undefined }} className={active ? "" : "text-white/45 group-hover:text-white/70 transition-colors"}>
                       {item.icon}
                     </span>
                     <span className="flex-1 truncate">{he ? item.labelHe : item.labelEn}</span>
                     {item.badge ? (
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full min-w-[18px] text-center font-semibold ${active ? "text-purple-300" : "bg-white/8 text-white/35"}`}
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full min-w-[18px] text-center font-semibold ${active ? "text-purple-300" : "bg-white/8 text-white/60"}`}
                         style={active ? { background: "rgba(94,106,210,0.25)" } : undefined}>
                         {item.badge}
                       </span>
@@ -568,7 +568,7 @@ export default function ProfilePage() {
             {/* Bottom */}
             <div className="mt-1 pt-2 border-t border-white/[0.05]">
               <Link href="/settings"
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/30 hover:text-white/65 hover:bg-white/[0.04] transition w-full group">
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/55 hover:text-white/85 hover:bg-white/[0.04] transition w-full group">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
