@@ -55,10 +55,10 @@ function ScoreBadge({
 
       {open && hasReasons && (
         <div
-          className="absolute top-full mt-2 end-0 z-50 w-72 bg-slate-900 border border-white/15 rounded-2xl shadow-2xl p-3 text-xs"
+          className="absolute top-full mt-2 end-0 z-50 w-72 bg-[#141415] border border-white/10 rounded-xl shadow-2xl p-3 text-xs"
           style={{ direction: lang === "he" ? "rtl" : "ltr" }}
         >
-          <div className="absolute -top-1.5 end-4 w-3 h-3 bg-slate-900 border-t border-e border-white/15 rotate-[-45deg]" />
+          <div className="absolute -top-1.5 end-4 w-3 h-3 bg-[#141415] border-t border-e border-white/10 rotate-[-45deg]" />
 
           {positives.length > 0 && (
             <div className="mb-2.5">
@@ -116,6 +116,7 @@ function highlightSkills(text: string, skills: string[]): React.ReactNode {
 function formatPostedDate(dateStr: string, lang: string): string {
   try {
     const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
     const diffDays = Math.floor((Date.now() - d.getTime()) / 86400000);
     if (diffDays === 0) return lang === "he" ? "היום" : "Today";
     if (diffDays === 1) return lang === "he" ? "אתמול" : "Yesterday";
@@ -157,7 +158,7 @@ export default function JobCard({ job, rank, saved = false, onToggleSave, onAppl
     : "bg-red-400/50";
 
   return (
-    <div className="group relative bg-white/5 hover:bg-white/8 border border-white/10 hover:border-purple-500/40 rounded-2xl p-4 sm:p-5 transition-all duration-200 overflow-hidden">
+    <div className="group relative linear-card rounded-xl p-4 sm:p-5 overflow-hidden">
       <div className={`absolute top-0 bottom-0 start-0 w-1 rounded-s-2xl ${accentColor}`} />
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
@@ -276,7 +277,7 @@ export default function JobCard({ job, rank, saved = false, onToggleSave, onAppl
       <div className="flex items-center gap-2 flex-wrap">
         <a href={job.url} target="_blank" rel="noopener noreferrer"
           onClick={handleViewJob}
-          className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all duration-200">
+          className="inline-flex items-center gap-2 bg-[#5E6AD2] hover:bg-[#6D79DB] text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-all duration-200 shadow-sm shadow-[rgba(94,106,210,0.2)]">
           {tx.viewJob}
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

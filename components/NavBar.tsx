@@ -28,7 +28,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
   ];
 
   return (
-    <nav className="bg-slate-900/40 backdrop-blur-2xl border-b border-white/[0.08]">
+    <nav className="backdrop-blur-2xl border-b" style={{ background: "rgba(12,12,13,0.72)", borderColor: "rgba(255,255,255,0.07)" }}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <a
@@ -115,7 +115,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
         </div>
       </div>
 
-      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${mobileOpen ? "max-h-[480px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"} bg-slate-900/95 backdrop-blur-2xl border-t border-purple-400/10`}>
+      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${mobileOpen ? "max-h-[480px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"} backdrop-blur-2xl border-t border-white/[0.06]`} style={{ background: "rgba(12,12,13,0.96)" }}>
         <div className="px-4 py-3 flex flex-col gap-1">
           {links.map((l) => (
             <Link
