@@ -48,11 +48,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8">
-        <div className="flex justify-end mb-4">
-          <div className="text-white/40 text-xs bg-white/5 border border-white/10 rounded-full px-3 py-1">
-            {tx.pricingDemoNote}
-          </div>
-        </div>
+
 
         <div className="text-center mb-6 max-w-2xl mx-auto">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">{tx.pricingTitle}</h1>
