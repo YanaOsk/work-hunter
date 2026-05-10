@@ -259,7 +259,8 @@ export default function AdvisorPageInner() {
   const onInterview = (r: MockInterview) => persist({ ...advisorState, mockInterview: r });
 
   const onUnlock = (plan: UnlockPlan) => {
-    router.push(`/checkout?plan=${plan}`);
+    const returnTo = encodeURIComponent(window.location.pathname + window.location.search);
+    router.push(`/checkout?plan=${plan}&returnTo=${returnTo}`);
   };
 
   const handleRedoStage = (stage: AdvisorStage) => {

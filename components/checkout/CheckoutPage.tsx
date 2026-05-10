@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { PLANS, type PlanId, type Plan } from "@/lib/plans";
@@ -31,7 +31,7 @@ function detectBrand(num: string): string {
   return "Visa";
 }
 
-export default function CheckoutPage({ planId }: { planId: string }) {
+export default function CheckoutPage({ planId, returnTo }: { planId: string; returnTo?: string }) {
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -45,10 +45,27 @@ export default function CheckoutPage({ planId }: { planId: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/auth/signin");
   }, [status, router]);
+
+  const doReturnRedirect = useCallback(() => {
+    if (returnTo) {
+      router.replace(decodeURIComponent(returnTo));
+    }
+  }, [returnTo, router]);
+
+  useEffect(() => {
+    if (!success || !returnTo) return;
+    if (countdown <= 0) {
+      doReturnRedirect();
+      return;
+    }
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [success, returnTo, countdown, doReturnRedirect]);
 
   if (status === "loading" || !session) {
     return (
@@ -116,55 +133,73 @@ export default function CheckoutPage({ planId }: { planId: string }) {
           <p className="text-white/60 text-sm mb-1">
             מסלול <span className="text-purple-300 font-semibold">{plan.nameHe}</span> פעיל עכשיו
           </p>
-          <p className="text-white/40 text-xs mb-10">מה תרצה/י לעשות עכשיו?</p>
 
-          {/* Mode choice — same pattern as home page */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            {/* Job search */}
-            <button
-              onClick={() => { queueAutoStart("jobs"); router.push("/"); }}
-              className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-500/50 rounded-3xl p-7 text-right transition-all duration-200 hover:shadow-xl hover:shadow-purple-900/30"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <p className="text-white font-bold text-lg mb-1">חיפוש עבודה</p>
-              <p className="text-white/50 text-sm leading-relaxed">אמצא לכם משרות מתאימות עכשיו לפי הפרופיל שלכם</p>
-              <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </div>
-            </button>
+          {/* If we know where the user came from, redirect there automatically */}
+          {returnTo ? (
+            <div className="mt-8">
+              <p className="text-white/50 text-sm mb-5">
+                מחזירים אתכם לדף הקודם בעוד {countdown}...
+              </p>
+              <button
+                onClick={doReturnRedirect}
+                className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-8 py-3 rounded-xl transition text-sm"
+              >
+                חזרה עכשיו ←
+              </button>
+            </div>
+          ) : (
+            <>
+              <p className="text-white/40 text-xs mb-10">מה תרצו לעשות עכשיו?</p>
 
-            {/* Career advisor */}
-            <button
-              onClick={() => router.push("/advisor?profileId=default-advisor&returnTo=summary")}
-              className="group relative bg-gradient-to-br from-purple-600/20 via-white/5 to-violet-600/20 hover:from-purple-600/30 hover:to-violet-600/30 border border-purple-500/40 hover:border-purple-500/70 rounded-3xl p-7 text-right transition-all duration-200 hover:shadow-xl hover:shadow-purple-900/40"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <p className="text-white font-bold text-lg mb-1">ייעוץ תעסוקתי</p>
-              <p className="text-white/50 text-sm leading-relaxed">אבחון אישיות, כיוון מקצועי, שיפור CV וראיון מדומה</p>
-              <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </div>
-            </button>
-          </div>
+              {/* Mode choice — same pattern as home page */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                {/* Job search */}
+                <button
+                  onClick={() => { queueAutoStart("jobs"); router.push("/"); }}
+                  className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-500/50 rounded-3xl p-7 text-right transition-all duration-200 hover:shadow-xl hover:shadow-purple-900/30"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-white font-bold text-lg mb-1">חיפוש עבודה</p>
+                  <p className="text-white/50 text-sm leading-relaxed">אמצא לכם משרות מתאימות עכשיו לפי הפרופיל שלכם</p>
+                  <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </div>
+                </button>
 
-          <button
-            onClick={() => router.push("/profile")}
-            className="text-white/35 hover:text-white/60 text-sm transition"
-          >
-            לפרופיל שלי
-          </button>
+                {/* Career advisor */}
+                <button
+                  onClick={() => router.push("/advisor?profileId=default-advisor")}
+                  className="group relative bg-gradient-to-br from-purple-600/20 via-white/5 to-violet-600/20 hover:from-purple-600/30 hover:to-violet-600/30 border border-purple-500/40 hover:border-purple-500/70 rounded-3xl p-7 text-right transition-all duration-200 hover:shadow-xl hover:shadow-purple-900/40"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  </div>
+                  <p className="text-white font-bold text-lg mb-1">ייעוץ תעסוקתי</p>
+                  <p className="text-white/50 text-sm leading-relaxed">אבחון אישיות, כיוון מקצועי, שיפור CV וראיון מדומה</p>
+                  <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </div>
+                </button>
+              </div>
+
+              <button
+                onClick={() => router.push("/profile")}
+                className="text-white/35 hover:text-white/60 text-sm transition"
+              >
+                לפרופיל שלי
+              </button>
+            </>
+          )}
         </div>
       </div>
     );
