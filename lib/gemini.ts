@@ -251,7 +251,11 @@ export async function geminiChat(
 ): Promise<string> {
   try {
     return await callOpenAI("gpt-4o-mini", prompt, systemPrompt, maxTokens, false);
-  } catch {
+  } catch (openaiErr) {
+    const keyRaw = process.env.OPENAI_API_KEY ?? "";
+    const keyLen = keyRaw.length;
+    const keyEnd = JSON.stringify(keyRaw.slice(-4)); // show last 4 chars (detects \r)
+    console.error("[geminiChat] OpenAI failed. keyLen:", keyLen, "keyEnd:", keyEnd, "err:", String(openaiErr));
     if (process.env.GROQ_API_KEY) {
       // Groq free tier: ~12k TPM. Truncate system prompt to stay under budget.
       const groqSystem = systemPrompt && systemPrompt.length > 6000
