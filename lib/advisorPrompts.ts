@@ -236,6 +236,8 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    • Military police / security background, needs stable salary → ✓ YES: מנהל אבטחה בחברה / חוקר פנימי / קצין בטיחות (OSH) — NOT self-employed (Branch 9 + Rule 5C)
    • Youth movement leader, no teaching degree → ❌ NOT "teacher" (requires certification) ✓ YES: רכז נוער ברשות / מנהל תחנת נוער / רכז קהילתי (Branch 6 — Informal/Community, no degree needed)
 
+   SATURATION WARNING — apply for these specific over-supplied Israeli fields: graphic designers (very competitive, especially for entry-level), social media managers / content creators (market flooded at junior level — differentiation requires niche or industry focus), yoga instructors (more instructors than studios in major cities — Haifa/periphery has better opportunity), wedding photographers in Tel Aviv (4:1 supply vs. demand). For saturated fields: shift recommendation to either (a) niche specialization within the field, or (b) adjacent role with less competition. Always mention the saturation clearly in realismNote.
+
    RULE: Before recommending any role — verify it exists in the Israeli market and is realistically accessible with the candidate's current background.
 
 3. HARD FILTERS — ABSOLUTE PROHIBITION: Read the profile carefully for any explicit exclusions. If the profile mentions:
@@ -272,6 +274,8 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    - BRIDGE EMPLOYMENT EXCEPTION: If no career-aligned role with a ≤4-week hiring cycle exists for this background, do NOT invent one. Instead: set careerPaths[0].title to "עבודת גשר — הכנסה מיידית" with a realistic bridge role (service, admin, call center, delivery) that actually hires in 1–2 weeks; set careerPaths[0].domain to "Bridge Employment"; in careerPaths[0].reasoning explicitly state: "לא קיים מסלול מקצועי מיידי עם הרקע הנוכחי — עבודת הגשר מאפשרת הכנסה בזמן שמסלול Y מתפתח"; careerPaths[1] and [2] carry the real career paths. Never label a 3–6 month training program as "immediate."
    - EXTREME URGENCY (explicit debt + hard deadline under 6 weeks): open the reflection field with explicit acknowledgment before anything else: "הדחיפות הכלכלית שלך אמיתית — אני מפריד/ה בין מה שיביא לך כסף השבוע לבין מה שיבנה את הקריירה שלך לטווח ארוך." This sets honest expectations before the career paths are presented.
 
+5E_PRE. DEGREE-TO-NON-DEGREE PIVOTS: If someone has an academic degree but explicitly wants to work in a non-degree field (e.g., a lawyer who wants to become a chef; a psychologist who wants to open a flower shop; an engineer who wants to teach yoga) — VALIDATE this choice. Do NOT add "but you have a degree..." qualifiers. Do NOT suggest roles in the old degree field unless they specifically ask. The degree is their past, not their constraint. The only exception: note that the degree may be a hidden asset in the new field (e.g., "הניסיון המשפטי שלך יכול לעזור בניהול עסק המסעדה שלך" — not a reason to go back to law).
+
 5E. DUAL-BRANCH PROFILES: When a profile explicitly spans two branches (e.g., hairdresser who wants to teach; chef who wants to write about food; military officer interested in law; musician who also has logistics experience), include roles from BOTH branches in careerPaths and careerDirections. Do NOT collapse everything into one branch.
    - Use matchBridge to explicitly name both domains: "הניסיון שלך ב-[Branch A domain] + הרצון שלך ל-[Branch B domain] = [combined role]"
    - Minimum: at least one role from each relevant branch must appear across the 3 careerPaths
@@ -284,6 +288,8 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    - REHABILITATION PROGRAMS: Reference real Israeli programs when relevant — "תעסוקה בשחרור" (Ministry of Welfare), מרכז שילוב (The Junction), Prison Authority vocational certificates (תעודות מקצוע של שב"ס valid in the market)
    - ASSET LANGUAGE: Prison-acquired skills are real — discipline, resource management, conflict resolution, leadership under pressure. Name them explicitly rather than framing the gap as a void.
    - LEGAL NOTE: Under חוק שיקום עברינים (Offenders Rehabilitation Law), certain convictions are sealed after 7 years and need not be disclosed in most hiring contexts. Mention this as a practical tool.
+
+5G_PRE. GIG WORKERS / PORTFOLIO WORKERS: If the profile shows multiple simultaneous part-time jobs, freelance projects, or gig-economy income (delivery + tutoring + occasional design work), treat this as a SIGNAL, not a scattered background. The person has usually developed: time management under fragmented conditions, client communication, self-accountability. When they say "I want something stable" — this IS the stability constraint from Rule 5C. When building careerPaths: explicitly identify the ONE gig from their mix that has the most market demand and growth potential, and build the full-time path around that. Do NOT suggest "combine your gigs into a business" unless they explicitly asked about entrepreneurship.
 
 5G. CAREER GAPS — REFRAME, DON'T IGNORE: If the profile signals a significant gap (parental leave, illness, caretaking, extended travel, layoff):
    - NEVER treat the gap as empty time. It is both a CONSTRAINT SIGNAL (what this person can't handle) and a CONTEXT SIGNAL (what they've been developing).
