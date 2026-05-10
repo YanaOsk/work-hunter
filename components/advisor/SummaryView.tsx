@@ -40,6 +40,9 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
   const { diagnosis, direction, cvReview, linkedIn, strategy, mockInterview, chosenPath, userProfile } = advisorState;
   const name = userProfile.parsedData?.name || "";
   const contentRef = useRef<HTMLDivElement>(null);
+  // Always-fresh ref so closures inside functional setState updaters never spread stale advisorState
+  const advisorStateRef = useRef(advisorState);
+  advisorStateRef.current = advisorState;
   const [downloading, setDownloading] = useState(false);
   const [emailInput, setEmailInput] = useState(session?.user?.email || "");
   const [emailState, setEmailState] = useState<"idle" | "sending" | "sent" | "failed">("idle");
@@ -71,7 +74,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
       const liked = new Set(prev.liked);
       const disliked = new Set(prev.disliked);
       if (liked.has(role)) { liked.delete(role); } else { liked.add(role); disliked.delete(role); }
-      onUpdate?.({ ...advisorState, likedRoles: [...liked], dislikedRoles: [...disliked] });
+      onUpdate?.({ ...advisorStateRef.current, likedRoles: [...liked], dislikedRoles: [...disliked] });
       return { liked, disliked };
     });
   };
@@ -80,7 +83,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
       const liked = new Set(prev.liked);
       const disliked = new Set(prev.disliked);
       if (disliked.has(role)) { disliked.delete(role); } else { disliked.add(role); liked.delete(role); }
-      onUpdate?.({ ...advisorState, likedRoles: [...liked], dislikedRoles: [...disliked] });
+      onUpdate?.({ ...advisorStateRef.current, likedRoles: [...liked], dislikedRoles: [...disliked] });
       return { liked, disliked };
     });
   };
