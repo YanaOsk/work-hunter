@@ -2,20 +2,21 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { geminiGenerate, safeParseJson } from "@/lib/gemini";
 import { SALARY_RESEARCH_PROMPT } from "@/lib/advisorPrompts";
+import { langInstruction } from "@/lib/langInstruction";
 
 export async function POST(req: NextRequest) {
   try {
     const { userProfile, diagnosis, lang } = await req.json();
     const p = userProfile?.parsedData ?? {};
-    const prompt = SALARY_RESEARCH_PROMPT(
+    const prompt = `${langInstruction(lang ?? "he")}\n\n${SALARY_RESEARCH_PROMPT(
       diagnosis?.topRoles ?? [],
       p.currentRole ?? "",
       p.yearsExperience ?? 0,
       p.education ?? "",
       p.location ?? "Israel",
       lang ?? "he"
-    );
-    const raw = await geminiGenerate(prompt);
+    )}`;
+    const raw = await geminiGenerate(prompt, undefined, 2048, true);
     const parsed = safeParseJson<{ ranges: unknown[]; marketInsight: string; negotiationTip: string }>(raw);
     if (!parsed) throw new Error("Failed to parse response");
     return NextResponse.json({ ...parsed, completedAt: new Date().toISOString() });

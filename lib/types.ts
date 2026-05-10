@@ -47,11 +47,28 @@ export interface JobResult {
   isNonObvious?: boolean; // Scout suggested this proactively
 }
 
+export interface TrainingInstitution {
+  name: string;
+  courseName: string;
+  duration: string;
+  estimatedCost: string;
+  url: string;
+  description: string;
+}
+
+export interface EntryPathResult {
+  message: string;
+  trainingBarrier: string;
+  entryTimeMonths: number;
+  institutions: TrainingInstitution[];
+}
+
 export interface AppState {
   phase: "upload" | "interview" | "searching" | "results";
   userProfile: UserProfile | null;
   chatMessages: ChatMessage[];
   jobResults: JobResult[];
+  entryPath: EntryPathResult | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -198,10 +215,20 @@ export interface SkillGapResource {
   free: boolean;
 }
 
+export interface StudyInstitution {
+  name: string;
+  location: string;
+  duration: string;
+  estimatedCost: string;
+  admissionRequirements?: string;
+}
+
 export interface SkillGapItem {
   skill: string;
   importance: "high" | "medium" | "low";
   currentLevel: "none" | "basic" | "intermediate";
+  requiredCredential?: string;
+  institutions?: StudyInstitution[];
   resources: SkillGapResource[];
 }
 
@@ -292,6 +319,8 @@ export interface AdvisorState {
   practicalPrep?: PracticalPrep | null;
   salaryResearch?: SalaryResearch | null;
   transitionRoadmap?: TransitionRoadmap | null;
+  likedRoles?: string[] | null;
+  dislikedRoles?: string[] | null;
   chatMessages: ChatMessage[];
   lastVisitedAt?: string;
 }

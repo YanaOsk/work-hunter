@@ -703,37 +703,49 @@ export const ADVISOR_CHAT_SYSTEM_PROMPT = `אתה יועץ תעסוקתי בכי
 
 IF THE USER WRITES IN ENGLISH, respond in English. Otherwise Hebrew.`;
 
-export const SKILL_GAP_PROMPT = (profileJson: string, topRoles: string, lang: string) => `You are a career skills advisor in Israel with expertise across all industries — tech, food & beverage, healthcare, education, trades, and more.
+export const SKILL_GAP_PROMPT = (profileJson: string, topRoles: string, lang: string) => `You are a career skills advisor in Israel with expertise across all industries — tech, healthcare, education, trades, law, finance, and more.
 
 User's CURRENT profile (role, existing skills, experience, education): ${profileJson}
 Target roles to analyze: ${topRoles}
 Response language: ${lang === "he" ? "Hebrew" : "English"}
 
-TASK: Identify skills this person is MISSING or UNDERDEVELOPED for their target roles — not what they already have.
+TASK: Identify formal credentials, degrees, licenses, and skill gaps this person is MISSING for their target roles.
+
+CRITICAL DISTINCTION — read carefully:
+• If the target role LEGALLY REQUIRES a license, state certificate, or academic degree (e.g., nurse, physiotherapist, lawyer, teacher, engineer, electrician, accountant, pharmacist): set requiredCredential to the EXACT credential name, and list real Israeli institutions.
+• If the gap is a practical skill closable through self-study or short courses (e.g., Excel, a programming language, specific software): leave requiredCredential/institutions empty, use resources instead.
 
 Return ONLY this JSON:
 {
   "gaps": [
     {
-      "skill": "skill name (2–5 words)",
+      "skill": "שם הכישור/הסמכה (2-5 מילים)",
       "importance": "high",
       "currentLevel": "none",
+      "requiredCredential": "תואר ראשון בסיעוד / תעודת מורה / רישיון חשמלאי / etc. (omit this field if no formal credential needed)",
+      "institutions": [
+        {
+          "name": "שם המוסד הלימודי",
+          "location": "תל אביב / ירושלים / חיפה / מרחבי הארץ",
+          "duration": "שנה / שנתיים / 3 שנים",
+          "estimatedCost": "₪X,000-Y,000 / ממומן על ידי הממשלה / תלוי במסלול",
+          "admissionRequirements": "בגרות + ממוצע X / ניסיון קודם / ראיון קבלה"
+        }
+      ],
       "resources": [
-        { "title": "Resource name", "type": "course", "platform": "Coursera", "free": false },
-        { "title": "Another resource", "type": "video", "platform": "YouTube", "free": true }
+        { "title": "שם המשאב", "type": "course", "platform": "Coursera", "free": false }
       ]
     }
   ]
 }
 
-CRITICAL rules:
-- FIRST check the user's existing skills — do NOT suggest skills they already have
-- Every gap must be a real, direct requirement for these specific target roles in Israel — check what employers actually list in job postings
-- For hands-on/trade roles (chef, barber, electrician, personal trainer, etc.) — only suggest profession-specific skills, certifications, or tools used in that exact profession. Never suggest generic office/tech skills for trade roles.
-- NO generic soft skills (communication, teamwork, leadership) unless a hiring manager would explicitly reject a candidate for lacking them
-- 4–6 gaps maximum, ordered high → medium importance
-- Each gap: exactly 2 resources — prefer one free + one paid; use Israeli platforms where relevant for non-tech roles
-- type: "course" | "book" | "video" | "practice"
+RULES:
+- Do NOT suggest skills the user already has
+- Every gap must be a real, direct requirement for these roles in the Israeli market
+- For formal credential gaps: list 2-3 REAL Israeli institutions (universities, colleges, vocational training centers like מכון וינגייט, הדסה, מכון לב, etc.). Include realistic cost ranges and admission requirements.
+- For skill gaps without a formal credential: omit institutions, include 2 resources (prefer one free + one paid)
+- Trade/hands-on roles: only profession-specific skills/certifications — never generic office skills
+- 3-5 gaps maximum, ordered high → medium importance
 - No extra text outside the JSON`;
 
 export const JD_FIT_PROMPT = (jobDescription: string, profileJson: string, topRoles: string[], lang: string) => `You are a career counselor helping a job seeker understand how well they fit a specific job posting.

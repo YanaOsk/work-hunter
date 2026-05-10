@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { AdvisorState, CareerPath, LifePath, SkillGapItem, OnboardingPlan, FreelanceKit, PracticalPrep, SalaryResearch, TransitionRoadmap } from "@/lib/types";
+import { AdvisorState, CareerPath, LifePath, SkillGapItem, StudyInstitution, OnboardingPlan, FreelanceKit, PracticalPrep, SalaryResearch, TransitionRoadmap } from "@/lib/types";
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
 import { queueAutoStart, queueAdvisorScoutContext } from "@/lib/autoStart";
@@ -50,6 +50,37 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
       return raw ? new Set<number>(JSON.parse(raw) as number[]) : new Set<number>();
     } catch { return new Set<number>(); }
   });
+
+  // Readiness conditions — drive section visibility
+  const isStudyPath = chosenPath === "studies";
+  const hasRelevantCV = !advisorState.cvSkipped && !!cvReview;
+  const hasExperience = (userProfile.parsedData.yearsExperience ?? 0) > 0;
+  // Ready to job-search: not on study path AND has reviewed CV or work experience
+  const isReadyForJobs = !isStudyPath && (hasRelevantCV || hasExperience);
+
+  // DNA role like/dislike
+  const [likedRoles, setLikedRoles] = useState<Set<string>>(
+    () => new Set(advisorState.likedRoles ?? [])
+  );
+  const [dislikedRoles, setDislikedRoles] = useState<Set<string>>(
+    () => new Set(advisorState.dislikedRoles ?? [])
+  );
+  const toggleLikeRole = (role: string) => {
+    setLikedRoles((prev) => {
+      const next = new Set(prev);
+      if (next.has(role)) { next.delete(role); }
+      else { next.add(role); setDislikedRoles((d) => { const nd = new Set(d); nd.delete(role); return nd; }); }
+      return next;
+    });
+  };
+  const toggleDislikeRole = (role: string) => {
+    setDislikedRoles((prev) => {
+      const next = new Set(prev);
+      if (next.has(role)) { next.delete(role); }
+      else { next.add(role); setLikedRoles((d) => { const nd = new Set(d); nd.delete(role); return nd; }); }
+      return next;
+    });
+  };
 
   const checklist = buildChecklist(advisorState, lang);
 
@@ -624,20 +655,53 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
             {/* Summary — personal address */}
             <p className="text-white/85 leading-relaxed mb-5">{diagnosis.summary}</p>
 
-            {/* Top 2 roles */}
+            {/* Top roles with like/dislike */}
             {diagnosis.topRoles && diagnosis.topRoles.length > 0 && (
               <div className="mb-5">
                 <h4 className="text-emerald-300 text-xs font-semibold mb-2.5 uppercase tracking-wide">
                   {tx.summaryTopRoles}
                 </h4>
+                <p className="text-white/40 text-xs mb-2">
+                  {lang === "he" ? "סמנו אם התפקיד מתאים לכם" : "Mark whether this role suits you"}
+                </p>
                 <div className="flex flex-col gap-2">
                   {diagnosis.topRoles.map((role, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-2.5"
+                      className={`flex items-center gap-3 rounded-xl px-4 py-2.5 border transition ${
+                        likedRoles.has(role)
+                          ? "bg-emerald-500/20 border-emerald-500/50"
+                          : dislikedRoles.has(role)
+                          ? "bg-white/[0.02] border-white/10 opacity-50"
+                          : "bg-emerald-500/10 border-emerald-500/20"
+                      }`}
                     >
-                      <span className="text-emerald-400 text-xs font-bold tabular-nums">#{i + 1}</span>
-                      <span className="text-white font-medium text-sm">{role}</span>
+                      <span className="text-emerald-400 text-xs font-bold tabular-nums flex-shrink-0">#{i + 1}</span>
+                      <span className="text-white font-medium text-sm flex-1">{role}</span>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <button
+                          onClick={() => toggleLikeRole(role)}
+                          title={lang === "he" ? "זה מתאים לי" : "This suits me"}
+                          className={`w-7 h-7 flex items-center justify-center rounded-lg text-sm transition ${
+                            likedRoles.has(role)
+                              ? "bg-emerald-500/30 text-emerald-300"
+                              : "text-white/25 hover:text-emerald-400 hover:bg-emerald-500/15"
+                          }`}
+                        >
+                          ✓
+                        </button>
+                        <button
+                          onClick={() => toggleDislikeRole(role)}
+                          title={lang === "he" ? "זה לא מתאים לי" : "This doesn't suit me"}
+                          className={`w-7 h-7 flex items-center justify-center rounded-lg text-sm transition ${
+                            dislikedRoles.has(role)
+                              ? "bg-rose-500/20 text-rose-300"
+                              : "text-white/25 hover:text-rose-400 hover:bg-rose-500/10"
+                          }`}
+                        >
+                          ✗
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -670,18 +734,81 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
                       </span>
                       <h4 className="text-white font-semibold text-sm">{item.skill}</h4>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {item.resources.map((r, j) => (
-                        <div key={j} className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5">
-                          <span className="text-white/50 text-[10px] uppercase tracking-wide">{r.type}</span>
-                          <span className="text-white/80 text-xs font-medium">{r.title}</span>
-                          {r.platform && <span className="text-white/40 text-[10px]">· {r.platform}</span>}
-                          <span className={`text-[10px] font-semibold ms-1 ${r.free ? "text-emerald-400" : "text-white/30"}`}>
-                            {r.free ? tx.skillGapFree : tx.skillGapPaid}
+
+                    {/* Formal credential + institutions */}
+                    {item.requiredCredential && (
+                      <div className="mb-3">
+                        <div className="inline-flex items-center gap-1.5 bg-purple-500/15 border border-purple-500/30 rounded-lg px-3 py-1.5 mb-3">
+                          <svg className="w-3.5 h-3.5 text-purple-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                          </svg>
+                          <span className="text-purple-200 text-xs font-semibold">
+                            {lang === "he" ? "הסמכה נדרשת:" : "Required credential:"}{" "}
+                            {item.requiredCredential}
                           </span>
                         </div>
-                      ))}
-                    </div>
+                        {item.institutions && item.institutions.length > 0 && (
+                          <div className="space-y-2">
+                            <p className="text-white/40 text-[10px] uppercase tracking-wide font-semibold">
+                              {lang === "he" ? "מוסדות לימוד בישראל" : "Institutions in Israel"}
+                            </p>
+                            {item.institutions.map((inst: StudyInstitution, j: number) => (
+                              <div key={j} className="bg-white/5 border border-white/10 rounded-xl px-3 py-3 space-y-1.5">
+                                <p className="text-white font-semibold text-sm">{inst.name}</p>
+                                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                  {inst.location && (
+                                    <span className="text-white/50 text-xs flex items-center gap-1">
+                                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                      </svg>
+                                      {inst.location}
+                                    </span>
+                                  )}
+                                  {inst.duration && (
+                                    <span className="text-white/50 text-xs flex items-center gap-1">
+                                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                      </svg>
+                                      {inst.duration}
+                                    </span>
+                                  )}
+                                  {inst.estimatedCost && (
+                                    <span className="text-emerald-400 text-xs flex items-center gap-1">
+                                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                      </svg>
+                                      {inst.estimatedCost}
+                                    </span>
+                                  )}
+                                </div>
+                                {inst.admissionRequirements && (
+                                  <p className="text-white/40 text-xs">
+                                    <span className="text-white/30">{lang === "he" ? "תנאי קבלה:" : "Admission:"}</span>{" "}
+                                    {inst.admissionRequirements}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Skill resources (for gaps without formal credentials) */}
+                    {(!item.requiredCredential || !item.institutions?.length) && item.resources?.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {item.resources.map((r, j) => (
+                          <div key={j} className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5">
+                            <span className="text-white/50 text-[10px] uppercase tracking-wide">{r.type}</span>
+                            <span className="text-white/80 text-xs font-medium">{r.title}</span>
+                            {r.platform && <span className="text-white/40 text-[10px]">· {r.platform}</span>}
+                            <span className={`text-[10px] font-semibold ms-1 ${r.free ? "text-emerald-400" : "text-white/30"}`}>
+                              {r.free ? tx.skillGapFree : tx.skillGapPaid}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
                 <button
@@ -720,8 +847,27 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
         {/* Salary research */}
         {diagnosis && (
           <Section title={tx.salaryTitle}>
+            {!isReadyForJobs && !salaryData && (
+              <p className="text-white/50 text-xs mb-3 leading-relaxed">
+                {lang === "he"
+                  ? "ממוצעי השכר בשוק לתפקידים אלו — לאחר קבלת ההסמכה הנדרשת תוכלו להיכנס לשוק ברמת Junior ולהתקדם משם."
+                  : "Market salary averages for these roles — after completing the required training, you can enter at the Junior level."}
+              </p>
+            )}
             {salaryData ? (
               <div className="space-y-4">
+                {!isReadyForJobs && (
+                  <div className="flex items-center gap-2 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-2.5">
+                    <svg className="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-amber-300 text-xs">
+                      {lang === "he"
+                        ? "אלו ממוצעי שוק — לאחר ההכשרה תוכלו להתחיל מרמת Junior"
+                        : "Market averages — after training you can start at Junior level"}
+                    </p>
+                  </div>
+                )}
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -749,7 +895,9 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
                 </div>
                 <div className="bg-blue-500/5 border border-blue-500/15 rounded-xl px-4 py-3 space-y-2">
                   <p className="text-blue-300 text-xs leading-relaxed">{salaryData.marketInsight}</p>
-                  <p className="text-emerald-300 text-xs font-medium">💡 {salaryData.negotiationTip}</p>
+                  {isReadyForJobs && salaryData.negotiationTip && (
+                    <p className="text-emerald-300 text-xs font-medium">💡 {salaryData.negotiationTip}</p>
+                  )}
                 </div>
                 <button onClick={loadSalary} disabled={salaryLoading} className="text-xs text-white/30 hover:text-white/60 transition disabled:opacity-40">
                   {lang === "he" ? "↺ רענן נתונים" : "↺ Refresh data"}
@@ -1013,8 +1161,8 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </Section>
         )}
 
-        {/* Section 5: Search Strategy */}
-        {strategy && (
+        {/* Section 5: Search Strategy — only for job-ready users */}
+        {strategy && isReadyForJobs && (
           <Section title={tx.summarySection5}>
             {strategy.topLine && (
               <div className="mb-5 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3">
@@ -1107,8 +1255,8 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </Section>
         )}
 
-        {/* Practical interview prep */}
-        {diagnosis && (
+        {/* Practical interview prep — only for job-ready users */}
+        {diagnosis && isReadyForJobs && (
           <Section title={tx.practicalPrepTitle}>
             {practicalData ? (
               <div className="space-y-4">
@@ -1177,7 +1325,8 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           </Section>
         )}
 
-        {/* Onboarding plan */}
+        {/* Onboarding plan — only for job-ready users */}
+        {isReadyForJobs && (
         <Section title={tx.onboardingTitle}>
           {onboardingData ? (
             <div className="grid md:grid-cols-3 gap-4">
@@ -1222,6 +1371,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
             </div>
           )}
         </Section>
+        )}
 
         {/* Email summary panel */}
         <div data-no-pdf className="mt-4 bg-white/[0.03] border border-white/10 rounded-3xl p-6">
@@ -1255,8 +1405,8 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           )}
         </div>
 
-        {/* Scout CTA */}
-        <div data-no-pdf className="mt-4 bg-gradient-to-br from-purple-600/20 to-emerald-600/20 border border-purple-500/30 rounded-3xl p-8">
+        {/* Scout CTA — only for job-ready users */}
+        {isReadyForJobs && <div data-no-pdf className="mt-4 bg-gradient-to-br from-purple-600/20 to-emerald-600/20 border border-purple-500/30 rounded-3xl p-8">
           <div className="flex items-start gap-4 mb-4">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-purple-500/20 flex-shrink-0">
               <svg className="w-6 h-6 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1280,10 +1430,10 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           >
             {lang === "he" ? "שלח ל-Scout — מצא לי משרות" : "Send to Scout — Find my jobs"}
           </button>
-        </div>
+        </div>}
 
-        {/* Interview CTA */}
-        <div data-no-pdf className="mt-4 bg-gradient-to-br from-rose-600/20 to-amber-600/20 border border-rose-500/30 rounded-3xl p-8">
+        {/* Interview CTA — only for job-ready users */}
+        {isReadyForJobs && <div data-no-pdf className="mt-4 bg-gradient-to-br from-rose-600/20 to-amber-600/20 border border-rose-500/30 rounded-3xl p-8">
           <div className="flex items-start gap-4 mb-4">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-rose-500/20 flex-shrink-0">
               <svg className="w-6 h-6 text-rose-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1301,7 +1451,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
           >
             {tx.openInterview}
           </button>
-        </div>
+        </div>}
       </div>
     </div>
   );
