@@ -11,6 +11,8 @@ export async function GET() {
   checks.GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ? "✅" : "❌ missing";
   checks.GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ? "✅" : "❌ missing";
   checks.GEMINI_API_KEY = process.env.GEMINI_API_KEY ? "✅" : "❌ missing";
+  checks.OPENAI_API_KEY = process.env.OPENAI_API_KEY ? `✅ len=${process.env.OPENAI_API_KEY.length}` : "❌ missing";
+  checks.GROQ_API_KEY = process.env.GROQ_API_KEY ? "✅" : "❌ missing";
   checks.SERPER_API_KEY = process.env.SERPER_API_KEY ? "✅" : "❌ missing (demo mode)";
   checks.DATABASE_URL = process.env.DATABASE_URL ? "✅" : "❌ missing";
   checks.NODE_ENV = process.env.NODE_ENV ?? "unknown";
@@ -28,15 +30,19 @@ export async function GET() {
     checks.postgres = `❌ ${e instanceof Error ? e.message.slice(0, 120) : "failed"}`;
   }
 
-  // Gemini test
+  // OpenAI test
   try {
-    if (!process.env.GEMINI_API_KEY) throw new Error("no key");
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`
-    );
-    checks.gemini = res.ok ? "✅ reachable" : `❌ status ${res.status}`;
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error("no key");
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "gpt-4o-mini", messages: [{ role: "user", content: "hi" }], max_tokens: 5 }),
+    });
+    const json = await res.json() as Record<string, unknown>;
+    checks.openai = res.ok ? "✅ working" : `❌ ${res.status}: ${JSON.stringify(json.error ?? json).slice(0, 120)}`;
   } catch (e: unknown) {
-    checks.gemini = `❌ ${e instanceof Error ? e.message : "failed"}`;
+    checks.openai = `❌ ${e instanceof Error ? e.message : "failed"}`;
   }
 
   return NextResponse.json(checks, { status: 200 });
