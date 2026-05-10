@@ -1042,7 +1042,7 @@ export const t = {
     selfIntroLovesSub: "בעבודה, בחיים — הדברים שגורמים לכם להרגיש חיים. זה חשוב יותר מכל מיומנות.",
     selfIntroLovesPh: "אני אוהב/ת כש...",
     selfIntroDislikesQ: "מה ממש לא בשבילכם?",
-    selfIntroDislikesSub: "כדי שנסנן עבורכם רק את מה שמתאים — גידו לנו ממה כדאי להתרחק.",
+    selfIntroDislikesSub: "כדי שנסנן עבורכם רק את מה שמתאים — תגידו לנו ממה כדאי להתרחק.",
     selfIntroDislikesPh: "מה שבאמת מעצבן אותי זה...",
     selfIntroConstraintsQ: "יש קווים אדומים שצריך לדעת?",
     selfIntroConstraintsSub: "תחומים שאתם לא מוכנים לשקול, מגבלות פיזיות, גיאוגרפיות, או כל דבר שהוא גבול — לא העדפה, גבול.",
