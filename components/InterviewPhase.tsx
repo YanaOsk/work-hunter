@@ -192,21 +192,23 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
         }, stripSurrogates2),
       });
       const data = await res.json();
-      if (!res.ok || data.error || !data.message) {
+      if (!res.ok || data.error) {
         addMessage("assistant", lang === "he"
           ? "שגיאה זמנית — אנא נסו שוב עוד כמה שניות."
           : "Temporary error — please try again in a moment.");
       } else {
         if (data.readyToSearch) setReadyToSearch(true);
-        addMessage("assistant", data.message, {
-          suggestedReplies: data.suggestedReplies ?? [],
-        });
-        const allPlain = [
-          ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
-          { role: "user" as const, content: userText },
-          { role: "assistant" as const, content: data.message },
-        ];
-        autoSave(allPlain);
+        if (data.message) {
+          addMessage("assistant", data.message, {
+            suggestedReplies: data.suggestedReplies ?? [],
+          });
+          const allPlain = [
+            ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+            { role: "user" as const, content: userText },
+            { role: "assistant" as const, content: data.message },
+          ];
+          autoSave(allPlain);
+        }
       }
     } catch {
       addMessage("assistant", lang === "he"

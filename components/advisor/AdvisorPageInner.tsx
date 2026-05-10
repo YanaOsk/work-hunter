@@ -85,7 +85,7 @@ function normalizeStage(stage: AdvisorStage): AdvisorStage {
 export default function AdvisorPageInner() {
   const router = useRouter();
   const params = useSearchParams();
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const { lang } = useLanguage();
   const guestProfileId = params.get("profileId");
   const [advisorState, setAdvisorState] = useState<AdvisorState | null>(null);
@@ -108,6 +108,7 @@ export default function AdvisorPageInner() {
   }, [profileId]);
 
   useEffect(() => {
+    if (sessionStatus === "loading") return;
     if (!profileId) {
       router.replace("/");
       return;
@@ -155,7 +156,7 @@ export default function AdvisorPageInner() {
       setAdvisorState(fresh);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileId, session?.user?.id, guestProfileId]);
+  }, [profileId, session?.user?.id, guestProfileId, sessionStatus]);
 
   useEffect(() => {
     if (!session?.user?.email || !profileId) return;

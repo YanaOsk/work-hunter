@@ -143,7 +143,13 @@ Missing information: ${JSON.stringify(userProfile?.missingFields || [])}`;
       .replace(/^נשמע\s+/u, "")
       .trim();
 
-    return NextResponse.json({ message: cleanMessage, readyToSearch: shouldSearch, suggestedReplies });
+    // If AI sent only [SEARCH_NOW] with no text, provide a fallback so the client
+    // doesn't see an empty message and incorrectly show a "temporary error".
+    const finalMessage = cleanMessage || (shouldSearch
+      ? (lang === "he" ? "מצאתי מספיק פרטים — מחפש לכם משרות מתאימות!" : "Got it — searching for matching jobs now!")
+      : "");
+
+    return NextResponse.json({ message: finalMessage, readyToSearch: shouldSearch, suggestedReplies });
   } catch (error) {
     console.error("chat error:", error);
     return NextResponse.json({ error: "Chat failed. Check your GEMINI_API_KEY." }, { status: 500 });
