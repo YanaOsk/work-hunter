@@ -200,7 +200,7 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    BRANCH 7 — אמנות, עיצוב ותקשורת (Arts, Design & Media):
    Design: מעצב גרפי, מעצב מוצר תעשייתי, מעצב לוגואים, מומחה מיתוג, Art Director, מעצב אריזות
    Photo/Video: צלם אירועים/אופנה/עיתונות, עורך וידאו, במאי, צלם רחפן, מפיק אירועים — REALISM CHECK: Instagram followers ≠ market entry proof. Before suggesting "צלם" as a primary career path, verify the profile shows actual portfolio history, paid event bookings, or clear income from photography. Geographic saturation note: Tel Aviv has ~4× photographer density vs. other cities — in smaller markets (Beer Sheva, Katzrin, Eilat, Afula), barrier to entry is meaningfully lower and recommendation is stronger.
-   Music/Performance: זמר/ת לאירועים (realistic entry) / זמר/ת מקצועי (⚠️ portfolio + market entry required), נגן, מפיק מוזיקלי, טכנאי סאונד, DJ, קריין, מדובב, מנחה סדנאות שירה, מורה לשירה
+   Music/Performance: זמר/ת לאירועים (realistic entry) / זמר/ת מקצועי (⚠️ portfolio + market entry required — social media followers are NOT market proof; only paid bookings count), נגן, מפיק מוזיקלי, טכנאי סאונד, DJ, קריין, מדובב, מנחה סדנאות שירה, מורה לשירה
    Writing/Media: עיתונאי, כתב, קופירייטר, כותב תוכן, מתרגם, עורך ספרותי, Ghostwriter
    PR/Events: מנהל יח"צ, דובר, מארגן חתונות, מפיק אירועים, אוצר תערוכות
 
@@ -807,7 +807,7 @@ Full Stack/Frontend/Backend/iOS/Android, DevOps, Cloud, סייבר, SOC — Data
 מורה (ביסודי/תיכון/חינוך מיוחד — דורש תעודת הוראה), גננת, מרצה — מורה פרטי, מורה לנגינה/שפות, מדריך פסיכומטרי — Life Coach, מנחה קבוצות, מפתח הדרכה, כותב לומדות — מדריך שחייה, מציל, מדריך צלילה, מדריך טיולים — חינוך בלתי פורמלי (ללא תואר): רכז נוער ברשות, מנהל תחנת נוער, רכז קהילתי, מנהל מרכז קהילתי, רכז פדגוגי בעמותה
 
 ענף 7 — אמנות, עיצוב ותקשורת:
-מעצב גרפי, מעצב מוצר, מומחה מיתוג, Art Director — צלם, עורך וידאו, במאי, צלם רחפן — זמר/ת לאירועים (כניסה ריאלית) / זמר/ת מקצועי (⚠️ דורש פורטפוליו + כניסה לשוק), נגן, מפיק מוזיקלי, DJ, קריין, מדובב, מנחה סדנאות שירה — עיתונאי, קופירייטר, כותב תוכן, מתרגם, Ghostwriter — מנהל יח"צ, מארגן חתונות, מפיק אירועים
+מעצב גרפי, מעצב מוצר, מומחה מיתוג, Art Director — צלם, עורך וידאו, במאי, צלם רחפן (⚠️ אינסטגרם לא = ביקוש שוק — רק הופעות בתשלום נחשבות) — זמר/ת לאירועים (כניסה ריאלית) / זמר/ת מקצועי (⚠️ עוקבים ברשתות לא = הוכחת שוק; רק הופעות בתשלום נחשבות), נגן, מפיק מוזיקלי, DJ, קריין, מדובב, מנחה סדנאות שירה — עיתונאי, קופירייטר, כותב תוכן, מתרגם, Ghostwriter — מנהל יח"צ, מארגן חתונות, מפיק אירועים
 
 ענף 8 — מזון, אירוח ותיירות:
 שף, קונדיטור, אופה, ברמן/מיקסולוג, בריסטה, סומלייה (הערה: בית ספר לבישול לא נדרש לרוב התפקידים — ניסיון מסעדה מספיק) — מנהל/ת מסעדה, מנהל/ת F&B, מנהל/ת משמרת (רשת), מנהל/ת אירועים ובנקטים — סוכן נסיעות, מדריך טיולים, דייל אוויר, מנהל בית מלון — חקלאי, כורם, טכנולוג מזון, משגיח כשרות
