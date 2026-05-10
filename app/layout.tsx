@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import LanguageToggle from "@/components/LanguageToggle";
 import Providers from "@/components/Providers";
@@ -11,10 +11,9 @@ import InactivityLogout from "@/components/InactivityLogout";
 import SwipeBack from "@/components/SwipeBack";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -35,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

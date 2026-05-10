@@ -20,10 +20,10 @@ function MenuItem({
   children: React.ReactNode;
   danger?: boolean;
 }) {
-  const cls = `w-full text-start px-3 py-2 rounded-[6px] text-sm transition-all duration-150 flex items-center gap-2.5 ${
+  const cls = `w-full text-start px-3 py-2.5 rounded-xl text-sm transition flex items-center gap-2.5 ${
     danger
-      ? "text-red-400/70 hover:text-red-400 hover:bg-red-500/8"
-      : "text-white/60 hover:text-white/90 hover:bg-white/5"
+      ? "text-red-400/80 hover:text-red-300 hover:bg-red-500/10"
+      : "text-white/70 hover:text-white hover:bg-white/5"
   }`;
 
   if (href) {
@@ -100,7 +100,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
         {/* Trigger */}
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center gap-2 rounded-[6px] hover:bg-white/5 ps-1 pe-2 py-1 transition-all duration-150"
+          className="flex items-center gap-2 rounded-full hover:bg-white/10 ps-1 pe-2 py-1 transition"
         >
           {displayImage ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -111,7 +111,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
               onError={() => setImgError(true)}
             />
           ) : (
-            <div className="w-[30px] h-[30px] rounded-full bg-[#5e6ad2] flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+            <div className="w-[30px] h-[30px] rounded-full bg-purple-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
               {initials}
             </div>
           )}
@@ -135,14 +135,14 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
 
         {/* Dropdown */}
         {open && (
-          <div className="absolute end-0 top-full mt-2 w-64 bg-slate-800 backdrop-blur-xl border border-white/[0.1] rounded-[10px] shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_8px_32px_rgba(0,0,0,0.6)] z-50 overflow-hidden animate-slide-up">
+          <div className="absolute end-0 top-full mt-2 w-64 bg-slate-800/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/60 z-50 overflow-hidden">
             {/* User info header */}
             <div className="px-4 py-3.5 border-b border-white/10 flex items-center gap-3">
               {displayImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={displayImage} alt="" className="w-[38px] h-[38px] rounded-full flex-shrink-0 object-cover" onError={() => setImgError(true)} />
               ) : (
-                <div className="w-[38px] h-[38px] rounded-full bg-[#5e6ad2] flex items-center justify-center text-white font-semibold flex-shrink-0">
+                <div className="w-[38px] h-[38px] rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
                   {initials}
                 </div>
               )}
@@ -213,7 +213,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
   return (
     <Link
       href="/auth/signin"
-      className="h-8 inline-flex items-center px-3.5 text-sm font-medium text-white/60 hover:text-white/90 border border-white/[0.1] hover:border-white/[0.2] hover:bg-white/5 rounded-[6px] transition-all duration-150"
+      className="h-9 inline-flex items-center px-4 text-sm font-medium text-white/80 hover:text-white border border-white/15 hover:border-white/30 rounded-lg transition"
     >
       {tx.signIn}
     </Link>

@@ -19,7 +19,7 @@ const Divider = () => <div className="border-t border-white/[0.05]" />;
 
 export default function HomeLanding({ onChoose }: Props) {
   return (
-    <div className="min-h-screen">
+    <div className="bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900 min-h-screen">
       <HeroSection onChoose={onChoose} />
 
       <Divider />

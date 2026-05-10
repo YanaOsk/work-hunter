@@ -12,12 +12,12 @@ export default function HighlightedReviews() {
   const featured = [REVIEWS[0], REVIEWS[5], REVIEWS[4]];
 
   const AVATAR_COLORS = [
-    "bg-[#5e6ad2]",
-    "bg-emerald-600",
-    "bg-blue-600",
-    "bg-rose-600",
-    "bg-amber-600",
-    "bg-sky-600",
+    "from-purple-600 to-fuchsia-600",
+    "from-emerald-600 to-teal-600",
+    "from-blue-600 to-sky-600",
+    "from-rose-600 to-pink-600",
+    "from-amber-600 to-orange-600",
+    "from-sky-600 to-blue-600",
   ];
 
   return (
@@ -52,7 +52,7 @@ export default function HighlightedReviews() {
             return (
               <div
                 key={r.id}
-                className="bg-white/[0.04] hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/[0.14] rounded-[8px] p-5 flex flex-col transition-all duration-150"
+                className="bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.08] hover:border-white/[0.16] rounded-2xl p-5 md:p-6 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20"
               >
                 {/* Stars */}
                 <div className="flex gap-0.5 mb-4">
@@ -69,7 +69,7 @@ export default function HighlightedReviews() {
                 {/* Author */}
                 <div className="flex items-center gap-3 pt-4 border-t border-white/[0.07]">
                   <div
-                    className={`w-9 h-9 rounded-full ${gradient} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}
+                    className={`w-9 h-9 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}
                   >
                     {initials}
                   </div>
@@ -88,7 +88,7 @@ export default function HighlightedReviews() {
         <div className="text-center">
           <Link
             href="/reviews"
-            className="inline-flex items-center gap-2 text-[#818cf8]/60 hover:text-[#818cf8] text-sm font-medium transition-colors duration-150"
+            className="inline-flex items-center gap-2 text-purple-300 hover:text-purple-200 text-sm font-medium transition-colors"
           >
             {tx.reviewsHomeMore}
           </Link>
