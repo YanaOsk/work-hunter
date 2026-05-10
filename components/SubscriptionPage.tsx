@@ -95,7 +95,7 @@ export default function SubscriptionPage() {
         setConfirmCancel(false);
         showToast(
           he
-            ? `המנוי בוטל — הגישה שלך פעילה עד ${sub?.expiryDate ? formatDate(sub.expiryDate, he) : "סוף התקופה"}`
+            ? `המנוי בוטל — הגישה שלכם פעילה עד ${sub?.expiryDate ? formatDate(sub.expiryDate, he) : "סוף התקופה"}`
             : `Cancelled — access active until ${sub?.expiryDate ? formatDate(sub.expiryDate, he) : "end of period"}`
         );
       }
@@ -138,7 +138,7 @@ export default function SubscriptionPage() {
               </svg>
             </div>
             <p className="text-amber-300 font-semibold text-lg mb-1">
-              {he ? "המנוי שלך פג" : "Your subscription expired"}
+              {he ? "המנוי שלכם פג" : "Your subscription expired"}
             </p>
             <p className="text-white/50 text-sm mb-1">
               {he
@@ -163,7 +163,7 @@ export default function SubscriptionPage() {
               </svg>
             </div>
             <p className="text-white font-semibold text-lg mb-1">{he ? "אין מנוי פעיל" : "No active subscription"}</p>
-            <p className="text-white/50 text-sm mb-6">{he ? "אתה כרגע בתוכנית החינמית" : "You're currently on the free plan"}</p>
+            <p className="text-white/50 text-sm mb-6">{he ? "אתם כרגע בתוכנית החינמית" : "You're currently on the free plan"}</p>
             <Link href="/pricing" className="inline-flex bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition">
               {he ? "צפה במסלולים" : "View plans"}
             </Link>
@@ -276,7 +276,7 @@ export default function SubscriptionPage() {
               {/* ── Col 2 (end side): features ── */}
               <div className="p-8">
                 <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-5">
-                  {he ? "מה כלול במנוי שלך" : "What's included"}
+                  {he ? "מה כלול במנוי שלכם" : "What's included"}
                 </p>
                 <ul className="space-y-4">
                   {planData.featuresHe.map((feature, i) => (
@@ -303,7 +303,7 @@ export default function SubscriptionPage() {
             </h3>
             <p className="text-white/60 text-sm mb-5">
               {he
-                ? `המנוי לא יתחדש אוטומטית. הגישה שלך תישאר פעילה עד ${formatDate(sub.expiryDate, he)}.`
+                ? `המנוי לא יתחדש אוטומטית. הגישה שלכם תישאר פעילה עד ${formatDate(sub.expiryDate, he)}.`
                 : `Your subscription won't auto-renew. You keep full access until ${formatDate(sub.expiryDate, he)}.`}
             </p>
             <div className="flex gap-3">

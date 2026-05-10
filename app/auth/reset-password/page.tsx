@@ -113,7 +113,7 @@ export default function ResetPasswordPage() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-white">איפוס סיסמה</h1>
-          <p className="text-white/50 text-sm mt-2">הזן/י סיסמה חדשה לחשבון שלך</p>
+          <p className="text-white/50 text-sm mt-2">הזינו סיסמה חדשה לחשבון שלכם</p>
         </div>
 
         <div className="bg-white/5 border border-white/10 rounded-3xl p-7 backdrop-blur-sm shadow-2xl shadow-black/30">

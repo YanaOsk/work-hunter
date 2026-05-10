@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-white">שכחתי סיסמה</h1>
-          <p className="text-white/50 text-sm mt-2">נשלח לך קישור לאיפוס הסיסמה</p>
+          <p className="text-white/50 text-sm mt-2">נשלח לכם קישור לאיפוס הסיסמה</p>
         </div>
 
         <div className="bg-white/5 border border-white/10 rounded-3xl p-7 backdrop-blur-sm shadow-2xl shadow-black/30">

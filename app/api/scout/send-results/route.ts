@@ -46,7 +46,7 @@ function buildEmailHtml(jobs: JobResult[], lang: string): string {
   <div style="max-width:600px;margin:0 auto;padding:32px 16px;">
     <div style="text-align:center;margin-bottom:28px;">
       <h1 style="margin:0;font-size:26px;color:#f1f5f9;">
-        ${isHe ? `Scout מצא לך ${jobs.length} משרות 🎯` : `Scout found ${jobs.length} jobs for you 🎯`}
+        ${isHe ? `Scout מצא לכם ${jobs.length} משרות 🎯` : `Scout found ${jobs.length} jobs for you 🎯`}
       </h1>
       <p style="margin:8px 0 0;color:#64748b;font-size:13px;">
         ${isHe ? "ממוינות לפי ציון התאמה" : "Ranked by AI match score"}
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       from: `"Work Hunter Scout" <${smtpUser}>`,
       to: toEmail,
       subject: isHe
-        ? `Scout מצא ${jobs.length} משרות מותאמות לך ✨`
+        ? `Scout מצא ${jobs.length} משרות מותאמות לכם ✨`
         : `Scout found ${jobs.length} matching jobs for you ✨`,
       html: buildEmailHtml(jobs, resolvedLang),
     });

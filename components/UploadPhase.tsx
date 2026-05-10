@@ -94,7 +94,7 @@ export default function UploadPhase({ onComplete }: Props) {
             </h1>
             <p className="text-white/60 text-base sm:text-lg leading-relaxed">
               {he
-                ? "אני הולך להיות העוזר האישי שלך לחיפוש עבודה. ספר לי קצת על עצמך ואני אמצא לך את המשרות הכי מתאימות."
+                ? "אני הולך להיות העוזר האישי שלכם לחיפוש עבודה. ספרו לי קצת על עצמכם ואני אמצא לכם את המשרות הכי מתאימות."
                 : "I'm going to be your personal job search assistant. Tell me a bit about yourself and I'll find the most relevant jobs for you."}
             </p>
           </div>

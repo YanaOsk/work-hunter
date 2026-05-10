@@ -607,7 +607,7 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
           </div>
           <textarea rows={3} value={(draft.bio as string) ?? ""}
             onChange={(e) => setDraft((d) => ({ ...d, bio: e.target.value }))}
-            placeholder={he ? "קצת על הרקע, המטרות שלך..." : "A bit about your background and goals..."}
+            placeholder={he ? "קצת על הרקע, המטרות שלכם..." : "A bit about your background and goals..."}
             className={`${input} resize-none`} />
         </div>
 
@@ -615,7 +615,7 @@ export default function UserMetaCard({ meta, scoutData, onSave, he }: Props) {
         <Field label={he ? "התנדבות" : "Volunteering"}>
           <textarea rows={2} value={(draft.volunteering as string) ?? ""}
             onChange={(e) => setDraft((d) => ({ ...d, volunteering: e.target.value }))}
-            placeholder={he ? "תאר/י את פעילות ההתנדבות שלך..." : "Describe your volunteering experience..."}
+            placeholder={he ? "תארו את פעילות ההתנדבות שלכם..." : "Describe your volunteering experience..."}
             className={`${input} resize-none`} />
         </Field>
 

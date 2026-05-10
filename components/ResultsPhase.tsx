@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { JobResult, UserProfile } from "@/lib/types";
+import { JobResult, UserProfile, EntryPathResult } from "@/lib/types";
 import JobCard from "./JobCard";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
@@ -20,6 +20,7 @@ const FREE_RESULTS = 3;
 
 interface Props {
   jobs: JobResult[];
+  entryPath?: EntryPathResult | null;
   userProfile: UserProfile;
   demoMode: boolean;
   isSubscribed?: boolean;
@@ -101,7 +102,7 @@ function EmailModal({
         <h2 className="text-white font-bold text-base mb-1">{tx.scoutEmailTitle}</h2>
         <p className="text-white/50 text-xs mb-4">
           {lang === "he"
-            ? `שולח ${jobs.length} משרות לתיבת הדואר שלך`
+            ? `שולח ${jobs.length} משרות לתיבת הדואר שלכם`
             : `Sending ${jobs.length} jobs to your inbox`}
         </p>
         {status === "sent" ? (
@@ -142,6 +143,7 @@ function EmailModal({
 
 export default function ResultsPhase({
   jobs,
+  entryPath,
   userProfile,
   demoMode,
   isSubscribed = false,
@@ -240,6 +242,95 @@ export default function ResultsPhase({
 
   const jobsWithSalary = useMemo(() => deduped.filter((j) => parseSalaryMin(j.salaryRange) !== null).length, [deduped]);
   const activeFilterCount = [filterRemote, filterMinScore > 0, filterSaved, filterLocation !== "all", filterJobType !== "all", filterMinSalary > 0].filter(Boolean).length;
+
+  if (entryPath && jobs.length === 0 && !isStreaming) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">
+        <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm sticky top-0 z-10">
+          <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+            <h1 className="text-white font-bold text-sm sm:text-base">מסלול כניסה לתחום</h1>
+            <div className="flex items-center gap-2">
+              {onRefine && (
+                <button onClick={onRefine} className="text-purple-300 hover:text-purple-200 text-xs border border-purple-500/30 hover:border-purple-500/60 bg-purple-500/10 px-2.5 py-1.5 rounded-xl transition">
+                  שנה חיפוש
+                </button>
+              )}
+              <button onClick={onReset} className="text-white/50 hover:text-white text-xs border border-white/15 hover:border-white/30 px-2.5 py-1.5 rounded-xl transition">
+                התחל מחדש
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-2xl mx-auto px-4 py-10">
+          <div className="mb-8 p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-sm leading-relaxed">
+            {entryPath.message}
+          </div>
+
+          <div className="flex flex-wrap gap-3 mb-8">
+            <span className="inline-flex items-center gap-1.5 text-xs bg-white/5 border border-white/15 text-white/70 px-3 py-1.5 rounded-full">
+              <svg className="w-3.5 h-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              נדרש: {entryPath.trainingBarrier}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-xs bg-purple-500/10 border border-purple-500/30 text-purple-300 px-3 py-1.5 rounded-full">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              זמן כניסה משוער: {entryPath.entryTimeMonths} חודשים
+            </span>
+          </div>
+
+          <h2 className="text-white font-semibold text-base mb-4">3 המקומות הטובים ביותר ללמוד:</h2>
+
+          <div className="grid gap-4">
+            {entryPath.institutions.map((inst, i) => (
+              <a
+                key={i}
+                href={inst.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-500/40 hover:bg-white/8 transition-all group"
+              >
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div>
+                    <p className="text-white font-medium text-sm group-hover:text-purple-300 transition">{inst.name}</p>
+                    <p className="text-purple-300 text-xs mt-0.5">{inst.courseName}</p>
+                  </div>
+                  <svg className="w-4 h-4 text-white/30 group-hover:text-purple-400 flex-shrink-0 mt-0.5 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </div>
+                <p className="text-white/50 text-xs mb-3 leading-relaxed">{inst.description}</p>
+                <div className="flex flex-wrap gap-2">
+                  {inst.duration !== "ליצירת קשר לפרטים" && (
+                    <span className="text-xs bg-white/5 border border-white/10 text-white/60 px-2.5 py-1 rounded-full">
+                      משך: {inst.duration}
+                    </span>
+                  )}
+                  {inst.estimatedCost !== "ליצירת קשר לפרטים" && (
+                    <span className="text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full">
+                      עלות: {inst.estimatedCost}
+                    </span>
+                  )}
+                  {(inst.duration === "ליצירת קשר לפרטים" || inst.estimatedCost === "ליצירת קשר לפרטים") && (
+                    <span className="text-xs bg-white/5 border border-white/10 text-white/40 px-2.5 py-1 rounded-full">
+                      לפרטים ומחירים — לחץ לאתר
+                    </span>
+                  )}
+                </div>
+              </a>
+            ))}
+
+            {entryPath.institutions.length === 0 && (
+              <p className="text-white/40 text-sm text-center py-8">לא נמצאו פרטי מוסדות — נסה לחפש בגוגל "{entryPath.trainingBarrier} ישראל"</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-950/30 to-slate-900">

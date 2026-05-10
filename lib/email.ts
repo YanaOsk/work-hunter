@@ -13,8 +13,8 @@ export async function sendWelcomeEmail(name: string, email: string): Promise<voi
   </div>
   <div style="background:#1a1730;border:1px solid rgba(168,85,247,0.25);border-radius:24px;padding:36px 32px">
     <h1 style="margin:0 0 12px;font-size:22px;font-weight:800">שלום ${firstName ? firstName : ""}! 👋</h1>
-    <p style="color:rgba(240,240,245,0.65);line-height:1.6">ברוך הבא ל-Work Hunter — הסקאוט האישי שלך לקריירה.<br>אנחנו כאן כדי לעזור לך למצוא את המשרה הבאה.</p>
-    <a href="${appUrl}" style="display:inline-block;margin-top:24px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:700;font-size:15px;padding:14px 32px;border-radius:12px;text-decoration:none">התחל/י עכשיו ←</a>
+    <p style="color:rgba(240,240,245,0.65);line-height:1.6">ברוכים הבאים ל-Work Hunter — הסקאוט האישי שלכם לקריירה.<br>אנחנו כאן כדי לעזור לכם למצוא את המשרה הבאה.</p>
+    <a href="${appUrl}" style="display:inline-block;margin-top:24px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:700;font-size:15px;padding:14px 32px;border-radius:12px;text-decoration:none">התחילו עכשיו ←</a>
   </div>
 </div></body></html>`;
   await getTransporter().sendMail({
@@ -55,8 +55,8 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string): P
   </div>
   <div style="background:#1a1730;border:1px solid rgba(168,85,247,0.25);border-radius:24px;padding:36px 32px">
     <h1 style="margin:0 0 12px;font-size:22px;font-weight:800">איפוס סיסמה 🔑</h1>
-    <p style="color:rgba(240,240,245,0.65);line-height:1.6;margin:0 0 24px">קיבלנו בקשה לאיפוס הסיסמה שלך.<br>לחץ/י על הכפתור כדי לאפס את הסיסמה — הקישור תקף לשעה אחת.</p>
-    <a href="${resetUrl}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:700;font-size:15px;padding:14px 32px;border-radius:12px;text-decoration:none">אפס/י סיסמה ←</a>
+    <p style="color:rgba(240,240,245,0.65);line-height:1.6;margin:0 0 24px">קיבלנו בקשה לאיפוס הסיסמה שלכם.<br>לחצו על הכפתור כדי לאפס את הסיסמה — הקישור תקף לשעה אחת.</p>
+    <a href="${resetUrl}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:700;font-size:15px;padding:14px 32px;border-radius:12px;text-decoration:none">אפסו סיסמה ←</a>
     <p style="color:rgba(240,240,245,0.35);font-size:12px;margin-top:24px">אם לא ביקשת איפוס סיסמה, אפשר להתעלם ממייל זה.</p>
   </div>
 </div></body></html>`;
@@ -149,14 +149,14 @@ export async function sendPurchaseConfirmationEmail(
     </div>
 
     <div style="background:linear-gradient(135deg,rgba(124,58,237,0.25),rgba(16,185,129,0.12));border:1px solid rgba(168,85,247,0.35);border-radius:16px;padding:18px 24px;margin-bottom:28px;text-align:center">
-      <div style="color:rgba(240,240,245,0.45);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-weight:600">המסלול שלך</div>
+      <div style="color:rgba(240,240,245,0.45);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-weight:600">המסלול שלכם</div>
       <div style="color:#f0f0f5;font-size:26px;font-weight:800">${plan.nameHe}</div>
       <div style="color:#a855f7;font-size:15px;font-weight:600;margin-top:4px">${priceStr}</div>
     </div>
 
     <div>
       <div style="color:rgba(240,240,245,0.45);font-size:12px;text-transform:uppercase;letter-spacing:1.2px;font-weight:600;margin-bottom:14px">
-        מעכשיו הכלים הזמינים לך:
+        מעכשיו הכלים הזמינים לכם:
       </div>
       <table style="width:100%;border-collapse:collapse"><tbody>${featuresHtml}</tbody></table>
     </div>
@@ -165,12 +165,12 @@ export async function sendPurchaseConfirmationEmail(
   <div style="text-align:center;margin-bottom:32px">
     <a href="${appUrl}/advisor?profileId=default-advisor"
        style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#ffffff;font-weight:700;font-size:16px;padding:16px 40px;border-radius:14px;text-decoration:none">
-      התחל/י עכשיו ←
+      התחילו עכשיו ←
     </a>
   </div>
 
   <div style="text-align:center;color:rgba(240,240,245,0.22);font-size:12px;line-height:1.8">
-    <p style="margin:0">Work Hunter — הסקאוט האישי שלך לקריירה</p>
+    <p style="margin:0">Work Hunter — הסקאוט האישי שלכם לקריירה</p>
     <p style="margin:0">© 2026 Work Hunter. כל הזכויות שמורות.</p>
   </div>
 </div>

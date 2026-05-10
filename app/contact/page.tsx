@@ -54,7 +54,7 @@ export default function ContactPage() {
           </h1>
           <p className="text-white/50 text-base leading-relaxed">
             {he
-              ? "נשמח לשמוע ממך — שאלה, הצעה או כל בעיה שנתקלת בה."
+              ? "נשמח לשמוע מכם — שאלה, הצעה או כל בעיה שנתקלתם בה."
               : "We'd love to hear from you — a question, suggestion, or any issue you've encountered."}
           </p>
         </div>
@@ -125,7 +125,7 @@ export default function ContactPage() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={6}
-                placeholder={he ? "כתוב כאן את הפנייה שלך..." : "Write your message here..."}
+                placeholder={he ? "כתבו כאן את הפנייה שלכם..." : "Write your message here..."}
                 className="w-full bg-white/5 border border-white/15 focus:border-purple-500 rounded-xl px-4 py-3 text-white placeholder-white/25 focus:outline-none text-sm transition resize-none"
               />
             </div>

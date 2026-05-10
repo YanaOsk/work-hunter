@@ -111,7 +111,7 @@ export default function PricingPage() {
               </p>
               <h2 className="text-xl sm:text-2xl font-bold text-white">
                 {lang === "he"
-                  ? "כלים מקצועיים שישנו את חיפוש העבודה שלך"
+                  ? "כלים מקצועיים שישנו את חיפוש העבודה שלכם"
                   : "Professional tools that transform your job search"}
               </h2>
             </div>
@@ -132,7 +132,7 @@ export default function PricingPage() {
                     { title: "הכוונה למסלולי קריירה", desc: "זיהוי תפקידים אופטימליים (כמו ניהול יצירתי או יזמות) על בסיס שילוב בין כישורים לשאיפות אישיות." },
                     { title: "ניתוח כדאיות (שכיר vs עצמאי)", desc: "השוואה כמותית של פוטנציאל השתכרות ואיכות חיים בין מסלולי תעסוקה שונים." },
                     { title: "מיפוי חברות ואסטרטגיית חיפוש", desc: "בניית רשימת חברות יעד (Target Companies) ותוכנית נטוורקינג אופרטיבית ל-30 יום." },
-                    { title: "סימולציית ראיונות ומיתוג אישי", desc: 'הכנה לראיונות עבודה מותאמים אישית וגיבוש ה-"Pitch" המקצועי שלך למול מעסיקים.' },
+                    { title: "סימולציית ראיונות ומיתוג אישי", desc: 'הכנה לראיונות עבודה מותאמים אישית וגיבוש ה-"Pitch" המקצועי שלכם למול מעסיקים.' },
                   ],
                   bulletsEn: [
                     { title: "Professional DNA Diagnosis", desc: "In-depth analysis of strengths, skills, and work style (e.g. ENFP) to create a precise match with the job market." },
@@ -144,9 +144,9 @@ export default function PricingPage() {
                 },
                 {
                   icon: "🤖",
-                  titleHe: "הסקאוט — צייד המשרות האישי שלך",
+                  titleHe: "הסקאוט — צייד המשרות האישי שלכם",
                   titleEn: "The Scout — Your Personal Job Hunter",
-                  descHe: "סריקה אקטיבית של השוק למציאת משרות שמתאימות בדיוק לפרופיל שלך ולאילוצים האישיים שלך.",
+                  descHe: "סריקה אקטיבית של השוק למציאת משרות שמתאימות בדיוק לפרופיל שלכם ולאילוצים האישיים שלכם.",
                   descEn: "Active market scanning to find positions that exactly match your profile and personal constraints.",
                   bulletsHe: [
                     { title: "חיפוש חכם ללא הגבלה", desc: "סריקה אקטיבית של השוק למציאת משרות התואמות בדיוק את פרופיל הייעוץ שנבנה עבורך." },
@@ -170,7 +170,7 @@ export default function PricingPage() {
                     { title: "שינוי תבניות (Formatting)", desc: "אפשרות להעלאת קובץ קיים והלבשתו על תבניות עיצוב מודרניות ומרשימות בלחיצת כפתור." },
                     { title: "אופטימיזציה של התוכן", desc: "הפיכת רשימת מטלות יבשה לתיאור הישגים מדידים ומרשימים (Impact-driven)." },
                     { title: "דיוק מילות מפתח", desc: "התאמת הניסיון התעסוקתי לדרישות המשרה כדי למשוך את תשומת לב המגייסים." },
-                    { title: "סיכום מקצועי מנצח", desc: 'כתיבת פסקת פתיחה ("Summary") המזקקת את הערך המוסף הייחודי שלך.' },
+                    { title: "סיכום מקצועי מנצח", desc: 'כתיבת פסקת פתיחה ("Summary") המזקקת את הערך המוסף הייחודי שלכם.' },
                   ],
                   bulletsEn: [
                     { title: "Built from Scratch, Global Standard", desc: "Creating a professional, winning document in Hebrew or English, tailored to ATS filtering systems." },

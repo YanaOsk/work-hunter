@@ -358,7 +358,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
             <div className="flex flex-col items-center gap-4 pt-2 pb-4 px-2">
               <p className="text-white/70 text-sm text-center">
                 {lang === "he"
-                  ? "יש לי שני מקורות מידע עליך — על מה לבסס את החיפוש?"
+                  ? "יש לי שני מקורות מידע עליכם — על מה לבסס את החיפוש?"
                   : "I have two sources of info about you — what should I base the search on?"}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">

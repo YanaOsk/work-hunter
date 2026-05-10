@@ -107,7 +107,7 @@ function SignInContent() {
   const greeting =
     tab === "signin"
       ? lang === "he"
-        ? "שמחים לראות אותך שוב!"
+        ? "שמחים לראות אתכם שוב!"
         : "Welcome back!"
       : lang === "he"
       ? "הצטרפות ל-Work Hunter"
@@ -130,7 +130,7 @@ function SignInContent() {
           <h1 className="text-3xl font-bold text-white">{greeting}</h1>
           {tab === "register" && (
             <p className="text-white/50 text-sm mt-2">
-              {lang === "he" ? "בנה את תוכנית הקריירה שלך" : "Build your career plan"}
+              {lang === "he" ? "בנו את תוכנית הקריירה שלכם" : "Build your career plan"}
             </p>
           )}
         </div>

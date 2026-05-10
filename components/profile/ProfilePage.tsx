@@ -684,7 +684,7 @@ export default function ProfilePage() {
                 <div className="bg-white/[0.04] border border-white/8 rounded-2xl p-5 mb-4">
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
                     <div>
-                      <p className="text-white font-semibold mb-0.5">{he ? "מסע הייעוץ שלך" : "Your advisor journey"}</p>
+                      <p className="text-white font-semibold mb-0.5">{he ? "מסע הייעוץ שלכם" : "Your advisor journey"}</p>
                       <p className="text-white/40 text-sm">
                         {!advisorStarted ? (he ? "טרם התחלת" : "Not started yet")
                           : advisorDone ? (he ? "כל השלבים הושלמו 🎉" : "All stages complete 🎉")
@@ -838,7 +838,7 @@ export default function ProfilePage() {
                 {professionalSummary && (
                   <div className="mt-4 bg-white/[0.03] border border-purple-500/20 rounded-2xl p-5">
                     <div className="flex items-center justify-between mb-3">
-                      <p className="text-white font-semibold text-sm">{he ? "הסיכום המקצועי שלך" : "Your Professional Summary"}</p>
+                      <p className="text-white font-semibold text-sm">{he ? "הסיכום המקצועי שלכם" : "Your Professional Summary"}</p>
                       <Link href="/cv-builder?from=/profile"
                         className="text-xs text-white/35 hover:text-white/70 border border-white/8 px-2.5 py-1 rounded-lg transition">
                         {he ? "הוסף ל-CV" : "Add to CV"}

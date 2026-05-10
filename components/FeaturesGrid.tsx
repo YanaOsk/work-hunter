@@ -65,7 +65,7 @@ export default function FeaturesGrid() {
           </h2>
           <p className="text-white/55 text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed">
             {he
-              ? "מהאבחון הראשוני ועד הראיון המדומה — כל שלב בדרך לעבודה הבאה שלך"
+              ? "מהאבחון הראשוני ועד הראיון המדומה — כל שלב בדרך לעבודה הבאה שלכם"
               : "From initial diagnosis to mock interview — every step of your job search journey"}
           </p>
         </div>

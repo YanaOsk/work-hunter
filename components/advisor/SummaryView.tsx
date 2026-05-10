@@ -18,7 +18,7 @@ function buildChecklist(state: AdvisorState, lang: string): string[] {
   if (chosen?.firstSteps?.length) items.push(chosen.firstSteps[0]);
   if (state.cvReview?.improvements?.length) items.push(state.cvReview.improvements[0].suggestion);
   if (state.linkedInSkipped)
-    items.push(lang === "he" ? "עדכן את פרופיל הלינקדאין שלך" : "Update your LinkedIn profile");
+    items.push(lang === "he" ? "עדכנו את פרופיל הלינקדאין שלכם" : "Update your LinkedIn profile");
   if (state.strategy?.thirtyDayPlan?.length) items.push(state.strategy.thirtyDayPlan[0]);
   const seen = new Set<string>();
   return items.filter((it) => { if (!it || seen.has(it)) return false; seen.add(it); return true; }).slice(0, 8);
@@ -1265,11 +1265,11 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
             </div>
             <div>
               <h3 className="text-xl font-bold text-white mb-2">
-                {lang === "he" ? "עכשיו Scout ימצא לך משרות" : "Now let Scout find your jobs"}
+                {lang === "he" ? "עכשיו Scout ימצא לכם משרות" : "Now let Scout find your jobs"}
               </h3>
               <p className="text-white/70 text-sm leading-relaxed">
                 {lang === "he"
-                  ? "Scout יקבל את הכיוונים שלך מהייעוץ וימצא עבורך משרות שמתאימות בדיוק לפרופיל."
+                  ? "Scout יקבל את הכיוונים שלכם מהייעוץ וימצא עבורכם משרות שמתאימות בדיוק לפרופיל."
                   : "Scout will receive your career direction and find jobs that match your profile precisely."}
               </p>
             </div>

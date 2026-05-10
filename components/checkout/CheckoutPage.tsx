@@ -131,7 +131,7 @@ export default function CheckoutPage({ planId }: { planId: string }) {
                 </svg>
               </div>
               <p className="text-white font-bold text-lg mb-1">חיפוש עבודה</p>
-              <p className="text-white/50 text-sm leading-relaxed">אמצא לך משרות מתאימות עכשיו לפי הפרופיל שלך</p>
+              <p className="text-white/50 text-sm leading-relaxed">אמצא לכם משרות מתאימות עכשיו לפי הפרופיל שלכם</p>
               <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity">
                 <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

@@ -69,7 +69,7 @@ export default function WelcomeModal({ userName, userEmail }: Props) {
             </h2>
             <p className="text-white/55 text-sm leading-relaxed">
               {he
-                ? "העלה קורות חיים ומצא משרות רלוונטיות עם התאמה חכמה לפרופיל שלך"
+                ? "העלו קורות חיים ומצאו משרות רלוונטיות עם התאמה חכמה לפרופיל שלכם"
                 : "Upload your CV and find jobs matched to your profile with AI"}
             </p>
             <div className="mt-5 flex items-center gap-1.5 text-purple-400 text-sm font-medium group-hover:gap-2.5 transition-all">
