@@ -217,7 +217,7 @@ function ConvCard({
       <div className="px-3 pb-3 flex items-center justify-between gap-2">
         <button onClick={onContinue}
           className="text-xs text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 hover:border-emerald-400/40 bg-emerald-500/8 px-2.5 py-1 rounded-lg transition">
-          {he ? "המשך ←" : "Continue →"}
+          {he ? "המשך" : "Continue"}
         </button>
         <div className="flex items-center gap-1">
           <Link href={`/conversations/${conv.id}`} onClick={(e) => e.stopPropagation()}
@@ -312,6 +312,9 @@ export default function ProfilePage() {
   const [showAllJobs, setShowAllJobs] = useState(false);
   const [archivedSessions, setArchivedSessions] = useState<ArchivedAdvisorSession[]>([]);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState("");
 
   const allOfferedJobs = useMemo(() => {
     const seenUrls = new Set<string>();
@@ -428,6 +431,24 @@ export default function ProfilePage() {
   const mockDone        = !!advisor?.mockInterview?.finished;
   const professionalSummary = advisor?.cvReview?.rewrittenSummary ?? null;
 
+  const displayName = userMeta.displayName ?? user?.name ?? "—";
+  const profileFields = [
+    !!displayImage, !!(userMeta.title), !!(userMeta.location),
+    !!(userMeta.bio), (userMeta.skills?.length ?? 0) > 0,
+    (userMeta.targetRoles?.length ?? 0) > 0, !!userMeta.availability,
+    !!userMeta.education, userMeta.yearsExperience !== undefined, !!userMeta.linkedin,
+  ];
+  const profileDone  = profileFields.filter(Boolean).length;
+  const profileTotal = profileFields.length;
+  const profilePct   = Math.round((profileDone / profileTotal) * 100);
+
+  async function commitNameEdit() {
+    const trimmed = nameDraft.trim();
+    setEditingName(false);
+    if (!trimmed || trimmed === displayName) return;
+    await saveMeta({ displayName: trimmed });
+  }
+
   function handleNewAdvisorSession() {
     archiveAdvisorState(profileId);
     setArchivedSessions(getAdvisorArchive(profileId));
@@ -502,8 +523,27 @@ export default function ProfilePage() {
                     }
                   </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-white font-semibold text-sm truncate leading-tight">{user?.name || "—"}</p>
+                <div className="min-w-0 flex-1">
+                  {editingName ? (
+                    <input
+                      ref={nameInputRef}
+                      value={nameDraft}
+                      onChange={(e) => setNameDraft(e.target.value)}
+                      onBlur={commitNameEdit}
+                      onKeyDown={(e) => { if (e.key === "Enter") commitNameEdit(); if (e.key === "Escape") setEditingName(false); }}
+                      className="w-full bg-white/10 border border-purple-500/50 rounded-lg px-2 py-0.5 text-white text-sm font-semibold focus:outline-none"
+                    />
+                  ) : (
+                    <button
+                      onClick={() => { setNameDraft(displayName); setEditingName(true); setTimeout(() => nameInputRef.current?.select(), 30); }}
+                      className="group flex items-center gap-1 w-full text-start"
+                    >
+                      <p className="text-white font-semibold text-sm truncate leading-tight">{displayName}</p>
+                      <svg className="w-3 h-3 text-white/0 group-hover:text-white/40 transition flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                  )}
                   <p className="text-white/60 text-xs truncate mt-0.5">{user?.email}</p>
                 </div>
               </div>
@@ -546,6 +586,35 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
+
+            {/* Profile completion */}
+            {profilePct < 100 && (
+              <div className="linear-card px-4 py-3 mb-1">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-white/35 text-[10px] uppercase tracking-wide">{he ? "השלמת פרופיל" : "Profile"}</span>
+                  <span className={`text-[10px] font-bold tabular-nums ${profilePct >= 80 ? "text-emerald-400" : profilePct >= 50 ? "text-amber-400" : "text-white/40"}`}>
+                    {profileDone}/{profileTotal}
+                  </span>
+                </div>
+                <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                  <div
+                    className="h-1 rounded-full transition-all duration-700"
+                    style={{
+                      width: `${profilePct}%`,
+                      background: profilePct >= 80 ? "#4ADE80" : profilePct >= 50 ? "#f59e0b" : "#5E6AD2",
+                    }}
+                  />
+                </div>
+                {profilePct < 60 && (
+                  <button
+                    onClick={() => setActiveSection("profile")}
+                    className="mt-1.5 text-[10px] text-purple-400/70 hover:text-purple-300 transition"
+                  >
+                    {he ? "השלם פרופיל" : "Complete profile"}
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Nav items */}
             <nav className="flex flex-col gap-0.5">
@@ -592,7 +661,10 @@ export default function ProfilePage() {
           <main className="flex-1 min-w-0">
 
             {/* Mobile horizontal tabs */}
-            <div className="lg:hidden flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4 mb-5 scrollbar-hide">
+            <div className="relative lg:hidden mb-5">
+              <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#0C0C0D] to-transparent pointer-events-none z-10" />
+              <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#0C0C0D] to-transparent pointer-events-none z-10" />
+            <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
               {navItems.map((item) => {
                 const active = activeSection === item.id;
                 return (
@@ -609,10 +681,11 @@ export default function ProfilePage() {
                 );
               })}
             </div>
+            </div>
 
             {/* ── CVs ──────────────────────────────────────────────────────── */}
             {activeSection === "cvs" && (
-              <>
+              <div className="animate-section-in">
                 <SectionHeader
                   title={he ? "קורות החיים שלי" : "My CVs"}
                   count={cvs.length}
@@ -625,23 +698,27 @@ export default function ProfilePage() {
                   }
                 />
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
-                  <NewCard
-                    label={he ? "צור קורות חיים" : "New CV"}
-                    onClick={() => router.push("/cv-builder?from=/profile")}
-                  />
-                  {cvs.map((cv) => (
-                    <CvCard key={cv.id} cv={cv} he={he} onDelete={() => deleteCV(cv.id)} />
+                  <div className="animate-card-in delay-0">
+                    <NewCard
+                      label={he ? "צור קורות חיים" : "New CV"}
+                      onClick={() => router.push("/cv-builder?from=/profile")}
+                    />
+                  </div>
+                  {cvs.map((cv, i) => (
+                    <div key={cv.id} className="animate-card-in" style={{ animationDelay: `${(i + 1) * 55}ms` }}>
+                      <CvCard cv={cv} he={he} onDelete={() => deleteCV(cv.id)} />
+                    </div>
                   ))}
                 </div>
                 {cvs.length === 0 && (
                   <p className="text-white/25 text-sm mt-4 text-center">{he ? "עדיין אין קורות חיים" : "No CVs yet"}</p>
                 )}
-              </>
+              </div>
             )}
 
             {/* ── Job Searches ─────────────────────────────────────────────── */}
             {activeSection === "searches" && (
-              <>
+              <div className="animate-section-in">
                 <SectionHeader
                   title={he ? "חיפושי משרות" : "Job Searches"}
                   count={conversations.length}
@@ -663,21 +740,23 @@ export default function ProfilePage() {
                       label={he ? "חיפוש חדש" : "New search"}
                       onClick={() => { queueAutoStart("jobs"); router.push("/"); }}
                     />
-                    {conversations.map((conv) => (
-                      <ConvCard key={conv.id} conv={conv} he={he}
-                        onContinue={() => router.push(`/?continueConv=${conv.id}`)}
-                        onDelete={() => setConversations((prev) => prev.filter((c) => c.id !== conv.id))}
-                        onRename={(title) => setConversations((prev) => prev.map((c) => c.id === conv.id ? { ...c, title } : c))}
-                      />
+                    {conversations.map((conv, i) => (
+                      <div key={conv.id} className="animate-card-in" style={{ animationDelay: `${(i + 1) * 55}ms` }}>
+                        <ConvCard conv={conv} he={he}
+                          onContinue={() => router.push(`/?continueConv=${conv.id}`)}
+                          onDelete={() => setConversations((prev) => prev.filter((c) => c.id !== conv.id))}
+                          onRename={(title) => setConversations((prev) => prev.map((c) => c.id === conv.id ? { ...c, title } : c))}
+                        />
+                      </div>
                     ))}
                   </div>
                 )}
-              </>
+              </div>
             )}
 
             {/* ── My Jobs ──────────────────────────────────────────────────── */}
             {activeSection === "jobs" && (
-              <>
+              <div className="animate-section-in">
                 <SectionHeader title={he ? "המשרות שלי" : "My Jobs"} count={allOfferedJobs.length} />
                 {allOfferedJobs.length === 0 ? (
                   <div className="text-center py-16">
@@ -687,7 +766,7 @@ export default function ProfilePage() {
                     <p className="text-white/30 text-sm">{he ? "עדיין אין משרות" : "No jobs yet"}</p>
                     <button onClick={() => { queueAutoStart("jobs"); router.push("/"); }}
                       className="text-purple-400 hover:text-purple-300 text-sm mt-2 inline-block transition">
-                      {he ? "צאי לחיפוש ←" : "Start searching →"}
+                      {he ? "צאי לחיפוש" : "Start searching"}
                     </button>
                   </div>
                 ) : (
@@ -714,12 +793,12 @@ export default function ProfilePage() {
                     )}
                   </div>
                 )}
-              </>
+              </div>
             )}
 
             {/* ── Career Advisor ───────────────────────────────────────────── */}
             {activeSection === "advisor" && (
-              <>
+              <div className="animate-section-in">
                 <SectionHeader title={he ? "ייעוץ תעסוקתי" : "Career Advisor"} />
                 <div className="bg-white/[0.04] border border-white/8 rounded-2xl p-5 mb-4">
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
@@ -889,20 +968,20 @@ export default function ProfilePage() {
                     </blockquote>
                   </div>
                 )}
-              </>
+              </div>
             )}
 
             {/* ── Personal Info ─────────────────────────────────────────────── */}
             {activeSection === "profile" && (
-              <>
+              <div className="animate-section-in">
                 <SectionHeader title={he ? "פרופיל אישי" : "Personal Info"} />
                 <UserMetaCard meta={userMeta} scoutData={{}} onSave={saveMeta} he={he} />
-              </>
+              </div>
             )}
 
             {/* ── Applications ─────────────────────────────────────────────── */}
             {activeSection === "tracker" && (
-              <>
+              <div className="animate-section-in">
                 <SectionHeader title={he ? "מעקב הגשות" : "Applications"} />
                 <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-8 text-center">
                   <div className="w-14 h-14 rounded-2xl bg-white/4 border border-white/8 flex items-center justify-center mx-auto mb-4">
@@ -919,7 +998,7 @@ export default function ProfilePage() {
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                   </Link>
                 </div>
-              </>
+              </div>
             )}
 
           </main>

@@ -5,6 +5,7 @@ export type WorkPref   = "remote" | "hybrid" | "onsite" | "flexible";
 
 export interface UserMeta {
   email: string;
+  displayName?: string;
   title?: string;
   location?: string;
   yearsExperience?: number;
@@ -36,6 +37,7 @@ export async function getUserMeta(email: string): Promise<UserMeta | null> {
   const r = rows[0];
   return {
     email: r.email,
+    displayName: r.display_name ?? undefined,
     title: r.title ?? undefined,
     location: r.location ?? undefined,
     yearsExperience: r.years_experience ?? undefined,
@@ -64,14 +66,16 @@ export async function saveUserMeta(email: string, data: Partial<Omit<UserMeta, "
   const lowerEmail = email.toLowerCase();
   const now = new Date().toISOString();
   await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS address TEXT`;
+  await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS display_name TEXT`;
   await db`
     INSERT INTO user_meta (
-      email, title, location, years_experience, education, skills, target_roles,
+      email, display_name, title, location, years_experience, education, skills, target_roles,
       work_preference, languages, bio, volunteering, linkedin, availability, profile_image,
       age, phone, address,
       advisor_current_stage, advisor_completed_count, advisor_state, updated_at
     ) VALUES (
       ${lowerEmail},
+      ${data.displayName ?? null},
       ${data.title ?? null}, ${data.location ?? null}, ${data.yearsExperience ?? null},
       ${data.education ?? null}, ${data.skills ?? null}, ${data.targetRoles ?? null},
       ${data.workPreference ?? null}, ${data.languages ?? null}, ${data.bio ?? null},
@@ -82,6 +86,7 @@ export async function saveUserMeta(email: string, data: Partial<Omit<UserMeta, "
       ${data.advisorState ?? null}, ${now}
     )
     ON CONFLICT (email) DO UPDATE SET
+      display_name = COALESCE(EXCLUDED.display_name, user_meta.display_name),
       title = COALESCE(EXCLUDED.title, user_meta.title),
       location = COALESCE(EXCLUDED.location, user_meta.location),
       years_experience = COALESCE(EXCLUDED.years_experience, user_meta.years_experience),

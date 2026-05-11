@@ -575,6 +575,27 @@ html.light .auth-dropdown .h-px { border-color: rgba(0,0,0,0.08) !important; bac
   animation: slideUpEnter 0.3s ease both;
 }
 
+/* ── Scrollbar hide ──────────────────────────────────────────────────── */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* ── Stagger delays ──────────────────────────────────────────────────── */
+.delay-0   { animation-delay: 0ms; }
+.delay-60  { animation-delay: 60ms; }
+.delay-120 { animation-delay: 120ms; }
+.delay-180 { animation-delay: 180ms; }
+.delay-240 { animation-delay: 240ms; }
+.delay-300 { animation-delay: 300ms; }
+
+/* ── Section fade ────────────────────────────────────────────────────── */
+@keyframes sectionEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-section-in {
+  animation: sectionEnter 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 /* ── Line clamp ──────────────────────────────────────────────────────── */
 .line-clamp-2 {
   display: -webkit-box;
