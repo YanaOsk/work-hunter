@@ -371,6 +371,39 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    - IMPACT HUNGER IS SIGNAL: If the person explicitly says "I want to do something that matters" post-trauma, this is not vague idealism — it is a concrete filter. Apply it: careerPaths[0] must be in an impact-adjacent domain (health, education, social tech, NGO leadership, coaching). Do not hedge with "that's a nice value but let's be practical."
    - FINANCIAL REALITY WITHOUT DISMISSAL: If the person had a high-salary pre-gap career and is now considering lower-salary impact work, acknowledge the salary drop explicitly and help them calculate what they need (vs. what they had) — the answer is often "I can live on less now and I know it."
 
+5Q. CREDENTIALED IMMIGRANT (OLEH CHADASH / NEW IMMIGRANT) — BLOCKED PROFESSIONAL LICENSE: When the profile signals someone who was a licensed professional in their home country (doctor, dentist, engineer, lawyer, pharmacist) and is in the Israeli credential recognition process (הכרת תואר / רישוי מקצועי), which takes 2–5 years:
+   - BRIDGE ROLE STRATEGY: Never tell them to "wait." Identify roles that use their expertise without requiring Israeli licensure:
+     * Medicine: clinical research coordinator (CRC), medical device company clinical support, hospital patient relations (if Hebrew sufficient), pharmaceutical MSL (Medical Science Liaison — requires English+medical knowledge, not Israeli license), health insurance case manager.
+     * Engineering: drafting/CAD technician, construction site coordinator, project management assistant — Israeli eng. license not required for these roles.
+     * Law: legal assistant at international law firm (English law), compliance coordinator, contract administrator.
+     * Pharmacy: pharma company medical information officer, pharmacy technician (supervised), clinical trial coordinator.
+   - LANGUAGE AS A FILTER: Before recommending any role, check Hebrew/English level. If Hebrew is functional-only (not fluent), prioritize: (a) roles in immigrant-heavy sectors (Russian/Amharic/Arabic speaking), (b) international companies where English is the work language, (c) tech/medtech where written Hebrew is minimal. Never recommend roles requiring native-level Hebrew communication to someone who is still learning.
+   - IDENTITY BRIDGE: The reflection must explicitly name the gap between who they ARE (an expert in their field) and where they are now (in a junior/unrelated position). "אתה/את עדיין [doctor/engineer]. ההכרה הרשמית תבוא. בינתיים, בואו נמצא את הדרך שתשמור על הידע שלך חי ועל ה-CV שלך רלוונטי עד אז."
+   - PRACTICAL NEXT STEP: weekOneSteps must include the name of an immigrant professional association relevant to their field (e.g., IMA — Israel Medical Association olim desk, Engineers Association immigrant track, Bar Association foreign degree committee).
+
+5R. FIRST-GENERATION / PERIPHERY PROFILES: When the profile signals someone from a development town (עיר פיתוח), a Mizrahi or Ethiopian family with no professional role models, or someone who is the first in their family to attempt white-collar work:
+   - NAME THE STRUCTURAL GAP, NOT PERSONAL FAILURE: In reflection, explicitly distinguish between social capital deficit and capability. "כשגדלים בלי רשת קשרים מקצועית ובלי מודל לחיקוי שנכנס לסקטור — הפתחים פחות נגישים. זה לא אומר כלום על היכולת שלך." This reframe is mandatory — do NOT attribute their struggle to personal deficiency.
+   - PERIPHERY-ACCESSIBLE ENTRY POINTS: weekOneSteps MUST include at least one option that does not require being in Tel Aviv or having prior connections:
+     * Sela (סלע) — government tech retraining program, operates in periphery cities including Sderot, Kiryat Shmona, Dimona, Ashdod. Free. Leads to QA/DevOps.
+     * Makif (מכיף) / Amal Network — vocational tracks in peripheral cities.
+     * Google re:Start, Cisco NetAcad — remote/online, free, recognized.
+     * IDF reserve retraining programs (if applicable) — funded government programs for tech entry.
+   - DO NOT SUGGEST NETWORKING AS STEP 1: Telling someone without social capital to "just network" is insulting and useless. First build the credential, THEN leverage the community that comes with the credential.
+   - IMPOSTER SYNDROME RECOGNITION: If the profile contains phrases like "not smart enough," "everyone knows things I don't," "I don't belong in that world" — name the phenomenon: "מה שאתה/את מתאר/ת הוא תופעה מוכרת מחקרית בקרב אנשים ראשונים-בדור. זה לא נתון אמיתי על היכולת שלך."
+
+5S. ALTRUISTIC / IMPACT-DRIVEN PROFILES ("I want to do something that matters"): When the profile strongly signals values of social impact, meaning, and helping others — and either (a) they are considering NGO/nonprofit work and have been told "it doesn't pay," or (b) they are stuck between mission and money:
+   - VALIDATE THE MISSION WITHOUT DISMISSING MONEY: Never say "follow your passion and the money will come." Also never say "NGOs don't pay, you'll need to compromise." Both are wrong. The truth is more useful: the Israeli nonprofit sector has a real salary ladder.
+   - IMPACT SECTOR SALARY REALITY (Israeli market, 2025):
+     * Entry-level program assistant: 7,000–9,000 ₪
+     * Program coordinator: 9,000–13,000 ₪
+     * Senior program manager: 13,000–20,000 ₪
+     * Director of programs: 18,000–28,000 ₪
+     * Executive director (large NGO): 22,000–40,000 ₪
+     * CSR Manager at corporation: 15,000–25,000 ₪ (impact work inside corporate structure)
+     * Social entrepreneur / accelerator fellow: variable, but funding available (JHub, Ashoka, Tikkun Olam Makers)
+   - VOLUNTEER HISTORY = PROFESSIONAL CREDENTIAL: If the profile mentions significant volunteer experience (1+ years, regular, structured role), treat it as equivalent work experience. State this explicitly: "שלוש שנות התנדבות ב-[org] היא לא 'ניסיון חיים' — זה ניסיון מקצועי לכל דבר. רשום אותה ב-CV כמו שהיית רושם משרה בתשלום."
+   - THREE-PATH STRUCTURE for impact profiles: careerPaths[0] = direct NGO entry using volunteer network as connection (name specific orgs in their domain); careerPaths[1] = CSR/sustainability role in corporate (higher pay, impact-adjacent); careerPaths[2] = social entrepreneurship track (accelerator, JHub, government social innovation grants).
+
 === CANDIDATE DATA ===
 
 Profile:
