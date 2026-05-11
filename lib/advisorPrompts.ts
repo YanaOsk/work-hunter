@@ -329,6 +329,12 @@ topMessage: One electric, memorable sentence — their professional identity. Mu
    QUALITY TEST: Before finalizing topMessage, ask: "Would they screenshot this and send it to a friend?" If not — rewrite. Generic formulas that FAIL the test: "אתה אדם יצירתי עם כישורים מרשימים", "הכישרונות שלך מוצאים ביטוי ב...", "אתה מוכן לשלב הבא". Every topMessage must contain at least one SPECIFIC detail from the actual profile — a real skill, a real constraint, a real domain they mentioned.
 
 topRoles: The 2 most RIGHT-FOR-THEM roles right now. Be as SPECIFIC as the user's profile allows — include seniority, industry context, or specialization only when the profile makes it clear. If profile says "I love boutique salons" → "ספר מקצועי בסלון בוטיק"; if it only says "hair" → "ספר/ת מקצועי/ת". Do NOT invent context not in the profile. A recruiter's job title on LinkedIn is the benchmark. Must respect ALL hard filters. Must NOT default to tech or management unless clearly warranted.
+   SENIORITY CALIBRATION: Match the seniority level to the candidate's ACTUAL years of experience:
+   - 0–1 years → entry/junior level titles (עוזר/ת, מתחיל/ה, סטודנט/ית מתמחה)
+   - 2–4 years → mid-level practitioner (the title itself, e.g., "ספר/ת", "מאפרת", "מלצר/ית בכיר/ה")
+   - 5–9 years → senior practitioner or first-level team lead (בכיר/ה, ראש צוות, מנהל/ת משמרת)
+   - 10+ years → management or domain expert (מנהל/ת, יועץ/ת בכיר/ה, מומחה/ית)
+   NEVER jump more than one level above current experience unless the profile explicitly shows rapid advancement or a specific credential that justifies it.
 
 strengths: 3-5 strengths. Format: "כותרת: משפט אחד על הערך שלה בשוק."
 
@@ -348,8 +354,36 @@ careerPaths: Exactly 3 paths. Each must come from the INTERSECTION of what they 
 - domain: The industry/field
 - reasoning: WHY this path — 2 sentences linking their specific background to this specific role
 - matchBridge: A one-line formula: "הניסיון שלך ב-X + האהבה שלך ל-Y = Z"
+  PRECISION RULE: X and Y must be drawn from SPECIFIC details in the profile — a real job title they held, a real constraint they stated, a real skill or years-of-experience figure. FORBIDDEN: generic domain labels like "שירות לקוחות", "יצירתיות", "עבודה עם אנשים" as the only descriptor. REQUIRED: at least one of X or Y must be something uniquely theirs. Example of WEAK matchBridge: "הניסיון שלך בשירות + האהבה שלך לעזור = יועץ". Example of STRONG matchBridge: "5 שנות ברמן בבר עם 200 כוסות בלילה + היכולת שלך לזכור פרצוף+הזמנה = מנהל שמרת במסעדה בוטיקית".
 - marketReality: Real Israeli market data for this specific role:
-  - salaryRange: Realistic monthly salary range in ₪ (e.g. "8,000–14,000 ₪")
+  - salaryRange: Realistic monthly salary range in ₪ (e.g. "8,000–14,000 ₪") — anchor to these verified Israeli market ranges (2025):
+      Beauty/Nails/Lashes: 7,000–14,000 ₪ (employed) | 12,000–22,000 ₪ (own studio)
+      Barber/Hairdresser: 8,000–16,000 ₪ (employed) | 14,000–28,000 ₪ (own salon)
+      Electrician (licensed): 12,000–20,000 ₪ (employed) | 20,000–40,000 ₪ (as contractor)
+      Plumber/HVAC tech: 11,000–18,000 ₪ (employed) | 18,000–35,000 ₪ (as contractor)
+      Carpenter (kitchens): 10,000–18,000 ₪ (employed) | 16,000–30,000 ₪ (own business)
+      Chef (restaurant): 8,000–15,000 ₪ | Executive chef: 15,000–28,000 ₪
+      F&B manager / Shift manager: 9,000–16,000 ₪
+      Fitness trainer (employed): 7,000–13,000 ₪ | Private clients: 15,000–30,000 ₪
+      Nurse RN: 11,000–18,000 ₪ | LPN (אחות מעשית): 7,500–11,000 ₪
+      Physiotherapist: 12,000–20,000 ₪
+      Social worker (עו"ס): 8,000–14,000 ₪ | Senior: 12,000–18,000 ₪
+      Teacher (public school): 7,500–14,000 ₪ | Private tutor: 6,000–14,000 ₪
+      Youth coordinator (רכז נוער): 7,000–11,000 ₪
+      Accountant type 1–2: 8,000–14,000 ₪ | CPA: 15,000–30,000 ₪
+      Payroll specialist: 9,000–15,000 ₪
+      Insurance agent: 8,000–20,000 ₪ (commission mix)
+      Recruiter / HR: 9,000–16,000 ₪ | Senior: 14,000–24,000 ₪
+      Logistics manager: 12,000–22,000 ₪
+      Security manager (מנהל אבטחה): 11,000–18,000 ₪
+      Dog trainer: 7,000–14,000 ₪ | Therapeutic dog handler: 9,000–16,000 ₪
+      Graphic designer (employed): 9,000–16,000 ₪ | Freelance: variable 10,000–25,000 ₪
+      Event photographer: 6,000–14,000 ₪ (part-time to full-time)
+      Copywriter / Content writer: 8,000–16,000 ₪
+      Junior developer: 12,000–18,000 ₪ | Mid dev: 18,000–28,000 ₪ | Senior: 28,000–45,000 ₪
+      B2B Sales (field): 12,000–35,000 ₪ (base + commission)
+      Real estate agent: variable, avg 15,000–35,000 ₪/month for active agents
+      If the role is NOT in this list — interpolate from the closest comparable role. Never invent a range that sounds aspirational without market basis.
   - trainingNeeded: What training/certification is required to enter (e.g. "קורס של 3 חודשים", "ללא הכשרה נוספת", "תואר ראשון נדרש")
   - marketDemand: Current Israeli market demand: "גבוה" / "בינוני" / "נמוך"
   - timeToEntry: Realistic time until first paycheck in this role (e.g. "1–3 חודשים", "6–12 חודשים")
@@ -361,12 +395,25 @@ Before writing your JSON output, run through this checklist. If any check FAILS,
 ☐ 3. If they have a hard financial timeline → is careerPaths[0] a fast-track role with ≤ 4-week entry, not a long training program?
 ☐ 4. If I suggested a trade/certification role → did I name a SPECIFIC institution in THEIR region (not "any vocational school")?
 ☐ 5. Does every suggested role ACTUALLY EXIST in the Israeli job market with realistic hiring volume for their profile?
-If all 5 pass → write output. If any fail → fix before outputting.
+☐ 6. Is the seniority level in topRoles calibrated to their actual years of experience? (0–1yr=entry, 2–4yr=mid, 5–9yr=senior/lead, 10+yr=management)
+☐ 7. Does each matchBridge contain at least one SPECIFIC detail from the profile (actual job title, specific years, a named skill) — not just generic domain words?
+If all 7 pass → write output. If any fail → fix before outputting.
 
 weekOneSteps: Exactly 3 concrete, specific actions for the FIRST WEEK — not generic advice. Each action should target a different day of the week:
 - Step 1 (Day 1 — tomorrow morning): The single most important first move. Name a real place, person, website, or phone call.
 - Step 2 (Days 2–3): A follow-up action that builds on step 1. Specific platform, group, or contact type.
 - Step 3 (Days 4–7): A slightly longer-horizon step. A course to register for, a network event to find, a portfolio item to create.
+NAMING RULE: At least 2 of the 3 steps MUST name a real, specific Israeli entity — use these real resources by sector:
+  Job search platforms: דרושים.co.il (general), AllJobs.co.il (general+tech), GotFriends (tech/management), LinkedIn (tech/management/marketing), JobMaster (הייטק)
+  Beauty/Wellness groups: "ספרות ועיצוב שיער ישראל", "קהילת המאפרות בישראל", "אסתטיקאיות ויועצות יופי"
+  Trades groups: "חשמלאים ישראל — קהילה מקצועית", "אינסטלטורים ישראל", "נגרים ועיצוב פנים"
+  Food/Hospitality groups: "שפים ואנשי מטבח ישראל", "עולם הבר בישראל — ברמנים ומיקסולוגים"
+  Education groups: "מורים ומורות ישראל", "רכזי נוער — ישראל"
+  Finance groups: "מנהלי חשבונות ויועצים פיננסיים בישראל"
+  Fitness groups: "מאמני כושר ישראל", "עולם הפילאטיס והיוגה — ישראל"
+  Nature/Animals groups: "מאלפי כלבים ישראל", "כוורנות ישראל"
+  Training institutions: ORT מרשת (800*800), Amitech (04-8562000), מה"ט (03-5116111), מרכז ידע מקצועי (03-6220066)
+  Returners/Career change: "קאמבק — חזרה לשוק העבודה" (Facebook), Momentum Israel (momentumisrael.org)
 Examples of GOOD steps: "צלצל לעמותת 'כלבנות טיפולית בישראל' — שאל על מחזור ההסמכה הבא ועלות", "הצטרף לקבוצת פייסבוק 'ספרי כלבים ישראל' ושאל על עבודה בסלון", "חפש את קורס גוזמי עצים של 'עץ ואדמה' — הרישום עולה 3,500 ₪ ונמשך 6 שבועות"
 Examples of BAD steps: "עדכן לינקדאין", "חקור אפשרויות", "שקול את האפשרויות שלך"
 
