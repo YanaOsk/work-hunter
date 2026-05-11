@@ -1,0 +1,48 @@
+name: Deploy Smoke Test
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  smoke:
+    name: Post-Deploy Smoke Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Wait for Vercel deployment
+        run: |
+          echo "Waiting 90s for Vercel to deploy..."
+          sleep 90
+
+      - name: Check homepage
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://work-hunter-five.vercel.app/")
+          echo "Homepage: HTTP $STATUS"
+          [ "$STATUS" = "200" ] || (echo "Homepage down!" && exit 1)
+
+      - name: Check health endpoint
+        run: |
+          RESULT=$(curl -s -H "Authorization: Bearer ${{ secrets.AGENT_SECRET }}" \
+            "https://work-hunter-five.vercel.app/api/agent/health")
+          echo "Health: $RESULT"
+          OK=$(echo "$RESULT" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).ok))")
+          [ "$OK" = "true" ] || echo "Warning: health check found issues (see above)"
+
+      - name: Check pricing page
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://work-hunter-five.vercel.app/pricing")
+          echo "Pricing: HTTP $STATUS"
+          [ "$STATUS" = "200" ] || (echo "Pricing page down!" && exit 1)
+
+      - name: Send alert on failure
+        if: failure()
+        run: |
+          COMMIT="${{ github.sha }}"
+          SHORT="${COMMIT:0:7}"
+          curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.AGENT_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"issues\":[\"Deploy smoke test failed after push ($SHORT)\",\"הדיפלוי האחרון שבר משהו — בדוק מיד!\",\"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"]}" \
+            "https://work-hunter-five.vercel.app/api/agent/alert" || true
