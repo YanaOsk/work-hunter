@@ -63,6 +63,12 @@ const GENERIC_PAGE_TITLE_PATTERNS = [
   // Company career page indexes (not specific jobs): "משרות עדכניות", "career opportunities"
   /משרות עדכניות/, /career opportunities/i, /job opportunities/i, /view all jobs/i,
   /all open positions/i, /join our team$/i,
+  // Job fair / future-dated listings: "IBBLS דרושים מאי 2026", "ירידת קריירה"
+  /דרושים\s+(ינואר|פברואר|מרץ|אפריל|מאי|יוני|יולי|אוגוסט|ספטמבר|אוקטובר|נובמבר|דצמבר)\s+20\d{2}/,
+  /ירידת קריירה/, /job fair/i, /career fair/i,
+  // Recruitment agency solicitations (not job listings)
+  /^ל[א-ת]+ הכי /, // "לסוכנויות הכי טובות בארץ..."
+  /לסוכנויות/, /recruiting agency/i, /staffing agency/i,
   // drushim.co.il category pages: "מצאנו 200 הצעות עבודה חדשות" / "27 משרות חדשות"
   /מצאנו \d+ הצעות עבודה/,
   /הצעות עבודה חדשות/,
@@ -136,7 +142,10 @@ function isJobSeekerPost(result: SerperResult): boolean {
 function isUSAJob(result: SerperResult): boolean {
   const text = `${result.title} ${result.snippet}`;
   return /\bIsrael,\s*OH\b/i.test(text) || /\bOhio\b/i.test(text) ||
-    /,\s*TX\b|,\s*CA\b|,\s*NY\b|,\s*FL\b|,\s*GA\b|,\s*WA\b/i.test(text);
+    /,\s*TX\b|,\s*CA\b|,\s*NY\b|,\s*FL\b|,\s*GA\b|,\s*WA\b|,\s*MA\b|,\s*NJ\b|,\s*PA\b/i.test(text) ||
+    /\bMassachusetts\b|\bBoston,\s*(MA|Massachusetts)\b/i.test(text) ||
+    // Well-known US employer names that sometimes surface in Israeli Serper results
+    /Beth Israel Lahey Health|Kaiser Permanente|Mayo Clinic|HCA Healthcare/i.test(text);
 }
 
 // Filter out business/franchise opportunities (not actual employment jobs)

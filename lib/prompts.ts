@@ -696,6 +696,12 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    - If yearsExperience is between 2–4 AND the job explicitly uses "Senior", "בכיר/ה", "5+ שנות ניסיון", "6+ years", "ניסיון של 5 שנים ומעלה" → reduce score by 15 and add matchNegative: "המשרה מיועדת לבכירים — [X] שנות ניסיון עשויות להיות קצר מדי לדרישות התפקיד".
    - If careerChangeInterest is true: waive the over-qualified and under-experienced rules — entry-level in the NEW field is appropriate, and seniority in the old field doesn't transfer.
 
+   MANAGEMENT ASPIRATION MISMATCH — applies when the profile shows the candidate wants to advance to a management role:
+   Detect management aspiration from ANY of: targetRoles includes "מנהל", "manager", "F&B manager", "מנהל מסעדה"; additionalNotes says "רוצה להתקדם לניהול", "growth into management", "צמיחה לניהול", "מחפש תפקיד ניהולי".
+   If management aspiration detected AND the job is clearly a NON-management hands-on service role:
+   - "Food Service Aide", "Server Assistant", "Busboy", "מדיח כלים", "עוזר מטבח", "עובד מטבח", "עוזר מלצר", "שליח" → set matchScore to MAX 15. Add matchNegative: "תפקיד ביצועי ללא אחריות ניהולית — מתחת ליעד הניהולי שציינת".
+   Do NOT apply this rule when the candidate is making a full career change — only when staying in the same industry but seeking promotion.
+
 8a. NICHE TECHNOLOGY / PLATFORM MISMATCH:
    If the job description is centered on a very specific proprietary platform or niche tech that requires dedicated training — and it is NOT mentioned anywhere in the candidate's skills:
    → Reduce score by 15 and add matchNegative: "המשרה מצריכה ניסיון ב-[פלטפורמה] שאינה מוזכרת בפרופיל שלך".
@@ -726,6 +732,14 @@ Scoring weights (after constraints applied):
 LANGUAGE BONUS: If the candidate is fluent in a European language beyond English (German, French, Dutch, Spanish, Russian) OR in Arabic, AND the job description mentions that language OR the company clearly operates in that market: add +8 to matchScore and include in matchReasons.
 - European language: "שפת ה-[שפה] שלך היא יתרון ממשי כאן — רוב המועמדים לא מביאים אותה"
 - Arabic: "ערבית שפת אם היא יתרון אמיתי לחברות שמשרתות שוק ערבי — בארץ ובמדינות המפרץ"
+
+NON-JOB LISTING GUARD: Before scoring, check if this is actually a job posting:
+Signs it is NOT a job posting (set matchScore to 5):
+- Title is a recruitment agency solicitation: "לסוכנויות", "לחברות גיוס", "staffing agency"
+- Title is a job fair/event: "ירידת קריירה", "job fair", "דרושים [month] [year]" referring to an event
+- Title describes a generic category listing with no specific role: "דרושים X - Jobnet", "[company] - משרות עדכניות"
+- The Full Description contains no job requirements, no skills, no employer name — just marketing copy
+In these cases: set matchScore to 5 and add matchNegative: "זו אינה מודעת משרה ספציפית — סינון".
 
 THIN DESCRIPTION RULE: If the Full Description is shorter than 120 characters (typical of Facebook snippets or Serper truncations), treat it as LOW CONFIDENCE data. In this case:
 → Do NOT infer details that are not stated. Do NOT assume remote, salary, or seniority requirements.
