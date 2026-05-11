@@ -108,11 +108,11 @@ export default function AdvisorPageInner() {
   }, [profileId]);
 
   useEffect(() => {
-    if (sessionStatus === "unauthenticated" && !guestProfileId) {
+    if (sessionStatus === "unauthenticated") {
       router.replace("/auth/signin?callbackUrl=%2Fadvisor");
       return;
     }
-  }, [sessionStatus, guestProfileId, router]);
+  }, [sessionStatus, router]);
 
   useEffect(() => {
     if (sessionStatus === "loading") return;

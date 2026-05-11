@@ -23,7 +23,7 @@ export default function SiteFooter() {
         {
           label: "כלים",
           links: [
-            { href: "/advisor?profileId=default-advisor", label: "יועץ קריירה" },
+            { href: "/auth/signin?callbackUrl=%2Fadvisor", label: "יועץ קריירה" },
             { href: "/cv-builder", label: "בונה קורות חיים" },
             { href: "/tracker", label: "מעקב בקשות" },
           ],
@@ -49,7 +49,7 @@ export default function SiteFooter() {
         {
           label: "Tools",
           links: [
-            { href: "/advisor?profileId=default-advisor", label: "Career Advisor" },
+            { href: "/auth/signin?callbackUrl=%2Fadvisor", label: "Career Advisor" },
             { href: "/cv-builder", label: "CV Builder" },
             { href: "/tracker", label: "Job Tracker" },
           ],
@@ -66,19 +66,18 @@ export default function SiteFooter() {
 
   return (
     <footer
-      className="border-t border-white/[0.06] mt-8"
-      style={{ background: "rgba(12,12,13,0.60)" }}
+      className="border-t border-black/[0.06] dark:border-white/[0.06] mt-8 bg-white dark:[background:rgba(12,12,13,0.60)]"
     >
       <div className="max-w-5xl mx-auto px-4 md:px-6 pt-12 pb-8">
         {/* Top row: logo + columns */}
-        <div className={`grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 pb-10 border-b border-white/[0.05]`} dir={he ? "rtl" : "ltr"}>
+        <div className={`grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 pb-10 border-b border-black/[0.05] dark:border-white/[0.05]`} dir={he ? "rtl" : "ltr"}>
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2.5 mb-3 hover:opacity-90 transition w-fit">
               <LogoMark size="sm" />
-              <span className="text-white font-semibold tracking-tight">Work Hunter</span>
+              <span className="text-black dark:text-white font-semibold tracking-tight">Work Hunter</span>
             </Link>
-            <p className="text-white/35 text-xs leading-relaxed max-w-[180px]">
+            <p className="text-black/35 dark:text-white/35 text-xs leading-relaxed max-w-[180px]">
               {he
                 ? "חיפוש עבודה חכם, מונחה בינה מלאכותית, בעברית."
                 : "AI-powered job search, built for the Israeli market."}
@@ -88,7 +87,7 @@ export default function SiteFooter() {
           {/* Link columns */}
           {columns.map((col) => (
             <div key={col.label}>
-              <p className="text-white/25 text-[10px] font-semibold uppercase tracking-[0.10em] mb-3">
+              <p className="text-black/25 dark:text-white/25 text-[10px] font-semibold uppercase tracking-[0.10em] mb-3">
                 {col.label}
               </p>
               <ul className="space-y-2">
@@ -96,7 +95,7 @@ export default function SiteFooter() {
                   <li key={l.href}>
                     <Link
                       href={l.href}
-                      className="text-white/50 hover:text-white/90 text-sm transition"
+                      className="text-black/50 hover:text-black/90 dark:text-white/50 dark:hover:text-white/90 text-sm transition"
                     >
                       {l.label}
                     </Link>
@@ -112,9 +111,9 @@ export default function SiteFooter() {
           className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
           dir={he ? "rtl" : "ltr"}
         >
-          <p className="text-white/25 text-xs">{tx.footerRights}</p>
+          <p className="text-black/25 dark:text-white/25 text-xs">{tx.footerRights}</p>
           <div className="flex items-center gap-4">
-            <span className="text-white/20 text-[10px] uppercase tracking-widest">
+            <span className="text-black/20 dark:text-white/20 text-[10px] uppercase tracking-widest">
               {he ? "עברית / English" : "Hebrew / English"}
             </span>
           </div>
