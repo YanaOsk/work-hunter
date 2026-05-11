@@ -445,7 +445,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
             <svg className="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <h3 className="text-amber-300 text-xs font-semibold uppercase tracking-wide">{tx.goalDeadlineTitle}</h3>
+            <h3 className="text-amber-300 text-xs font-semibold uppercase tracking-wide">{isStudyPath ? tx.goalStudyDeadlineTitle : tx.goalDeadlineTitle}</h3>
             {weeksLeft !== null && (
               <span className="ms-auto text-amber-400 text-xs font-bold tabular-nums">
                 {weeksLeft} {tx.goalWeeksLeft}

@@ -579,7 +579,7 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
 
 Profile:
 ${profile}
-${freeformIntro ? `\nCandidate's own words (free-form intro — highest priority context, read carefully):\n${freeformIntro}\n` : ""}
+${freeformIntro ? `\nCandidate's own words (free-form intro — MANDATORY READ, highest priority signal):\n${freeformIntro}\n\n⚠️ FREE-TEXT INTEGRATION RULE: The above free-text is what the candidate actually wrote in their own voice. You MUST quote or directly paraphrase at least one specific phrase from it in either topMessage or reflection. If you generate advice that could apply to ANY person with similar personality scores but ignores what THIS person specifically said about themselves, you have failed the most important part of the analysis. The free-text overrides any pattern the personality questions suggest.\n` : ""}
 Personality answers:
 ${answers}
 
