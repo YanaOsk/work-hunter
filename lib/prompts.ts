@@ -496,6 +496,8 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
 
    SAME-REGION RULE: Kfar Saba ↔ Herzliya ↔ Ra'anana ↔ Petah Tikva ↔ Tel Aviv = same Greater Tel Aviv region, no penalty. Haifa ↔ Acre ↔ Kiryat Ata = same Greater Haifa region, no penalty. Tiberias ↔ Haifa = ~75km, acceptable for a 40km radius worker only if within that radius.
 
+   MULTI-LOCATION JOBS: If the job title or description lists multiple work locations (e.g., "כפר סבא / יוקנעם / קרית שמונה"), evaluate commute based on the CLOSEST listed location to the candidate. If that closest location is within range → score normally but note in matchNegatives that the candidate should confirm which location applies. If the CLOSEST location exceeds maxCommuteKm → apply normal distance penalty as if the job were at the closest (but still too-far) location. Do NOT use the farthest location to unfairly penalize, but do NOT use the closest to mask that most listed locations are too far.
+
    RELOCATION REQUIRED: If the job explicitly mentions "רילוקיישן", "נכונות למעבר דירה", "relocation required", OR mentions a foreign city (Bangkok, London, New York, etc.) as the work location AND the candidate has a stated home city in Israel without explicitly saying they are open to relocation → set matchScore to MAX 10. This rule applies even when maxCommuteKm is NOT set — any candidate with a stated Israeli home city is assumed to want local work unless they explicitly say otherwise.
 
    OUT-OF-REGION JOBS: Even without maxCommuteKm and without no-car, if the candidate has a stated home city AND the job is onsite in a clearly different geographic region of Israel (e.g., a Gush Dan/Tel Aviv area resident → South Israel or North Israel job, a Jerusalem resident → Tel Aviv job with no transit statement):
@@ -685,7 +687,7 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    - Lawyer → chef / kitchen work (unless careerChangeInterest to culinary is stated)
    - Marketing manager / digital marketing manager → customer service rep / שירות לקוחות / תמיכה טכנית (completely different function — marketing creates demand, service handles complaints)
    - Marketing manager → store manager / מנהלת חנות / retail chain manager (marketing ≠ retail ops; these require completely different daily work)
-   - Mechanical / systems engineer (targeting PM in tech/defense/industrial) → construction PM / residential housing PM / בנייה למגורים (defense/industrial engineering background transfers to tech/industrial project management, NOT to real estate/residential construction — completely different regulatory, contractual, and operational context)
+   - Mechanical / systems engineer (targeting PM in tech/defense/industrial) → construction PM / residential housing PM / בנייה למגורים (defense/industrial engineering background transfers to tech/industrial project management, NOT to real estate/residential construction — completely different regulatory, contractual, and operational context). SPECIFIC HEBREW KEYWORDS that trigger this rule: "פרויקטי מגורים", "בנייה רוויה", "פרויקטי בינוי למגורים", "ניהול פרויקטים בינוי", "חברת בנייה", "יזמות נדל"ן", "שיכון" — if these appear in the job title or description for a mechanical/systems engineer profile → set matchScore to MAX 15 unconditionally.
 
    RELATED examples — do NOT penalize:
    - Restaurant manager → hotel F&B manager, catering manager, venue/event food operations, club F&B director (same food-service domain)
@@ -711,6 +713,11 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    - If yearsExperience >= 2 AND careerChangeInterest is false AND the job explicitly targets inexperienced candidates ("ללא ניסיון", "סטודנטים", "0-1 שנות ניסיון", "entry level", "fresh graduate", "first job") → reduce score by 20 and add matchNegative: "משרת כניסה — מתחת לרמת הניסיון שלך".
    - If yearsExperience <= 1 AND the job requires extensive experience ("5+ שנות ניסיון", "Senior", "בכיר", "10 years", "experienced only") → reduce score by 20 and add matchNegative: "המשרה דורשת ניסיון רב מהנוכחי".
    - If yearsExperience is between 2–4 AND the job explicitly uses "Senior", "בכיר/ה", "5+ שנות ניסיון", "6+ years", "ניסיון של 5 שנים ומעלה" → reduce score by 15 and add matchNegative: "המשרה מיועדת לבכירים — [X] שנות ניסיון עשויות להיות קצר מדי לדרישות התפקיד".
+
+   SENIORITY DOWNGRADE — MANAGER → COORDINATOR:
+   If the candidate's currentRole or targetRoles include "מנהל", "מנהלת", "Manager", "Director", "Head of" AND yearsExperience >= 4 AND careerChangeInterest is false AND the job title contains any of: "רכז/ת", "מתאם/ת", "Coordinator", "Associate", "Junior", "Specialist" (when these are clearly BELOW the management level the candidate already holds):
+   → Reduce score by 20 and add matchNegative: "תפקיד רכז/ת הוא ירידה בדרגה משמעותית ביחס לניסיון הניהולי שלך — השכר צפוי להיות נמוך מהציפיות".
+   Exception: if careerChangeInterest is true AND the new field is different from the old one → waive this rule (a career changer may accept a coordinator role in the new field).
    - If careerChangeInterest is true: waive the over-qualified and under-experienced rules — entry-level in the NEW field is appropriate, and seniority in the old field doesn't transfer.
 
    MANAGEMENT ASPIRATION MISMATCH — applies when the profile shows the candidate wants to advance to a management role:

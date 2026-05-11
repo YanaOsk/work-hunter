@@ -97,6 +97,13 @@ const GENERIC_PAGE_TITLE_PATTERNS = [
   /^\d+ משרות פנויות/,          // "47 משרות פנויות ב..."
   /^\d+ משרות ב[א-ת]/,          // "124 משרות בתל אביב"
   /כל הדרושים/,
+  // Job board search result pages (not actual job postings)
+  /משרות \| חיפוש עבודה/,       // "משרות | חיפוש עבודה | הצעות עבודה - AllJobs"
+  /חיפוש עבודה \| הצעות עבודה/,
+  /הצעות עבודה - alljobs/i,
+  // Generic "we're hiring" brand posts without a specific role
+  /מחפש\.?ת? עבודה שווה\?/,     // "מחפש.ת עבודה שווה? זה הפוסט בשבילך"
+  /זה הפוסט בשבילך/,
 ];
 
 const GENERIC_PAGE_URL_PATTERNS = [
