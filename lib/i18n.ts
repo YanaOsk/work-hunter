@@ -1062,7 +1062,7 @@ export const t = {
     selfIntroAgePh: "גיל",
     selfIntroLocationPh: "עיר או אזור",
     selfIntroStoryQ: "מה הסיפור שלכם בקצרה?",
-    selfIntroStorySub: "איפה הייתם מקצועית, מה אתם עושים היום, ומה עברתם בדרך. שלושה משפטים מספיק.",
+    selfIntroStorySub: "בלי לחץ — איפה הייתם מקצועית, מה אתם עושים היום, ומה עברתם בדרך. שלושה משפטים מספיק.",
     selfIntroStoryPh: "למדתי... עבדתי ב... היום אני...",
     selfIntroLovesQ: "מה מדליק אתכם?",
     selfIntroLovesSub: "בעבודה, בחיים — הדברים שגורמים לכם להרגיש חיים. זה חשוב יותר מכל מיומנות.",
