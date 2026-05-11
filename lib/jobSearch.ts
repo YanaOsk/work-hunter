@@ -74,7 +74,15 @@ const GENERIC_PAGE_TITLE_PATTERNS = [
   /\bjobs\b.*- facebook$/i, /\bwork\b.*- facebook$/i, /\bמשרות.*- facebook$/i,
   // Jobnet / board category pages: "דרושים ב[city/field]" with no specific role, or "משרות X | דרושים..."
   /^דרושים ב[א-ת]+ - Jobnet$/, /^דרושים ב[א-ת]+ – Jobnet$/,
+  /^דרושים ב[א-ת]+ – משרות/,   // "דרושים בירושלים – משרות פנויות ברפואה ובריאות"
   /^משרות [א-ת].* \| דרושים/,
+  // JobNet/JobMaster demographic or sector category pages
+  /פנסיונרים/,                  // "משרות לפנסיונרים", "דרושים פנסיונרים"
+  /חיפוש עבודה בחינם/,         // "חיפוש עבודה בחינם - Jobnet"
+  /^משרות פנויות ב/,            // "משרות פנויות בתחום..." (category landing)
+  /^\d+ משרות פנויות/,          // "47 משרות פנויות ב..."
+  /^\d+ משרות ב[א-ת]/,          // "124 משרות בתל אביב"
+  /כל הדרושים/,
 ];
 
 const GENERIC_PAGE_URL_PATTERNS = [
@@ -108,6 +116,9 @@ const JOBSEEKER_POST_MARKERS = [
   "מחפש הזדמנות", "מחפשת הזדמנות", "אני מחפש", "אני מחפשת",
   "זמין לעבודה", "זמינה לעבודה", "מעוניין במשרה", "מעוניינת במשרה",
   "מציג את עצמי", "קורות חיים לשיתוף", "שיתוף קו\"ח",
+  "מחפש פרויקט חדש", "מחפשת פרויקט חדש", "מחפש/ת פרויקט חדש",
+  "הבית החדש שלי",         // "מחפשת את הבית החדש שלי"
+  "מחפש עבודה כ", "מחפשת עבודה כ",
   "looking for work", "seeking employment", "available for hire",
   "open to work", "seeking a job", "job seeker", "seeking new opportunities",
   "i am looking for", "currently seeking",
@@ -116,6 +127,16 @@ const JOBSEEKER_POST_MARKERS = [
 function isJobSeekerPost(result: SerperResult): boolean {
   const text = `${result.title} ${result.snippet}`.toLowerCase();
   return JOBSEEKER_POST_MARKERS.some((m) => text.includes(m.toLowerCase()));
+}
+
+function normalizeJobTitle(title: string): string {
+  const separators = [" – ", " — ", " - ", " | ", " at ", " @ "];
+  let normalized = title;
+  for (const sep of separators) {
+    const idx = normalized.indexOf(sep);
+    if (idx > 0) normalized = normalized.slice(0, idx);
+  }
+  return normalized.toLowerCase().trim().replace(/\s+/g, " ");
 }
 
 async function generateSearchPlan(profileText: string): Promise<SearchPlan> {
@@ -184,7 +205,16 @@ async function runSearches(plan: SearchPlan): Promise<TaggedResult[]> {
   );
 
   const all = results.flat();
-  const deduped = all.filter((r, i, arr) => arr.findIndex((x) => x.link === r.link) === i);
+  // URL-based dedup first
+  const urlDeduped = all.filter((r, i, arr) => arr.findIndex((x) => x.link === r.link) === i);
+  // Content-based dedup: same job title from multiple board sources
+  const titlesSeen = new Set<string>();
+  const deduped = urlDeduped.filter((r) => {
+    const key = normalizeJobTitle(r.title);
+    if (titlesSeen.has(key)) return false;
+    titlesSeen.add(key);
+    return true;
+  });
   const active = deduped.filter((r) => !isSpam(r) && !isExpiredListing(r) && !isGenericLandingPage(r) && !isJobSeekerPost(r));
 
   // Pre-rank: results whose title overlaps a targetTitle keyword score first

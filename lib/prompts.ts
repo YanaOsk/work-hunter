@@ -482,6 +482,14 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    - If maxCommuteKm is set (e.g. 30) and the job is onsite in a different city far from candidate's location, reduce score by 15 and add a commute concern to matchNegatives.
    - If the job is remote or location is unclear, ignore this constraint.
 
+   PERIPHERAL CITIES — EXTREME DISTANCE PENALTY:
+   If the candidate lives in a true peripheral city (קריית שמונה, נהריה, צפת, טבריה — northern; מצפה רמון, קציעות, דימונה — southern Negev; אילת — far south) AND the job is onsite in the Tel Aviv/Gush Dan/Jerusalem/Haifa regions:
+   → These are 150-250 km distances — not a commute, a relocation.
+   → Reduce score by 35 (not 15) and add matchNegative: "המשרה נמצאת 150+ ק״מ ממקום המגורים — לא ריאלי כנסיעה יומית".
+   → Only waive if the candidate explicitly says they are willing to relocate.
+
+   SAME-REGION RULE: Kfar Saba ↔ Herzliya ↔ Ra'anana ↔ Petah Tikva ↔ Tel Aviv = same Greater Tel Aviv region, no penalty. Haifa ↔ Acre ↔ Kiryat Ata = same Greater Haifa region, no penalty.
+
 4. SALARY INFERENCE & FLOOR:
    Conversion rate: 182 hours/month. Convert hourly↔monthly as needed before comparing.
 
@@ -641,13 +649,33 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    - Management roles that typically require late hours (VP, Director, Head of) should also be flagged if the candidate has an exit time constraint.
 
 6a. PART-TIME CONSTRAINT:
-   - If additionalNotes or constraints mention "part-time", "max X hours/week", "student schedule", "חצי משרה", "30 שעות בשבוע", or similar — AND the job description uses language like "משרה מלאה", "full-time", "40 שעות", "נוכחות מלאה נדרשת", or "full availability expected":
-   → Reduce score by 25 and add matchNegative: "המשרה דורשת משרה מלאה — לא מתאים לאילוץ השעות שציינת".
+   DETECT part-time preference from ANY of: "חצי משרה", "part-time", "max X hours/week", "student schedule", "30 שעות בשבוע", "מקסימום X שעות", "עבודה חלקית", "5 שעות ביום", "מקסימום 5 שעות", "משרה חלקית".
+
+   If part-time preference detected AND the job says "משרה מלאה", "full-time", "40 שעות", "נוכחות מלאה", or "full availability expected":
+   → Set matchScore to MAX 20. Add as FIRST matchNegative: "המשרה דורשת משרה מלאה — לא מתאים לאילוץ חצי משרה שציינת".
+
+   If part-time preference detected AND the job does NOT mention hours/scope:
+   → Reduce score by 15. Add matchNegative: "לא ברור שהמשרה מציעה חצי משרה — כדאי לוודא לפני הגשה".
 
 7. PROFESSIONAL RELEVANCE (HARD FILTER):
    Evaluate whether the job's field/profession is related to the candidate's background or intended direction.
    - RELATED = same profession, adjacent field, or logical pivot (sales → account management, teacher → instructional designer, developer → product manager).
-   - UNRELATED = completely different profession with no skill overlap (e.g., sales rep → accountant; software developer → truck driver; nurse → graphic designer).
+   - UNRELATED = completely different profession with no skill overlap.
+
+   UNRELATED examples — all must receive MAX 15:
+   - Sales rep → accountant
+   - Software developer → truck driver
+   - Nurse → graphic designer
+   - Restaurant / F&B manager → cosmetics store or beauty salon manager (food service culture ≠ beauty retail — different product, supplier, customer, and operational culture; no meaningful overlap)
+   - Engineer (mechanical/civil) → social work or education
+   - Lawyer → chef / kitchen work (unless careerChangeInterest to culinary is stated)
+
+   RELATED examples — do NOT penalize:
+   - Restaurant manager → hotel F&B manager, catering manager, venue/event food operations, club F&B director (same food-service domain)
+   - Restaurant manager → food production operations manager, food industry supply chain (adjacent)
+   - Waiter → restaurant manager / shift manager (natural career progression within same field)
+   - Software engineer (PM pivot) → Product manager (engineering background is a plus, not a mismatch)
+
    - If careerChangeInterest is true: use targetRoles / additionalNotes to determine the NEW direction. A job in the new direction is RELATED even if it differs from currentRole.
    - If UNRELATED: set matchScore to MAX 15. Add as first matchNegative: "התפקיד אינו קשור לניסיון או לכיוון המבוקש" (Hebrew) or "Role is unrelated to the candidate's background or target direction" (English).
    - Do NOT penalize non-obvious pivots — only flag clearly irrelevant professions.
@@ -664,6 +692,12 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    Examples of niche platforms: Shopify/Liquid, SAP, Salesforce, Oracle ERP, SolidWorks, CATIA, Unity (game dev), Unreal Engine, ServiceNow, HubSpot (advanced configuration), Adobe Commerce (Magento).
    Do NOT apply for general transferable technologies (React, Python, Node.js, SQL, Excel, Google Workspace) — a good developer can learn these quickly.
    Only apply when the job description makes the niche platform the CORE requirement ("חייב ניסיון ב-Shopify", "experience with Salesforce CRM required"), not just a mention.
+
+8c. ISRAELIS ABROAD — "חברה ישראלית" CONSTRAINT:
+   If the candidate's location is outside Israel (e.g. "כיום גר/ה ב-[country]", "based in Germany", "living in the US") AND their profile/notes mention they want to work specifically for an Israeli company ("חברה ישראלית", "Israeli company", "רק חברות ישראליות"):
+   - AND the posting is clearly from a non-Israeli company with no Israeli connection → reduce score by 25 and add matchNegative: "הפרופיל מציין עדיפות לחברה ישראלית — חברה זו נראית לא ישראלית".
+   - AND the posting is from an Israeli company or an Israeli company operating globally → no penalty, add matchReason: "חברה ישראלית — מתאים לדרישת 'חברה ישראלית' שציינת".
+   - If no "חברה ישראלית" constraint is stated — skip this rule entirely.
 
 8b. BEAUTY / SALON SECTOR — SENIORITY RULE EXCEPTION:
    In beauty, nail, and salon job postings, "ללא ניסיון" or "לא חייבים ניסיון" means the salon provides its own in-house brand training — it does NOT mean the post targets students or inexperienced-only candidates. Experienced technicians are explicitly welcome.
