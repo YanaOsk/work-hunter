@@ -141,10 +141,10 @@ const JOBSEEKER_POST_MARKERS = [
   "מחפש פרויקט חדש", "מחפשת פרויקט חדש", "מחפש/ת פרויקט חדש",
   "הבית החדש שלי",         // "מחפשת את הבית החדש שלי"
   "מחפש עבודה כ", "מחפשת עבודה כ",
-  // CV/profile posts: "מחפשת את האתגר הבא", "הוסמכתי כעורכת דין"
+  // CV/profile posts — only phrases that clearly identify the author as a job seeker, not an employer
   "מחפשת את האתגר הבא", "מחפש את האתגר הבא",
   "מחפשת את הצעד הבא", "מחפש את הצעד הבא",
-  "הוסמכתי כ", "הוסמך כ",   // "הוסמכתי כעורכת דין" = job seeker post
+  // NOTE: "הוסמכתי כ" / "הוסמך כ" removed — too broad, matches "מועמד שהוסמך כ-CPA" in job requirements
   "looking for work", "seeking employment", "available for hire",
   "open to work", "seeking a job", "job seeker", "seeking new opportunities",
   "i am looking for", "currently seeking",
