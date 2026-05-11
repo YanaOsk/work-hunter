@@ -478,6 +478,24 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
 
    TYPE A / TYPE B — score normally: A clinic nurse job for a hospital nurse is a direct match, not a career change. A salaried real estate role for a freelance broker is a direct match. Evaluate these as regular candidates in their profession.
 
+2a. MEDICAL SETTING AVOIDANCE (healthcare workers):
+   DETECT setting-avoidance from ANY of: "עייפה/עייף מבית חולים", "לא רוצה משמרות לילה", "לא רוצה משמרות", "מחפשת/מחפש מרפאה", "מחפשת/מחפש קליניקה", "רוצה לצאת מבית חולים", "רוצה סביבה פחות לחוצה", "tired of hospital", "wants clinic work", "clinic only", "no nights", "no shifts".
+
+   If setting-avoidance detected:
+   - AND the job is clearly in a hospital, ER (חדר מיון), acute ward (מחלקת אשפוז, כירורגיה, פנימית), or explicitly mentions "משמרות לילה" / "night shifts" / "כוננות" → set matchScore to MAX 25. Add as FIRST matchNegative: "המשרה בסביבת בית חולים עם משמרות — ציינת שאת מחפשת עבודה מחוץ לסביבה זו".
+   - AND the job is in an HMO clinic, outpatient clinic, private clinic, or occupational health → treat as strong positive. Add to matchReasons: "עבודה בסביבת מרפאה/קליניקה — בדיוק הסביבה שחיפשת".
+   - AND the job is "Clinical Coordinator", "מתאמת קלינית", or research role → treat as good match, add to matchReasons.
+   - AND the job mentions only "day shifts" / "שעות קבועות" / "ללא משמרות" → treat positively even if hospital-based.
+
+2b. HYBRID OFFICE-DAY MISMATCH:
+   DETECT office-day maximum from ANY of: "מקסימום X ימים משרד", "max X days in office", "X ימי נוכחות לכל היותר", "עד X ימים משרד", "X days onsite max".
+
+   If office-day maximum detected (e.g., candidate said "max 2 days office"):
+   - AND the job specifies EXACTLY that count or fewer → no penalty.
+   - AND the job specifies 1 extra day (e.g., job says "3 ימי משרד" vs candidate's max 2) → reduce score by 15. Add matchNegative: "המשרה מציינת [X] ימי נוכחות — ציינת מקסימום [Y] ימים".
+   - AND the job specifies 2+ extra days or is fully onsite → apply Rule 1 (remote) logic; treat as mismatch.
+   - AND the job doesn't specify office days → reduce score by 10. Add matchNegative: "לא צוין מספר ימי הנוכחות — כדאי לברר לפני הגשה".
+
 3. COMMUTE:
    If maxCommuteKm is set AND the job is onsite in a different city:
    - Distance ≤ maxCommuteKm: no penalty.
@@ -516,6 +534,7 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    → The stated salary is a part-time floor. Before comparing against the full-time market ranges below, multiply salaryExpectation by 2 to get the full-time equivalent.
    → Example: "חצי משרה, 10,000 ₪" → full-time equivalent = 20,000 ₪ → compare 20,000 against the bookkeeper range (9,000–15,000 full-time) — mismatch flagged correctly.
    → Do NOT compare the raw part-time floor directly against full-time ranges — this produces false signals in both directions.
+   → JOB SALARY vs PART-TIME FLOOR: If the job lists a salary AND the job doesn't specify scope (unclear if full-time or part-time): estimate part-time pay = job_salary / 2. If estimated part-time pay < candidate's part-time floor → reduce score by 10, add matchNegative: "שכר משרה מלאה [Y]₪ — חצי משרה יהיה כ-[Y/2]₪, מתחת למינימום שלך [X]₪".
 
    Israeli market salary ranges (2026) — use these when no salary is listed:
 
@@ -1161,6 +1180,50 @@ CRITICAL RULES — read carefully before generating anything:
    - If candidate has social media emphasis: include "Social Media Manager" in one query
 
    ENFORCEMENT: Before outputting JSON, verify that for each applicable role above, at least one query uses the synonymous title — not only the candidate's exact stated title.
+
+18. GEOGRAPHIC ZONE EXPANSION — when candidate states a directional travel limit:
+
+   DETECT directional constraints from ANY of: "לא מוכנ[ה/] לנסוע דרומה מ...", "לא מגיע/ה מתחת ל...", "עד [עיר] בלבד", "רק צפון", "רק מרכז", "only north of...", "I won't travel south of...", "max north", "only cities in...".
+
+   When detected:
+   - Extract the anchor city/region (e.g., "חיפה" → acceptable zone is Haifa + everything NORTH)
+   - Generate queries that EXPLICITLY name multiple cities in the acceptable zone, not only the home city.
+   - Acceptable zone mapping:
+     * North of or equal to Haifa: Haifa, Krayot (קריות), Akko, Nahariya, Carmiel, Yokneam, Nesher, Tirat Carmel, Hadera (borderline — include), Upper Galilee
+     * North of Tel Aviv (Sharon): Herzliya, Ra'anana, Kfar Saba, Netanya, Hadera, Pardes Hanna
+     * Greater Tel Aviv only: Tel Aviv, Ramat Gan, Givatayim, Petah Tikva, Bnei Brak, Holon, Bat Yam, Ramat HaSharon
+     * South-only candidates: Beersheba, Ashdod, Ashkelon, Kiryat Gat, Dimona, Netivot
+   - MANDATORY: at least 1 of the 3 Hebrew queries must include a multi-city clause or a regional name (e.g., "אחות מרפאה קריות | נהריה | עכו | חיפה").
+   - Do NOT produce 3 queries all targeting only the single home city — that artificially limits the result pool.
+   - In searchRationale: explain the zone expansion (e.g., "הרחבנו לאזור חיפה-קריות-עכו כי המועמד/ת לא מוכנ/ה לנסוע דרומה מחיפה").
+
+19. CAREER CHANGE TIER OVERRIDE — applying correct Tier when source and target roles differ:
+
+   The Tier classification (Tier 0 / Tier 1 / Tier 2) must reflect the TARGET role, not the current role.
+
+   OVERRIDE RULE: When the candidate is performing a TYPE C career change (leaving profession A → entering profession B):
+   - If target role B is Tier 0 or Tier 1 → set requiresTraining: false, generate normal job queries for role B.
+   - Do NOT inherit Tier 2 from source role A if target role B is lower-Tier.
+   - EXAMPLE — Gannenet (Tier 2) → Office/Admin Manager (Tier 0): This is Tier 0. requiresTraining: false. Generate admin queries ("מנהל/ת משרד", "עוזר/ת ניהולי/ת", "רכז/ת משרד", "Office Manager ישראל").
+   - EXAMPLE — Lawyer (Tier 1) → HR Manager (Tier 0): Tier 0. requiresTraining: false. Generate HR queries.
+   - EXAMPLE — Accountant (Tier 1) → Financial Analyst (Tier 1): Tier stays 1. No override needed.
+   - EXAMPLE — Career changer from any role → nursing/medicine (Tier 2): requiresTraining: true — Tier 2 applies because TARGET is Tier 2.
+
+   In searchRationale: note the override when applied (e.g., "מעבר קריירה מגננת (Tier 2) לניהול משרד (Tier 0) — מחפשים לפי תפקיד היעד, לא המקצוע הנוכחי").
+
+20. ISRAELI ABROAD — candidate outside Israel seeking Israeli company remote:
+
+   DETECT from ANY of: candidate location is outside Israel (Germany, USA, UK, Netherlands, etc.) AND profile signals Israeli identity AND candidate mentions "חברה ישראלית", "עם ישראלים", "remote Israel", "Israeli company remote", "חברה ישראלית מרחוק", "רוצה לעבוד עם ישראלים", "ישראלי בחו"ל".
+
+   When detected:
+   - ALL queries must target Israeli-company remote postings. Do NOT generate queries for local jobs in their current country.
+   - Mandatory query patterns:
+     * Hebrew: "[תפקיד] חברה ישראלית רמוט", "[תפקיד] remote ישראל"
+     * English: "[role title] remote Israeli company", "[role title] Israel remote"
+   - Facebook query: search Israeli job groups (not expat groups in their country).
+   - LinkedIn query: include "Israel" and "remote" together.
+   - In searchRationale: "ישראלי/ת בחו"ל — כל החיפושים מכוונים לחברות ישראליות המגייסות לרמוט. לא מחפשים משרות [מדינה X]."
+   - isTech: determine by the role, not by location.
 
 Respond with JSON only:
 {
