@@ -224,7 +224,7 @@ export default function SelfIntro({ advisorState, onBack, onComplete }: Props) {
               <h2 className="text-2xl font-bold text-white mb-2">
                 {tx.selfIntroWelcome.replace("{name}", data.name.trim())}
               </h2>
-              <p className="text-white/70 leading-relaxed">{tx.selfIntroWelcomeSub}</p>
+              <p className="text-white/70 leading-relaxed">{tx.selfIntroWelcomeSub.replace("{name}", data.name.trim())}</p>
             </div>
           )}
 
