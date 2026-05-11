@@ -686,6 +686,12 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    - Waiter → restaurant manager / shift manager (natural career progression within same field)
    - Software engineer (PM pivot) → Product manager (engineering background is a plus, not a mismatch)
 
+   FOOD-ADJACENT but UNRELATED to restaurant operations — these SHOULD receive heavy penalty (-20) for candidates from restaurant/F&B service backgrounds:
+   - Restaurant manager → chocolate/candy brand operations manager (product company, no guest service component)
+   - Restaurant manager → food retail chain department manager / store manager (קמעונאות מזון — inventory/retail ops ≠ F&B service)
+   - Waiter → customer service rep at food brand (different work environment entirely)
+   The distinction: "food" in the company description does NOT make it restaurant-adjacent. Only companies where the core operation involves serving food/drinks to guests (restaurants, hotels, catering, bars, events) count as F&B-related.
+
    - If careerChangeInterest is true: use targetRoles / additionalNotes to determine the NEW direction. A job in the new direction is RELATED even if it differs from currentRole.
    - If UNRELATED: set matchScore to MAX 15. Add as first matchNegative: "התפקיד אינו קשור לניסיון או לכיוון המבוקש" (Hebrew) or "Role is unrelated to the candidate's background or target direction" (English).
    - Do NOT penalize non-obvious pivots — only flag clearly irrelevant professions.

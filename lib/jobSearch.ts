@@ -81,10 +81,15 @@ const GENERIC_PAGE_TITLE_PATTERNS = [
   // Facebook group pages: "משרות ל[group]", "משרות בתחום", "קבוצת משרות", "Hi-Tech Jobs israel - Facebook"
   /^משרות ל/, /^משרות בתחום/, /קבוצת משרות/,
   /\bjobs\b.*- facebook$/i, /\bwork\b.*- facebook$/i, /\bמשרות.*- facebook$/i,
+  /^דרושים .* - facebook$/i,   // "דרושים מנהלי מסעדות - Facebook" (category page, not a job)
   // Jobnet / board category pages: "דרושים ב[city/field]" with no specific role, or "משרות X | דרושים..."
   /^דרושים ב[א-ת]+ - Jobnet$/, /^דרושים ב[א-ת]+ – Jobnet$/,
   /^דרושים ב[א-ת]+ – משרות/,   // "דרושים בירושלים – משרות פנויות ברפואה ובריאות"
+  /^דרושים בתחום/,              // "דרושים בתחום עוזר מנהל - Jobnet" (category, not specific job)
   /^משרות [א-ת].* \| דרושים/,
+  // Blog / article / report pages: "Accountant Job Outlook & Demand Report 2026 - Intuit Blog"
+  /\bblog\b/i,                  // any title containing "blog" is not a job posting
+  /job outlook/i, /demand report/i, /\bguide\b.*\bjobs?\b/i, /salary guide/i,
   // JobNet/JobMaster demographic or sector category pages
   /פנסיונרים/,                  // "משרות לפנסיונרים", "דרושים פנסיונרים"
   /חיפוש עבודה בחינם/,         // "חיפוש עבודה בחינם - Jobnet"
@@ -97,6 +102,7 @@ const GENERIC_PAGE_TITLE_PATTERNS = [
 const GENERIC_PAGE_URL_PATTERNS = [
   /\/(jobs|careers|positions|משרות)\/?$/, // bare category pages
   /\?category=/, /\?type=remote/, /\/tag\//, /\/category\//,
+  /\/blog\//, /\/resource[s]?\//, /\/insight[s]?\//, /\/guide\//,  // blog/content pages
 ];
 
 function isGenericLandingPage(result: SerperResult): boolean {
