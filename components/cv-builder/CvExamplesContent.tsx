@@ -113,7 +113,7 @@ function ExampleCard({ example }: { example: typeof EXAMPLES[0] }) {
           className="w-full text-[10px] font-semibold py-1.5 rounded-lg transition-all hover:opacity-90 active:scale-[0.97]"
           style={{ background: example.accent + "22", color: example.accent }}
         >
-          {lang === "he" ? "צפה בדוגמה" : "View Example"}
+          {lang === "he" ? "פתחו דוגמה" : "View Example"}
         </button>
       </div>
     </div>
@@ -142,7 +142,7 @@ export default function CvExamplesContent({ compact = false }: Props) {
             קורות חיים לכל מקצוע
           </h2>
           <p className="text-white/50 text-sm">
-            דוגמאות מקצועיות בעברית. בחרו מקצוע וצרו קורות חיים מותאמים אישית.
+            בחרו מקצוע וצרו קורות חיים מותאמים — בעברית, בכמה דקות.
           </p>
         </div>
       )}

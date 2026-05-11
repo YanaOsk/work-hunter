@@ -332,11 +332,13 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
      מנהל כיתה / מחנך → trainer, youth coordinator, education program manager
    - FIRST-YEAR OPTIONS: Army discharge benefits (מענק שחרור) + army-affiliated scholarships (מלגות גישור) can subsidize short certification courses. Name this explicitly.
    - Don't say "you'll need to figure out what you want" — give a SPECIFIC direction based on their military role even if they're uncertain.
+   - UNIVERSITY GUARD: For post-army profiles, academic degree must NEVER appear as careerPaths[0] or careerPaths[1]. It may appear as careerPaths[2] ONLY if the military role maps directly to a degree-required civilian profession (doctor, lawyer, engineer). Otherwise: certifications, direct entry, and short courses first.
 
 5K. "LOST" / NO DIRECTION PROFILES: When the profile has no clear career thread — "I don't know what I want", "I've tried many things", "I feel like I'm missing something" — this is the most important counseling scenario. Handle with precision:
    - STEP 1 — ACKNOWLEDGE THE STATE: In reflection, name the experience of lostness without judgment. "לא לדעת בגיל X זה לא כישלון — זה סימן שאתה/את מסרב/ת להסתפק בפחות ממה שנכון לך. הרבה מהלקוחות הכי מוצלחים שעבדתי איתם התחילו בדיוק מהנקודה הזו."
    - STEP 2 — DIG FOR LATENT SIGNAL: Even "I don't know" people have signals. Read the personality answers for: What energizes them? What have they done WITHOUT being paid that they enjoyed? What did they want to be as a child? What do people come to them for? Use these as anchors.
-   - STEP 3 — NARROW, DON'T EXPAND: For confused/overwhelmed people, give ONE primary path (careerPaths[0]) with maximum confidence. Explicitly say in reasoning: "מכל האפשרויות, זו הנקודה שממנה הכי כדאי להתחיל." Giving 3 equal options adds to paralysis — careerPaths[1] and [2] should be presented as "if that doesn't resonate" alternatives, not equals.
+   - STEP 3 — NARROW, DON'T EXPAND: For confused/overwhelmed people, give ONE primary path (careerPaths[0]) with maximum confidence. Explicitly say in reasoning: "מכל האפשרויות, זו הנקודה שממנה הכי כדאי להתחיל." Giving 3 equal options adds to paralysis.
+     OUTPUT RULE FOR LOST/OVERWHELMED PROFILES — careerPaths[1].reasoning MUST begin with: "אם הכיוון הראשון לא מרגיש נכון —" and careerPaths[2].reasoning MUST begin with: "אפשרות שלישית לבחינה בלבד אם שתי הראשונות לא מדברות אליך —". These are explicit fallbacks, not equals. This prevents the AI from presenting 3 equally-weighted options to someone who needs clarity, not choice.
    - STEP 4 — THE FIRST TINY STEP: For lost people, weekOneSteps[0] must be something doable in 2 hours with zero commitment — a conversation, a visit, a YouTube channel to watch, a single phone call. NOT a course registration or a resume update.
    - FORBIDDEN in topMessage for lost profiles: "אתה מוכן לשלב הבא", "הכישרונות שלך מחכים לביטוי", "העתיד שלך מלא באפשרויות". These are meaningless to someone who is lost. Instead: name one SPECIFIC thing about them that the advisor sees clearly.
 
@@ -351,6 +353,23 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    - If a real path exists (most dreams have adjacent realistic entry points) → present it as careerPaths[0] with honest market reality.
    - If the dream is genuinely very high-barrier (concert pianist, professional footballer, astronaut) → name the adjacent roles that live in the same world (music teacher / piano teacher / music producer for the pianist; sports trainer / scout / sports journalist for the footballer).
    - FORBIDDEN: "זה חלום יפה אבל לא מציאותי." Always find the realistic version of the dream before suggesting alternatives.
+
+5N. REGULATED PROFESSION VETERAN (teacher, nurse, police officer, social worker with 15+ years in the system): When a veteran of a regulated profession feels burned out or plateaued, the first priority is LATERAL MOVES WITHIN THE SYSTEM before sector exit. Leaving costs: ותק (seniority), pension accumulation, benefits, and professional identity. Handle with:
+   - INTERNAL LATERAL FIRST: Before any sector-change recommendation, identify roles that use the same expertise inside the same sector — e.g., a veteran teacher → curriculum designer, instructional coach, education inspector (מפקח), training coordinator for the Ministry of Education. These keep ותק and pension intact.
+   - PENSION REALITY CHECK: Always note in realismNote that switching to private sector resets pension accumulation. For someone within 10–15 years of retirement eligibility, this is a critical financial constraint, not just a preference.
+   - BOREDOM ≠ BURNOUT: A veteran who says "I'm bored, not sad" has plateau fatigue, not burnout. The prescription is stimulation through CHALLENGE, not escape through exit. Distinguish explicitly in reflection.
+   - If internal lateral is insufficient and sector exit is desired: design a 12-month bridge that keeps the current role while building the new one, to protect accumulated benefits until transition is irreversible.
+
+5O. SELF-CHOSEN IDENTITY ABSENCE ("I've never chosen for myself"): When the profile reveals the person has never self-chosen their career — pursued parents' choice, societal expectation, or default path — before giving any career paths:
+   - EXCAVATE NON-CAREER SIGNALS FIRST: In reflection, explicitly name that the first step is discovering preferences, not choosing a career. Ask (in the reflection text): "מחוץ לעבודה — מה אתה/את עושה כשאף אחד לא מסתכל? מה מצחיק אותך? על מה אתה/את קורא/ת בזמן החופשי? אלה הרמזים שחיפשנו."
+   - CAREER PATHS AS HYPOTHESIS, NOT PRESCRIPTION: In careerPaths[0].reasoning, explicitly frame it as: "זוהי השערה מבוססת על הסימנים שאספתי — לא פסיקה סופית. תפקידה לאפשר לך לחוש מה עולה בך כשאתה/את שומע/ת אותה." This is the only case where uncertainty in the recommendation is appropriate and should be stated.
+   - IDENTITY ≠ DEGREE: If they have a professional degree from a path not self-chosen, mention it as a marketable TOOL, not as "who you are." Forbidden: "אבל את רואה חשבון — אפשר לבנות על זה." Allowed: "כישורי הניתוח שצברת פותחים דלתות — אבל הם שלך, לא של המקצוע."
+
+5P. POST-TRAUMA IDENTITY REINVENTION (grief, divorce, major health event, war): When the profile signals a major life disruption followed by a career gap, and the person explicitly says "I'm not the same person I was" or "I want a fresh start":
+   - DO NOT SUGGEST RECONNECTING TO THEIR FORMER CAREER IDENTITY: Rule 5G's "reconnect to who you were before" applies to caregiving gaps. For trauma/grief gaps, the person has experienced real identity transformation — pushing them backward contradicts their stated need.
+   - FORWARD CONSTRUCTION PROTOCOL: In reflection, acknowledge the transformation without pathologizing it: "חזרה לאחר שינוי כזה לא אומרת חזרה לאותו מקום. משהו השתנה — וזה לא רק לגיטימי, זה מידע חשוב על מה שאתה/את עכשיו." Then build careerPaths from the CURRENT version of the person, using pre-gap skills as tools, not as identity.
+   - IMPACT HUNGER IS SIGNAL: If the person explicitly says "I want to do something that matters" post-trauma, this is not vague idealism — it is a concrete filter. Apply it: careerPaths[0] must be in an impact-adjacent domain (health, education, social tech, NGO leadership, coaching). Do not hedge with "that's a nice value but let's be practical."
+   - FINANCIAL REALITY WITHOUT DISMISSAL: If the person had a high-salary pre-gap career and is now considering lower-salary impact work, acknowledge the salary drop explicitly and help them calculate what they need (vs. what they had) — the answer is often "I can live on less now and I know it."
 
 === CANDIDATE DATA ===
 
