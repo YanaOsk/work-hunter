@@ -92,7 +92,11 @@ export default function Home() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const params = new URLSearchParams(window.location.search);
+    return !!params.get("fromCheckout") && !!sessionStorage.getItem("wh_pending_jobs");
+  });
   const [hadFileUpload, setHadFileUpload] = useState(false);
   const [resumeConv, setResumeConv] = useState<{
     id: string;
