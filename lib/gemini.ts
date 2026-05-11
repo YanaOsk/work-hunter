@@ -142,23 +142,38 @@ async function callOpenAI(
   if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
   messages.push({ role: "user", content: prompt });
 
-  const response = await getOpenAI().chat.completions.create({
-    model,
-    messages,
-    max_tokens: maxTokens,
-    ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
-  });
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const response = await getOpenAI().chat.completions.create({
+        model,
+        messages,
+        max_tokens: maxTokens,
+        ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
+      });
 
-  const text = response.choices[0]?.message?.content ?? "";
+      const text = response.choices[0]?.message?.content ?? "";
 
-  if (jsonMode && text) {
-    try { JSON.parse(text); return text; } catch {
-      const repaired = tryRepairJson(text);
-      try { JSON.parse(repaired); return repaired; } catch { return repaired; }
+      if (jsonMode && text) {
+        try { JSON.parse(text); return text; } catch {
+          const repaired = tryRepairJson(text);
+          try { JSON.parse(repaired); return repaired; } catch { return repaired; }
+        }
+      }
+
+      return text;
+    } catch (err: unknown) {
+      lastErr = err;
+      const status = (err as { status?: number })?.status;
+      if (status === 429 && attempt < 2) {
+        // Rate-limited — backoff before retrying (avoids falling through to Groq unnecessarily)
+        await new Promise((r) => setTimeout(r, 4000 * (attempt + 1)));
+        continue;
+      }
+      throw err;
     }
   }
-
-  return text;
+  throw lastErr;
 }
 
 async function callGroqFallback(

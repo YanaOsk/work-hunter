@@ -80,9 +80,20 @@ function isGenericLandingPage(result: SerperResult): boolean {
   const titleLower = result.title.trim().toLowerCase();
   if (GENERIC_PAGE_TITLE_PATTERNS.some((p) => p.test(titleLower))) return true;
   if (GENERIC_PAGE_URL_PATTERNS.some((p) => p.test(result.link))) return true;
-  // Very short snippet with no job-specific content is likely a category page
-  if (result.snippet.length < 60 && !/משרה|דרוש|מחפש|דרישות|ניסיון|job|hiring|position/i.test(result.snippet)) return true;
+  const snippet = result.snippet ?? "";
+  if (snippet.length < 60 && !/משרה|דרוש|מחפש|דרישות|ניסיון|job|hiring|position/i.test(snippet)) return true;
   return false;
+}
+
+const SPAM_PATTERNS = [
+  /[一-鿿㐀-䶿]/,  // Chinese characters anywhere in title
+  /vip[\s.]*(网|直推|cc|客服)/i,
+  /app下载|直推|叫炮|tg客服|网红服务|叫小姐|世界杯|竞彩|约小姐/i,
+  /→[a-z0-9]+\.(vip|cc|top|xyz)/i,  // spam shortlinks
+];
+
+function isSpam(result: SerperResult): boolean {
+  return SPAM_PATTERNS.some((p) => p.test(result.title));
 }
 
 const JOBSEEKER_POST_MARKERS = [
@@ -168,7 +179,7 @@ async function runSearches(plan: SearchPlan): Promise<TaggedResult[]> {
 
   const all = results.flat();
   const deduped = all.filter((r, i, arr) => arr.findIndex((x) => x.link === r.link) === i);
-  const active = deduped.filter((r) => !isExpiredListing(r) && !isGenericLandingPage(r) && !isJobSeekerPost(r));
+  const active = deduped.filter((r) => !isSpam(r) && !isExpiredListing(r) && !isGenericLandingPage(r) && !isJobSeekerPost(r));
 
   // Pre-rank: results whose title overlaps a targetTitle keyword score first
   const titleWords = plan.targetTitles.flatMap((t) =>
@@ -239,9 +250,10 @@ function normalizeSerperDate(dateStr?: string): string | undefined {
 
 async function analyzeMatch(profileText: string, job: TaggedResult, lang = "he"): Promise<JobResult> {
   const fullContent = await fetchJobContent(job.link);
+  const snippet = job.snippet ?? "";
   // Use full page content only when it's substantially richer than the snippet
   const description =
-    fullContent && fullContent.length > job.snippet.length * 2 ? fullContent : job.snippet;
+    fullContent && fullContent.length > snippet.length * 2 ? fullContent : snippet;
 
   try {
     const text = await geminiAnalyze(
