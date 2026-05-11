@@ -228,7 +228,7 @@ export default function InterviewPhase({ userProfile, onComplete, onBack, initia
   const hasCvData = !!(pd?.name || pd?.currentRole || (pd?.skills as string[] | undefined)?.length);
   const userMessageCount = messages.filter((m) => m.role === "user").length;
   const hasConversationContext = userMessageCount > 1;
-  const needsCvChoice = readyToSearch && hasCvData && hasConversationContext && cvUsage === null;
+  const needsCvChoice = readyToSearch && hadFileUpload && hasCvData && hasConversationContext && cvUsage === null;
 
   const handleStartSearch = (chosenUsage?: CvUsage) => {
     const usage = chosenUsage ?? cvUsage ?? "both";
