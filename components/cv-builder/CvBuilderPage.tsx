@@ -71,6 +71,12 @@ export default function CvBuilderPage() {
   const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth/signin?callbackUrl=%2Fcv-builder");
+    }
+  }, [status, router]);
+
+  useEffect(() => {
     if (status === "authenticated") {
       fetch("/api/subscription")
         .then((r) => r.json())
