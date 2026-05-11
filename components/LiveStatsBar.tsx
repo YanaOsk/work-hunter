@@ -6,13 +6,13 @@ import CountUp from "./CountUp";
 const STATS = [
   {
     value: 421,
-    he: "קורות חיים נבנו היום",
+    he: "אנשים בנו היום קורות חיים מדויקים",
     en: "resumes built today",
     color: "#5E6AD2",
   },
   {
     value: 187,
-    he: "תוכניות קריירה נבנו מאפס",
+    he: "תוכניות קריירה נבנו מהיסוד",
     en: "career plans built from scratch",
     color: "#4ADE80",
   },

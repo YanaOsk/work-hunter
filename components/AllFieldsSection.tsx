@@ -35,11 +35,11 @@ export default function AllFieldsSection() {
             {he ? "לכולם" : "FOR EVERYONE"}
           </p>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 tracking-[-0.03em]">
-            {he ? "לכל תחום. לכל נקודת פתיחה." : "Every field. Every background."}
+            {he ? "בכל תחום ומכל נקודת פתיחה." : "Every field. Every background."}
           </h2>
           <p className="text-white/45 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
             {he
-              ? "משוחרר טרי, מורה, מהנדס, איש מכירות — Work Hunter מכיר את שוק העבודה הישראלי לעומק, בכל תחום."
+              ? "זה לא משנה אם אתם משוחררים טריים, מורים, אנשי מכירות או מהנדסים – Work Hunter מכיר מקרוב את כל מה שקורה היום בשוק העבודה הישראלי."
               : "Engineers, teachers, salespeople, or career changers — Work Hunter knows the Israeli job market across every sector"}
           </p>
         </div>
@@ -65,7 +65,7 @@ export default function AllFieldsSection() {
         {/* Bottom note */}
         <p className="text-center text-white/25 text-xs mt-8 tracking-wide">
           {he
-            ? "ועוד עשרות תחומים — אם אתם בחיפוש, אנחנו כבר כאן."
+            ? "ועוד עשרות תחומים נוספים — אם אתם מחפשים עבודה, Work Hunter יודע לעזור"
             : "And dozens more — if you're job hunting, Work Hunter knows how to help"}
         </p>
       </div>

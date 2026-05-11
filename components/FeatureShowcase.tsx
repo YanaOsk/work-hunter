@@ -232,7 +232,7 @@ export default function FeatureShowcase() {
         ? "היועץ שואל את השאלות שאף מגייס לא ישאל — על ערכים, על סביבות עבודה, על מה שמפעיל אתכם. התוצאה: אבחון כתוב עם חוזקות, מיומנויות מועברות ועיוורונות שכדאי לדעת."
         : "The advisor asks the questions no recruiter will — about values, work environments, what drives you. The output: a written diagnosis with strengths, transferable skills, and blind spots worth knowing.",
       bullets: he
-        ? ["חפירה אמיתית בכישורים שעוברים בין תחומים", "מה חשוב לכם בעבודה ואיך אתם עובדים בפועל", "2–3 מסלולים מומלצים שמתאימים לפרופיל שלכם"]
+        ? ["אבחון עמוק של כישורים מועברים", "מיפוי ערכים ואורח עבודה", "2–3 מסלולים מומלצים שמתאימים לפרופיל שלכם"]
         : ["Deep scan of transferable skills", "Values and work-style mapping", "2–3 recommended career paths that fit your profile"],
       accent: "#5E6AD2",
       mockup: <AdvisorMockup />,
@@ -264,7 +264,7 @@ export default function FeatureShowcase() {
         ? "הבינה המלאכותית כותבת מחדש את קורות החיים שלכם בשפה שמדברת לפרופיל הספציפי שאתם רוצים — ועוזרת לאופטימיזציה של הלינקדאין כך שמגייסים יגיעו אליכם."
         : "The AI rewrites your CV in language tuned to the specific role you're targeting — and optimizes your LinkedIn so recruiters come to you.",
       bullets: he
-        ? ["שכתוב של קורות החיים לתפקיד שאתם רוצים", "ניסוח שעובר מסנני ATS ומגיע לשולחן מגייסים", "אופטימיזציה של לינקדאין + כותרת מגנטית"]
+        ? ["כתיבה מחדש מותאמת לתפקיד הספציפי", "ניסוח מקצועי שעובר מסנני ATS", "אופטימיזציה של לינקדאין + כותרת מגנטית"]
         : ["Role-specific rewrite, not generic polish", "ATS-optimized language and structure", "LinkedIn headline and about-section upgrade"],
       accent: "#5E6AD2",
       mockup: <CvMockup />,
