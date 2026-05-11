@@ -88,7 +88,7 @@ const GENERIC_PAGE_TITLE_PATTERNS = [
   /^דרושים בתחום/,              // "דרושים בתחום עוזר מנהל - Jobnet" (category, not specific job)
   /^משרות [א-ת].* \| דרושים/,
   // Blog / article / report pages: "Accountant Job Outlook & Demand Report 2026 - Intuit Blog"
-  /\bblog\b/i,                  // any title containing "blog" is not a job posting
+  / blog$/i,                    // title ENDING with " blog" (e.g. "- Intuit Blog"), not mid-title "blog manager"
   /job outlook/i, /demand report/i, /\bguide\b.*\bjobs?\b/i, /salary guide/i,
   // JobNet/JobMaster demographic or sector category pages
   /פנסיונרים/,                  // "משרות לפנסיונרים", "דרושים פנסיונרים"
