@@ -11,6 +11,7 @@ import CvPreview from "./CvPreview";
 import CvUpgrader from "./CvUpgrader";
 import CvTranslator from "./CvTranslator";
 import CvExamplesContent from "./CvExamplesContent";
+import SubscriptionModal from "../SubscriptionModal";
 import {
   CV_ACCENT_COLORS,
   CV_TEMPLATES,
@@ -48,6 +49,7 @@ export default function CvBuilderPage() {
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [downloading, setDownloading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [showSubModal, setShowSubModal] = useState(false);
   const [advisorImport, setAdvisorImport] = useState<{ summary: string; improvements: Array<{ section: string; issue: string; suggestion: string }> } | null>(() => {
     if (typeof window === "undefined") return null;
     try {
@@ -229,7 +231,7 @@ export default function CvBuilderPage() {
     }
 
     if (isLoggedIn && !isSubscribed) {
-      window.location.href = "/pricing";
+      setShowSubModal(true);
       return;
     }
 
@@ -969,6 +971,10 @@ export default function CvBuilderPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {showSubModal && (
+        <SubscriptionModal trigger="cv" onClose={() => setShowSubModal(false)} />
       )}
     </div>
   );

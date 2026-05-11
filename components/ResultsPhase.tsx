@@ -15,8 +15,9 @@ import {
   updateApplicationStatus,
 } from "@/lib/applicationTracker";
 import { DEFAULT_ADVISOR_ID } from "@/lib/advisorState";
+import SubscriptionModal from "./SubscriptionModal";
 
-const FREE_RESULTS = 3;
+const FREE_RESULTS = 1;
 
 interface Props {
   jobs: JobResult[];
@@ -165,6 +166,7 @@ export default function ResultsPhase({
   const [sortKey, setSortKey] = useState<SortKey>("score");
   const [savedIds, setSavedIds] = useState<Set<string>>(() => new Set());
   const [showEmail, setShowEmail] = useState(false);
+  const [showSubModal, setShowSubModal] = useState(false);
 
   useEffect(() => {
     const apps = getApplications(profileId);
@@ -612,12 +614,12 @@ export default function ResultsPhase({
                   </div>
 
                   <div className="flex justify-center">
-                    <a
-                      href="/pricing"
+                    <button
+                      onClick={() => setShowSubModal(true)}
                       className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-8 py-3.5 rounded-xl transition-all duration-200 text-sm"
                     >
                       {tx.paywallCta}
-                    </a>
+                    </button>
                   </div>
                 </div>
 
@@ -644,6 +646,14 @@ export default function ResultsPhase({
           jobs={filtered.length > 0 ? filtered : jobs}
           lang={lang}
           onClose={() => setShowEmail(false)}
+        />
+      )}
+
+      {showSubModal && (
+        <SubscriptionModal
+          hiddenCount={hiddenCount}
+          trigger="jobs"
+          onClose={() => setShowSubModal(false)}
         />
       )}
     </div>
