@@ -106,7 +106,7 @@ export const REVIEWS: Review[] = [
     titleHe: "חזרה לעבודה אחרי 12 שנות אימהות — בלי פאניקה",
     titleEn: "Returning to work after 12 years of motherhood — without panic",
     bodyHe:
-      "הייתי אחות ולקחתי הפסקה של 12 שנה. חשבתי שאף אחד לא ירצה אותי. היועץ זיהה שהניסיון שלי רלוונטי לתפקידי תיאום בחברות רפואיות ושכתב לי CV שמציג את זה ככה. קיבלתי עבודה תוך 3 חודשים.",
+      "הייתי אחות ולקחתי הפסקה של 12 שנה. חשבתי שאף אחד לא ירצה אותי. היועץ זיהה שהניסיון שלי רלוונטי לתפקידי תיאום בחברות רפואיות ושכתב לי קורות חיים שמציגים את זה ככה. קיבלתי עבודה תוך 3 חודשים.",
     bodyEn:
       "I was a nurse and took a 12-year break. Thought nobody would want me. The advisor spotted that my experience fits medical coordination roles and rewrote my CV to show it. Got a job in 3 months.",
     rating: 5,
