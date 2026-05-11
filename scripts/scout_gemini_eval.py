@@ -36,7 +36,7 @@ if sys.stderr.encoding != "utf-8":
 APP_URL       = os.getenv("APP_URL", "http://localhost:3000")
 AGENT_SECRET  = os.getenv("AGENT_SECRET", "wh_agent_ba266400b2512e4be84f3ba35a7c3705")
 GEMINI_API_KEY = "AIzaSyAMjoUoYyKU8RrwlbrKPlV0dzf6wgDex8Y"
-GEMINI_MODELS  = ["gemini-2.5-flash", "gemini-2.0-flash-lite", "gemini-2.0-flash"]
+GEMINI_MODELS  = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite"]
 
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = 587
@@ -196,7 +196,7 @@ def build_email_html(results: list[dict], run_ts: str) -> str:
     ⚠️ זהו דוח מידע בלבד. <strong>אין שינויים בקוד</strong> — אישור נדרש לפני כל שינוי.
   </p>
   {rows}
-  <p style="color:#555;font-size:12px;margin-top:32px;">Work Hunter Scout QA Pipeline · Gemini {GEMINI_MODEL}</p>
+  <p style="color:#555;font-size:12px;margin-top:32px;">Work Hunter Scout QA Pipeline · Gemini {GEMINI_MODELS[0]}</p>
 </body>
 </html>"""
 
@@ -206,7 +206,7 @@ def main():
     run_ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     print(f"\n=== Scout + Gemini Eval — {run_ts} ===\n")
     print(f"  Scout endpoint: {APP_URL}/api/agent/scout-eval")
-    print(f"  Gemini model:   {GEMINI_MODEL}")
+    print(f"  Gemini models:  {GEMINI_MODELS}")
     print(f"  Report to:      {REPORT_TO}\n")
 
     results = []
