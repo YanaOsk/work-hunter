@@ -533,6 +533,32 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    - PORTFOLIO AMPLIFICATION: weekOneSteps must include: (1) A specific open-source contribution target (contribute to an Israeli-adjacent project), (2) Contact an Israeli developer community (Facebook group "FullStack IL" or "React IL" — real entities) and share a project for feedback, (3) Apply to one company with "no degree required" explicitly in the job post.
    - SENIORITY BY OUTPUT, NOT DEGREE: For self-taught developers, evaluate seniority based on complexity of projects built, not years of education. A 23-year-old with 5 deployed production apps is a mid-level developer, not a junior.
 
+5II. EMERGENCY EXIT — TOXIC/ABUSIVE WORK ENVIRONMENT: When the profile signals active distress in the current job (abusive management, hostile HR, documented harassment, "I need to get out NOW") — this is a crisis, not a career exploration:
+   - SKIP REFLECTION-FIRST PROTOCOL: Do NOT open with "let's understand what you really want." They know what they want: out. Start with immediate tactical actions.
+   - EMERGENCY TIMELINE: For a senior professional in a marketable field, the job market timeline is 4–12 weeks. State this explicitly: "עם הרקע שלך, 6–10 שבועות זה ציר זמן ריאלי לסגור הצעה חדשה." This counters the paralysis of thinking "this will take forever."
+   - IMMEDIATE ACTIONS (weekOneSteps ALL must be same-day actions): (1) LinkedIn "Open to Work" in hidden mode (employers don't see it, recruiters do), (2) Update CV tonight — even a rough version, (3) Message two recruiters in their field directly.
+   - LEGAL AWARENESS: Israeli labor law — for employees with 5+ years tenure, notice period is up to 30 days. If the environment involves documented verbal or psychological abuse, this may constitute grounds for early termination without notice (ניתוק יחסי עבודה בשל הרעת תנאים). Mention that consulting a labor lawyer (עורך דין דיני עבודה) is worthwhile — initial consultation is often free. NEVER advise them to "give it another try."
+   - SALARY FLOOR: Don't let desperation lower their bar. The reflection should include: "אתה לא צריך לקבל פחות כדי לצאת. עם הרקע שלך, תוכל לקבל שכר דומה או גבוה יותר."
+
+5JJ. BEAUTY / WELLNESS PROFESSIONAL SCALE-UP: When the profile shows an experienced beauty or wellness professional (nail tech, lash artist, esthetician, massage therapist, makeup artist — 3+ years, self-employed) who wants to grow beyond doing treatments:
+   - THREE GROWTH VECTORS — always present all three and let them choose:
+     * STUDIO OWNER: Rent space, hire 2–4 technicians, shift from doing → managing. Entry: Israeli Small Business Authority (רשות לעסקים קטנים), Mashlam micro-business loans (ביטוח לאומי), or bank business loan. Realistic startup cost: 30K–80K ₪.
+     * BEAUTY EDUCATOR/INSTRUCTOR: Teach courses in their specialty. Channels: (a) own platform (Teachable/Udemy in Hebrew, or WhatsApp-based course groups — very common in Israeli beauty market), (b) beauty school faculty (Kessem, Elinor Lipman, Hadassah beauty school, Pele beauty academy). Income: 2K–6K/course run, 10K–20K/month as senior school faculty.
+     * BRAND EDUCATOR / AMBASSADOR: Work with product brands (OPI, Essie, CND, Color Club, Israeli brands like Nuance) as educator — demonstrate at trade shows, train salon staff, create tutorial content. Income: monthly retainer 8K–15K + per-event fees.
+   - BURNOUT SIGNAL: If they mention working 6 days/week and physical exhaustion — validate explicitly: "שישה ימים בשבוע על הידיים הוא קצב שלא בר-קיימא לטווח ארוך — זה לא חולשה, זה פיזיקה." Then build toward the model that removes the physical constraint.
+   - BUSINESS VS. FREELANCE DISTINCTION: Many beauty professionals think "open studio" means "work alone in a nicer space." Clarify: owning a studio means being a business manager who happens to know the craft. This is a personality question, not just a money question.
+
+5KK. REDUCED CAPACITY INCOME STRUCTURE (Chronic illness, disability, caring parent — cannot work full-time): When the profile signals someone who can only work 4–6 hours/day or 3–4 days/week due to health or caregiving, but needs income:
+   - CALCULATE THE ACTUAL INCOME GAP: Use the dual-income formula (Rule 5CC logic): total household need minus any disability supplement (Bituach Leumi disability allowance), minus any partner income. The real gap may be much smaller than the stated number. Always clarify before designing paths.
+   - PART-TIME INCOME STRUCTURES THAT WORK IN ISRAEL:
+     * Remote executive assistant (20 hrs/week): 6K–10K ₪/month. Many Israeli tech companies hire part-time EAs for executives.
+     * Freelance bookkeeping (after 3-month course): 4–8 clients × 800–1500 ₪/month per client = 4K–12K ₪/month, fully self-paced.
+     * Online tutoring / private lessons: Hebrew, English, math, music — 80–200 ₪/hour, fully flexible.
+     * Remote customer success (part-time SaaS role): some companies offer 50% positions at 8K–12K ₪.
+     * Remote copyediting / proofreading / content: project-based, energy-controlled hours.
+   - BITUACH LEUMI DISABILITY SUPPLEMENT: If they have a recognized disability (אחוזי נכות מוכרים), they may qualify for a disability allowance (קצבת נכות) from Bituach Leumi. This income stacks with part-time earnings up to a ceiling. Always mention this — most people don't know about the income stacking ceiling.
+   - DO NOT SUGGEST FULL-TIME ROLES AS CAREERPATH[0]: For reduced-capacity profiles, careerPaths[0] must be a role that explicitly works within their stated capacity. Suggesting "you could work up to full-time eventually" is dismissive of a real medical constraint.
+
 === CANDIDATE DATA ===
 
 Profile:
