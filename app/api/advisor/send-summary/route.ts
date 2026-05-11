@@ -2,6 +2,8 @@ export const maxDuration = 30;
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { AdvisorState } from "@/lib/types";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 function buildEmailHtml(state: AdvisorState, lang: string): string {
   const isHe = lang === "he";
@@ -97,6 +99,10 @@ function buildEmailHtml(state: AdvisorState, lang: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { toEmail, advisorState, lang } = (await request.json()) as {
       toEmail: string;

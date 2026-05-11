@@ -137,7 +137,7 @@ export default function AdvisorPageInner() {
               const normalized = { ...serverState, currentStage: normalizeStage(serverState.currentStage) };
               saveAdvisorState(profileId, normalized);
               setAdvisorState(normalized);
-              if (normalized.currentStage === "done") setView("summary");
+              if (normalized.currentStage === "done") setViewAndUrl("summary");
               return;
             } catch { /* fall through */ }
           }

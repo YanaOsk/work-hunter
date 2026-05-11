@@ -3,8 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { geminiGenerate } from "@/lib/gemini";
 import { ADVISOR_CHAT_SYSTEM_PROMPT } from "@/lib/advisorPrompts";
 import { AdvisorState, ChatMessage } from "@/lib/types";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { messages, advisorState, lang } = (await request.json()) as {
       messages: ChatMessage[];

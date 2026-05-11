@@ -4,8 +4,14 @@ import { geminiAnalyze as geminiGenerate, safeParseJson, truncate } from "@/lib/
 import { INTERVIEW_QUESTIONS_PROMPT } from "@/lib/advisorPrompts";
 import { UserProfile, DiagnosisResult } from "@/lib/types";
 import { langInstruction } from "@/lib/langInstruction";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { userProfile, diagnosis, role, chosenPath, lang } = (await request.json()) as {
       userProfile: UserProfile;

@@ -4,6 +4,8 @@ import { geminiAnalyze as geminiGenerate, safeParseJson, truncate } from "@/lib/
 import { DIRECTION_ANALYSIS_PROMPT } from "@/lib/advisorPrompts";
 import { DiagnosisResult, UserProfile } from "@/lib/types";
 import { langInstruction } from "@/lib/langInstruction";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 function slimDiagnosis(d: DiagnosisResult | null): string {
   if (!d) return "Not completed yet.";
@@ -18,6 +20,10 @@ function slimDiagnosis(d: DiagnosisResult | null): string {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { userProfile, diagnosis, userGoal, lang } = (await request.json()) as {
       userProfile: UserProfile;

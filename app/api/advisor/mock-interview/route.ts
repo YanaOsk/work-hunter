@@ -3,8 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { geminiGenerate } from "@/lib/gemini";
 import { MOCK_INTERVIEW_SYSTEM_PROMPT } from "@/lib/advisorPrompts";
 import { ChatMessage, DirectionResult, LifePath, UserProfile } from "@/lib/types";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { userProfile, role, messages, chosenPath, direction } = (await request.json()) as {
       userProfile: UserProfile;

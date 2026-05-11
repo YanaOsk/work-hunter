@@ -64,6 +64,13 @@ function buildEmailHtml(jobs: JobResult[], lang: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const { getServerSession } = await import("next-auth/next");
+  const { authOptions } = await import("@/lib/auth");
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { toEmail, jobs, lang } = (await request.json()) as {
       toEmail: string;
