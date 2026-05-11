@@ -3,7 +3,7 @@
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
 
-export type UnlockPlan = "weekly" | "quarterly" | "lifetime";
+export type UnlockPlan = "weekly" | "quarterly" | "annual";
 
 interface Props {
   onUnlock: (plan: UnlockPlan) => void;
@@ -85,20 +85,22 @@ export default function SummaryGate({ onUnlock, onBack }: Props) {
               badge={tx.planQuarterlyBadge}
               price={tx.planQuarterlyPrice}
               per={tx.planQuarterlyPer}
+              subPrice={tx.planQuarterlySubPrice}
               tagline={tx.planQuarterlyTagline}
               cta={tx.gateUnlock}
               variant="popular"
               onClick={() => onUnlock("quarterly")}
             />
             <PlanCard
-              name={tx.planLifetimeName}
-              badge={tx.planLifetimeBadge}
-              oldPrice={tx.planLifetimeOld}
-              price={tx.planLifetimePrice}
-              tagline={tx.planLifetimeTagline}
+              name={tx.planAnnualName}
+              badge={tx.planAnnualBadge}
+              price={tx.planAnnualPrice}
+              per={tx.planAnnualPer}
+              subPrice={tx.planAnnualSubPrice}
+              tagline={tx.planAnnualTagline}
               cta={tx.gateUnlock}
-              variant="pro"
-              onClick={() => onUnlock("lifetime")}
+              variant="annual"
+              onClick={() => onUnlock("annual")}
             />
           </div>
         </div>
@@ -158,12 +160,12 @@ function LockedSection({
 interface PlanCardProps {
   name: string;
   badge?: string;
-  oldPrice?: string;
   price: string;
   per?: string;
+  subPrice?: string;
   tagline: string;
   cta: string;
-  variant: "weekly" | "popular" | "pro";
+  variant: "weekly" | "popular" | "annual";
   onClick: () => void;
 }
 
@@ -180,7 +182,7 @@ const PLAN_STYLES = {
     cta: "bg-purple-600 hover:bg-purple-500 text-white",
     badge: "bg-gradient-to-r from-purple-500 to-emerald-500 text-white",
   },
-  pro: {
+  annual: {
     wrap: "bg-white/5 border-amber-500/15",
     accent: "text-amber-300",
     cta: "bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold",
@@ -188,7 +190,7 @@ const PLAN_STYLES = {
   },
 };
 
-function PlanCard({ name, badge, oldPrice, price, per, tagline, cta, variant, onClick }: PlanCardProps) {
+function PlanCard({ name, badge, price, per, subPrice, tagline, cta, variant, onClick }: PlanCardProps) {
   const s = PLAN_STYLES[variant];
   return (
     <div
@@ -200,13 +202,11 @@ function PlanCard({ name, badge, oldPrice, price, per, tagline, cta, variant, on
         </div>
       )}
       <h3 className={`text-base font-semibold mb-2 ${s.accent}`}>{name}</h3>
-      <div className="flex items-baseline gap-1.5 mb-1">
-        {oldPrice && (
-          <span className="text-white/30 line-through text-sm">{oldPrice}</span>
-        )}
+      <div className="flex items-baseline gap-1.5 mb-0.5">
         <span className="text-3xl font-bold text-white">{price}</span>
         {per && <span className="text-white/50 text-sm">{per}</span>}
       </div>
+      {subPrice && <p className="text-emerald-400 text-xs font-semibold mb-1">{subPrice}</p>}
       <p className="text-white/50 text-xs mb-5 leading-relaxed">{tagline}</p>
       <button
         onClick={onClick}

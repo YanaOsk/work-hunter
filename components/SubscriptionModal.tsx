@@ -87,12 +87,13 @@ export default function SubscriptionModal({ onClose, hiddenCount, trigger = "job
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-2.5 mb-4">
+        <div className="grid grid-cols-2 gap-2.5 mb-4">
           {/* Weekly */}
           <div className="bg-white/5 border border-sky-500/20 rounded-2xl p-3 flex flex-col">
             <p className="text-sky-300 text-xs font-semibold mb-1">{tx.planWeeklyName}</p>
             <div className="flex items-baseline gap-0.5 mb-1">
               <span className="text-white text-xl font-bold leading-none">{tx.planWeeklyPrice}</span>
+              <span className="text-white/40 text-[10px] ms-1">{tx.planWeeklyPer}</span>
             </div>
             <p className="text-white/50 text-[10px] leading-snug mb-3 flex-1">{tx.planWeeklyTagline}</p>
             <button
@@ -103,15 +104,32 @@ export default function SubscriptionModal({ onClose, hiddenCount, trigger = "job
             </button>
           </div>
 
+          {/* Monthly */}
+          <div className="bg-white/5 border border-teal-500/20 rounded-2xl p-3 flex flex-col">
+            <p className="text-teal-300 text-xs font-semibold mb-1">{tx.planMonthlyName}</p>
+            <div className="flex items-baseline gap-0.5 mb-1">
+              <span className="text-white text-xl font-bold leading-none">{tx.planMonthlyPrice}</span>
+              <span className="text-white/40 text-[10px] ms-1">{tx.planMonthlyPer}</span>
+            </div>
+            <p className="text-white/50 text-[10px] leading-snug mb-3 flex-1">{tx.planMonthlyTagline}</p>
+            <button
+              onClick={() => go("monthly")}
+              className="w-full py-2 text-xs rounded-xl font-semibold bg-teal-500 hover:bg-teal-400 text-slate-900 transition"
+            >
+              {tx.planMonthlyCta}
+            </button>
+          </div>
+
           {/* Quarterly */}
           <div className="bg-gradient-to-br from-purple-600/20 via-white/5 to-emerald-600/20 border border-purple-500/50 rounded-2xl p-3 flex flex-col relative">
             <div className="absolute -top-2.5 start-2 bg-gradient-to-r from-purple-500 to-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
               {tx.planQuarterlyBadge}
             </div>
             <p className="text-purple-300 text-xs font-semibold mb-1">{tx.planQuarterlyName}</p>
-            <div className="flex items-baseline gap-0.5 mb-1">
+            <div className="flex items-baseline gap-0.5 mb-0.5">
               <span className="text-white text-xl font-bold leading-none">{tx.planQuarterlyPrice}</span>
             </div>
+            <p className="text-emerald-400 text-[10px] font-semibold mb-1">{tx.planQuarterlySubPrice}</p>
             <p className="text-white/50 text-[10px] leading-snug mb-3 flex-1">{tx.planQuarterlyTagline}</p>
             <button
               onClick={() => go("quarterly")}
@@ -121,19 +139,19 @@ export default function SubscriptionModal({ onClose, hiddenCount, trigger = "job
             </button>
           </div>
 
-          {/* Lifetime */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col">
-            <p className="text-amber-300 text-xs font-semibold mb-1">{tx.planLifetimeName}</p>
-            <div className="flex items-baseline gap-1 mb-1 flex-wrap">
-              <span className="text-white/40 line-through text-xs">{tx.planLifetimeOld}</span>
-              <span className="text-white text-xl font-bold leading-none">{tx.planLifetimePrice}</span>
+          {/* Annual */}
+          <div className="bg-white/5 border border-amber-500/20 rounded-2xl p-3 flex flex-col">
+            <p className="text-amber-300 text-xs font-semibold mb-1">{tx.planAnnualName}</p>
+            <div className="flex items-baseline gap-0.5 mb-0.5">
+              <span className="text-white text-xl font-bold leading-none">{tx.planAnnualPrice}</span>
             </div>
-            <p className="text-white/50 text-[10px] leading-snug mb-3 flex-1">{tx.planLifetimeTagline}</p>
+            <p className="text-emerald-400 text-[10px] font-semibold mb-1">{tx.planAnnualSubPrice}</p>
+            <p className="text-white/50 text-[10px] leading-snug mb-3 flex-1">{tx.planAnnualTagline}</p>
             <button
-              onClick={() => go("lifetime")}
+              onClick={() => go("annual")}
               className="w-full py-2 text-xs rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 transition"
             >
-              {tx.planLifetimeCta}
+              {tx.planAnnualCta}
             </button>
           </div>
         </div>

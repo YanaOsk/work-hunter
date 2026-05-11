@@ -1,4 +1,4 @@
-export type PlanId = "free" | "weekly" | "quarterly" | "lifetime";
+export type PlanId = "free" | "weekly" | "monthly" | "quarterly" | "annual";
 
 export interface Plan {
   id: PlanId;
@@ -7,8 +7,10 @@ export interface Plan {
   price: number;
   displayPrice: string;
   per?: string;
+  subPriceHe?: string;
+  subPriceEn?: string;
   featuresHe: string[];
-  color: "slate" | "sky" | "purple" | "amber";
+  color: "slate" | "sky" | "teal" | "purple" | "amber";
   /** Days until expiry. null = lifetime (never expires). undefined = free (no subscription). */
   renewalDays?: number | null;
 }
@@ -47,24 +49,40 @@ export const PLANS: Record<PlanId, Plan> = {
     featuresHe: SHARED_FEATURES_HE,
     color: "sky",
   },
+  monthly: {
+    id: "monthly",
+    nameEn: "Monthly",
+    nameHe: "חודשי",
+    price: 49,
+    displayPrice: "₪49",
+    per: "/ חודש",
+    renewalDays: 30,
+    featuresHe: SHARED_FEATURES_HE,
+    color: "teal",
+  },
   quarterly: {
     id: "quarterly",
     nameEn: "3 Months",
     nameHe: "3 חודשים",
-    price: 59,
-    displayPrice: "₪59",
+    price: 99,
+    displayPrice: "₪99",
     per: "/ 3 חודשים",
+    subPriceHe: "כ-₪33 לחודש",
+    subPriceEn: "~₪33/mo",
     renewalDays: 90,
     featuresHe: SHARED_FEATURES_HE,
     color: "purple",
   },
-  lifetime: {
-    id: "lifetime",
-    nameEn: "Lifetime",
-    nameHe: "לצמיתות",
-    price: 99,
-    displayPrice: "₪99",
-    renewalDays: null,
+  annual: {
+    id: "annual",
+    nameEn: "Annual",
+    nameHe: "שנתי",
+    price: 249,
+    displayPrice: "₪249",
+    per: "/ שנה",
+    subPriceHe: "כ-₪21 לחודש",
+    subPriceEn: "~₪21/mo",
+    renewalDays: 365,
     featuresHe: SHARED_FEATURES_HE,
     color: "amber",
   },

@@ -11,8 +11,9 @@ import SiteFooter from "./SiteFooter";
 const PLAN_IDS: Record<string, string> = {
   free: "free",
   weekly: "weekly",
+  monthly: "monthly",
   popular: "quarterly",
-  pro: "lifetime",
+  annual: "annual",
 };
 
 export default function PricingPage() {
@@ -63,7 +64,7 @@ export default function PricingPage() {
             <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3 text-center">
               {lang === "he" ? "בחרו את המסלול שמתאים לכם" : "Choose your plan"}
             </p>
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-2 gap-2.5">
               <PlanCard
                 compact
                 name={tx.planWeeklyName}
@@ -78,10 +79,23 @@ export default function PricingPage() {
               />
               <PlanCard
                 compact
+                name={tx.planMonthlyName}
+                badge={tx.planMonthlyBadge}
+                price={tx.planMonthlyPrice}
+                per={tx.planMonthlyPer}
+                tagline={tx.planMonthlyTagline}
+                features={[]}
+                cta={tx.planMonthlyCta}
+                onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["monthly"]}`)}
+                variant="monthly"
+              />
+              <PlanCard
+                compact
                 name={tx.planQuarterlyName}
                 badge={tx.planQuarterlyBadge}
                 price={tx.planQuarterlyPrice}
                 per={tx.planQuarterlyPer}
+                subPrice={tx.planQuarterlySubPrice}
                 tagline={tx.planQuarterlyTagline}
                 features={[]}
                 cta={tx.planQuarterlyCta}
@@ -90,15 +104,16 @@ export default function PricingPage() {
               />
               <PlanCard
                 compact
-                name={tx.planLifetimeName}
-                badge={tx.planLifetimeBadge}
-                oldPrice={tx.planLifetimeOld}
-                price={tx.planLifetimePrice}
-                tagline={tx.planLifetimeTagline}
+                name={tx.planAnnualName}
+                badge={tx.planAnnualBadge}
+                price={tx.planAnnualPrice}
+                per={tx.planAnnualPer}
+                subPrice={tx.planAnnualSubPrice}
+                tagline={tx.planAnnualTagline}
                 features={[]}
-                cta={tx.planLifetimeCta}
-                onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["pro"]}`)}
-                variant="pro"
+                cta={tx.planAnnualCta}
+                onCtaClick={() => router.push(`/checkout?plan=${PLAN_IDS["annual"]}`)}
+                variant="annual"
               />
             </div>
           </div>
@@ -274,39 +289,51 @@ interface PlanProps {
   oldPrice?: string;
   price: string;
   per?: string;
+  subPrice?: string;
   tagline: string;
   features: string[];
   cta: string;
   onCtaClick: () => void;
-  variant: "free" | "weekly" | "popular" | "pro";
+  variant: "free" | "weekly" | "monthly" | "popular" | "annual";
   compact?: boolean;
 }
 
-function PlanCard({ name, badge, oldPrice, price, per, tagline, features, cta, onCtaClick, variant, compact = false }: PlanProps) {
+function PlanCard({ name, badge, oldPrice, price, per, subPrice, tagline, features, cta, onCtaClick, variant, compact = false }: PlanProps) {
   const variantClasses = {
     free: {
       wrap: "bg-white/5 border-white/10",
       accent: "text-white",
       cta: "bg-white/10 hover:bg-white/15 border border-white/20 text-white",
       badge: "",
+      check: "text-white/50",
     },
     weekly: {
       wrap: "bg-white/5 border-sky-500/20",
       accent: "text-sky-300",
       cta: "bg-sky-500 hover:bg-sky-400 text-slate-900 font-semibold",
       badge: "bg-sky-500 text-slate-900",
+      check: "text-sky-400",
+    },
+    monthly: {
+      wrap: "bg-white/5 border-teal-500/20",
+      accent: "text-teal-300",
+      cta: "bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold",
+      badge: "bg-teal-500 text-slate-900",
+      check: "text-teal-400",
     },
     popular: {
       wrap: `bg-gradient-to-br from-purple-600/20 via-white/5 to-emerald-600/20 border-purple-500/50 shadow-xl shadow-purple-500/20${compact ? "" : " lg:-translate-y-2 lg:scale-[1.02]"}`,
       accent: "text-purple-300",
       cta: "bg-purple-600 hover:bg-purple-500 text-white",
       badge: "bg-gradient-to-r from-purple-500 to-emerald-500 text-white",
+      check: "text-purple-400",
     },
-    pro: {
-      wrap: "bg-white/5 border-white/10",
+    annual: {
+      wrap: "bg-white/5 border-amber-500/20",
       accent: "text-amber-300",
       cta: "bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold",
       badge: "bg-amber-500 text-slate-900",
+      check: "text-amber-400",
     },
   }[variant];
 
@@ -320,11 +347,12 @@ function PlanCard({ name, badge, oldPrice, price, per, tagline, features, cta, o
 
       <div className={compact ? "mb-2.5" : "mb-3"}>
         <h3 className={`${compact ? "text-sm" : "text-base"} font-semibold mb-1 ${variantClasses.accent}`}>{name}</h3>
-        <div className="flex items-baseline gap-1 mb-1 flex-wrap">
+        <div className="flex items-baseline gap-1 mb-0.5 flex-wrap">
           {oldPrice && <span className="text-white/40 line-through text-xs">{oldPrice}</span>}
           <span className={`${compact ? "text-2xl" : "text-3xl"} font-bold text-white leading-none`}>{price}</span>
           {per && <span className="text-white/50 text-xs">{per}</span>}
         </div>
+        {subPrice && <p className="text-emerald-400 text-[10px] font-semibold mb-0.5">{subPrice}</p>}
         <p className="text-white/60 text-xs leading-snug">{tagline}</p>
       </div>
 
@@ -339,12 +367,7 @@ function PlanCard({ name, badge, oldPrice, price, per, tagline, features, cta, o
         {features.map((f, i) => (
           <li key={i} className="flex items-start gap-2 text-sm">
             <svg
-              className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                variant === "free" ? "text-white/50"
-                : variant === "weekly" ? "text-sky-400"
-                : variant === "popular" ? "text-purple-400"
-                : "text-amber-400"
-              }`}
+              className={`w-5 h-5 flex-shrink-0 mt-0.5 ${variantClasses.check}`}
               fill="none" viewBox="0 0 24 24" stroke="currentColor"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />

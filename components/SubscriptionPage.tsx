@@ -24,6 +24,16 @@ const PLAN_META: Record<string, {
     glowTo:    "to-transparent",
     badgeCls:  "bg-sky-500/15 border-sky-500/30 text-sky-300",
   },
+  monthly: {
+    nameHe: "חודשי",      nameEn: "Monthly",
+    borderCls: "border-teal-500/40",
+    iconCls:   "text-teal-300",
+    checkCls:  "text-teal-400",
+    priceCls:  "text-teal-200",
+    glowFrom:  "from-teal-600/20",
+    glowTo:    "to-transparent",
+    badgeCls:  "bg-teal-500/15 border-teal-500/30 text-teal-300",
+  },
   quarterly: {
     nameHe: "3 חודשים",  nameEn: "3 Months",
     borderCls: "border-purple-500/50",
@@ -34,8 +44,8 @@ const PLAN_META: Record<string, {
     glowTo:    "to-transparent",
     badgeCls:  "bg-purple-500/15 border-purple-500/30 text-purple-300",
   },
-  lifetime: {
-    nameHe: "לצמיתות",   nameEn: "Lifetime",
+  annual: {
+    nameHe: "שנתי",       nameEn: "Annual",
     borderCls: "border-amber-500/40",
     iconCls:   "text-amber-300",
     checkCls:  "text-amber-400",

@@ -19,8 +19,9 @@ interface SubData {
 const PLAN_META: Record<string, { he: string; en: string; cls: string }> = {
   free:       { he: "חינמי",          en: "Free",         cls: "text-white/60 bg-white/10 border-white/20" },
   weekly:     { he: "שבועי",          en: "Weekly",        cls: "text-sky-300 bg-sky-500/20 border-sky-500/30" },
-  quarterly:  { he: "רבעוני",         en: "Quarterly",     cls: "text-purple-300 bg-purple-500/20 border-purple-500/30" },
-  lifetime:   { he: "לצמיתות",        en: "Lifetime",      cls: "text-amber-300 bg-amber-500/20 border-amber-500/30" },
+  monthly:    { he: "חודשי",          en: "Monthly",       cls: "text-teal-300 bg-teal-500/20 border-teal-500/30" },
+  quarterly:  { he: "3 חודשים",      en: "3 Months",      cls: "text-purple-300 bg-purple-500/20 border-purple-500/30" },
+  annual:     { he: "שנתי",           en: "Annual",        cls: "text-amber-300 bg-amber-500/20 border-amber-500/30" },
   "one-time": { he: "קידום קריירה",   en: "Career Boost",  cls: "text-purple-300 bg-purple-500/20 border-purple-500/30" },
   full:       { he: "מסע מלא",        en: "Full Journey",  cls: "text-purple-300 bg-purple-500/20 border-purple-500/30" },
 };
