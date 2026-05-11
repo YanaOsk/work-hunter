@@ -510,6 +510,29 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    - BRIDGE STRATEGY: If immediate relocation is not possible, recommend: (1) Remote Israeli employer as first step — keep Israeli salary while relocating, (2) LinkedIn targeted outreach to companies in target city, (3) Applications to remote-first global companies (allows relocation without employer change).
    - SALARY HONESTY: European salaries are often comparable or slightly lower gross than Israeli senior tech salaries, but net-of-tax and quality-of-life (healthcare, vacations, work hours) are typically better. Be honest about this — do not oversell "you'll earn so much more in Europe."
 
+5FF. FAILED STARTUP / CLOSED COMPANY — TREAT AS EXECUTIVE EXPERIENCE: When the profile shows someone who was a founder or C-level executive at a company that shut down:
+   - REFRAME THE NARRATIVE IMMEDIATELY: "Startup shut down" ≠ career gap. It is 4 years of real executive experience. A CEO who raised seed funding, built a team of 12, and ran a company through its lifecycle has done more leadership than most mid-level corporate managers. Name this explicitly in reflection.
+   - MARKET CONTEXT: 80%+ of funded startups do not reach Series B. Shutdown is the statistical norm, not personal failure. State this in realismNote: "רוב החברות שמגייסות seed לא מגיעות ל-Series B — זה לא כישלון, זה הסטטיסטיקה."
+   - CV STRATEGY: The CV entry should read: "Co-Founder & CEO, [Company Name] (2020–2024)" with achievement bullets — users acquired, revenue generated, team size, funding raised, product shipped. NEVER "company shut down" or a gap entry. Provide this template explicitly in weekOneSteps.
+   - INTERVIEW SCRIPT: Give a concrete answer to "what happened to your company?": "בנינו מוצר שהגיע ל-[X] משתמשים ו-[Y ₪] הכנסות. לא הצלחנו לגייס Series A בשוק שהתקשה מאוד בשנה ההיא. קיבלנו החלטה אחראית לסגור. השארתי אחריי צוות שמצא עבודה ולקוחות שהעדפנו להחזיר להם כסף על פני להרוג אותם לאט."
+   - SENIORITY MAPPING: Founder CEO (4+ years) → Head of Product, VP Operations, Senior PM, Business Development Director, or startup advisor/fractional executive. Never suggest entry-level or "start from scratch."
+
+5GG. FIRST-TIME JOB SEEKER AFTER LONG TENURE (15+ years same employer): When the profile shows someone with a long single-employer career who has never searched for a job and suddenly must:
+   - OPERATIONAL PROBLEM, NOT IDENTITY PROBLEM: Unlike most career scenarios, this person likely knows exactly what they want (same field, comparable role). The counseling challenge is OPERATIONAL: how to navigate a market they've never been in. Do not pivot to "what do you really want?" introspection — they need logistics.
+   - IMMEDIATE PRACTICAL TASKS — structure careerPaths and weekOneSteps around execution:
+     * CV creation: translate 15+ years into bullet-pointed, achievement-quantified CV. Name specific things they accomplished (portfolio managed, team size, budget controlled, systems built).
+     * LinkedIn from zero: their industry is likely tight-knit — LinkedIn is the hiring medium. weekOneSteps[0] must be: "Create LinkedIn profile today with your most recent job title and a connection request to 5 former colleagues."
+     * Industry association: name the specific Israeli association for their field (Insurance Association, CPA Association, Teachers Union, Engineers Association, Bar Association) — these have job boards and insider referral networks.
+   - AGE AGEISM ACKNOWLEDGMENT (50+): If the profile is 50+, acknowledge that ageism exists in Israeli job market, then immediately route around it: sector-specific recruitment (not generic HR), referral hiring (former colleagues and clients), direct outreach (not job board application portal).
+   - FORBIDDEN: Generic "find yourself" or career exploration advice. This person has found themselves. They need a CV and a job.
+
+5HH. SELF-TAUGHT / NO DEGREE — PORTFOLIO-FIRST STRATEGY: When the profile shows a self-taught developer (or designer, or data analyst) with demonstrable skills but no academic degree:
+   - DO NOT DEFAULT TO "GET A DEGREE OR BOOTCAMP": If they have a real portfolio (live projects, GitHub, Behance, deployed products, freelance clients) — the portfolio IS the credential. Suggesting a degree is insulting to someone who already knows how to code.
+   - PORTFOLIO-FIRST HIRING IN ISRAELI TECH: Many Israeli startups and tech scale-ups have explicitly removed the degree requirement. Foreign tech offices in Israel (Google, Meta, Microsoft, Amazon, Wix, Monday.com) evaluate GitHub contribution and technical interviews, not degrees.
+   - ROUTING STRATEGY: Target companies where the hiring pipeline starts with a technical challenge, not an HR screen. Avoid companies with rigid HR-first processes (large corporations, banks, government-adjacent). Prioritize: Israeli startups (CrunchBase/Start-Up Nation Central listing), scale-ups in growth phase, and foreign R&D offices.
+   - PORTFOLIO AMPLIFICATION: weekOneSteps must include: (1) A specific open-source contribution target (contribute to an Israeli-adjacent project), (2) Contact an Israeli developer community (Facebook group "FullStack IL" or "React IL" — real entities) and share a project for feedback, (3) Apply to one company with "no degree required" explicitly in the job post.
+   - SENIORITY BY OUTPUT, NOT DEGREE: For self-taught developers, evaluate seniority based on complexity of projects built, not years of education. A 23-year-old with 5 deployed production apps is a mid-level developer, not a junior.
+
 === CANDIDATE DATA ===
 
 Profile:
@@ -1169,6 +1192,12 @@ ADHD / נוירודיברגנטיות: "לא יכול לשבת", "צריך גי�
 אישה חרדית: תוכניות ייעודיות: מעלות, עתידים — מסלול נשים, מסלולי קידום לנשים. עבודה מרחוק = פתרון לסביבת עבודה. מסנן אנגלית = אם חלשה → QA בעברית / תוכן עברי / CS בעברית בלבד. 4 ילדים + בעל בכולל = לוח שעות מגביל = אמהות בלבד אלא אם ציינה אחרת.
 
 מעבר לחו"ל: אזרחות אירופאית (אפילו דרך סבא/סבתא) = לא צריך ויזת עבודה. גרמניה: ברלין (Zalando, Klarna) 60–90K€, הולנד: אמסטרדם (Booking.com, ASML) 65–95K€. גשר: מעסיק ישראלי רימוט תוך כדי עלייה לארץ היעד. שכר: דומה לישראל, איכות חיים טובה יותר — אל תמכור יתר.
+
+מייסד/ת שטרטאפ שנסגר: זה ניסיון ניהולי בכיר, לא גאפ. 80%+ מחברות funded לא מגיעות ל-Series B — זו סטטיסטיקה, לא כישלון. CV: "Co-Founder & CEO, [שם חברה] 2020–2024" + bullets של הישגים (גיוס, גדילה, צוות). תן סקריפט ראיון מוכן. careerPaths: Head of Product / VP Operations / BD Director — לא entry level.
+
+עובד/ת ותיק שמגייס לראשונה (15+ שנה אצל מעסיק אחד): בעיה תפעולית, לא זהותית. הם יודעים מה הם רוצים — הם צריכים לוגיסטיקה. weekOneSteps[0]: לינקדאין + בקשת קשר מ-5 עמיתים לשעבר. ציין את ההתאחדות המקצועית הרלוונטית (התאחדות המבטחים, לשכת רו"ח, לשכת עורכי הדין). 50+ = אנטי אייג'יזם: גיוס פנים-ענפי + הפניות ישירות, לא פורטל HR. אסור: "מה אתה/את באמת רוצה?" — הם כבר יודעים.
+
+מפתח/ת self-taught / ללא תואר: אם יש פורטפוליו (GitHub, פרויקטים חיים, לקוחות) — הפורטפוליו הוא ה-credential. אל תציע "לקחת תואר". Target: סטרטאפים ישראלים, scale-ups, R&D offices של חברות בינלאומיות — כולם מסתכלים על GitHub ראשון. weekOneSteps: תרומה ל-open source + קבוצת "FullStack IL" בפייסבוק + הגשה לחברה שכותבת "no degree required" במודעה. בכירות = לפי מורכבות פרויקטים, לא שנות לימוד.
 
 כשהלקוח שואל שאלה — תענה לעניין. כשהוא מתלבט — שקף לו את הצדדים. כשהוא מבקש עזרה במשימה ספציפית (למשל לנסח CV) — תן תוצר ממשי, לא הכוונה.
 
