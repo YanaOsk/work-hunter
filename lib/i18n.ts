@@ -945,7 +945,7 @@ export const t = {
     modeAdvisorDesc: "ליווי אישי בכיוון חיים, אבחון, CV, ראיונות ועוד.",
 
     // Advisor
-    advisorTitle: "היועץ התעסוקתי שלכם",
+    advisorTitle: "היועץ התעסוקתי שלך",
     advisorSubtitle: "מנטור שמכיר אתכם ולא שוכח כלום.",
     toolDiagnosis: "מיפוי חוזקות וכישורים",
     toolDiagnosisDesc: "שאלון קצר (MBTI + Holland) → כיווני קריירה מותאמים.",
@@ -978,7 +978,7 @@ export const t = {
     diagnosisDirections: "כיווני קריירה לבחינה",
     diagnosisOther: "משהו אחר",
     diagnosisOtherPlaceholder: "כתבו תשובה משלכם",
-    diagnosisFreeformTitle: "רגע לפני — ספרו לנו קצת עליכם",
+    diagnosisFreeformTitle: "לפני שמתחילים — ספרו לנו עליכם",
     diagnosisFreeformSubtitle: "כמה משפטים על הרקע שלכם, המצב הנוכחי ומה עובר לכם בראש. זה עוזר לנו להתאים אישית את כל מה שיבוא אחר כך.",
     diagnosisFreeformPlaceholder: "עבדתי ב... / אני עובר/ת תקופה של... / מה שאני מחפש/ת זה...",
     diagnosisFreeformSkip: "דלגו — עברו ישירות לשאלות",
@@ -1077,7 +1077,7 @@ export const t = {
     selfIntroStoryPh: "למדתי... עבדתי ב... היום אני...",
     selfIntroLovesQ: "מה מדליק אתכם?",
     selfIntroLovesSub: "בעבודה, בחיים — הדברים שגורמים לכם להרגיש חיים. זה חשוב יותר מכל מיומנות.",
-    selfIntroLovesPh: "מה שמדליק אותי זה...",
+    selfIntroLovesPh: "אני אוהב/ת כש...",
     selfIntroDislikesQ: "מה ממש לא בשבילכם?",
     selfIntroDislikesSub: "כדי שנסנן עבורכם רק את מה שמתאים — תגידו לנו ממה כדאי להתרחק.",
     selfIntroDislikesPh: "מה שבאמת מעצבן אותי זה...",
@@ -1333,21 +1333,21 @@ export const t = {
     printPlan: "הדפס / שמור",
 
     // Hero
-    heroTitle: "כבר יודעים לאן ללכת. עכשיו רק צריך מישהו שיעזור לכם להגיע לשם.",
-    heroSubtitle: "מאבחון ראשוני ועד עבודה חדשה — כל מה שצריך כדי להתקדם, במקום אחד.",
-    heroPrimaryCta: "קבלו אבחון בחינם",
-    heroSecondaryCta: "רק רוצה עבודה",
+    heroTitle: "הצעד הבא בקריירה שלכם מעולם לא היה ברור יותר.",
+    heroSubtitle: "אנחנו איתכם לאורך כל הדרך – מהרגע שבו בודקים מה הכיוון, ועד שמוצאים את העבודה הבאה. הכל בנחת ובקצב שלכם.",
+    heroPrimaryCta: "להתחיל אבחון בחינם",
+    heroSecondaryCta: "אני רק מחפש/ת עבודה",
     trustBar: "2,400+ ישראלים כבר בנו תוכנית קריירה · ★ 4.8 · מותאם ל-50+ תחומים · הכל בעברית",
 
     // Pain points
     painTitle: "מכירים את ההרגשה הזו?",
-    pain1: "תקועים בעבודה הזו כבר שנים ולא יודעים לאן ללכת?",
-    pain2: "שולחים עשרות קורות חיים ומקבלים שתיקה בחזרה?",
-    pain3: "חושבים על עצמאות אבל לא יודעים אם זה בשבילכם?",
+    pain1: "אני תקוע/ה בעבודה הזו כבר שנים — ולא יודע/ת לאן ללכת מכאן",
+    pain2: "אני שולח/ת עשרות קורות חיים וכלום לא חוזר",
+    pain3: "חושב/ת על עצמאות אבל לא בטוח/ה שאני מתאים/ה",
 
     // How it works
-    howItWorksTitle: "45 דקות. תוכנית קריירה מסודרת.",
-    howItWorksSubtitle: "כל שלב בנוי על הקודם — לא ניתן לדלג, ולא צריך.",
+    howItWorksTitle: "בלי למרוח את הזמן, בואו נצא לדרך עם תוכנית עבודה מסודרת לקריירה שלכם.",
+    howItWorksSubtitle: "כל שלב בנוי על הקודם — בסוף יש לך תמונה ברורה ואפשר לצאת לדרך.",
     howStep1: "מיפוי חוזקות וכישורים",
     howStep2: "כיוון חיים",
     howStep3: "קורות חיים",
@@ -1378,9 +1378,9 @@ export const t = {
     pricingComparisonLine: "למה לשלם 800 ₪ לפגישה אצל יועץ? קבלו מעטפת קריירה מלאה בטכנולוגיית AI, במחיר של ארוחה אחת.",
 
     // Final CTA
-    finalCtaTitle: "מה מחכה לכם בצד השני?",
-    finalCtaSubtitle: "הרבה יותר קל כשיש מי שמכיר אתכם ויודע לאן לכוון.",
-    finalCtaButton: "צאו לדרך — בחינם",
+    finalCtaTitle: "אז מה הצעד הבא?",
+    finalCtaSubtitle: "הרבה יותר קל כשיש מישהו ששואל את השאלות הנכונות.",
+    finalCtaButton: "להתחיל עכשיו — בחינם",
 
     // Nav
     navAbout: "מי אנחנו",
