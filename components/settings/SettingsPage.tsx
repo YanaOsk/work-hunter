@@ -43,6 +43,15 @@ export default function SettingsPage() {
   const [cancellingPlan, setCancellingPlan] = useState(false);
   const [removingCard, setRemovingCard] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [isGoogleUser, setIsGoogleUser] = useState<boolean | null>(null);
+
+  // Change-password form state
+  const [pwCurrent, setPwCurrent] = useState("");
+  const [pwNew, setPwNew] = useState("");
+  const [pwConfirm, setPwConfirm] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwOpen, setPwOpen] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/auth/signin?callbackUrl=/settings");
@@ -55,6 +64,12 @@ export default function SettingsPage() {
       .then((d) => setSub(d))
       .catch(() => {})
       .finally(() => setLoading(false));
+
+    // Check if Google user (no password to change)
+    fetch("/api/auth/change-password")
+      .then((r) => r.json())
+      .then((d) => setIsGoogleUser(!!d.isGoogleUser))
+      .catch(() => setIsGoogleUser(false));
   }, [status]);
 
   function showToast(msg: string) {
@@ -74,6 +89,44 @@ export default function SettingsPage() {
     } finally {
       setCancellingPlan(false);
     }
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwError(null);
+    if (pwNew !== pwConfirm) {
+      setPwError(he ? "הססמאות החדשות אינן תואמות" : "New passwords don't match");
+      return;
+    }
+    if (pwNew.length < 8) {
+      setPwError(he ? "הססמא חייבת להכיל לפחות 8 תווים" : "Password must be at least 8 characters");
+      return;
+    }
+    setPwLoading(true);
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: pwCurrent, newPassword: pwNew }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPwError(he ? translatePwError(data.error) : data.error);
+        return;
+      }
+      showToast(he ? "הססמא שונתה בהצלחה" : "Password changed successfully");
+      setPwOpen(false);
+      setPwCurrent(""); setPwNew(""); setPwConfirm("");
+    } finally {
+      setPwLoading(false);
+    }
+  }
+
+  function translatePwError(err: string): string {
+    if (err === "Current password is incorrect") return "הססמא הנוכחית שגויה";
+    if (err === "New password must differ from current") return "הססמא החדשה חייבת להיות שונה מהנוכחית";
+    if (err === "New password must be at least 8 characters") return "הססמא חייבת להכיל לפחות 8 תווים";
+    return "אירעה שגיאה, נסה שנית";
   }
 
   async function handleRemoveCard() {
@@ -231,6 +284,94 @@ export default function SettingsPage() {
             </div>
           )}
         </div>
+
+        {/* Change password card — credentials users only */}
+        {isGoogleUser === false && (
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                  <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-white font-semibold">{he ? "שינוי ססמא" : "Change Password"}</h2>
+                  {!pwOpen && (
+                    <p className="text-white/35 text-xs mt-0.5">
+                      {he ? "עדכן את ססמת הכניסה שלך" : "Update your login password"}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => { setPwOpen((o) => !o); setPwError(null); setPwCurrent(""); setPwNew(""); setPwConfirm(""); }}
+                className="text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/25 px-3 py-1.5 rounded-lg transition"
+              >
+                {pwOpen ? (he ? "סגור" : "Close") : (he ? "שנה" : "Change")}
+              </button>
+            </div>
+
+            {pwOpen && (
+              <form onSubmit={handleChangePassword} className="mt-5 space-y-3" dir={he ? "rtl" : "ltr"}>
+                <div className="space-y-2.5">
+                  <div>
+                    <label className="block text-white/50 text-xs mb-1">
+                      {he ? "ססמא נוכחית" : "Current password"}
+                    </label>
+                    <input
+                      type="password"
+                      value={pwCurrent}
+                      onChange={(e) => setPwCurrent(e.target.value)}
+                      required
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-emerald-500/50 focus:bg-white/8 transition"
+                      placeholder={he ? "הכנס ססמא נוכחית" : "Enter current password"}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/50 text-xs mb-1">
+                      {he ? "ססמא חדשה" : "New password"}
+                    </label>
+                    <input
+                      type="password"
+                      value={pwNew}
+                      onChange={(e) => setPwNew(e.target.value)}
+                      required
+                      minLength={8}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-emerald-500/50 focus:bg-white/8 transition"
+                      placeholder={he ? "לפחות 8 תווים" : "At least 8 characters"}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/50 text-xs mb-1">
+                      {he ? "אימות ססמא חדשה" : "Confirm new password"}
+                    </label>
+                    <input
+                      type="password"
+                      value={pwConfirm}
+                      onChange={(e) => setPwConfirm(e.target.value)}
+                      required
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-emerald-500/50 focus:bg-white/8 transition"
+                      placeholder={he ? "הכנס שוב את הססמא החדשה" : "Re-enter new password"}
+                    />
+                  </div>
+                </div>
+
+                {pwError && (
+                  <p className="text-rose-400 text-sm">{pwError}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={pwLoading}
+                  className="w-full bg-emerald-600/80 hover:bg-emerald-600 disabled:opacity-50 text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition"
+                >
+                  {pwLoading ? "..." : (he ? "שמור ססמא" : "Save password")}
+                </button>
+              </form>
+            )}
+          </div>
+        )}
 
         {/* Footer note */}
         <p className="text-white/20 text-xs text-center leading-relaxed px-4">
