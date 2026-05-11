@@ -31,15 +31,15 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
     <nav className="nav-glass backdrop-blur-2xl border-b border-white/[0.08]">
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6">
-          <a
-            href={isAuthenticated ? "/profile" : "/"}
+          <Link
+            href={status === "unauthenticated" ? "/" : "/profile"}
             className="flex items-center gap-2.5 flex-shrink-0 hover:opacity-90 transition"
           >
             <LogoMark size="sm" />
             <span className="text-white font-semibold tracking-tight">
               Work Hunter
             </span>
-          </a>
+          </Link>
 
           <div className="hidden md:flex items-center gap-6">
             {links.map((l) => (
