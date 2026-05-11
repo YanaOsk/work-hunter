@@ -186,6 +186,21 @@ Scout שולח לכל היותר 4 הודעות. ההודעה ה-4 חייבת ל
 תוכניות Returnship בישראל: Intel IL, Microsoft IL, HP / Indigo, Wix — מפרסמות מדי שנה תפקידי חזרה לאנשים אחרי הפסקה ארוכה. להזכיר כשמתאים.
 כיוון חיפוש: לפנות לחברות עם מדיניות Return-to-work מוכחת ו-hybrid גמיש — לא סטארטאפ A-B שמצפה לניסיון רציף.
 
+שומר/ת שבת / דתי/ת / חרדי/ת:
+לא לשאול שאלות על דת, על רמת שמירה, או על מגבלות ספציפיות. אם ציינו — לסמן מיד ולהמשיך.
+✓ "שמירת שבת — מסומן. יש מעסיקים שמפרסמים ש״ש. מה האזור ומה התחום?"
+❌ "תסביר לי מה זה אומר בפועל בעבודה" — זה לא רלוונטי
+סימנים שמצביעים על שמירת שבת גם ללא הצהרה מפורשת: "בוגר ישיבה", "כולל", "מגזר חרדי", "ש"ש", "דתי/ה", "חרדי/ת".
+לחרדים שרוצים להיכנס להייטק ואין להם ניסיון פורמלי:
+✓ "יש תוכניות הכשרה ייעודיות למגזר החרדי שפותחות את שוק הטק — Elevation, Talpiot, InfinityHubs, JoBC. יצרת קשר עם אחת מהן?"
+שמירת שבת = פילטר מחייב כמו רכבת. לא לחפש משרות שדורשות שישי-שבת.
+
+סטודנט/ית שמחפש/ת עבודה במקביל ללימודים:
+אם הזכירו לימודים מקבילים + מחפשים עבודה — לחדד אינטרנשיפ או חצי משרה:
+✓ "לומד/ת במקביל — מחפש אינטרנשיפ, או משרה חלקית בצד הלימודים?"
+אינטרנשיפ (CS/הנדסה, שנה 1-3): Wix, Monday.com, Check Point, Intel, HP, IBM, NICE — תוכניות student פורמליות.
+חצי משרה = פילטר מחייב — לא להציע משרה מלאה. [SEARCH_NOW] עם פרמטר "חצי משרה" מפורש.
+
 ═══ שלב 2 — אילוצים קריטיים (Hard Constraints) ═══
 לפני שמפעילים חיפוש, חובה לדעת את כל אלה:
 1. מיקום / אזור רצוי לעבודה
@@ -603,12 +618,25 @@ Good: "The role's focus on customer onboarding aligns with your stated love for 
 
 Include 1-2 honest matchNegatives — specific gaps or concerns. Brief and direct.
 
+LOCATION & COMPANY EXTRACTION:
+- location: The actual city or area where the job is physically located. Extract from the job title or description.
+  Common Israeli job locations: "תל אביב", "ירושלים", "חיפה", "הרצליה", "פתח תקוה", "רמת גן", "באר שבע", "רחובות", "בני ברק", "חולון", "ראשון לציון", "אשדוד", "כפר סבא", "Ra'anana", "Herzliya", "Tel Aviv".
+  - If isRemote is true, set location to null (the calling code shows "מרחוק" for remote jobs).
+  - If the city is not clearly mentioned, set to null — do NOT guess.
+- companyName: The name of the hiring company (not the job board). Extract from:
+  - Job title after separators: " – ", " — ", " | ", " at ", " @ "  (e.g. "Software Engineer – Wix" → "Wix")
+  - Description phrases: "חברת", "ב-", "אנחנו מחברת", "the company is", "at [Company]"
+  - Do NOT return job board names (drushim, alljobs, LinkedIn, GotFriends, JobMaster, comeet) as the company.
+  - If the company name cannot be confidently extracted, set to null.
+
 Respond with JSON only:
 {
   "matchScore": <0-100>,
   "matchReasons": ["specific reason 1", "specific reason 2", "specific reason 3"],
   "matchNegatives": ["specific concern 1"],
   "isRemote": <boolean>,
+  "location": "<city name or null>",
+  "companyName": "<hiring company name or null>",
   "salaryRange": "<salary range if mentioned in description, or inferred range, else null>",
   "salaryNote": "<inferred salary note in Hebrew when salary not listed, else null>"
 }`;
@@ -880,6 +908,14 @@ CRITICAL RULES — read carefully before generating anything:
    → facebookQuery: target English-speaking Israel groups: "Secret Tel Aviv", "Anglo Jobs Israel", "Jobs in Israel (English)".
    → Priority companies: international-first Israeli companies that conduct hiring entirely in English: Intel IL, Microsoft IL, Amazon AWS Israel, Google IL, Wix, Monday.com, Check Point, CyberArk, Radware, NICE, Amdocs.
    → Note in searchRationale: "מועמד ללא עברית — Hebrew queries require Hebrew-reading recruiter; LinkedIn + English queries are primary channel. Targeting international-first companies."
+
+15. AGE 50+ CANDIDATES:
+   If additionalContext or parsedData implies the candidate is 50+ (e.g. "20+ שנות ניסיון", "בן/בת 50", "50+", "ותיק/ה", very long work history):
+   → Do NOT include "junior", "entry level", "ללא ניסיון", "0-1 שנות ניסיון" in any query.
+   → Add "ניסיון רב" or "בכיר" or "מנוסה" to at least one Hebrew query.
+   → In searchRationale: "מועמד 50+ — ממוקד בתאגידים, מגזר ציבורי ובטחון. לא סטארטאפ A-B."
+   → Prefer queries targeting: תאגידים בינוניים+, חברות ביטחון (Elbit, IAI, Rafael), בנקים, ביטוח, ממשלה, חברות יעוץ ותיקות.
+   → Do NOT use the word "senior" explicitly in Hebrew queries — it can trigger age-filtering by ATS. Use role + seniority implied by context (e.g. "מנהל לוגיסטיקה 20 שנה" → "מנהל תפעול בכיר ישראל").
 
 Respond with JSON only:
 {

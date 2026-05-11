@@ -141,9 +141,12 @@ async function runSearches(plan: SearchPlan): Promise<TaggedResult[]> {
   ];
 
   const fbQuery = plan.facebookQuery || `${plan.hebrewQueries[0]} דרושים`;
+  const fbQuery2 = plan.hebrewQueries.length > 1
+    ? `${plan.hebrewQueries[1]} דרושים`
+    : `${plan.targetTitles[0] || plan.hebrewQueries[0]} קבוצה דרושים`;
   const fbSearches = [
     { q: fbQuery, lang: "iw", nonObvious: false, sites: FACEBOOK_SITES },
-    { q: `${plan.hebrewQueries[0]} דרושים קבוצה`, lang: "iw", nonObvious: false, sites: FACEBOOK_SITES },
+    { q: fbQuery2, lang: "iw", nonObvious: false, sites: FACEBOOK_SITES },
   ];
 
   const liQuery = plan.linkedinQuery || plan.englishQueries[0];
@@ -252,8 +255,8 @@ async function analyzeMatch(profileText: string, job: TaggedResult, lang = "he")
     return {
       id: Math.random().toString(36).substr(2, 9),
       title: job.title,
-      company: extractCompany(job.title),
-      location: analysis.isRemote ? "מרחוק" : "ראה מודעה",
+      company: analysis.companyName || extractCompany(job.title),
+      location: analysis.isRemote ? "מרחוק" : (analysis.location || "ראה מודעה"),
       url: job.link,
       description: job.snippet,
       matchScore: analysis.matchScore ?? 0,
@@ -424,7 +427,10 @@ export async function runJobSearch(
       })
     );
     jobs.sort((a, b) => b.matchScore - a.matchScore);
-    return { jobs, demoMode: false };
+    // Drop clearly irrelevant results, but never return empty if search succeeded
+    const MINIMUM_SCORE = 30;
+    const aboveThreshold = jobs.filter((j) => j.matchScore >= MINIMUM_SCORE);
+    return { jobs: aboveThreshold.length >= 2 ? aboveThreshold : jobs, demoMode: false };
   } else {
     const jobs = getMockJobs(profileText);
     for (const job of jobs) {
