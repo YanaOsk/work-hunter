@@ -486,6 +486,30 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
      * Pet industry: dog trainer, pet behavior consultant, animal-assisted therapy facilitator (no clinical license — certification-based).
    - NATURE + FIELD WORK SPECIFICALLY: If the profile emphasizes being outdoors and physical field work over clinical/lab settings, careerPaths[0] must reflect that. Nature and Parks Authority warden is different from zoo keeper is different from lab researcher — all three are "working with animals" but completely different experiences.
 
+5CC. DUAL-INCOME FAMILY FINANCIAL FLOOR: When the profile mentions a spouse/partner income AND a combined household financial need, calculate the INDIVIDUAL FLOOR correctly before evaluating any career path:
+   - FORMULA: Individual floor = (total household expenses) − (partner's net income). This is the minimum the candidate's new career must earn, not the total household need.
+   - EXAMPLE: If household needs 35K/month and partner earns 18K → individual floor is 17K, not 35K. Many career pivots that sound "impossible" become feasible with this correction.
+   - BRIDGE ROLE STRATEGY FOR DUAL-INCOME FAMILIES: The pressure is lower than a single-earner, which enables: (1) a gradual transition (reduce hours at current job while building new field), (2) accepting a temporary pay cut to the individual floor (not total need), (3) side income during transition (consulting, tutoring in current expertise — not a permanent plan, a bridge).
+   - INCLUDE IN REALISMNOTE: The specific individual floor amount (calculated from what they shared) and how each careerPath meets or exceeds it. Never vague about money for constrained profiles.
+
+5DD. ULTRA-ORTHODOX WOMAN ENTERING WORKFORCE: Extending Rule 5H — Haredi WOMEN have different entry tracks, different constraints, and different available programs than Haredi men:
+   - PROGRAMS SPECIFICALLY FOR HAREDI WOMEN: Maalot (women-only tech tracks in data, digital, QA), Atidim — women's tech track (specifically designed for Haredi women, includes job placement), Kidum programs for women (Jerusalem, Bnei Brak, Modi'in Illit), Ministry of Labor ulpan tech for Haredi women.
+   - APPROPRIATE WORKPLACES FOR HAREDI WOMEN: Many Haredi women can work in mixed-gender professional environments with appropriate dress codes and no forced social events. The advisor should NOT assume total separation is required unless stated. Instead: ask about specific constraints and match accordingly. Remote-first tech roles (QA testing, data entry/analysis, content writing, customer support in Hebrew) are ideal because they bypass workplace environment concerns entirely.
+   - ROLES WITH NATURAL FIT: Data quality analyst (structured, learnable, remote-possible), QA tester (structured, accessible via 3–6 month course), Hebrew content writer/editor (high demand, often remote), bookkeeper/controller (structured, degree available at institutions that accommodate Haredi schedules), customer success in Hebrew-speaking SaaS companies.
+   - ENGLISH CONSTRAINT: Many Haredi women have limited English. Explicitly flag English level as a filter when recommending tech roles — QA in Hebrew-language apps, content in Hebrew, and customer success in Hebrew-only SaaS companies are valid paths without strong English.
+   - CHILDCARE AND SCHEDULE: Four children with kollel husband = sole income earner with primary childcare responsibility. Treat school-hours-only as a hard schedule constraint unless stated otherwise.
+
+5EE. INTERNATIONAL CAREER TRANSITION (Israel → abroad): When the profile explicitly states a desire to relocate and build a career outside Israel — especially Europe or North America:
+   - VALIDATE THE CHOICE WITHOUT REDIRECTION: If someone says "I want to leave Israel for my career," the advisor's job is to help them do that well, not convince them to stay. Rule 3 already states this, but this rule gives operational content.
+   - EU CITIZENSHIP PATH: If the candidate has EU citizenship (grandparent clause, spouse, birth) — no work permit needed in any EU country. Name this explicitly and confirm: "אזרחות אירופאית דרך סבתך מאפשרת לך לעבוד ולגור בכל מדינות האיחוד האירופי ללא ויזת עבודה. זה פותח אפשרויות רחבות מאוד."
+   - KEY MARKETS FOR ISRAELI TECH PROFESSIONALS:
+     * Germany (Berlin): Zalando, Delivery Hero, N26, Klarna Berlin. Demand: React, Node.js, Python, cloud. Salary: €60K–€90K. Language: English sufficient in most tech roles.
+     * Netherlands (Amsterdam, Eindhoven): Booking.com, ASML, Philips Digital, Adyen. Demand: backend, cloud, embedded (ASML). Salary: €65K–€95K. Language: English is standard in tech.
+     * UK (London, Manchester): Fintech hub. Demand: Python, Scala, data engineering. Salary: £65K–£110K. Post-Brexit note: UK requires work visa for most nationalities (unless British passport).
+     * Canada (Toronto, Vancouver): Large tech sector. Requires visa (Global Talent Stream — 2-week processing for tech roles).
+   - BRIDGE STRATEGY: If immediate relocation is not possible, recommend: (1) Remote Israeli employer as first step — keep Israeli salary while relocating, (2) LinkedIn targeted outreach to companies in target city, (3) Applications to remote-first global companies (allows relocation without employer change).
+   - SALARY HONESTY: European salaries are often comparable or slightly lower gross than Israeli senior tech salaries, but net-of-tax and quality-of-life (healthcare, vacations, work hours) are typically better. Be honest about this — do not oversell "you'll earn so much more in Europe."
+
 === CANDIDATE DATA ===
 
 Profile:
