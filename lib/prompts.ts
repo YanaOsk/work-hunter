@@ -688,6 +688,8 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    - Marketing manager / digital marketing manager → customer service rep / שירות לקוחות / תמיכה טכנית (completely different function — marketing creates demand, service handles complaints)
    - Marketing manager → store manager / מנהלת חנות / retail chain manager (marketing ≠ retail ops; these require completely different daily work)
    - Mechanical / systems engineer (targeting PM in tech/defense/industrial) → construction PM / residential housing PM / בנייה למגורים (defense/industrial engineering background transfers to tech/industrial project management, NOT to real estate/residential construction — completely different regulatory, contractual, and operational context). SPECIFIC HEBREW KEYWORDS that trigger this rule: "פרויקטי מגורים", "בנייה רוויה", "פרויקטי בינוי למגורים", "ניהול פרויקטים בינוי", "חברת בנייה", "יזמות נדל"ן", "שיכון" — if these appear in the job title or description for a mechanical/systems engineer profile → set matchScore to MAX 15 unconditionally.
+   - Mechanical / systems engineer → "מנהל עבודה" in construction, electrical, or civil fields (this is a site foreman/supervisor role — physically supervising workers at a construction site. It is NOT equivalent to project management. The distinction: PM = planning, scheduling, budget, stakeholders. Foreman/מנהל עבודה = daily on-site worker supervision. These are different career tracks.) → MAX 15.
+   - Engineer targeting PM roles → Customer Success PM / "מנהל/ת פרויקטים Customer Success" (this is a client relationship/post-sales role, not technical project management — different daily work, different skills, not relevant to a manufacturing/defense background) → reduce score by 25.
 
    RELATED examples — do NOT penalize:
    - Restaurant manager → hotel F&B manager, catering manager, venue/event food operations, club F&B director (same food-service domain)
@@ -717,7 +719,7 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    SENIORITY DOWNGRADE — MANAGER → COORDINATOR:
    If the candidate's currentRole or targetRoles include "מנהל", "מנהלת", "Manager", "Director", "Head of" AND yearsExperience >= 4 AND careerChangeInterest is false AND the job title contains any of: "רכז/ת", "מתאם/ת", "Coordinator", "Associate", "Junior", "Specialist" (when these are clearly BELOW the management level the candidate already holds):
    → Reduce score by 20 and add matchNegative: "תפקיד רכז/ת הוא ירידה בדרגה משמעותית ביחס לניסיון הניהולי שלך — השכר צפוי להיות נמוך מהציפיות".
-   Exception: if careerChangeInterest is true AND the new field is different from the old one → waive this rule (a career changer may accept a coordinator role in the new field).
+   Exception: waive this rule ONLY if (a) careerChangeInterest is true AND (b) the new field is genuinely different from the old one (e.g., nurse → tech coordinator). Do NOT waive for employment-model changes in the same field (e.g., freelance marketing manager → salaried marketing coordinator — this is still a seniority downgrade even if careerChangeInterest is technically true).
    - If careerChangeInterest is true: waive the over-qualified and under-experienced rules — entry-level in the NEW field is appropriate, and seniority in the old field doesn't transfer.
 
    MANAGEMENT ASPIRATION MISMATCH — applies when the profile shows the candidate wants to advance to a management role:
@@ -763,6 +765,8 @@ Signs it is NOT a job posting (set matchScore to 5):
 - Title is a job fair/event: "ירידת קריירה", "job fair", "דרושים [month] [year]" referring to an event
 - Title describes a generic category listing with no specific role: "דרושים X - Jobnet", "[company] - משרות עדכניות"
 - Title is a generic hiring announcement without a specific job title: "We're hiring!", "We're building the future of X and we're hiring", "Join our team", "Come work with us" — these are brand awareness posts, not job listings. A real job posting must state a specific role.
+- Title or description is a JOB SEEKER post (a person advertising themselves, NOT an employer): "מחפשת את האתגר הבא", "הוסמכתי כעורכת דין", "זמין/ה למשרה", "אני מחפש/ת" — these are individuals posting their availability, not employers posting openings.
+- Title or description is MLM / "work from home" spam: "עבודה אונליין", "הכנסה פסיבית", "הכנסה מהבית", "נפתחה ההרשמה לעבודה" — these are not legitimate employment offers.
 - The Full Description contains no job requirements, no skills, no employer name — just marketing copy
 In these cases: set matchScore to 5 and add matchNegative: "זו אינה מודעת משרה ספציפית — סינון".
 
