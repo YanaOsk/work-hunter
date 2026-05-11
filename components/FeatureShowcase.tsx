@@ -106,6 +106,8 @@ function ScoutMockup() {
 }
 
 function CvMockup() {
+  const { lang } = useLanguage();
+  const he = lang === "he";
   return (
     <div className="w-full max-w-xs linear-card p-5 select-none pointer-events-none">
       {/* CV header */}
@@ -123,7 +125,7 @@ function CvMockup() {
       {/* Score indicator */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-1.5">
-          <p className="text-white/40 text-[9px] uppercase tracking-wide">CV Score</p>
+          <p className="text-white/40 text-[9px] uppercase tracking-wide">{he ? "ציון קורות חיים" : "CV Score"}</p>
           <span className="text-[10px] font-bold text-green-400">92 / 100</span>
         </div>
         <div className="h-1 rounded-full bg-white/[0.06]">

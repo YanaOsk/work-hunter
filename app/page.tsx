@@ -69,7 +69,12 @@ export default function Home() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const { lang } = useLanguage();
-  const [mode, setMode] = useState<AppMode | null>(null);
+  const [mode, setMode] = useState<AppMode | null>(() => {
+    if (typeof window === "undefined") return null;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("fromCheckout") && sessionStorage.getItem("wh_pending_jobs")) return "jobs";
+    return null;
+  });
   const [state, setState] = useState<AppState>(initialState);
   const [showWelcome, setShowWelcome] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
@@ -94,6 +99,23 @@ export default function Home() {
     }
     return null;
   });
+
+  // Restore jobs after returning from checkout
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get("fromCheckout")) return;
+    window.history.replaceState({}, "", "/");
+    try {
+      const saved = sessionStorage.getItem("wh_pending_jobs");
+      if (!saved) return;
+      const restoredJobs: JobResult[] = JSON.parse(saved);
+      sessionStorage.removeItem("wh_pending_jobs");
+      if (restoredJobs.length > 0) {
+        setState({ ...initialState, phase: "results", jobResults: restoredJobs, userProfile: emptyProfile });
+        setIsSubscribed(true);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     if (!window.location.search) return;

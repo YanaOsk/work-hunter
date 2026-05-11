@@ -974,7 +974,7 @@ export default function CvBuilderPage() {
       )}
 
       {showSubModal && (
-        <SubscriptionModal trigger="cv" onClose={() => setShowSubModal(false)} />
+        <SubscriptionModal trigger="cv" returnTo="/cv-builder" onClose={() => setShowSubModal(false)} />
       )}
     </div>
   );

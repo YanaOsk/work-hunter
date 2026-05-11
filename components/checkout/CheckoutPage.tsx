@@ -183,7 +183,7 @@ export default function CheckoutPage({ planId, returnTo }: { planId: string; ret
                     </svg>
                   </div>
                   <p className="text-white font-bold text-lg mb-1">ייעוץ תעסוקתי</p>
-                  <p className="text-white/50 text-sm leading-relaxed">אבחון אישיות, כיוון מקצועי, שיפור CV וראיון מדומה</p>
+                  <p className="text-white/50 text-sm leading-relaxed">אבחון אישיות, כיוון מקצועי, שיפור קורות חיים וראיון מדומה</p>
                   <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

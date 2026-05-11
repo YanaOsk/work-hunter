@@ -875,7 +875,7 @@ export default function ProfilePage() {
                       <p className="text-white font-semibold text-sm">{he ? "הסיכום המקצועי שלכם" : "Your Professional Summary"}</p>
                       <Link href="/cv-builder?from=/profile"
                         className="text-xs text-white/35 hover:text-white/70 border border-white/8 px-2.5 py-1 rounded-lg transition">
-                        {he ? "הוסף ל-CV" : "Add to CV"}
+                        {he ? "הוסף לקורות חיים" : "Add to CV"}
                       </Link>
                     </div>
                     <blockquote className="border-s-2 border-purple-500/50 ps-4 text-white/65 text-sm leading-relaxed">

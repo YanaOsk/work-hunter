@@ -615,7 +615,10 @@ export default function ResultsPhase({
 
                   <div className="flex justify-center">
                     <button
-                      onClick={() => setShowSubModal(true)}
+                      onClick={() => {
+                        try { sessionStorage.setItem("wh_pending_jobs", JSON.stringify(jobs)); } catch {}
+                        setShowSubModal(true);
+                      }}
                       className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-8 py-3.5 rounded-xl transition-all duration-200 text-sm"
                     >
                       {tx.paywallCta}
@@ -653,6 +656,7 @@ export default function ResultsPhase({
         <SubscriptionModal
           hiddenCount={hiddenCount}
           trigger="jobs"
+          returnTo="/?fromCheckout=1"
           onClose={() => setShowSubModal(false)}
         />
       )}

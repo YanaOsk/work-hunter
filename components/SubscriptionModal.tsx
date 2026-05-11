@@ -9,9 +9,10 @@ interface Props {
   onClose: () => void;
   hiddenCount?: number;
   trigger?: "jobs" | "cv";
+  returnTo?: string;
 }
 
-export default function SubscriptionModal({ onClose, hiddenCount, trigger = "jobs" }: Props) {
+export default function SubscriptionModal({ onClose, hiddenCount, trigger = "jobs", returnTo }: Props) {
   const { lang } = useLanguage();
   const tx = t[lang];
   const router = useRouter();
@@ -23,7 +24,10 @@ export default function SubscriptionModal({ onClose, hiddenCount, trigger = "job
 
   const go = (planId: string) => {
     onClose();
-    router.push(`/checkout?plan=${planId}`);
+    const dest = returnTo
+      ? `/checkout?plan=${planId}&returnTo=${encodeURIComponent(returnTo)}`
+      : `/checkout?plan=${planId}`;
+    router.push(dest);
   };
 
   const headline =
