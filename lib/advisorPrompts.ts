@@ -404,6 +404,31 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    - VOLUNTEER HISTORY = PROFESSIONAL CREDENTIAL: If the profile mentions significant volunteer experience (1+ years, regular, structured role), treat it as equivalent work experience. State this explicitly: "שלוש שנות התנדבות ב-[org] היא לא 'ניסיון חיים' — זה ניסיון מקצועי לכל דבר. רשום אותה ב-CV כמו שהיית רושם משרה בתשלום."
    - THREE-PATH STRUCTURE for impact profiles: careerPaths[0] = direct NGO entry using volunteer network as connection (name specific orgs in their domain); careerPaths[1] = CSR/sustainability role in corporate (higher pay, impact-adjacent); careerPaths[2] = social entrepreneurship track (accelerator, JHub, government social innovation grants).
 
+5T. REMOTE WORK AS STRUCTURAL REQUIREMENT (not preference): When the profile indicates remote/hybrid work is a necessity rather than a nice-to-have — due to ADHD, disability, geography (periphery → center commute), chronic illness, or childcare — treat it as a hard constraint in CONSTRAINT VALIDATION, not a preference:
+   - ADHD + OPEN OFFICE = STRUCTURAL MISMATCH: For ADHD-diagnosed or self-identified profiles, open-plan office environments are specifically contra-indicated. Remote/hybrid work IS the accommodation. Name this explicitly: "עבודה מרחוק עבורך היא לא נוחות — זהי הסביבה שמאפשרת לך לפעול ברמה המלאה שלך." Do not suggest they "learn to cope" with an open office.
+   - REMOTE-FRIENDLY FIELDS IN ISRAEL (high-demand, actively hiring remote): UX/UI design, software engineering, QA automation, data science, content writing, digital marketing, customer success (SaaS), product management, graphic design, translation/localization. These fields have established remote work infrastructure in the Israeli market.
+   - REMOTE-HOSTILE FIELDS IN ISRAEL (caution): Nursing, physical therapy, construction, on-site security, restaurant/hospitality, early education, hands-on manufacturing. If a profile needs remote AND is currently in a remote-hostile field, this is a field-change signal, not just a scheduling preference.
+   - LOCATION AS CONTEXT: For profiles in periphery cities (Be'er Sheva, Sderot, Kiryat Shmona, Dimona) commuting to Tel Aviv: acknowledge the commute time explicitly in realismNote, and weight remote-first options higher in careerPaths.
+
+5U. CRIMINAL RECORD — REGULATED VS. UNREGULATED FIELD DISTINCTION: Extending Rule 5F — when the profile includes a criminal conviction, the key question is whether the desired field is REGULATED (requires license or government clearance) or UNREGULATED:
+   - REGULATED FIELDS THAT GENUINELY CLOSE (for most conviction types): banking (Bank of Israel license requirement), licensed financial advisor (רישיון ייעוץ השקעות), government positions requiring security clearance, licensed attorney (Bar Association fitness requirement), social work and teaching (ethics board review, may be grounds for rejection).
+   - UNREGULATED/OPEN FIELDS (criminal record legally permissible per Offenders Rehabilitation Law): private-sector accounting (controller, bookkeeper — as long as not publicly-listed company), fintech startup, tech roles, sales, operations, logistics, construction, food, hospitality. For these: the Offenders Rehabilitation Law explicitly restricts employers from asking about expunged convictions after the statutory period.
+   - HONEST FRAMING: In reflection, name the real vs. perceived barriers: "יש תפקידים שסגורים — וחשוב לדעת אילו הם. אבל רוב שוק העבודה פתוח בפניך חוקית ומעשית." This removes both false hope AND false hopelessness.
+   - REQUIRED weekOneSteps for conviction profiles: Include Nitan (ניתן — nitan.org.il) or Tishma (תשמע) — Israeli non-profits specializing in ex-offender job placement with employer networks. These are real, named resources, not generic advice.
+
+5V. SENIOR MILITARY OFFICER TO CIVILIAN (rank: Major and above, 15+ years service, retirement age 45–55): When the profile signals a high-ranking military career transitioning to civilian life:
+   - EXPERIENCE TRANSLATION IS THE CORE TASK: The candidate has real, substantial leadership and operational experience. The advisor's job is to translate it into civilian language, not suggest retraining. A Colonel who commanded 5,000 soldiers and managed a ₪500M budget is NOT a "career changer" — they are a senior executive who needs a new industry label.
+   - MILITARY ROLE → CIVILIAN ROLE MAPPING (senior level):
+     * Combat brigade commander → VP Operations, COO, Crisis management director
+     * Logistics corps (אגד / קצין לוגיסטיקה senior) → Supply chain VP, Operations director
+     * Intelligence officer (אמ"ן / מודיעין) → Corporate intelligence, Cyber security director, Risk officer
+     * Cyber unit (8200 / C4I corps) → CISO, Cybersecurity company executive/VP
+     * Medical corps senior → Hospital department head, Health system director
+     * Education corps → L&D director, Organizational development head
+   - DEFENSE INDUSTRY PIPELINE: Elbit Systems, Rafael Advanced Defense Systems, IAI (Israel Aerospace Industries), IMI Systems, and ELTA actively recruit retiring officers at salary ranges of 25,000–60,000 ₪/month. Name this explicitly.
+   - PENSION FINANCIAL CONTEXT: Israeli military pension (קצבת פרישה) for full service (at least 20 years) is approximately 70% of last salary. This fundamentally changes the financial calculation — the civilian salary is supplemental, not primary. This affects how aggressively they need to pursue maximum salary in a transition role.
+   - FORBIDDEN: Suggesting they get a degree, go back to school, or start at an entry level. A retiring Colonel does not need to "prove themselves" in civilian academic terms. Corporate Israel respects military seniority — the advisor must match that respect.
+
 === CANDIDATE DATA ===
 
 Profile:
