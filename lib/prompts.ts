@@ -496,7 +496,11 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
 
    SAME-REGION RULE: Kfar Saba ↔ Herzliya ↔ Ra'anana ↔ Petah Tikva ↔ Tel Aviv = same Greater Tel Aviv region, no penalty. Haifa ↔ Acre ↔ Kiryat Ata = same Greater Haifa region, no penalty. Tiberias ↔ Haifa = ~75km, acceptable for a 40km radius worker only if within that radius.
 
-   RELOCATION REQUIRED: If the job explicitly mentions "רילוקיישן", "נכונות למעבר דירה", "relocation required" AND the candidate has stated a maxCommuteKm or home city without saying they're willing to relocate → set matchScore to MAX 10.
+   RELOCATION REQUIRED: If the job explicitly mentions "רילוקיישן", "נכונות למעבר דירה", "relocation required", OR mentions a foreign city (Bangkok, London, New York, etc.) as the work location AND the candidate has a stated home city in Israel without explicitly saying they are open to relocation → set matchScore to MAX 10. This rule applies even when maxCommuteKm is NOT set — any candidate with a stated Israeli home city is assumed to want local work unless they explicitly say otherwise.
+
+   OUT-OF-REGION JOBS: Even without maxCommuteKm and without no-car, if the candidate has a stated home city AND the job is onsite in a clearly different geographic region of Israel (e.g., a Gush Dan/Tel Aviv area resident → South Israel or North Israel job, a Jerusalem resident → Tel Aviv job with no transit statement):
+   → Reduce score by 20 and add matchNegative: "המשרה נמצאת באזור שונה ממיקום המגורים שציינת".
+   → Exception: if the candidate explicitly said "כל הארץ", "מוכן לנסוע בכל מקום", "גמיש על מיקום" — skip this penalty.
 
    NORTH AMERICA / OVERSEAS: If the job description or title mentions "Israel, OH", "Ohio", or any US state abbreviation as the job location → this is a US-based job, not an Israeli job. Set matchScore to MAX 5 for Israeli candidates without explicit overseas intent.
 
@@ -644,7 +648,7 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    DETECT no-car from ANY of: profile text contains "אין רכב", "no car", "ללא רכב", "תחבורה ציבורית בלבד", "רק תחבורה ציבורית", "אין לי רכב", "without a car", or constraints field includes such phrasing.
 
    If no-car detected:
-   - AND the job is onsite in a DIFFERENT CITY from the candidate's stated city → reduce score by 30 and add matchNegative: "המשרה ב[עיר] — ללא רכב, קשה להגיע לעיר אחרת".
+   - AND the job is onsite in a DIFFERENT CITY from the candidate's stated city → set matchScore to MAX 15. Add as FIRST matchNegative: "המשרה ב[עיר] — ללא רכב, לא ניתן להגיע לעיר אחרת". This is a hard mobility fail equal to the commute hard cap.
    - AND the job is in the SAME city as the candidate → no penalty (buses exist within cities).
    - AND the job is remote → no penalty.
 
@@ -679,12 +683,19 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    - Restaurant / F&B manager → cosmetics store or beauty salon manager (food service culture ≠ beauty retail — different product, supplier, customer, and operational culture; no meaningful overlap)
    - Engineer (mechanical/civil) → social work or education
    - Lawyer → chef / kitchen work (unless careerChangeInterest to culinary is stated)
+   - Marketing manager / digital marketing manager → customer service rep / שירות לקוחות / תמיכה טכנית (completely different function — marketing creates demand, service handles complaints)
+   - Marketing manager → store manager / מנהלת חנות / retail chain manager (marketing ≠ retail ops; these require completely different daily work)
+   - Mechanical / systems engineer (targeting PM in tech/defense/industrial) → construction PM / residential housing PM / בנייה למגורים (defense/industrial engineering background transfers to tech/industrial project management, NOT to real estate/residential construction — completely different regulatory, contractual, and operational context)
 
    RELATED examples — do NOT penalize:
    - Restaurant manager → hotel F&B manager, catering manager, venue/event food operations, club F&B director (same food-service domain)
    - Restaurant manager → food production operations manager, food industry supply chain (adjacent)
    - Waiter → restaurant manager / shift manager (natural career progression within same field)
    - Software engineer (PM pivot) → Product manager (engineering background is a plus, not a mismatch)
+
+   MARKETING-ADJACENT but UNRELATED to marketing role — heavy penalty (-20) for marketing background candidates:
+   - Marketing manager → sales coordinator / מתאמת מכירות (support/admin function, not strategic marketing — different seniority and function)
+   - Marketing manager → sales development rep / SDR (lead generation, not marketing strategy)
 
    FOOD-ADJACENT but UNRELATED to restaurant operations — these SHOULD receive heavy penalty (-20) for candidates from restaurant/F&B service backgrounds:
    - Restaurant manager → chocolate/candy brand operations manager (product company, no guest service component)
@@ -744,6 +755,7 @@ Signs it is NOT a job posting (set matchScore to 5):
 - Title is a recruitment agency solicitation: "לסוכנויות", "לחברות גיוס", "staffing agency"
 - Title is a job fair/event: "ירידת קריירה", "job fair", "דרושים [month] [year]" referring to an event
 - Title describes a generic category listing with no specific role: "דרושים X - Jobnet", "[company] - משרות עדכניות"
+- Title is a generic hiring announcement without a specific job title: "We're hiring!", "We're building the future of X and we're hiring", "Join our team", "Come work with us" — these are brand awareness posts, not job listings. A real job posting must state a specific role.
 - The Full Description contains no job requirements, no skills, no employer name — just marketing copy
 In these cases: set matchScore to 5 and add matchNegative: "זו אינה מודעת משרה ספציפית — סינון".
 
@@ -848,6 +860,15 @@ CRITICAL RULES — read carefully before generating anything:
    - Valid qualifiers: "Technical Product Manager", "Platform PM", "API PM", "PM R&D", or the candidate's dominant stack (e.g. "Product Manager Fullstack React").
    - "מנהל מוצר" alone is FORBIDDEN for engineering-background PM candidates — it surfaces generic B2C PM roles that reject candidates with no PM track record.
    - For non-engineering candidates targeting PM: generate generic PM queries with field-specific context (e.g. "מנהל מוצר SaaS ישראל").
+
+3b. SPECIAL CASE — PROJECT MANAGER (PM) FOR ENGINEERS:
+   When the candidate is a mechanical/systems/industrial engineer pivoting to PROJECT MANAGEMENT:
+   - The target is ENGINEERING PM / TECHNICAL PM — NOT construction PM or residential housing PM.
+   - Construction PM searches ("מנהל פרויקטים בנייה", "פרויקטי מגורים") are FORBIDDEN — these surface residential construction roles that require civil engineering + construction regulation knowledge that mechanical engineers don't have.
+   - REQUIRED qualifiers for every Hebrew query: "הנדסי", "תעשייתי", "מו"פ", "ייצור", "ביטחוני", or "היטק" — whichever fits the candidate's specific background.
+   - REQUIRED qualifiers for English queries: "Engineering", "Technical", "R&D", "Defense", "Manufacturing", or "Industrial" before "Project Manager".
+   - Valid Hebrew query examples: "מנהל פרויקטים הנדסי", "מנהל פרויקטים ביטחוני", "מנהל פרויקטים ייצור", "ניהול פרויקטי מו"פ", "מנהל פרויקטים היטק".
+   - FORBIDDEN Hebrew queries for this profile: "מנהל פרויקטים בנייה", "מנהל פרויקטי מגורים", "מנהל פרויקטים נדל"ן".
 
 4. SEARCH COVERAGE — Israel-wide, multiple platforms:
    - hebrewQueries: 3 queries for Israeli job boards. Target sites include: drushim.co.il, alljobs.co.il, jobmaster.co.il, gotfriends.co.il, sahbak.co.il, mploy.co.il, jobnet.co.il, comeet.io, nisha.co.il, seev.co.il, goozali.com. Cover: (a) obvious match, (b) one step up/pivot, (c) non-obvious opportunity.
