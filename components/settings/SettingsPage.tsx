@@ -170,7 +170,6 @@ export default function SettingsPage() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-white">{he ? "הגדרות" : "Settings"}</h1>
-            <p className="text-white/40 text-sm">{he ? "ניהול מנוי ואמצעי תשלום" : "Manage subscription & payment"}</p>
           </div>
         </div>
 
