@@ -68,7 +68,7 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string): P
   });
 }
 
-const ADMIN_EMAIL = "yanaoskin35@gmail.com";
+export const ADMIN_EMAIL = "yanaoskin35@gmail.com";
 
 export async function sendAdminPurchaseNotificationEmail(
   userName: string,
@@ -181,5 +181,69 @@ export async function sendPurchaseConfirmationEmail(
     to: toEmail,
     subject: `🎉 ברוך הבא למסלול ${plan.nameHe}! | Work Hunter`,
     html,
+  });
+}
+
+export async function sendMonitorAlertEmail(issues: string[]): Promise<void> {
+  const now = new Date().toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" });
+  const issuesHtml = issues
+    .map((i) => `<li style="margin-bottom:8px;color:#f87171">${i}</li>`)
+    .join("");
+  await getTransporter().sendMail({
+    from: process.env.SMTP_FROM ?? "Work Hunter <noreply@workhunter.com>",
+    to: ADMIN_EMAIL,
+    subject: `[Work Hunter] התראת מערכת — ${issues.length} בעיה(ות) זוהו`,
+    html: `<!DOCTYPE html>
+<html dir="rtl" lang="he"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#0f0e1a;font-family:'Segoe UI',Arial,sans-serif;color:#f0f0f5;direction:rtl">
+<div style="max-width:520px;margin:0 auto;padding:40px 16px">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="color:#a855f7;font-weight:800;font-size:18px">Work Hunter — Monitor</div>
+  </div>
+  <div style="background:#1a1730;border:1px solid rgba(248,113,113,0.4);border-radius:20px;padding:32px">
+    <div style="font-size:36px;text-align:center;margin-bottom:12px">🚨</div>
+    <h2 style="margin:0 0 16px;font-size:18px;font-weight:800;text-align:center">זוהו בעיות במערכת</h2>
+    <p style="color:rgba(240,240,245,0.5);font-size:13px;margin:0 0 20px;text-align:center">${now}</p>
+    <ul style="padding-right:18px;margin:0">${issuesHtml}</ul>
+  </div>
+</div></body></html>`,
+  });
+}
+
+export interface DailyStats {
+  users: { total: number; newToday: number; newThisWeek: number; premium: number };
+  analytics: { sessionsToday: number };
+  revenue: { note: string };
+  timestamp: string;
+}
+
+export async function sendDailyReportEmail(stats: DailyStats): Promise<void> {
+  const now = new Date().toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" });
+  await getTransporter().sendMail({
+    from: process.env.SMTP_FROM ?? "Work Hunter <noreply@workhunter.com>",
+    to: ADMIN_EMAIL,
+    subject: `[Work Hunter] דוח יומי — ${new Date().toLocaleDateString("he-IL")}`,
+    html: `<!DOCTYPE html>
+<html dir="rtl" lang="he"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#0f0e1a;font-family:'Segoe UI',Arial,sans-serif;color:#f0f0f5;direction:rtl">
+<div style="max-width:520px;margin:0 auto;padding:40px 16px">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="color:#a855f7;font-weight:800;font-size:18px">Work Hunter — דוח יומי</div>
+  </div>
+  <div style="background:#1a1730;border:1px solid rgba(168,85,247,0.25);border-radius:20px;padding:32px">
+    <p style="color:rgba(240,240,245,0.4);font-size:12px;margin:0 0 24px;text-align:center">${now}</p>
+    <table style="width:100%;border-collapse:collapse">
+      <tr><td colspan="2" style="padding:6px 0 10px;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:rgba(240,240,245,0.35)">משתמשים</td></tr>
+      <tr><td style="padding:8px 0;color:rgba(240,240,245,0.55);border-bottom:1px solid rgba(255,255,255,0.06)">סה"כ</td><td style="padding:8px 0;font-weight:700;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06)">${stats.users.total}</td></tr>
+      <tr><td style="padding:8px 0;color:rgba(240,240,245,0.55);border-bottom:1px solid rgba(255,255,255,0.06)">חדשים היום</td><td style="padding:8px 0;font-weight:700;color:#10b981;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06)">+${stats.users.newToday}</td></tr>
+      <tr><td style="padding:8px 0;color:rgba(240,240,245,0.55);border-bottom:1px solid rgba(255,255,255,0.06)">חדשים השבוע</td><td style="padding:8px 0;font-weight:700;color:#10b981;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06)">+${stats.users.newThisWeek}</td></tr>
+      <tr><td style="padding:8px 0;color:rgba(240,240,245,0.55);border-bottom:1px solid rgba(255,255,255,0.06)">פרימיום</td><td style="padding:8px 0;font-weight:700;color:#a855f7;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06)">${stats.users.premium}</td></tr>
+      <tr><td colspan="2" style="padding:18px 0 10px;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:rgba(240,240,245,0.35)">תנועה</td></tr>
+      <tr><td style="padding:8px 0;color:rgba(240,240,245,0.55)">סשנים היום</td><td style="padding:8px 0;font-weight:700;text-align:left">${stats.analytics.sessionsToday}</td></tr>
+      <tr><td colspan="2" style="padding:18px 0 10px;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:rgba(240,240,245,0.35)">הכנסות</td></tr>
+      <tr><td colspan="2" style="padding:8px 0;color:rgba(240,240,245,0.4);font-size:13px">${stats.revenue.note}</td></tr>
+    </table>
+  </div>
+</div></body></html>`,
   });
 }
