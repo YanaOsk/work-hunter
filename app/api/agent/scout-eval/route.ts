@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     await runJobSearch(
       profileText,
       (job: JobResult) => {
-        if (job.matchScore < 38) return;
+        if (job.matchScore < 30) return;
         if (wantsRemoteOnly && !job.isRemote) return;
         jobs.push(job);
       },

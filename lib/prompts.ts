@@ -1121,6 +1121,47 @@ CRITICAL RULES — read carefully before generating anything:
    → For non-tech fresh grads: target companies with stated on-the-job training programs. Look for "הכשרה מלאה", "אנחנו נכשיר", "ייתן הכשרה".
    → In searchRationale: "בוגר/ת טרי/ה — ממוקד בג'וניור + תוכניות הכשרה בחברות B+. לא מחפש תפקידים שדורשים ניסיון מוכח."
 
+17. ROLE SYNONYM EXPANSION — prevent zero results by broadening to posting-rich synonymous titles:
+
+   The most common zero-result cause is a search too narrow to the exact stated title. Israeli job boards use different title vocabularies than candidates do. For these specific roles, USE AT LEAST ONE of the 3 Hebrew queries on the synonymous/adjacent title — NOT only the primary title:
+
+   A. ACCOUNTANT / CPA (רואת חשבון, רו"ח):
+   - yearsExperience >= 6: one query must target "חשב/ת חברה" or "מנהל/ת כספים" — experienced CPAs in Israel are hired under these titles
+   - yearsExperience >= 10: also consider "CFO" or "סמנכ"ל כספים" (small/mid-cap companies)
+   - Industry preference (e.g. "מכות ייצור"): add that sector to one query: "חשב חברת ייצור"
+
+   B. NURSE (אחות) seeking clinic or non-hospital environment:
+   When additionalContext signals "מרפאה", "קליניקה", "קופת חולים", or explicitly wants to avoid hospital shifts:
+   - Mandatory title synonyms in at least 2 of 3 queries: "אחות קופת חולים", "אחות מרפאה", "אחות תעסוקתית", "מתאמת קלינית"
+   - These are the ACTUAL titles clinics post — a query for bare "אחות" surfaces hospital/ER results. The clinic market is title-specific.
+   - One query may target: "Clinical Research Coordinator ישראל" or "nurse clinical coordinator" for candidates who mentioned research/coordinator interest
+
+   C. LAWYER (עורך/ת דין) seeking in-house, part-time, or corporate role:
+   - Always include at least one Hebrew query for "יועץ/ת משפטי/ת" and one English query for "Legal Counsel" / "In-house counsel"
+   - Companies post in-house roles under "יועץ/ת משפטי/ת" or "Legal Counsel" — rarely under "עורך/ת דין"
+   - For commercial/corporate specialization: "עו"ד חברה", "Associate Commercial Law"
+   - For part-time: append "חצי משרה" or "part-time" to every query (per Rule 10)
+
+   D. CAREER CHANGER TARGETING MANAGEMENT from service/hospitality (waiter, cook, bartender → manager):
+   CRITICAL: Search for the TARGET management role, NOT the current service role.
+   - WRONG: "מלצר מנוסה מחפש ניהול" — this is a job seeker post framing, not a job search query
+   - CORRECT: "מנהל משמרת מסעדה [עיר]", "עוזר מנהל מסעדה", "מנהל בית קפה", "F&B Supervisor", "מנהל שף"
+   - The candidate's current job title is NOT the search term — their target role is the search term
+   - Use their current experience as scoring weight (it will appear in the CV text), but search for where they WANT to go
+
+   E. ELECTRONICS TECHNICIAN (טכנאי אלקטרוניקה) especially in peripheral areas:
+   - Include at least 2 synonymous titles across queries: "טכנאי שירות", "טכנאי אחזקה", "טכנאי בדיקות אלקטרוניקה", "טכנאי מעבדה אלקטרונית"
+   - For peripheral/northern areas: add regional qualifiers: "גליל", "צפון ישראל", "קריית שמונה", "עמק יזרעאל" — not just the specific city
+   - One query may target a broader category: "אלקטרוניקה תעשייתית בכיר" for 15+ years experience
+
+   F. MARKETING MANAGER (מנהלת/מנהל שיווק, especially digital):
+   - At least one Hebrew query should use: "מנהלת שיווק דיגיטלי" or "מנהלת שיווק ביצועים" or "Performance Marketing Manager"
+   - At least one English query: "Digital Marketing Manager Israel" or "Performance Marketing Manager Israel"
+   - For freelance→salaried (Type B career change): search directly for salaried role title — do NOT add "עצמאי/ת" to queries
+   - If candidate has social media emphasis: include "Social Media Manager" in one query
+
+   ENFORCEMENT: Before outputting JSON, verify that for each applicable role above, at least one query uses the synonymous title — not only the candidate's exact stated title.
+
 Respond with JSON only:
 {
   "hebrewQueries": ["שאילתה 1", "שאילתה 2", "שאילתה 3"],

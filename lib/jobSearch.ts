@@ -148,9 +148,9 @@ const JOBSEEKER_POST_MARKERS = [
   "looking for work", "seeking employment", "available for hire",
   "open to work", "seeking a job", "job seeker", "seeking new opportunities",
   "i am looking for", "currently seeking",
-  // MLM / online "work from home" spam
-  "עבודה אונליין", "הכנסה מהבית", "הכנסה פסיבית",
-  "נפתחה ההרשמה", "הצטרפו אלינו לעבודה אונליין",
+  // MLM / online "work from home" spam — keep only phrases unique to MLM, not found in real job listings
+  "הכנסה מהבית", "הכנסה פסיבית",
+  "הצטרפו אלינו לעבודה אונליין",   // "נפתחה ההרשמה" removed — too broad, appears in legitimate job announcements
 ];
 
 function isJobSeekerPost(result: SerperResult): boolean {
