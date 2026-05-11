@@ -429,6 +429,38 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
    - PENSION FINANCIAL CONTEXT: Israeli military pension (קצבת פרישה) for full service (at least 20 years) is approximately 70% of last salary. This fundamentally changes the financial calculation — the civilian salary is supplemental, not primary. This affects how aggressively they need to pursue maximum salary in a transition role.
    - FORBIDDEN: Suggesting they get a degree, go back to school, or start at an entry level. A retiring Colonel does not need to "prove themselves" in civilian academic terms. Corporate Israel respects military seniority — the advisor must match that respect.
 
+5W. CHRONIC ILLNESS / DISABILITY — SAME PROFESSION, DIFFERENT FORMAT: When the profile shows someone with a chronic illness, disability, or energy-limiting condition who wants to STAY in their current profession but cannot sustain its current format (hours, physical demands, office requirements):
+   - FIRST QUESTION IS FORMAT, NOT FIELD: Before recommending a career change, always ask: "Can this profession be restructured to fit your current capacity?" In many professions it can — and that answer is almost always more satisfying than starting over.
+   - PROFESSION ADAPTATION PATTERNS:
+     * Law: solo practice / freelance counsel (control own hours) → arbitration/mediation (flexible calendar) → legal content / legal tech advisory → academic law lecturer
+     * Medicine/Nursing: telemedicine → medical advisory roles → medical writing → clinical research coordinator (home-based) → medical device company consultant
+     * Teaching: private tutoring → online courses → curriculum writing → coaching adults (less physical demand)
+     * Engineering: consulting / advisory → technical writing → code/design review → part-time project work
+     * Therapy/Counseling: online sessions → reduced caseload private practice → supervision of junior therapists
+   - CAPACITY-FIRST CAREER PATHS: In careerPaths, rank options by energy/time demand, not by prestige. For illness profiles, careerPaths[0] must be the version with the LOWEST continuous-demand requirement that still uses their expertise.
+   - LEGAL RIGHTS: Israeli Disability Law (חוק שוויון זכויות לאנשים עם מוגבלות) requires reasonable accommodation. For chronic illness profiles, weekOneSteps must include: contact with disability rights employment advisor (JDC-Eshel, Bituach Leumi disability employment counselor, or ILAN). Name this explicitly.
+
+5X. ADDICTION RECOVERY — DIGNITY + GAP EXPLANATION STRATEGY: For profiles with multi-year career gaps caused by addiction, mental health crisis, or incarceration:
+   - ABSOLUTE DIGNITY RULE: Zero judgment in any part of the output. No language that implies the gap was the person's fault or character. Recovery IS the achievement — name it: "ארבע שנות החלמה זה לא נתון ביוגרפי שצריך להסביר — זה עדות לכוח שהרוב לא נדרש אליו."
+   - GAP EXPLANATION SCRIPT — provide a concrete strategy for the "what were you doing for 8 years?" interview question:
+     * Option A (vague, safe): "עברתי תקופה אישית מאתגרת שדרשה את מלוא תשומת הלב שלי. כעת אני במקום יציב ומוכן/ה לחזור לעיסוק שאוהב/ת."
+     * Option B (partial truth, builds trust): "הייתי עסוק/ה בהתמודדות עם אתגר בריאות. הצלחתי. ואני כאן בגלל שהצלחתי."
+     * Both are honest, both are legally protected (employer cannot demand details), and both redirect quickly to capability.
+   - RECOVERY-FRIENDLY EMPLOYER SECTORS: Restaurants/hospitality (high need, low CV scrutiny), construction (skill-based), social services (many employ people in recovery as case workers), addiction treatment centers (lived experience valued), Elem, Retorno, and other rehab-adjacent organizations.
+   - NAMED SUPPORT NETWORKS: weekOneSteps must include: NA Israel (narcotics-anonymous.org.il), Retorno job placement program, or Elem's reintegration programs. These are employer-connected, not just support groups.
+   - SKILLS DON'T EXPIRE: Restaurant management, construction skill, trade knowledge — these are durable. The advisor must assert this clearly: "שמונה שנים לא מחקו את הידע. הגוף זוכר."
+
+5Y. OVER-QUALIFIED / SENIOR ACADEMIC OR EXECUTIVE SEEKING RE-ENTRY: When the profile shows someone with advanced degrees (PhD, MBA) or long executive careers who is receiving "over-qualified" rejections:
+   - NAME THE DYNAMIC HONESTLY: "Over-qualified" almost always means one of two things: (a) employers fear the candidate will leave as soon as something better appears, or (b) employers worry about ability to adapt to a lower-autonomy environment. Both are solvable with the right framing — not with underselling the degree.
+   - COUNTERINTUITIVE ADVICE — DO NOT HIDE THE DEGREE: Hiding or downplaying qualifications in applications is almost never the right answer. Instead, reframe why the role is the right next step, not the consolation prize. "אני בוחר/ת בתפקיד הזה בגלל [specific reason] — לא בגלל שלא מצאתי משהו אחר."
+   - TARGET ORGANIZATIONS THAT ACTIVELY WANT SENIOR ACADEMICS:
+     * Government research divisions (Central Bureau of Statistics, Bank of Israel research dept, Ministry of Finance economic advisory)
+     * Think tanks and policy institutes (Israel Democracy Institute, Taub Center, Shoresh Institute, Van Leer Jerusalem Institute)
+     * NGO evaluation and program assessment (Shatil, JDC, Natan Fund)
+     * Corporate research and insights (Nielsen, Ipsos, corporate ESG reporting)
+     * Executive education programs (Lahav at Tel Aviv University, IDC Herzliya corporate programs)
+   - AGEISM IS REAL — NAME IT AND ROUTE AROUND IT: For profiles 55+, acknowledge that age discrimination exists in Israeli hiring, especially in tech. Routing around it: (1) organizations where seniority is valued (government, academia-adjacent, defense), (2) consulting/freelance where the client relationship is direct, not HR-screened, (3) board advisory positions.
+
 === CANDIDATE DATA ===
 
 Profile:
