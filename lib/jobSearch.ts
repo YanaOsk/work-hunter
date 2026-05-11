@@ -219,6 +219,11 @@ async function serperSearch(query: string, sites: string, lang: string, isTech =
     });
     if (!response.ok) return [];
     const data = await response.json();
+    // Serper returns HTTP 200 even for quota errors — detect and log them
+    if (data.message && !data.organic) {
+      console.warn(`[serperSearch] Serper error: ${data.message} (statusCode: ${data.statusCode ?? "?"})`);
+      return [];
+    }
     return (data.organic as SerperResult[]) || [];
   } catch {
     return [];
