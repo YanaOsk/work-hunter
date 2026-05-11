@@ -22,6 +22,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "profileText required" }, { status: 400 });
   }
 
+  const wantsRemoteOnly =
+    /"workPreference"\s*:\s*"remote"/.test(profileText) ||
+    /remote בלבד|מרחוק בלבד|לא יבוא למשרד|לא תגיע למשרד|only remote|fully remote|remote only|עבודה מהבית בלבד|100% remote/i.test(profileText);
+
   const jobs: JobResult[] = [];
   let entryPath: EntryPathResult | undefined;
 
@@ -29,7 +33,9 @@ export async function POST(request: NextRequest) {
     await runJobSearch(
       profileText,
       (job: JobResult) => {
-        if (job.matchScore >= 38) jobs.push(job);
+        if (job.matchScore < 38) return;
+        if (wantsRemoteOnly && !job.isRemote) return;
+        jobs.push(job);
       },
       lang,
       (ep: EntryPathResult) => { entryPath = ep; },

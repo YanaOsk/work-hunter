@@ -456,15 +456,25 @@ ${jobDescription}
 CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
 
 1. REMOTE WORK:
-   - If workPreference is "remote" and the job does NOT appear to be remote/work-from-home, set matchScore to MAX 30 and note it as first matchNegative.
-   - If the job description explicitly contains a NEGATIVE remote signal ("לא ניתן לעבוד מהבית", "חובה להגיע למשרד", "נוכחות פיזית נדרשת", "office only", "no remote work", "must be on-site") AND candidate wants remote → set matchScore to MAX 15 and add "נדרשת נוכחות פיזית — לא מתאים לעבודה מהבית" as first matchNegative.
-   - If the job IS remote and the candidate wants remote, add +15 to score.
+   DETECT remote-only preference from ANY of these signals (structured field OR free text):
+   - workPreference field is "remote", OR
+   - Profile text contains any of: "remote בלבד", "מרחוק בלבד", "לא יבוא למשרד", "לא תגיע למשרד", "only remote", "fully remote", "remote only", "עבודה מהבית בלבד", "רוצה לעבוד מהבית בלבד", "home office only", "no office", "100% remote"
+
+   If remote-only preference detected:
+   - AND the job has a specific physical office location listed (city name WITHOUT "מרחוק"/"remote"/"היברידי") → set matchScore to MAX 15. Add as first matchNegative: "המשרה דורשת נוכחות פיזית — לא מתאים לדרישת remote בלבד".
+   - AND the job does NOT clearly state it is remote → set matchScore to MAX 25. Add as first matchNegative: "לא ברור שהמשרה מאפשרת עבודה מרחוק — דרישת remote בלבד לא מתקיימת".
+   - AND the job explicitly bans remote ("לא ניתן לעבוד מהבית", "חובה להגיע למשרד", "office only", "must be on-site") → set matchScore to MAX 10. Add "נדרשת נוכחות פיזית מלאה — לא מתאים בכלל" as first matchNegative.
+   - If the job IS remote and candidate wants remote: add +15 to score.
 
 2. CAREER CHANGE:
+   DETECT career change from ANY of: careerChangeInterest field is true, OR profile text contains "רוצה לעבוד ב-", "רוצה לעבור ל-", "רוצה לשנות כיוון", "מחפש/ת שינוי", "מעבר קריירה", "career change", "switching to", "transitioning to", "רוצה תפקיד X" where X is clearly different from currentRole.
+
    Apply the max-25 cap ONLY when this is a Type C career change (true profession change — different field entirely).
    Do NOT apply the cap for Type A (setting change) or Type B (employment model change within same field).
 
-   TYPE C ONLY — hard cap: If careerChangeInterest is true AND the job is in the candidate's OLD profession (not just old employer type), set matchScore to MAX 25. Add as first matchNegative: "זו עבודה בתחום הישן — המועמד ציין שרוצה לצאת מתחום זה". This is always filtered out (below 38) — intentional.
+   TYPE C ONLY — hard cap: If career change detected AND the job is in the candidate's OLD profession (not just old employer type), set matchScore to MAX 25. Add as first matchNegative: "זו עבודה בתחום הישן — המועמד ציין שרוצה לצאת מתחום זה". This is always filtered out (below 38) — intentional.
+
+   TYPE C — TRANSFERABLE SKILLS: When the candidate is changing to a new field, identify TRANSFERABLE skills from their background that apply to the new role. A kindergarten teacher transitioning to admin brings: scheduling/coordination, communication with stakeholders, handling crises, documentation — these are real admin skills. State these explicitly in matchReasons when relevant. Do NOT treat career-changers as blank slates.
 
    TYPE A / TYPE B — score normally: A clinic nurse job for a hospital nurse is a direct match, not a career change. A salaried real estate role for a freelance broker is a direct match. Evaluate these as regular candidates in their profession.
 
@@ -612,8 +622,16 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
       - If candidate's floor is HIGHER than inferred ceiling by 30%+ → reduce score by 20, add matchNegative noting the likely gap.
    c) If salary is NOT listed and role is ambiguous → set salaryRange to null, no penalty.
 
-5. TRANSIT / TRAIN ACCESS:
-   - If constraints include train dependency (e.g. "רכבת", "train only", "no car") and the job is onsite, check if the job location is near a rail station.
+5. TRANSIT / NO-CAR CONSTRAINT:
+   DETECT no-car from ANY of: profile text contains "אין רכב", "no car", "ללא רכב", "תחבורה ציבורית בלבד", "רק תחבורה ציבורית", "אין לי רכב", "without a car", or constraints field includes such phrasing.
+
+   If no-car detected:
+   - AND the job is onsite in a DIFFERENT CITY from the candidate's stated city → reduce score by 30 and add matchNegative: "המשרה ב[עיר] — ללא רכב, קשה להגיע לעיר אחרת".
+   - AND the job is in the SAME city as the candidate → no penalty (buses exist within cities).
+   - AND the job is remote → no penalty.
+
+   TRAIN DEPENDENCY (specific):
+   - If constraints include "רכבת" / "train only" and the job is onsite, check if the job location is near a rail station.
    - Major Israeli rail stations: Tel Aviv HaShalom, Tel Aviv Center, Tel Aviv Savidor, Tel Aviv University, Herzliya, Ra'anana South, Kfar Saba, Bnei Brak, Petah Tikva, Lod, Rehovot, Beer Sheva North.
    - Industrial zones (Holon, Kiryat Gat factories, airport industrial areas) are typically NOT walkable from stations. If job is in such a zone, reduce score by 25 and add "לא נגיש ברכבת" as first matchNegative.
    - If bike-only: job must be in the same city and neighborhood-accessible. Cross-city = hard fail (score max 20).
@@ -637,9 +655,17 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
 8. SENIORITY MISMATCH:
    - If yearsExperience >= 2 AND careerChangeInterest is false AND the job explicitly targets inexperienced candidates ("ללא ניסיון", "סטודנטים", "0-1 שנות ניסיון", "entry level", "fresh graduate", "first job") → reduce score by 20 and add matchNegative: "משרת כניסה — מתחת לרמת הניסיון שלך".
    - If yearsExperience <= 1 AND the job requires extensive experience ("5+ שנות ניסיון", "Senior", "בכיר", "10 years", "experienced only") → reduce score by 20 and add matchNegative: "המשרה דורשת ניסיון רב מהנוכחי".
-   - If careerChangeInterest is true: waive the first rule — entry-level in the NEW field is appropriate.
+   - If yearsExperience is between 2–4 AND the job explicitly uses "Senior", "בכיר/ה", "5+ שנות ניסיון", "6+ years", "ניסיון של 5 שנים ומעלה" → reduce score by 15 and add matchNegative: "המשרה מיועדת לבכירים — [X] שנות ניסיון עשויות להיות קצר מדי לדרישות התפקיד".
+   - If careerChangeInterest is true: waive the over-qualified and under-experienced rules — entry-level in the NEW field is appropriate, and seniority in the old field doesn't transfer.
 
-8a. BEAUTY / SALON SECTOR — SENIORITY RULE EXCEPTION:
+8a. NICHE TECHNOLOGY / PLATFORM MISMATCH:
+   If the job description is centered on a very specific proprietary platform or niche tech that requires dedicated training — and it is NOT mentioned anywhere in the candidate's skills:
+   → Reduce score by 15 and add matchNegative: "המשרה מצריכה ניסיון ב-[פלטפורמה] שאינה מוזכרת בפרופיל שלך".
+   Examples of niche platforms: Shopify/Liquid, SAP, Salesforce, Oracle ERP, SolidWorks, CATIA, Unity (game dev), Unreal Engine, ServiceNow, HubSpot (advanced configuration), Adobe Commerce (Magento).
+   Do NOT apply for general transferable technologies (React, Python, Node.js, SQL, Excel, Google Workspace) — a good developer can learn these quickly.
+   Only apply when the job description makes the niche platform the CORE requirement ("חייב ניסיון ב-Shopify", "experience with Salesforce CRM required"), not just a mention.
+
+8b. BEAUTY / SALON SECTOR — SENIORITY RULE EXCEPTION:
    In beauty, nail, and salon job postings, "ללא ניסיון" or "לא חייבים ניסיון" means the salon provides its own in-house brand training — it does NOT mean the post targets students or inexperienced-only candidates. Experienced technicians are explicitly welcome.
    → Do NOT apply the Rule 8 seniority mismatch penalty to these postings.
    → Treat "ללא ניסיון" in beauty/nail/salon ads as a POSITIVE signal (training included), not as an inexperienced-only filter.
