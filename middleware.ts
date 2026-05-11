@@ -10,5 +10,5 @@ export default withAuth({
 });
 
 export const config = {
-  matcher: ["/advisor/:path*", "/cv-builder/:path*", "/profile/:path*", "/profile"],
+  matcher: ["/advisor/:path*", "/cv-builder/:path*"],
 };

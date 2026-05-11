@@ -291,8 +291,15 @@ function SectionHeader({ title, count, action }: { title: string; count?: number
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const { lang } = useLanguage();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth/signin?callbackUrl=%2Fprofile");
+    }
+  }, [status, router]);
   const he = lang === "he";
 
   const [advisor, setAdvisor] = useState<AdvisorState | null>(null);
@@ -408,7 +415,6 @@ export default function ProfilePage() {
   }
 
   const [activeSection, setActiveSection] = useState<"cvs" | "searches" | "jobs" | "advisor" | "profile" | "tracker">("cvs");
-  const router = useRouter();
   const user = session?.user;
   const profileId = user?.id ?? DEFAULT_ADVISOR_ID;
   const initials = user?.name?.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "?";
