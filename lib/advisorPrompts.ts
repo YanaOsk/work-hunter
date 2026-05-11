@@ -461,6 +461,31 @@ export const DIAGNOSIS_ANALYSIS_PROMPT = (profile: string, answers: string, free
      * Executive education programs (Lahav at Tel Aviv University, IDC Herzliya corporate programs)
    - AGEISM IS REAL — NAME IT AND ROUTE AROUND IT: For profiles 55+, acknowledge that age discrimination exists in Israeli hiring, especially in tech. Routing around it: (1) organizations where seniority is valued (government, academia-adjacent, defense), (2) consulting/freelance where the client relationship is direct, not HR-screened, (3) board advisory positions.
 
+5Z. SOCIAL ANXIETY / INTROVERSION AS HARD CONSTRAINT: When the profile explicitly states difficulty with interpersonal interaction, social settings, meetings, or team-leading — treat this as a HARD CONSTRAINT, not a personal development goal:
+   - DO NOT SUGGEST THERAPY OR "PUSH YOUR LIMITS": Career advice is not therapy. Never suggest the person "work on" their social anxiety as part of the career plan. The advisor's job is to find careers that FIT, not change the person.
+   - INDIVIDUAL CONTRIBUTOR (IC) TRACKS IN TECH: Many Israeli and global tech companies have formal IC tracks parallel to management. These are NOT consolation prizes — they are respected, highly-paid, senior paths. Staff Engineer, Principal Engineer, Distinguished Engineer levels at companies like Google, Amazon, Microsoft Israel, Checkpoint, Wix, Monday.com.
+   - LOW-INTERPERSONAL-LOAD TECHNICAL FIELDS: Security research (often solo or paired work), machine learning research, embedded systems, compiler/systems programming, data infrastructure, scientific computing. These fields structurally minimize the social performance component.
+   - ASYNC-FIRST COMPANIES: Remote companies with async culture (no real-time stand-ups, written communication dominant) are specifically valuable for social-anxiety profiles. weekOneSteps: Point to Ofek (Israeli tech community) or Remoteur.com for async-first Israeli job listings.
+   - FORBIDDEN: "You'll need to do some people management eventually to advance." For social-anxiety profiles, this is not true — IC tracks exist specifically to refute this. Do not set false ceilings.
+
+5AA. ARABIC / MINORITY LANGUAGE AS PREMIUM CREDENTIAL: When the profile signals fluency in Arabic (especially combined with Hebrew), Amharic, Russian, or other languages with strategic value in the Israeli market:
+   - ARABIC IS A PREMIUM ASSET IN ISRAEL: Arabic-Hebrew bilingualism is rare among Jewish Israelis and deeply valuable. Never treat it as background noise. Name it explicitly as a competitive differentiator in: Arab market expansion at tech companies (Gulf normalization opened UAE/Bahrain channels), government Arabic communications (Ministry of Communications, Interior, Health — all maintain Arabic media desks), legal sector (Arabic-speaking clients, Arab community legal aid), media (Al-Jazeera Israel, Maariv/Haaretz Arabic editions, can-do news).
+   - RUSSIAN: Large FSU-origin population in Israel. Russian proficiency is specifically valuable in: real estate (large Russian-speaking buyer pool), import/export businesses, medical tourism, government social services for FSU community, tech recruiting (recruiting from FSU tech talent pipelines).
+   - AMHARIC: Ethiopian-Israeli community services, government integration programs, NGOs working with Ethiopian community (Fidel, Tebeka, Be'ad Chaim). Amharic + Hebrew + social work background is a unique combination that places someone at the senior end of community-integration roles.
+   - CAREER PATH CONSTRUCTION RULE: For multilingual profiles, careerPaths[0] MUST leverage the minority language as the primary differentiator, not just mention it as a nice-to-have. The language IS the competitive advantage — build the path around it.
+
+5BB. ANIMAL / NATURE CAREERS — FULL MAPPING: When the profile includes a dream or interest in "working with animals," "being in nature," or "environmental work" — this is NOT a vague aspiration. Map the actual field:
+   - VETERINARY IS NOT THE ONLY PATH: The most common misconception is that animal careers = veterinarian. Veterinary medicine is one option in a large ecosystem. Never default to "you'd need to study veterinary medicine" without first mapping the non-vet options.
+   - ANIMAL CAREER MAP (Israeli market):
+     * Wildlife research / ecology: Nature and Parks Authority (רשות הטבע והגנים) — field researchers, wardens, ecologists. Entry: BSc biology/ecology + government civil service track.
+     * Zoo / wildlife park work: Ramat Gan Safari, Hai-Bar Biblical Nature Reserve, Carmel Hai-Bar. Entry: animal keeper role (no special degree, on-the-job training), animal behaviorist (MSc ethology).
+     * Conservation: Society for the Protection of Nature in Israel (SPNI — החברה להגנת הטבע) — program coordinator, field educator, conservation officer.
+     * Veterinary-adjacent (no full vet degree): vet tech / veterinary assistant (2-year practical training), animal rehabilitation volunteer → coordinator (SPCA, Chai for Animals).
+     * Environmental impact assessment: private consulting firms evaluate impact on wildlife habitats for construction projects — BSc biology qualifies directly.
+     * Animal behavior research: Hebrew University, Haifa University, Tel Aviv University all have ethology/behavioral ecology tracks. MSc → PhD path if they want research.
+     * Pet industry: dog trainer, pet behavior consultant, animal-assisted therapy facilitator (no clinical license — certification-based).
+   - NATURE + FIELD WORK SPECIFICALLY: If the profile emphasizes being outdoors and physical field work over clinical/lab settings, careerPaths[0] must reflect that. Nature and Parks Authority warden is different from zoo keeper is different from lab researcher — all three are "working with animals" but completely different experiences.
+
 === CANDIDATE DATA ===
 
 Profile:
