@@ -70,6 +70,14 @@ export const DIAGNOSIS_QUESTIONS_HE: DiagnosisQuestionDef[] = [
       "לארגן, לתכנן ולנהל תהליכים מורכבים",
     ],
   },
+  {
+    id: "dream",
+    question: "אם כסף לא היה שיקול בכלל — במה הייתם עוסקים? כתבו בחופשיות, בלי לחשוב על מה שמציאותי.",
+  },
+  {
+    id: "reputation",
+    question: "מה חברים, בני משפחה, או עמיתים לעבודה אומרים שאתם הכי טובים בו? כתבו בחופשיות — גם אם זה נשמע מובן מאליו.",
+  },
 ];
 
 export const DIAGNOSIS_QUESTIONS_EN: DiagnosisQuestionDef[] = [
@@ -141,6 +149,14 @@ export const DIAGNOSIS_QUESTIONS_EN: DiagnosisQuestionDef[] = [
       "Leading conversations, persuading and influencing",
       "Organizing, planning and managing complex processes",
     ],
+  },
+  {
+    id: "dream",
+    question: "If money were no object — what would you spend your time doing? Write freely, without thinking about what's realistic.",
+  },
+  {
+    id: "reputation",
+    question: "What do friends, family, or colleagues say you are best at? Write freely — even if it seems obvious.",
   },
 ];
 
@@ -566,6 +582,19 @@ ${profile}
 ${freeformIntro ? `\nCandidate's own words (free-form intro — highest priority context, read carefully):\n${freeformIntro}\n` : ""}
 Personality answers:
 ${answers}
+
+=== SPECIAL SIGNAL WEIGHTING ===
+Two of the above answers carry extra diagnostic weight — treat them as primary signals, not secondary data:
+
+1. DREAM ANSWER (question id: "dream" / "אם כסף לא היה שיקול"): This answer bypasses financial rationalization and reveals intrinsic motivation. Cross-reference it against the other personality answers:
+   - If the dream ALIGNS with their personality answers → strong confirmation signal. Use the dream framing in topMessage and reflection.
+   - If the dream CONFLICTS with their personality answers → this is the most important signal in the whole profile. Name the tension explicitly in reflection: "הבחירות שאתה/את עושה ביום-יום מדברות על [X], אבל כשמסירים את שיקול הכסף — אתה/את בוחר/ת [Y]. זה לא סתירה — זה מידע."
+   - Use the dream answer to calibrate careerPaths — at least one of the three paths should live in the world of the dream, or explain why it cannot.
+
+2. REPUTATION ANSWER (question id: "reputation" / "מה אחרים אומרים"): This is how the world SEES them, independent of how they see themselves. Often more accurate than self-assessment.
+   - If reputation aligns with their stated interests → double-confirm those paths.
+   - If reputation describes a DIFFERENT strength than what they say they love → this is signal for a hidden competency. Surface it: "אחרים רואים ב[X] את הכוח שלך — גם אם אתה/את לא חושב/ת עליו כקריירה, שווה לשאול למה כל כך הרבה אנשים מגיעים אליך עם [X]."
+   - If reputation is missing (they left it blank) → do not penalize. Proceed without it.
 
 === OUTPUT RULES ===
 
@@ -1226,6 +1255,11 @@ ADHD / נוירודיברגנטיות: "לא יכול לשבת", "צריך גי�
 מפתח/ת self-taught / ללא תואר: אם יש פורטפוליו (GitHub, פרויקטים חיים, לקוחות) — הפורטפוליו הוא ה-credential. אל תציע "לקחת תואר". Target: סטרטאפים ישראלים, scale-ups, R&D offices של חברות בינלאומיות — כולם מסתכלים על GitHub ראשון. weekOneSteps: תרומה ל-open source + קבוצת "FullStack IL" בפייסבוק + הגשה לחברה שכותבת "no degree required" במודעה. בכירות = לפי מורכבות פרויקטים, לא שנות לימוד.
 
 כשהלקוח שואל שאלה — תענה לעניין. כשהוא מתלבט — שקף לו את הצדדים. כשהוא מבקש עזרה במשימה ספציפית (למשל לנסח CV) — תן תוצר ממשי, לא הכוונה.
+
+═══ אותות מיוחדים מהאבחון ═══
+שתי שאלות באבחון נושאות משקל פרשני מיוחד — אם הן מופיעות בנתוני הלקוח:
+• "אם כסף לא היה שיקול" (שאלת החלום): זה האות הכי כנה בכל הפרופיל. אם הוא עולה בשיחה — השתמש בו לעיגון הכיוון. אם הוא מתנגש עם מה שהלקוח אמר שהוא רוצה — שקף את הפער בעדינות.
+• "מה אחרים אומרים שאתה הכי טוב בו" (שאלת המוניטין): זה מה שהעולם רואה, לא רק מה שהלקוח רואה בעצמו. לעתים קרובות מדויק יותר מהדיווח העצמי. אם עולה כוח שלא הלקוח לא אימץ — שאל עליו.
 
 IF THE USER WRITES IN ENGLISH, respond in English. Otherwise Hebrew.`;
 
