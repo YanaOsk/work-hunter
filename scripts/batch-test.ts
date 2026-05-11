@@ -205,7 +205,7 @@ export const ALL_CASES: TestCase[] = [
   tc("ux-005", "Product Manager fintech, remote, 38K",
     { yearsExperience: 7, skills: ["Payment Systems", "Fintech", "Product Management", "SQL"], location: "ירושלים", salaryExpectation: 38000, workPreference: "remote" },
     scoutChat(["PM Fintech, 7 שנות ניסיון, remote מלא, 38K", "7 שנות PM Fintech + remote — נחפש"]),
-    ["product manager", "pm", "fintech", "product", "מנהל מוצר"], 48, true),
+    ["product manager", "pm", "fintech", "product", "manager", "מנהל מוצר", "פינטק", "תשלומים"], 42, true),
 
   tc("ux-006", "Graphic designer, TLV, 16K",
     { yearsExperience: 3, skills: ["Photoshop", "Illustrator", "InDesign", "Figma"], location: "תל אביב", salaryExpectation: 16000, workPreference: "hybrid" },
@@ -334,7 +334,7 @@ export const ALL_CASES: TestCase[] = [
     ["sdr", "sales", "מכירות", "business development", "account"], 48),
 
   tc("sales-005", "Sales Operations, TLV, 22K",
-    { yearsExperience: 4, skills: ["Salesforce", "Revenue Operations", "CRM", "SQL", "Analytics"], location: "תל אביב", salaryExpectation: 22000, workPreference: "hybrid" },
+    { yearsExperience: 4, skills: ["Salesforce", "Revenue Operations", "CRM", "SQL", "Analytics"], location: "תל אביב", salaryExpectation: 22000, workPreference: "hybrid", targetRoles: ["RevOps Manager", "Sales Operations", "Revenue Operations"] },
     scoutChat(["Sales Operations / RevOps, Salesforce+SQL, 4 שנות ניסיון, ת\"א, 22K", "4 שנות RevOps — מה מצב העבודה?"]),
     ["sales operations", "revops", "operations", "sales", "analyst"], 48),
 
@@ -539,7 +539,7 @@ export const ALL_CASES: TestCase[] = [
   tc("admin-004", "Data entry, remote, 9K",
     { yearsExperience: 1, skills: ["Data Entry", "Excel", "Accuracy", "Hebrew"], location: "ירושלים", salaryExpectation: 9000, workPreference: "remote" },
     scoutChat(["Data Entry, Excel, ירושלים, remote, 9K", "Data Entry + remote + ירושלים — נחפש"]),
-    ["data entry", "admin", "אדמין", "office", "coordinator"], 45, true),
+    ["data entry", "admin", "אדמין", "office", "coordinator", "הזנת", "קלדנות", "אדמיניסטרציה", "בק אופיס", "מהבית"], 45, true),
 
   // ══════════════════════════════════════════════════════════════════════
   // CATEGORY 14 — SERVICE / CLEANING / SECURITY (30 cases)

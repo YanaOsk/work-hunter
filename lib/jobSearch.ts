@@ -69,6 +69,12 @@ const GENERIC_PAGE_TITLE_PATTERNS = [
   /מגוון משרות מיידיות/,
   // drushim guides/articles (not job listings)
   /המדריך המלא/,
+  // Facebook group pages: "משרות ל[group]", "משרות בתחום", "קבוצת משרות", "Hi-Tech Jobs israel - Facebook"
+  /^משרות ל/, /^משרות בתחום/, /קבוצת משרות/,
+  /\bjobs\b.*- facebook$/i, /\bwork\b.*- facebook$/i, /\bמשרות.*- facebook$/i,
+  // Jobnet / board category pages: "דרושים ב[city/field]" with no specific role, or "משרות X | דרושים..."
+  /^דרושים ב[א-ת]+ - Jobnet$/, /^דרושים ב[א-ת]+ – Jobnet$/,
+  /^משרות [א-ת].* \| דרושים/,
 ];
 
 const GENERIC_PAGE_URL_PATTERNS = [

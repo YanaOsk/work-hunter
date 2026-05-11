@@ -770,7 +770,7 @@ CRITICAL RULES — read carefully before generating anything:
        • Marketing (mid-senior): Marketing Manager, Growth Manager, Brand Manager, CMO, VP Marketing, Content Manager, Content Strategist, Social Media Manager (mid+), Performance Marketing Manager
        • Legal / Compliance: Legal Counsel, General Counsel, Compliance Manager, Contract Manager (corporate)
        • Business Development: Business Development Manager, Strategic Partnerships, VP Partnerships
-       • Customer Success / Sales (tech-adjacent): Customer Success Manager (CSM), Customer Success Operations, Account Manager (B2B tech), Sales Development Representative (SDR), Sales Operations Manager
+       • Customer Success / Sales (tech-adjacent): Customer Success Manager (CSM), Customer Success Operations, Account Manager (B2B tech), Sales Development Representative (SDR), Sales Operations Manager, Revenue Operations Manager (RevOps), RevOps Analyst, GTM Operations
        • Project Management (non-engineering, tech company): Project Manager transitioning from law / finance / medicine / military into tech company PM roles (these are actively sourced on LinkedIn Israel by tech HRBPs)
        • Creative (senior / studio): Graphic Designer (mid-senior, studio/agency), Art Director, Creative Director, UX/UI Designer, Brand Designer
        • Impact / Sustainability: CSR Manager, ESG Manager, Sustainability Manager, Impact Manager
@@ -791,7 +791,10 @@ CRITICAL RULES — read carefully before generating anything:
    → Fitness / Sports: personal trainer, gym instructor, yoga instructor, football coach, swimming instructor — Israeli gyms and sports clubs recruit on Israeli boards and Facebook, not English sites
    → Trades: electrician, plumber, HVAC, welder, carpenter — Israeli trade companies recruit on drushim/alljobs, not English sites
    → Agriculture / farm work: farm hand, agricultural worker, organic farm worker, vineyard worker — recruit via moshav/kibbutz networks, Facebook, and local boards; not English sites
+   → Admin / data entry (low-skill): data entry, מזין/ת נתונים, רישום נתונים, עבודת אדמין בסיסית — English queries return US/global remote jobs at $50-80/hr that are irrelevant. Use only Hebrew boards + Facebook.
    These roles are recruited exclusively on Israeli boards (drushim, alljobs, jobmaster) and Facebook. English queries waste search budget.
+   For REMOTE data entry: use framing that Israeli boards understand — "מזין/ת נתונים מהבית", "עבודה מהבית הזנת נתונים", "הזנת מידע עבודה מרחוק ישראל". Do NOT write "remote" in English in any query. The word "מהבית" (from home) is the effective search term on drushim/alljobs for these roles.
+   facebookQuery for remote data entry: "מחפש/ת עבודה מהבית — הזנת נתונים / אדמין / אופיס"
 
    FACEBOOK QUERY — field-specific framing:
    For beauty / nail / salon / grooming: write facebookQuery as if posting in a beauty group.
@@ -970,6 +973,22 @@ CRITICAL RULES — read carefully before generating anything:
    → In searchRationale: "מועמד 50+ — ממוקד בתאגידים, מגזר ציבורי ובטחון. לא סטארטאפ A-B."
    → Prefer queries targeting: תאגידים בינוניים+, חברות ביטחון (Elbit, IAI, Rafael), בנקים, ביטוח, ממשלה, חברות יעוץ ותיקות.
    → Do NOT use the word "senior" explicitly in Hebrew queries — it can trigger age-filtering by ATS. Use role + seniority implied by context (e.g. "מנהל לוגיסטיקה 20 שנה" → "מנהל תפעול בכיר ישראל").
+
+16a. REVOPS / SALES OPERATIONS — ROLE-SPECIFIC QUERY RULES:
+   Trigger: targetRoles or additionalContext contains "RevOps", "Revenue Operations", "Sales Operations", "GTM Operations", "מנהל תפעול מכירות", "Salesforce admin", "CRM Operations".
+   These roles use English job titles even in Israeli postings — Hebrew queries must include the English term.
+   → hebrewQueries: use "Sales Operations ישראל", "RevOps Manager ישראל", "מנהל תפעול מכירות Salesforce". Do NOT generate generic "מנהל מכירות" — that surfaces sales reps, not ops roles.
+   → linkedinQuery: MANDATORY — LinkedIn is the #1 channel for RevOps in Israel. Use "Revenue Operations Manager Israel Salesforce" or "Sales Operations Analyst Israel HubSpot".
+   → englishQueries: "Sales Operations Manager Israel", "RevOps Analyst Israel SaaS", "GTM Operations Israel".
+   → Note in searchRationale: "RevOps — English title required in Hebrew queries. LinkedIn is primary channel."
+
+16b. PRODUCT MANAGER + FINTECH + REMOTE — ZERO-RESULT PREVENTION:
+   When the role is Product Manager AND the field is Fintech AND workPreference is remote: Israeli fintech PM remote postings are sparse on standard boards.
+   → hebrewQueries: (a) "מנהל מוצר פינטק מרחוק", (b) "Product Manager Fintech Israel remote", (c) broaden to leading Israeli fintech companies: Payoneer, Rapyd, Tipalti, Papaya Global, Melio, Fiverr, Nuvei, monday.com — e.g. "מנהל מוצר Rapyd Payoneer מרחוק".
+   → linkedinQuery: MANDATORY — "Product Manager Fintech Israel remote" (LinkedIn is the primary channel for remote fintech PM in Israel).
+   → englishQueries: "Product Manager Fintech Israel remote", "PM Payments Israel remote", "Product Manager B2B Fintech Israel".
+   → If all 3 Hebrew queries return near-zero results: set hebrewQueries[2] to a broader fallback — "מנהל מוצר SaaS מרחוק ישראל" (drops fintech constraint to ensure at least some results).
+   → Note in searchRationale: "PM Fintech remote — ספרסה בלוחות. LinkedIn + חברות פינטק ספציפיות הן הכיוון הראשי."
 
 16. FRESH GRADUATE / 0 EXPERIENCE:
    Trigger: yearsExperience is 0 or null AND ANY of these signals appear in additionalContext or parsedData: "סיים/ה לאחרונה", "בוגר/ת", "ללא ניסיון", "first job", "first job", "עכשיו יצאתי מהלימודים", "no experience", "0 ניסיון", "ג'וניור", or the candidate explicitly stated they have no work experience.
