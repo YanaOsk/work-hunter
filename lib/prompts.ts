@@ -663,9 +663,12 @@ CRITICAL RULES — read carefully before generating anything:
    - additionalContext says "עבדתי 8 שנה כמנהלת שיווק, עוברת למטבח" → culinary queries, NOT marketing
 
 1. REMOTE / WORK-FROM-HOME CONSTRAINT:
-   - If workPreference is "remote" or "flexible", EVERY query must include "מרחוק" or "remote" or "עבודה מהבית".
+   - Remote is triggered by ANY of these signals (not only workPreference field):
+     (a) workPreference is "remote" or "flexible" in parsedData, OR
+     (b) additionalContext contains any of: "מרחוק", "עבודה מהבית", "remote", "work from home", "home office", "רוצה לעבוד מהבית", "only remote", "fully remote", "רוצה רמוט"
+   - When ANY of (a) or (b) is present: EVERY query must include "מרחוק" or "remote" or "עבודה מהבית".
    - Do NOT generate queries for office/onsite roles. Remote is a hard filter, not a preference.
-   - ENFORCEMENT: Before outputting JSON, count how many hebrewQueries contain "מרחוק" or "עבודה מהבית" or "remote". If workPreference is "remote" and the count is less than 3, rewrite the missing queries. Same for englishQueries — all 3 must contain "remote". Append "עבודה מהבית" at the END of each Hebrew query that is missing it. There are no exceptions.
+   - ENFORCEMENT: Before outputting JSON, count how many hebrewQueries contain "מרחוק" or "עבודה מהבית" or "remote". If the remote signal is present and the count is less than 3, rewrite the missing queries. Same for englishQueries — all 3 must contain "remote". Append "עבודה מהבית" at the END of each Hebrew query that is missing it. There are no exceptions.
 
 2. CAREER CHANGE — THREE TYPES, THREE DIFFERENT ACTIONS:
 
