@@ -399,8 +399,12 @@ export default function ProfilePage() {
   }, [session?.user?.id]);
 
   async function saveMeta(patch: Partial<UserMeta>) {
-    await fetch("/api/user-meta", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
-    setUserMeta((prev) => ({ ...prev, ...patch }));
+    try {
+      await fetch("/api/user-meta", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
+      setUserMeta((prev) => ({ ...prev, ...patch }));
+    } catch {
+      // network error — UI stays as-is, server not updated
+    }
   }
 
   const [activeSection, setActiveSection] = useState<"cvs" | "searches" | "jobs" | "advisor" | "profile" | "tracker">("cvs");

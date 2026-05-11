@@ -63,10 +63,6 @@ export async function saveUserMeta(email: string, data: Partial<Omit<UserMeta, "
   const db = sql();
   const lowerEmail = email.toLowerCase();
   const now = new Date().toISOString();
-  await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS advisor_state TEXT`;
-  await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS volunteering TEXT`;
-  await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS age INTEGER`;
-  await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS phone TEXT`;
   await db`ALTER TABLE user_meta ADD COLUMN IF NOT EXISTS address TEXT`;
   await db`
     INSERT INTO user_meta (
