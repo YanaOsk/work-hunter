@@ -8,8 +8,9 @@ import { renderMixedText } from "@/lib/rtl";
 
 const PLAN_IDS: Record<string, string> = {
   weekly: "weekly",
+  monthly: "monthly",
   popular: "quarterly",
-  pro: "lifetime",
+  annual: "annual",
 };
 
 export default function PlansSection() {
@@ -30,45 +31,67 @@ export default function PlansSection() {
       variant: "weekly" as const,
     },
     {
+      name: tx.planMonthlyName,
+      badge: tx.planMonthlyBadge,
+      price: tx.planMonthlyPrice,
+      per: tx.planMonthlyPer,
+      tagline: tx.planMonthlyTagline,
+      features: [tx.planMonthly1, tx.planMonthly2, tx.planMonthly3, tx.planMonthly4, tx.planMonthly5],
+      cta: tx.planMonthlyCta,
+      variant: "monthly" as const,
+    },
+    {
       name: tx.planQuarterlyName,
       badge: tx.planQuarterlyBadge,
       price: tx.planQuarterlyPrice,
       per: tx.planQuarterlyPer,
+      subPrice: tx.planQuarterlySubPrice,
       tagline: tx.planQuarterlyTagline,
       features: [tx.planQuarterly1, tx.planQuarterly2, tx.planQuarterly3, tx.planQuarterly4, tx.planQuarterly5],
       cta: tx.planQuarterlyCta,
       variant: "popular" as const,
     },
     {
-      name: tx.planLifetimeName,
-      badge: tx.planLifetimeBadge,
-      oldPrice: tx.planLifetimeOld,
-      price: tx.planLifetimePrice,
-      tagline: tx.planLifetimeTagline,
-      features: [tx.planLifetime1, tx.planLifetime2, tx.planLifetime3, tx.planLifetime4, tx.planLifetime5],
-      cta: tx.planLifetimeCta,
-      variant: "pro" as const,
+      name: tx.planAnnualName,
+      badge: tx.planAnnualBadge,
+      price: tx.planAnnualPrice,
+      per: tx.planAnnualPer,
+      subPrice: tx.planAnnualSubPrice,
+      tagline: tx.planAnnualTagline,
+      features: [tx.planAnnual1, tx.planAnnual2, tx.planAnnual3, tx.planAnnual4, tx.planAnnual5],
+      cta: tx.planAnnualCta,
+      variant: "annual" as const,
     },
   ];
 
-  const variantClasses: Record<string, { wrap: string; accent: string; cta: string; check: string }> = {
+  const variantClasses: Record<string, { wrap: string; accent: string; cta: string; check: string; badge: string }> = {
     weekly: {
       wrap: "bg-white/5 border-sky-500/20",
       accent: "text-sky-300",
       cta: "bg-sky-500 hover:bg-sky-400 text-slate-900 font-semibold",
       check: "text-sky-400",
+      badge: "bg-sky-500 text-slate-900",
+    },
+    monthly: {
+      wrap: "bg-white/5 border-teal-500/20",
+      accent: "text-teal-300",
+      cta: "bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold",
+      check: "text-teal-400",
+      badge: "bg-teal-500 text-slate-900",
     },
     popular: {
       wrap: "bg-gradient-to-br from-purple-600/20 via-white/5 to-emerald-600/20 border-purple-500/50 shadow-2xl shadow-purple-500/20 lg:-translate-y-2 lg:scale-[1.02]",
       accent: "text-purple-300",
       cta: "bg-purple-600 hover:bg-purple-500 text-white",
       check: "text-purple-400",
+      badge: "bg-gradient-to-r from-purple-500 to-emerald-500 text-white",
     },
-    pro: {
+    annual: {
       wrap: "bg-white/5 border-amber-500/20",
       accent: "text-amber-300",
       cta: "bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold",
       check: "text-amber-400",
+      badge: "bg-amber-500 text-slate-900",
     },
   };
 
@@ -86,57 +109,51 @@ export default function PlansSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {plans.map((p, i) => {
             const c = variantClasses[p.variant];
             return (
               <div
                 key={i}
-                className={`relative rounded-3xl p-6 backdrop-blur-sm border transition-all ${c.wrap}`}
+                className={`relative rounded-3xl p-5 backdrop-blur-sm border transition-all ${c.wrap}`}
               >
                 {p.badge && (
-                  <div
-                    className={`absolute -top-3 start-6 text-xs font-bold px-3 py-1 rounded-full ${
-                      p.variant === "popular"
-                        ? "bg-gradient-to-r from-purple-500 to-emerald-500 text-white"
-                        : p.variant === "weekly"
-                        ? "bg-sky-500 text-slate-900"
-                        : "bg-amber-500 text-slate-900"
-                    }`}
-                  >
+                  <div className={`absolute -top-3 start-6 text-xs font-bold px-3 py-1 rounded-full ${c.badge}`}>
                     {p.badge}
                   </div>
                 )}
 
-                <div className="mb-6">
-                  <h3 className={`text-lg font-semibold mb-2 ${c.accent}`}>{p.name}</h3>
-                  <div className="flex items-baseline gap-2 mb-1 flex-wrap">
-                    {p.oldPrice && <span className="text-white/40 line-through text-lg">{p.oldPrice}</span>}
-                    <span className="text-4xl font-bold text-white">{p.price}</span>
-                    {p.per && <span className="text-white/50 text-sm">{p.per}</span>}
+                <div className="mb-5">
+                  <h3 className={`text-base font-semibold mb-2 ${c.accent}`}>{p.name}</h3>
+                  <div className="flex items-baseline gap-1.5 mb-0.5 flex-wrap">
+                    <span className="text-3xl font-bold text-white">{p.price}</span>
+                    {p.per && <span className="text-white/50 text-xs">{p.per}</span>}
                   </div>
-                  <p className="text-white/60 text-sm">{p.tagline}</p>
+                  {p.subPrice && (
+                    <p className="text-emerald-400 text-xs font-semibold mb-1">{p.subPrice}</p>
+                  )}
+                  <p className="text-white/55 text-xs">{p.tagline}</p>
                 </div>
 
                 <button
                   onClick={() => router.push(`/checkout?plan=${PLAN_IDS[p.variant]}`)}
-                  className={`w-full py-3 px-2 rounded-xl font-semibold transition mb-6 text-sm sm:text-base truncate active:scale-[0.97] ${c.cta}`}
+                  className={`w-full py-2.5 px-2 rounded-xl font-semibold transition mb-5 text-sm truncate active:scale-[0.97] ${c.cta}`}
                 >
                   {p.cta}
                 </button>
 
-                <ul className="space-y-2.5">
+                <ul className="space-y-2">
                   {p.features.map((f, fi) => (
-                    <li key={fi} className="flex items-start gap-2 text-sm">
+                    <li key={fi} className="flex items-start gap-1.5 text-xs">
                       <svg
-                        className={`w-5 h-5 flex-shrink-0 mt-0.5 ${c.check}`}
+                        className={`w-4 h-4 flex-shrink-0 mt-0.5 ${c.check}`}
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-white/85 leading-relaxed">{renderMixedText(f)}</span>
+                      <span className="text-white/80 leading-snug">{renderMixedText(f)}</span>
                     </li>
                   ))}
                 </ul>
