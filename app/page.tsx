@@ -75,7 +75,20 @@ export default function Home() {
     if (params.get("fromCheckout") && sessionStorage.getItem("wh_pending_jobs")) return "jobs";
     return null;
   });
-  const [state, setState] = useState<AppState>(initialState);
+  const [state, setState] = useState<AppState>(() => {
+    if (typeof window === "undefined") return initialState;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("fromCheckout")) {
+        const saved = sessionStorage.getItem("wh_pending_jobs");
+        if (saved) {
+          const jobs: JobResult[] = JSON.parse(saved);
+          if (jobs.length > 0) return { ...initialState, phase: "results", jobResults: jobs, userProfile: emptyProfile };
+        }
+      }
+    } catch {}
+    return initialState;
+  });
   const [showWelcome, setShowWelcome] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
