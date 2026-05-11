@@ -24,6 +24,8 @@ from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from google import genai
+
 # Force UTF-8 on Windows terminal
 if sys.stdout.encoding != "utf-8":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -33,14 +35,14 @@ if sys.stderr.encoding != "utf-8":
 # ── Config ─────────────────────────────────────────────────────────────────────
 APP_URL       = os.getenv("APP_URL", "http://localhost:3000")
 AGENT_SECRET  = os.getenv("AGENT_SECRET", "wh_agent_ba266400b2512e4be84f3ba35a7c3705")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL  = "gemini-2.0-flash"
+GEMINI_API_KEY = "AIzaSyAMjoUoYyKU8RrwlbrKPlV0dzf6wgDex8Y"
+GEMINI_MODELS  = ["gemini-2.5-flash", "gemini-2.0-flash-lite", "gemini-2.0-flash"]
 
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = 587
 SMTP_USER = "yanaoskin35@gmail.com"
 SMTP_PASS = "jwcm unwc edbk tlaz"
-REPORT_TO = "dvirgazala13579@gmail.com"
+REPORT_TO = "yanaoskin35@gmail.com"
 
 # ── Test profiles ──────────────────────────────────────────────────────────────
 # Each profile simulates a real user: what they'd type as CV/free text + constraints
@@ -109,27 +111,29 @@ def build_gemini_prompt(label: str, profile: str, jobs: list) -> str:
 
 
 # ── Gemini call ────────────────────────────────────────────────────────────────
-def call_gemini(prompt: str) -> str:
-    if not GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY is not set. Export it before running this script.")
+_gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 
-    url = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
-        f"?key={GEMINI_API_KEY}"
-    )
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"maxOutputTokens": 2048, "temperature": 0.4},
-    }
-    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    req = urllib.request.Request(
-        url, data=body,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        result = json.loads(resp.read().decode("utf-8"))
-    return result["candidates"][0]["content"]["parts"][0]["text"]
+def call_gemini(prompt: str) -> str:
+    for model_name in GEMINI_MODELS:
+        for attempt in range(3):
+            try:
+                response = _gemini_client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                )
+                return response.text.strip()
+            except Exception as e:
+                msg = str(e)
+                if "503" in msg or "UNAVAILABLE" in msg:
+                    wait = 10 * (attempt + 1)
+                    print(f"  {model_name} busy, retry in {wait}s...")
+                    time.sleep(wait)
+                elif "404" in msg or "NOT_FOUND" in msg:
+                    print(f"  {model_name} not available, trying next...")
+                    break
+                else:
+                    raise
+    raise RuntimeError("All Gemini models failed")
 
 
 # ── Scout call ─────────────────────────────────────────────────────────────────
@@ -199,11 +203,6 @@ def build_email_html(results: list[dict], run_ts: str) -> str:
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 def main():
-    if not GEMINI_API_KEY:
-        print("ERROR: GEMINI_API_KEY is not set.", file=sys.stderr)
-        print("Usage: GEMINI_API_KEY=<key> python scripts/scout_gemini_eval.py", file=sys.stderr)
-        sys.exit(1)
-
     run_ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     print(f"\n=== Scout + Gemini Eval — {run_ts} ===\n")
     print(f"  Scout endpoint: {APP_URL}/api/agent/scout-eval")
