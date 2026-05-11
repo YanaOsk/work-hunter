@@ -479,16 +479,26 @@ CRITICAL CONSTRAINTS — evaluate these FIRST, in order:
    TYPE A / TYPE B — score normally: A clinic nurse job for a hospital nurse is a direct match, not a career change. A salaried real estate role for a freelance broker is a direct match. Evaluate these as regular candidates in their profession.
 
 3. COMMUTE:
-   - If maxCommuteKm is set (e.g. 30) and the job is onsite in a different city far from candidate's location, reduce score by 15 and add a commute concern to matchNegatives.
-   - If the job is remote or location is unclear, ignore this constraint.
+   If maxCommuteKm is set AND the job is onsite in a different city:
+   - Distance ≤ maxCommuteKm: no penalty.
+   - Distance > maxCommuteKm AND ≤ 2× maxCommuteKm: reduce score by 20, add commute concern.
+   - Distance > 2× maxCommuteKm (clearly outside the stated limit): set matchScore to MAX 15. This is a hard location fail.
+   - If the job is remote or location is unclear: ignore this constraint.
 
-   PERIPHERAL CITIES — EXTREME DISTANCE PENALTY:
-   If the candidate lives in a true peripheral city (קריית שמונה, נהריה, צפת, טבריה — northern; מצפה רמון, קציעות, דימונה — southern Negev; אילת — far south) AND the job is onsite in the Tel Aviv/Gush Dan/Jerusalem/Haifa regions:
-   → These are 150-250 km distances — not a commute, a relocation.
-   → Reduce score by 35 (not 15) and add matchNegative: "המשרה נמצאת 150+ ק״מ ממקום המגורים — לא ריאלי כנסיעה יומית".
-   → Only waive if the candidate explicitly says they are willing to relocate.
+   KNOWN CITY DISTANCES — use these when judging commute feasibility:
+   קריית שמונה is NEAR: צפת (30km), חצור הגלילית (20km), קצרין (50km), טבריה (55km), עפולה (45km), חיפה (75km).
+   קריית שמונה is FAR (180–230km) from: תל אביב, ירושלים, באר שבע, אשדוד, רחובות, בית שמש, נס ציונה, ראשון לציון, כפר סבא, רמת גן, ביזרעאל, אפיקים — these all EXCEED any reasonable commute radius and must receive MAX 15.
 
-   SAME-REGION RULE: Kfar Saba ↔ Herzliya ↔ Ra'anana ↔ Petah Tikva ↔ Tel Aviv = same Greater Tel Aviv region, no penalty. Haifa ↔ Acre ↔ Kiryat Ata = same Greater Haifa region, no penalty.
+   PERIPHERAL CITIES — EXTREME DISTANCE HARD CAP:
+   If the candidate lives in קריית שמונה, אילת, מצפה רמון, קציעות, or דימונה AND the job is onsite in the Tel Aviv metro, Jerusalem, or southern coast (Beer Sheva, Ashdod, Ashkelon):
+   → Set matchScore to MAX 10 regardless of other signals.
+   → Add matchNegative: "מרחק 180+ ק״מ ממקום המגורים — בלתי ריאלי לנסיעה יומית".
+
+   SAME-REGION RULE: Kfar Saba ↔ Herzliya ↔ Ra'anana ↔ Petah Tikva ↔ Tel Aviv = same Greater Tel Aviv region, no penalty. Haifa ↔ Acre ↔ Kiryat Ata = same Greater Haifa region, no penalty. Tiberias ↔ Haifa = ~75km, acceptable for a 40km radius worker only if within that radius.
+
+   RELOCATION REQUIRED: If the job explicitly mentions "רילוקיישן", "נכונות למעבר דירה", "relocation required" AND the candidate has stated a maxCommuteKm or home city without saying they're willing to relocate → set matchScore to MAX 10.
+
+   NORTH AMERICA / OVERSEAS: If the job description or title mentions "Israel, OH", "Ohio", or any US state abbreviation as the job location → this is a US-based job, not an Israeli job. Set matchScore to MAX 5 for Israeli candidates without explicit overseas intent.
 
 4. SALARY INFERENCE & FLOOR:
    Conversion rate: 182 hours/month. Convert hourly↔monthly as needed before comparing.

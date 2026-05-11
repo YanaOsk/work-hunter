@@ -60,6 +60,9 @@ const GENERIC_PAGE_TITLE_PATTERNS = [
   /^דרושים$/, /^משרות$/, /^jobs?$/i, /^careers?$/i, /^all jobs/i,
   /כל המשרות/, /לוח דרושים/, /חיפוש משרות/, /job listings/i, /job board/i,
   /remote jobs/i, /משרות מרחוק$/, /משרות היום/,
+  // Company career page indexes (not specific jobs): "משרות עדכניות", "career opportunities"
+  /משרות עדכניות/, /career opportunities/i, /job opportunities/i, /view all jobs/i,
+  /all open positions/i, /join our team$/i,
   // drushim.co.il category pages: "מצאנו 200 הצעות עבודה חדשות" / "27 משרות חדשות"
   /מצאנו \d+ הצעות עבודה/,
   /הצעות עבודה חדשות/,
@@ -127,6 +130,35 @@ const JOBSEEKER_POST_MARKERS = [
 function isJobSeekerPost(result: SerperResult): boolean {
   const text = `${result.title} ${result.snippet}`.toLowerCase();
   return JOBSEEKER_POST_MARKERS.some((m) => text.includes(m.toLowerCase()));
+}
+
+// Filter out US-based jobs mislabeled as Israeli (e.g., "Israel, OH" = Ohio)
+function isUSAJob(result: SerperResult): boolean {
+  const text = `${result.title} ${result.snippet}`;
+  return /\bIsrael,\s*OH\b/i.test(text) || /\bOhio\b/i.test(text) ||
+    /,\s*TX\b|,\s*CA\b|,\s*NY\b|,\s*FL\b|,\s*GA\b|,\s*WA\b/i.test(text);
+}
+
+// Filter out business/franchise opportunities (not actual employment jobs)
+const BUSINESS_OPPORTUNITY_MARKERS = [
+  "הזדמנות עסקית", "business opportunity", "franchise opportunity",
+  "זיכיון", "שותפות עסקית", "עסק עצמאי להשקעה",
+];
+function isBusinessOpportunity(result: SerperResult): boolean {
+  const text = `${result.title} ${result.snippet}`.toLowerCase();
+  return BUSINESS_OPPORTUNITY_MARKERS.some((m) => text.includes(m.toLowerCase()));
+}
+
+// Filter out Facebook discussion/community posts (not actual job listings)
+const FACEBOOK_DISCUSSION_PATTERNS = [
+  /משתפ(ים|ות|ת)\.\.\./,   // "מנהלי חנויות משתפים..."
+  /עונ(ים|ות) על שאלה/,
+  /ממליצ(ים|ות) על/,
+];
+function isFacebookDiscussion(result: SerperResult): boolean {
+  if (!result.link.includes("facebook.com")) return false;
+  const title = result.title;
+  return FACEBOOK_DISCUSSION_PATTERNS.some((p) => p.test(title));
 }
 
 function normalizeJobTitle(title: string): string {
@@ -215,7 +247,10 @@ async function runSearches(plan: SearchPlan): Promise<TaggedResult[]> {
     titlesSeen.add(key);
     return true;
   });
-  const active = deduped.filter((r) => !isSpam(r) && !isExpiredListing(r) && !isGenericLandingPage(r) && !isJobSeekerPost(r));
+  const active = deduped.filter((r) =>
+    !isSpam(r) && !isExpiredListing(r) && !isGenericLandingPage(r) &&
+    !isJobSeekerPost(r) && !isUSAJob(r) && !isBusinessOpportunity(r) && !isFacebookDiscussion(r)
+  );
 
   // Pre-rank: results whose title overlaps a targetTitle keyword score first
   const titleWords = plan.targetTitles.flatMap((t) =>
