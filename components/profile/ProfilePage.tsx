@@ -98,7 +98,7 @@ function CvCard({ cv, he, onDelete }: { cv: CvMeta; he: boolean; onDelete: () =>
   return (
     <div
       onClick={() => router.push(`/cv-builder?cvId=${cv.id}&from=/profile`)}
-      className="group cursor-pointer rounded-2xl border border-white/10 hover:border-purple-500/40 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-200 overflow-hidden hover:shadow-xl hover:shadow-purple-900/20 hover:-translate-y-0.5"
+      className="group cursor-pointer rounded-2xl border border-white/10 hover:border-purple-500/40 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-200 overflow-hidden hover:shadow-xl hover:shadow-purple-900/20 hover:-translate-y-0.5 h-full"
     >
       {/* Thumbnail */}
       <div className="relative h-36 bg-gradient-to-br from-slate-800/80 to-purple-950/60 flex items-center justify-center overflow-hidden border-b border-white/5">
@@ -134,7 +134,7 @@ function CvCard({ cv, he, onDelete }: { cv: CvMeta; he: boolean; onDelete: () =>
 function NewCard({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button onClick={onClick}
-      className="group rounded-2xl border-2 border-dashed border-white/10 hover:border-purple-500/50 bg-transparent hover:bg-purple-500/5 transition-all duration-200 flex flex-col items-center justify-center gap-2 h-[168px] hover:-translate-y-0.5"
+      className="group rounded-2xl border-2 border-dashed border-white/10 hover:border-purple-500/50 bg-transparent hover:bg-purple-500/5 transition-all duration-200 flex flex-col items-center justify-center gap-2 w-full h-full min-h-[168px] hover:-translate-y-0.5"
     >
       <div className="w-9 h-9 rounded-xl bg-white/5 group-hover:bg-purple-500/20 border border-white/10 group-hover:border-purple-500/30 flex items-center justify-center transition-all">
         <svg className="w-4 h-4 text-white/30 group-hover:text-purple-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,7 +175,7 @@ function ConvCard({
   }
 
   return (
-    <div className="group rounded-2xl border border-white/10 hover:border-purple-500/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-200 overflow-hidden hover:shadow-lg hover:shadow-purple-900/10 hover:-translate-y-0.5">
+    <div className="group rounded-2xl border border-white/10 hover:border-purple-500/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-200 overflow-hidden hover:shadow-lg hover:shadow-purple-900/10 hover:-translate-y-0.5 h-full flex flex-col">
       {/* Card body */}
       <div
         className="px-4 pt-4 pb-3 cursor-pointer"
@@ -214,7 +214,7 @@ function ConvCard({
         )}
       </div>
       {/* Footer */}
-      <div className="px-3 pb-3 flex items-center justify-between gap-2">
+      <div className="px-3 pb-3 flex items-center justify-between gap-2 mt-auto">
         <button onClick={onContinue}
           className="text-xs text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 hover:border-emerald-400/40 bg-emerald-500/8 px-2.5 py-1 rounded-lg transition">
           {he ? "המשך" : "Continue"}
@@ -698,14 +698,14 @@ export default function ProfilePage() {
                   }
                 />
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
-                  <div className="animate-card-in delay-0">
+                  <div className="animate-card-in delay-0 h-full">
                     <NewCard
                       label={he ? "צור קורות חיים" : "New CV"}
                       onClick={() => router.push("/cv-builder?from=/profile")}
                     />
                   </div>
                   {cvs.map((cv, i) => (
-                    <div key={cv.id} className="animate-card-in" style={{ animationDelay: `${(i + 1) * 55}ms` }}>
+                    <div key={cv.id} className="animate-card-in h-full" style={{ animationDelay: `${(i + 1) * 55}ms` }}>
                       <CvCard cv={cv} he={he} onDelete={() => deleteCV(cv.id)} />
                     </div>
                   ))}
@@ -736,12 +736,14 @@ export default function ProfilePage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                    <NewCard
-                      label={he ? "חיפוש חדש" : "New search"}
-                      onClick={() => { queueAutoStart("jobs"); router.push("/"); }}
-                    />
+                    <div className="h-full">
+                      <NewCard
+                        label={he ? "חיפוש חדש" : "New search"}
+                        onClick={() => { queueAutoStart("jobs"); router.push("/"); }}
+                      />
+                    </div>
                     {conversations.map((conv, i) => (
-                      <div key={conv.id} className="animate-card-in" style={{ animationDelay: `${(i + 1) * 55}ms` }}>
+                      <div key={conv.id} className="animate-card-in h-full" style={{ animationDelay: `${(i + 1) * 55}ms` }}>
                         <ConvCard conv={conv} he={he}
                           onContinue={() => router.push(`/?continueConv=${conv.id}`)}
                           onDelete={() => setConversations((prev) => prev.filter((c) => c.id !== conv.id))}
