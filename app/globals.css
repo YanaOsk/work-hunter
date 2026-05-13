@@ -19,6 +19,7 @@ html, body {
 :root {
   --background: #0C0C0D;
   --foreground: #E8E8ED;
+  --foreground-rgb: 232,232,237;
   --surface:    #141415;
   --surface-2:  #1A1A1D;
   --border:     rgba(255,255,255,0.08);
@@ -36,6 +37,7 @@ html, body {
 html.light {
   --background: #EDF1FB;
   --foreground: #111827;
+  --foreground-rgb: 17,24,39;
   --surface:    #FFFFFF;
   --surface-2:  #E4ECF8;
   --border:     rgba(0,0,0,0.08);
