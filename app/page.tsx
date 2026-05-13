@@ -107,6 +107,7 @@ export default function Home() {
     messages: Array<{ role: "user" | "assistant"; content: string }>;
     convId?: string;
   } | null>(null);
+  const [pendingSearchRerun, setPendingSearchRerun] = useState<string | null>(null);
   const [pendingAutoMode, setPendingAutoMode] = useState<AppMode | null>(() => {
     const queued = consumeAutoStart();
     if (queued) return queued;
@@ -156,6 +157,11 @@ export default function Home() {
       .catch(() => { window.history.replaceState({}, "", "/"); });
   }, []);
 
+  // Persist phase + jobs to sessionStorage so refresh can restore correctly
+  useEffect(() => {
+    if (mode === "jobs") sessionStorage.setItem("wh_phase", state.phase);
+  }, [state.phase, mode]);
+
   useEffect(() => {
     if (status === "authenticated" && mode === null && !pendingAutoMode) {
       const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
@@ -165,6 +171,36 @@ export default function Home() {
           const email = session?.user?.email;
           if (email && !localStorage.getItem(`wh_welcomed_${email}`)) return;
           setMode("jobs");
+
+          const savedPhase = sessionStorage.getItem("wh_phase");
+
+          // Results already found — restore them directly
+          if (savedPhase === "results") {
+            try {
+              const raw = sessionStorage.getItem("wh_jobs");
+              if (raw) {
+                const jobs: JobResult[] = JSON.parse(raw);
+                if (jobs.length > 0) {
+                  setState({ ...initialState, phase: "results", jobResults: jobs, userProfile: emptyProfile });
+                  return;
+                }
+              }
+            } catch {}
+          }
+
+          // Was searching — re-run the search so animation shows and results load
+          if (savedPhase === "searching") {
+            const ctx = sessionStorage.getItem("wh_searching_ctx");
+            if (ctx) {
+              scoutContextRef.current = { context: ctx, messages: [] };
+              setState({ ...initialState, phase: "searching" });
+              setIsStreaming(true);
+              setPendingSearchRerun(ctx);
+              return;
+            }
+          }
+
+          // Default — restore conversation (interview phase)
           const savedConvId = sessionStorage.getItem("wh_conv_id");
           if (savedConvId) {
             fetch(`/api/conversations/${savedConvId}`)
@@ -180,6 +216,48 @@ export default function Home() {
       }
     }
   }, [status, mode, pendingAutoMode, session?.user?.email]);
+
+  // Re-run search when recovering from a refresh during searching phase
+  useEffect(() => {
+    if (!pendingSearchRerun || status !== "authenticated") return;
+    const ctx = pendingSearchRerun;
+    setPendingSearchRerun(null);
+    const collectedJobs: JobResult[] = [];
+    let streamStarted = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/search-jobs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userProfile: emptyProfile, chatContext: ctx, lang }),
+        });
+        if (!res.ok) throw new Error("failed");
+        await readSearchStream(
+          res,
+          (job) => {
+            collectedJobs.push(job);
+            if (!streamStarted) {
+              streamStarted = true;
+              setState({ ...initialState, phase: "results", jobResults: [job], userProfile: emptyProfile });
+            } else {
+              setState((s) => ({ ...s, jobResults: [...s.jobResults, job].sort((a, b) => b.matchScore - a.matchScore) }));
+            }
+          },
+          (demo) => {
+            setDemoMode(demo);
+            setState((s) => ({ ...s, jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore) }));
+            sessionStorage.setItem("wh_jobs", JSON.stringify(collectedJobs));
+          },
+        );
+      } catch {
+        if (!streamStarted)
+          setState({ ...initialState, phase: "results", jobResults: [], userProfile: emptyProfile });
+      } finally {
+        setIsStreaming(false);
+        sessionStorage.removeItem("wh_searching_ctx");
+      }
+    })();
+  }, [pendingSearchRerun, status, lang]);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -305,6 +383,7 @@ export default function Home() {
     if (state.userProfile) saveProfile(state.userProfile);
     setState((s) => ({ ...s, phase: "searching" }));
     setIsStreaming(true);
+    sessionStorage.setItem("wh_searching_ctx", context);
 
     const collectedJobs: JobResult[] = [];
     let streamStarted = false;
@@ -370,6 +449,7 @@ export default function Home() {
         (demo) => {
           setDemoMode(demo);
           setState((s) => ({ ...s, jobResults: [...s.jobResults].sort((a, b) => b.matchScore - a.matchScore) }));
+          sessionStorage.setItem("wh_jobs", JSON.stringify(collectedJobs));
         },
         (path) => {
           streamStarted = true;
@@ -382,6 +462,7 @@ export default function Home() {
       }
     } finally {
       setIsStreaming(false);
+      sessionStorage.removeItem("wh_searching_ctx");
     }
 
     if (existingConvId) {
