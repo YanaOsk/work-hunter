@@ -66,7 +66,8 @@ export default function SiteFooter() {
 
   return (
     <footer
-      className="border-t border-black/[0.06] dark:border-white/[0.06] mt-8 bg-white dark:bg-[#0C0C0D]"
+      className="border-t mt-8"
+      style={{ background: "var(--background)", borderColor: "var(--border)" }}
     >
       <div className="max-w-5xl mx-auto px-4 md:px-6 pt-12 pb-8">
         {/* Top row: logo + columns */}
