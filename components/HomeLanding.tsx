@@ -9,6 +9,7 @@ import ReviewCarousel from "./ReviewCarousel";
 import FinalCTA from "./FinalCTA";
 import SiteFooter from "./SiteFooter";
 import FadeIn from "./FadeIn";
+import IndustriesSection from "./IndustriesSection";
 
 interface Props {
   onChoose: (mode: AppMode) => void;
@@ -46,6 +47,11 @@ export default function HomeLanding({ onChoose }: Props) {
         <Divider />
         <FadeIn>
           <ServicesIntro onChoose={onChoose} />
+        </FadeIn>
+
+        <Divider />
+        <FadeIn>
+          <IndustriesSection />
         </FadeIn>
 
         <Divider />
