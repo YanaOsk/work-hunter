@@ -87,7 +87,7 @@ function ServiceCard({ badge, title, intro, steps, bonus, result, cta, onClick, 
         };
 
   return (
-    <div className="group linear-card p-6 md:p-7 flex flex-col">
+    <div className="group linear-card p-4 sm:p-5 md:p-7 flex flex-col">
       <div className="flex items-start justify-between mb-4">
         <div className={`w-11 h-11 rounded-xl ${styles.icon} flex items-center justify-center`}>
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

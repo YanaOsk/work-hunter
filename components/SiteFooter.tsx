@@ -70,7 +70,7 @@ export default function SiteFooter() {
     >
       <div className="max-w-5xl mx-auto px-4 md:px-6 pt-12 pb-8">
         {/* Top row: logo + columns */}
-        <div className={`grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 pb-10 border-b border-black/[0.05] dark:border-white/[0.05]`} dir={he ? "rtl" : "ltr"}>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 pb-10 border-b border-black/[0.05] dark:border-white/[0.05]`} dir={he ? "rtl" : "ltr"}>
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2.5 mb-3 hover:opacity-90 transition w-fit">

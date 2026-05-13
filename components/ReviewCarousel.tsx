@@ -139,7 +139,7 @@ export default function ReviewCarousel() {
           <div className="flex items-center gap-2">
             <button
               onClick={prev}
-              className="w-9 h-9 rounded-xl border border-white/10 hover:border-white/20 flex items-center justify-center text-white/50 hover:text-white transition"
+              className="w-11 h-11 sm:w-9 sm:h-9 rounded-xl border border-white/10 hover:border-white/20 flex items-center justify-center text-white/50 hover:text-white transition"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -147,7 +147,7 @@ export default function ReviewCarousel() {
             </button>
             <button
               onClick={next}
-              className="w-9 h-9 rounded-xl border border-white/10 hover:border-white/20 flex items-center justify-center text-white/50 hover:text-white transition"
+              className="w-11 h-11 sm:w-9 sm:h-9 rounded-xl border border-white/10 hover:border-white/20 flex items-center justify-center text-white/50 hover:text-white transition"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

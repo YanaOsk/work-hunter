@@ -92,7 +92,7 @@ export default function HowItWorks() {
                 <h3 className="text-white font-semibold text-base mb-2 tracking-[-0.01em]">
                   {s.title}
                 </h3>
-                <p className="text-white/40 text-sm leading-relaxed max-w-[200px]">
+                <p className="text-white/40 text-sm leading-relaxed max-w-[200px] mx-auto md:mx-0">
                   {s.desc}
                 </p>
               </div>

@@ -57,7 +57,7 @@ export default function SubscriptionModal({ onClose, hiddenCount, trigger = "job
     >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div
-        className="relative w-full max-w-lg bg-slate-900 border border-white/15 rounded-3xl p-6 shadow-2xl"
+        className="relative w-full max-w-lg bg-slate-900 border border-white/15 rounded-3xl p-4 sm:p-6 shadow-2xl"
         dir={lang === "he" ? "rtl" : "ltr"}
       >
         <button

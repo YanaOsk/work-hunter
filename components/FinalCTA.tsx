@@ -30,7 +30,7 @@ export default function FinalCTA({ onChoose }: Props) {
             </p>
             <button
               onClick={() => onChoose("advisor")}
-              className="inline-flex items-center gap-2 bg-[#5E6AD2] hover:bg-[#6D79DB] text-white font-semibold px-9 py-4 md:px-14 md:py-4 rounded-lg transition-all shadow-lg hover:scale-[1.02] active:scale-[0.97] text-sm md:text-base tracking-[-0.01em]" style={{ boxShadow: "0 4px 24px rgba(94,106,210,0.30)" }}
+              className="inline-flex items-center gap-2 bg-[#5E6AD2] hover:bg-[#6D79DB] text-white font-semibold px-6 py-3.5 sm:px-9 sm:py-4 md:px-14 rounded-lg transition-all shadow-lg hover:scale-[1.02] active:scale-[0.97] text-sm md:text-base tracking-[-0.01em]" style={{ boxShadow: "0 4px 24px rgba(94,106,210,0.30)" }}
             >
               {tx.finalCtaButton}
             </button>

@@ -58,7 +58,7 @@ export default function HeroSection({ onChoose }: Props) {
             </div>
 
             {/* Trust stats */}
-            <div className="flex items-center gap-6 md:gap-8">
+            <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
               {[
                 { value: 2400, suffix: "+", label: he ? "משתמשים" : "users" },
                 { value: 4.8, suffix: "★", label: he ? "דירוג" : "rating", decimals: 1 },

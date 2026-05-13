@@ -57,7 +57,7 @@ export default function WelcomeModal({ userName, userEmail }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4" dir={he ? "rtl" : "ltr"}>
           <button
             onClick={() => handleChoose("jobs")}
-            className="group text-start bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-purple-500/60 rounded-3xl p-5 sm:p-8 transition-all duration-200 hover:shadow-lg hover:shadow-purple-900/20"
+            className="group text-start bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-purple-500/60 rounded-3xl p-4 sm:p-6 md:p-8 transition-all duration-200 hover:shadow-lg hover:shadow-purple-900/20"
           >
             <div className="w-12 h-12 rounded-xl bg-purple-600/20 group-hover:bg-purple-600 flex items-center justify-center mb-5 transition-colors duration-200">
               <svg className="w-6 h-6 text-purple-300 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">

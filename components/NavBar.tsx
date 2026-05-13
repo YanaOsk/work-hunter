@@ -114,7 +114,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
         </div>
       </div>
 
-      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${mobileOpen ? "max-h-[480px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"} backdrop-blur-2xl border-t border-white/[0.06]`} style={{ background: "rgba(12,12,13,0.96)" }}>
+      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${mobileOpen ? "max-h-[calc(100vh-60px)] opacity-100" : "max-h-0 opacity-0 pointer-events-none"} backdrop-blur-2xl border-t border-white/[0.06]`} style={{ background: "rgba(12,12,13,0.96)" }}>
         <div className="px-4 py-3 flex flex-col gap-1">
           {links.map((l) => (
             <Link
