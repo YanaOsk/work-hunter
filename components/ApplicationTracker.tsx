@@ -16,6 +16,7 @@ import { DEFAULT_ADVISOR_ID, getAdvisorState } from "@/lib/advisorState";
 import { useLanguage } from "./LanguageProvider";
 import { t } from "@/lib/i18n";
 import CoverLetterModal from "./CoverLetterModal";
+import AddToCalendarModal from "./AddToCalendarModal";
 
 interface NegotiationState {
   loading: boolean;
@@ -108,6 +109,12 @@ export default function ApplicationTracker() {
   const [manualCompany, setManualCompany] = useState("");
   const [manualUrl, setManualUrl] = useState("");
   const [editingInterviewDate, setEditingInterviewDate] = useState<string | null>(null);
+  const [calendarApp, setCalendarApp] = useState<JobApplication | null>(null);
+  const [calendarConnected, setCalendarConnected] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch("/api/calendar/status").then(r => r.json()).then(d => setCalendarConnected(d.connected)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     mergeWithServer(profileId).then(() => {
@@ -286,6 +293,23 @@ export default function ApplicationTracker() {
           </div>
         </div>
 
+        {/* Google Calendar connect nudge */}
+        {calendarConnected === false && (
+          <div className="flex items-center justify-between gap-3 bg-[#4285F4]/8 border border-[#4285F4]/20 rounded-2xl px-4 py-3 mb-4">
+            <div className="flex items-center gap-2.5">
+              <svg className="w-4 h-4 text-[#4285F4] flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.89 4 3 4.9 3 6v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"/>
+              </svg>
+              <p className="text-white/60 text-xs">
+                {lang === "he" ? "חבר את יומן Google כדי להוסיף ראיונות ישירות ללוז שלך" : "Connect Google Calendar to add interviews to your schedule"}
+              </p>
+            </div>
+            <a href="/settings" className="text-[#4285F4] text-xs font-semibold whitespace-nowrap hover:underline">
+              {lang === "he" ? "חבר ←" : "Connect →"}
+            </a>
+          </div>
+        )}
+
         {/* Manual add form */}
         {showAddForm && (
           <div className="bg-white/5 border border-white/15 rounded-2xl p-4 mb-5 space-y-3">
@@ -435,6 +459,17 @@ export default function ApplicationTracker() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     {tx.trackerInterviewDate} +
+                  </button>
+                )}
+                {app.status === "interview" && calendarConnected && (
+                  <button
+                    onClick={() => setCalendarApp(app)}
+                    className="flex items-center gap-1.5 text-xs text-[#4285F4]/80 hover:text-[#4285F4] border border-[#4285F4]/20 hover:border-[#4285F4]/40 px-2.5 py-1 rounded-lg transition"
+                  >
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.89 4 3 4.9 3 6v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"/>
+                    </svg>
+                    {lang === "he" ? "הוסף ליומן" : "Add to calendar"}
                   </button>
                 )}
 
@@ -742,6 +777,19 @@ export default function ApplicationTracker() {
           jobDescription={coverLetterJob.job.description}
           jobId={coverLetterJob.id}
           onClose={() => { setCoverLetterJob(null); refresh(); }}
+        />
+      )}
+
+      {calendarApp && (
+        <AddToCalendarModal
+          defaultTitle={lang === "he"
+            ? `ראיון עבודה — ${calendarApp.job.company}`
+            : `Job interview — ${calendarApp.job.company}`}
+          defaultDescription={lang === "he"
+            ? `ראיון לתפקיד ${calendarApp.job.title} ב-${calendarApp.job.company}`
+            : `Interview for ${calendarApp.job.title} at ${calendarApp.job.company}`}
+          defaultLocation={calendarApp.job.location ?? ""}
+          onClose={() => setCalendarApp(null)}
         />
       )}
     </div>

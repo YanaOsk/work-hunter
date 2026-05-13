@@ -137,6 +137,16 @@ export async function GET() {
       CREATE INDEX IF NOT EXISTS idx_job_applications_user_id ON job_applications(user_id)
     `;
 
+    await db`
+      CREATE TABLE IF NOT EXISTS calendar_tokens (
+        user_email TEXT PRIMARY KEY,
+        access_token TEXT NOT NULL,
+        refresh_token TEXT,
+        expires_at BIGINT,
+        connected_at TEXT NOT NULL
+      )
+    `;
+
     return NextResponse.json({ ok: true, message: "All tables created" });
   } catch (err) {
     console.error("init-db error:", err);
