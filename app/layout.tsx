@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { LanguageProvider } from "@/components/LanguageProvider";
-import LanguageToggle from "@/components/LanguageToggle";
 import Providers from "@/components/Providers";
 import NavBarWrapper from "@/components/NavBarWrapper";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -62,7 +61,6 @@ export default function RootLayout({
             <NavBarWrapper />
             <ScrollToTop />
             <AdminFab />
-            <LanguageToggle />
             {children}
           </LanguageProvider>
         </Providers>

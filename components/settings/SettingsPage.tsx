@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/components/LanguageProvider";
+import { t } from "@/lib/i18n";
 import SiteFooter from "@/components/SiteFooter";
 
 interface SubData {
@@ -34,7 +35,7 @@ const CARD_BRANDS: Record<string, string> = {
 };
 
 export default function SettingsPage() {
-  const { lang } = useLanguage();
+  const { lang, toggle } = useLanguage();
   const he = lang === "he";
   const router = useRouter();
   const { status } = useSession();
@@ -283,6 +284,51 @@ export default function SettingsPage() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Language toggle card */}
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+                <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-white font-semibold">{he ? "שפה" : "Language"}</h2>
+                <p className="text-white/35 text-xs mt-0.5">
+                  {he ? "בחר את שפת הממשק" : "Choose interface language"}
+                </p>
+              </div>
+            </div>
+
+            {/* Segmented toggle */}
+            <div className="relative flex items-center bg-white/[0.06] border border-white/10 rounded-xl p-1 gap-1">
+              <button
+                onClick={() => lang !== "he" && toggle()}
+                className="relative z-10 px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
+                style={{
+                  background: lang === "he" ? "#5E6AD2" : "transparent",
+                  color: lang === "he" ? "#fff" : "rgba(255,255,255,0.45)",
+                  boxShadow: lang === "he" ? "0 2px 8px rgba(94,106,210,0.35)" : "none",
+                }}
+              >
+                עברית
+              </button>
+              <button
+                onClick={() => lang !== "en" && toggle()}
+                className="relative z-10 px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
+                style={{
+                  background: lang === "en" ? "#5E6AD2" : "transparent",
+                  color: lang === "en" ? "#fff" : "rgba(255,255,255,0.45)",
+                  boxShadow: lang === "en" ? "0 2px 8px rgba(94,106,210,0.35)" : "none",
+                }}
+              >
+                English
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Change password card — credentials users only */}
