@@ -60,16 +60,13 @@ export function ShaderBackground({ children }: ShaderBackgroundProps) {
         className="absolute inset-0 w-full h-full"
         colors={["#0D0F1A", "#5E6AD2", "#0a0c18", "#1a1f3a", "#3D4CB8"]}
         speed={0.25}
-        backgroundColor="#0D0F1A"
       />
 
-      {/* Shader layer 2 — subtle wireframe overlay */}
+      {/* Shader layer 2 — soft accent overlay */}
       <MeshGradient
-        className="absolute inset-0 w-full h-full opacity-40"
+        className="absolute inset-0 w-full h-full opacity-30"
         colors={["#0D0F1A", "#4ADE80", "#5E6AD2", "#0D0F1A"]}
         speed={0.15}
-        wireframe="true"
-        backgroundColor="transparent"
       />
 
       {children}
