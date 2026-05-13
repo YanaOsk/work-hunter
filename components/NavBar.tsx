@@ -20,11 +20,10 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
 
   const isAuthenticated = status === "authenticated";
 
-  const links = [
-    ...(!isAuthenticated ? [{ href: "/#how-it-works", label: tx.navHowItWorks }] : []),
+  const links = isAuthenticated ? [] : [
+    { href: "/#how-it-works", label: tx.navHowItWorks },
     { href: "/cv-builder", label: tx.navCvBuilder },
     { href: "/reviews", label: tx.navReviews },
-    ...(isAuthenticated ? [{ href: "/tracker", label: tx.navTracker }] : []),
   ];
 
   return (
