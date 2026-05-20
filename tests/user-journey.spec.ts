@@ -171,8 +171,8 @@ test("3 · Career advisor: stop at stage 3 → profile shows correct stage → c
   if (await nameField.isVisible({ timeout: 3000 }).catch(() => false)) {
     await nameField.fill("Playwright Test");
     await page.waitForTimeout(400);
-    // Click "הלאה" / "Next" or "סיימתי" up to 6 times to get through all steps
-    for (let i = 0; i < 6; i++) {
+    // Click "הלאה" / "Next" or "סיימתי" up to 7 times to get through all steps (7 steps total)
+    for (let i = 0; i < 7; i++) {
       const btn = page.locator("button", { hasText: /הלאה|Next|סיימתי|יוצאים לדרך|Done/i }).last();
       if (await btn.isVisible({ timeout: 2000 }).catch(() => false) &&
           await btn.isEnabled().catch(() => false)) {
@@ -196,24 +196,45 @@ test("3 · Career advisor: stop at stage 3 → profile shows correct stage → c
   await diagStart.click();
   await page.waitForTimeout(600);
 
-  // Answer 6 questions: click the first checkbox option for each
+  // Questions 1–6: checkbox type — click first label then "הבא"
   for (let q = 0; q < 6; q++) {
-    // Click the first label/option visible
     const firstOption = page.locator("label").first();
     if (await firstOption.isVisible({ timeout: 5000 }).catch(() => false)) {
       await firstOption.click();
       await page.waitForTimeout(400);
     }
-
-    // Click "Next" or "Analyze" button
-    const nextBtn = page.getByRole("button", { name: /הבא|Next|נתח|Analyze/i }).last();
+    const nextBtn = page.getByRole("button", { name: /הבא|Next/i }).last();
     await expect(nextBtn).toBeVisible({ timeout: 5000 });
     await nextBtn.click();
     await page.waitForTimeout(500);
   }
 
-  // Wait for AI to analyze (shows loading screen then returns to map)
-  await waitForNoSpinner(page, 60_000);
+  // Question 7: dream — freeform textarea
+  const dreamTa = page.locator("textarea").first();
+  if (await dreamTa.isVisible({ timeout: 5000 }).catch(() => false)) {
+    await dreamTa.fill("הייתי מפתח מערכות AI שעוזרות לאנשים למצוא עבודה שמתאימה להם");
+    await page.waitForTimeout(400);
+    const nextBtn7 = page.getByRole("button", { name: /הבא|Next/i }).last();
+    await nextBtn7.click();
+    await page.waitForTimeout(500);
+  }
+
+  // Question 8: reputation — freeform textarea, last button is "שלח / Submit"
+  const repTa = page.locator("textarea").first();
+  if (await repTa.isVisible({ timeout: 5000 }).catch(() => false)) {
+    await repTa.fill("כולם אומרים שאני מסביר דברים טכניים בצורה פשוטה וברורה");
+    await page.waitForTimeout(400);
+    const submitBtn = page.getByRole("button", { name: /שלח|Submit|נתח|Analyze/i }).last();
+    await expect(submitBtn).toBeVisible({ timeout: 5000 });
+    await submitBtn.click();
+  }
+
+  // Wait for AI diagnosis loading screen to finish and JourneyMap to reappear
+  // Loading screen disappears when onComplete is called — wait for stage cards to return
+  await page.waitForSelector("button:has-text('כיוון חיים'), button:has-text('Life direction')", {
+    timeout: 90_000,
+    state: "visible",
+  }).catch(() => page.waitForTimeout(45_000));
   await page.waitForTimeout(2000);
 
   // ── STAGE 2 · Direction ─────────────────────────────────────────────────

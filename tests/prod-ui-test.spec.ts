@@ -224,40 +224,104 @@ async function runAdvisorFlow(page: Page, user: (typeof users)[0]) {
   await page.waitForTimeout(2000);
   await shot(page, `${user.id}_10_advisor_landing`);
 
-  // Step 1: PreJourneyIntro — click "בוא/י נתחיל" / "Let's start"
-  const startBtn = page.getByRole("button", { name: /בוא|נתחיל|Let.s start|התחל/i }).first();
-  if (await startBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-    console.log(`  [${user.id}] Clicking PreJourneyIntro start button`);
-    await startBtn.click();
-    await page.waitForTimeout(2000);
-    await shot(page, `${user.id}_11_diagnosis_tool`);
-  } else {
-    console.log(`  [${user.id}] No intro button visible — already past intro`);
-    await shot(page, `${user.id}_11_advisor_state`);
+  // Step 1: PreJourneyIntro — click "בוא/י נתחיל"
+  const preIntroBtn = page.locator("button", { hasText: /בואו נתחיל|בוא נתחיל|Let.s start/i }).first();
+  if (await preIntroBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
+    console.log(`  [${user.id}] Clicking PreJourneyIntro button`);
+    await preIntroBtn.click();
+    await page.waitForTimeout(1500);
   }
+  await shot(page, `${user.id}_11_after_intro`);
 
-  // Step 2: DiagnosisTool — fill textarea and submit
-  const ta = page.locator("textarea").first();
-  if (await ta.isVisible({ timeout: 5000 }).catch(() => false)) {
-    await ta.fill(user.advisorText);
-    await page.waitForTimeout(500);
-    await shot(page, `${user.id}_12_diagnosis_filled`);
-
-    const submitBtn = page.getByRole("button", { name: /שלח|Submit|המשך|Continue/i }).first();
-    if (await submitBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await submitBtn.click();
-      console.log(`  [${user.id}] Diagnosis submitted — waiting for AI response`);
-      await page.waitForTimeout(25000);
-      await shot(page, `${user.id}_13_diagnosis_result`);
+  // Step 2: SelfIntro wizard (name → basics → story → loves → dislikes → constraints → welcome)
+  // Only shown on first visit — skip through all 7 steps
+  const nameField = page.getByPlaceholder(/השם שלך|Your name/i);
+  if (await nameField.isVisible({ timeout: 3000 }).catch(() => false)) {
+    console.log(`  [${user.id}] SelfIntro wizard — filling name and skipping through`);
+    await nameField.fill(user.name);
+    await page.waitForTimeout(400);
+    for (let i = 0; i < 7; i++) {
+      const btn = page.locator("button", { hasText: /הלאה|Next|סיימתי|יוצאים לדרך|Done/i }).last();
+      if (await btn.isVisible({ timeout: 2000 }).catch(() => false) &&
+          await btn.isEnabled().catch(() => false)) {
+        await btn.click();
+        await page.waitForTimeout(600);
+      }
     }
-  } else {
-    console.log(`  [${user.id}] No textarea in DiagnosisTool`);
-    await shot(page, `${user.id}_12_no_textarea`);
+    await page.waitForTimeout(1000);
+    await shot(page, `${user.id}_12_after_selfintro`);
   }
+
+  // Step 3: JourneyMap — click Diagnosis card
+  const diagCard = page.locator("button", { hasText: /מיפוי חוזקות|Personality diagnosis/i }).first();
+  if (await diagCard.isVisible({ timeout: 8000 }).catch(() => false)) {
+    console.log(`  [${user.id}] Clicking Diagnosis card`);
+    await diagCard.click();
+    await page.waitForTimeout(800);
+  } else {
+    console.log(`  [${user.id}] WARNING: Diagnosis card not found`);
+    await shot(page, `${user.id}_12_no_diag_card`);
+    return;
+  }
+
+  // Step 4: StageIntro — click "התחל"
+  const diagStart = page.getByRole("button", { name: /התחל|Start/i }).first();
+  if (await diagStart.isVisible({ timeout: 5000 }).catch(() => false)) {
+    await diagStart.click();
+    await page.waitForTimeout(600);
+  }
+  await shot(page, `${user.id}_13_diagnosis_quiz`);
+
+  // Step 5: DiagnosisTool — 6 checkbox questions then 2 freeform
+  // Q1–6: click first checkbox label then "הבא"
+  for (let q = 0; q < 6; q++) {
+    const firstLabel = page.locator("label").first();
+    if (await firstLabel.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await firstLabel.click();
+      await page.waitForTimeout(400);
+    }
+    const nextBtn = page.getByRole("button", { name: /הבא|Next/i }).last();
+    if (await nextBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await nextBtn.click();
+      await page.waitForTimeout(500);
+    }
+  }
+
+  // Q7: dream — freeform textarea
+  const dreamTa = page.locator("textarea").first();
+  if (await dreamTa.isVisible({ timeout: 5000 }).catch(() => false)) {
+    await dreamTa.fill(user.advisorText);
+    await page.waitForTimeout(400);
+    const nextBtn7 = page.getByRole("button", { name: /הבא|Next/i }).last();
+    if (await nextBtn7.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await nextBtn7.click();
+      await page.waitForTimeout(500);
+    }
+  }
+
+  // Q8: reputation — freeform textarea + "שלח" / submit
+  const repTa = page.locator("textarea").first();
+  if (await repTa.isVisible({ timeout: 5000 }).catch(() => false)) {
+    await repTa.fill("אנשים אומרים שאני מקצועי ומסור ויודע לפתור בעיות בצורה יצירתית");
+    await page.waitForTimeout(400);
+    const submitBtn = page.getByRole("button", { name: /שלח|Submit|נתח|Analyze/i }).last();
+    if (await submitBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
+      console.log(`  [${user.id}] Submitting DiagnosisTool`);
+      await submitBtn.click();
+    }
+  }
+  await shot(page, `${user.id}_14_diagnosis_submitted`);
+
+  // Wait for AI to finish and JourneyMap to reappear (up to 90s)
+  await page.waitForSelector("button:has-text('כיוון חיים'), button:has-text('Life direction')", {
+    timeout: 90_000,
+    state: "visible",
+  }).catch(() => page.waitForTimeout(45_000));
+  await page.waitForTimeout(2000);
 
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(1000);
-  await shot(page, `${user.id}_14_advisor_full`);
+  await shot(page, `${user.id}_15_advisor_done`);
   console.log(`  [${user.id}] Advisor flow done`);
 }
 

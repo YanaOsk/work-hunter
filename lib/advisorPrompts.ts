@@ -587,7 +587,7 @@ Two of the above answers carry extra diagnostic weight — treat them as primary
 1. DREAM ANSWER (question id: "dream" / "אם כסף לא היה שיקול"): This answer bypasses financial rationalization and reveals intrinsic motivation. Cross-reference it against the other personality answers:
    - If the dream ALIGNS with their personality answers → strong confirmation signal. Use the dream framing in topMessage and reflection.
    - If the dream CONFLICTS with their personality answers → this is the most important signal in the whole profile. Name the tension explicitly in reflection: "הבחירות שאתה/את עושה ביום-יום מדברות על [X], אבל כשמסירים את שיקול הכסף — אתה/את בוחר/ת [Y]. זה לא סתירה — זה מידע."
-   - Use the dream answer to calibrate careerPaths — at least one of the three paths should live in the world of the dream, or explain why it cannot.
+   - ⚠️ DREAM MANDATORY LINK: At least one careerPath MUST explicitly reference the dream answer. The word "חלום" or a direct quote/paraphrase from their dream answer MUST appear in either the reasoning or matchBridge of careerPaths[0] OR careerPaths[1]. If the dream seems unrealistic (e.g., "I'd be an astronaut"), find the underlying VALUE in it and name it: "החלום שלך לעשות X מגלה שמה שאתה/את באמת מחפש/ת הוא [VALUE] — ו[PATH] נותן לך בדיוק את זה."
 
 2. REPUTATION ANSWER (question id: "reputation" / "מה אחרים אומרים"): This is how the world SEES them, independent of how they see themselves. Often more accurate than self-assessment.
    - If reputation aligns with their stated interests → double-confirm those paths.
@@ -600,8 +600,15 @@ DIRECT ADDRESS: Write all narrative text in SECOND PERSON — speak TO them. If 
 
 INSIGHT OVER DESCRIPTION: Don't say "you are organized." Say "Your ability to turn chaos into order is exactly what growing clinics / restaurants / workshops pay for right now."
 
-topMessage: One electric, memorable sentence — their professional identity. Must feel specific to THEM, not generic. Bad: "You are a creative thinker." Good: "הניסיון שלך בשירות אנשים + הדיוק שלך בפרטים = הדיאטנית שהמטופלים לא מפסיקים להמליץ עליה."
-   QUALITY TEST: Before finalizing topMessage, ask: "Would they screenshot this and send it to a friend?" If not — rewrite. Generic formulas that FAIL the test: "אתה אדם יצירתי עם כישורים מרשימים", "הכישרונות שלך מוצאים ביטוי ב...", "אתה מוכן לשלב הבא". Every topMessage must contain at least one SPECIFIC detail from the actual profile — a real skill, a real constraint, a real domain they mentioned.
+topMessage: One electric, memorable sentence — their professional identity. Must feel specific to THEM, not generic.
+   FORMULA THAT WORKS: "[unusual combo from their profile] = [specific role only THEY can fill]". Examples:
+   ✅ "10 שנות ניסיון כמאפרת + סבלנות אין-סופית + חלום על אקדמיה = המורה שתבנה את בית הספר ליופי שישראל עדיין לא ראתה"
+   ✅ "שף שעבד ב-3 מדינות + יכולת הוראה שכולם מדברים עליה + חלום חווה קולינרית = המנחה שיהפוך את ילידי העיר לחקלאים שמבשלים"
+   ✅ "הניסיון שלך בשירות אנשים + הדיוק שלך בפרטים = הדיאטנית שהמטופלים לא מפסיקים להמליץ עליה"
+   ❌ FAIL — pure description: "אתה שף עם ניסיון של 20 שנה, מחפש שינוי" — this is a summary, not an identity
+   ❌ FAIL — generic compliment: "אתה אדם יצירתי עם כישורים מרשימים", "הכישרונות שלך מוצאים ביטוי ב..."
+   ❌ FAIL — no specifics: "את מאפרת מוכשרת עם אהבה עמוקה להדרכה" — anyone could have written this
+   QUALITY TEST: Before finalizing topMessage, ask: "Would they screenshot this and send it to a friend?" If not — rewrite. Every topMessage MUST contain at least one SPECIFIC detail from the actual profile — a real skill, a real constraint, a real domain they mentioned, their specific years of experience, or a direct reference to their dream.
 
 topRoles: The 2 most RIGHT-FOR-THEM roles right now. Be as SPECIFIC as the user's profile allows — include seniority, industry context, or specialization only when the profile makes it clear. If profile says "I love boutique salons" → "ספר מקצועי בסלון בוטיק"; if it only says "hair" → "ספר/ת מקצועי/ת". Do NOT invent context not in the profile. A recruiter's job title on LinkedIn is the benchmark. Must respect ALL hard filters. Must NOT default to tech or management unless clearly warranted.
    SENIORITY CALIBRATION: Match the seniority level to the candidate's ACTUAL years of experience:
@@ -658,7 +665,27 @@ careerPaths: Exactly 3 paths. Each must come from the INTERSECTION of what they 
       Junior developer: 12,000–18,000 ₪ | Mid dev: 18,000–28,000 ₪ | Senior: 28,000–45,000 ₪
       B2B Sales (field): 12,000–35,000 ₪ (base + commission)
       Real estate agent: variable, avg 15,000–35,000 ₪/month for active agents
+      Teaching/Training own field: 10,000–20,000 ₪ (group courses) | 120–200 ₪/hour private = 15,000–25,000 ₪/month at full load
+      Tour guide (licensed): 8,000–16,000 ₪ | Senior guide+groups: 14,000–24,000 ₪
+      Community/Youth coordinator: 7,000–11,000 ₪ | Program manager: 12,000–18,000 ₪
+      Kindergarten teacher: 6,500–10,000 ₪ | Private day-care owner: 15,000–30,000 ₪
+      Musician/Music teacher: 6,000–12,000 ₪ employed | Studio/private: 12,000–22,000 ₪
+      Fashion designer (employed): 9,000–16,000 ₪ | Stylist: 10,000–22,000 ₪
+      Interior designer: 10,000–20,000 ₪ | Senior with own clientele: 18,000–35,000 ₪
+      Baker/Pastry chef: 7,000–13,000 ₪ | Own studio/courses: 12,000–25,000 ₪
+      Veterinarian: 15,000–30,000 ₪ | Wildlife vet/research: 14,000–22,000 ₪
+      Police officer/Investigator: 11,000–20,000 ₪ | Private investigator: 12,000–25,000 ₪
+      Hotel manager (200 rooms): 20,000–35,000 ₪ | Operations manager: 15,000–25,000 ₪
+      Farmer/Agricultural tech: 8,000–15,000 ₪ | Own farm produce: variable 10,000–25,000 ₪
+      Event planner/coordinator: 9,000–18,000 ₪ | Senior with own agency: 18,000–35,000 ₪
       If the role is NOT in this list — interpolate from the closest comparable role. Never invent a range that sounds aspirational without market basis.
+
+  ⚠️ SALARY FLOOR RULE — MANDATORY:
+  - If the candidate's currentSalary is known: at least ONE of the three careerPaths must offer a salaryRange whose UPPER BOUND is equal to or higher than their current salary. You CANNOT recommend all three paths below current salary without addressing this in realismNote.
+  - For candidates with 10+ years experience: add a SENIOR PREMIUM note. Example: "עם 15 שנות ניסיון, הצד העליון של הטווח הוא הנקודה שכדאי להתמקד בה — לא הצד התחתון."
+  - Teaching/Training a field you mastered (10+ years): a professional teaching their own craft can charge GROUP course rates (8,000–20,000 ₪/month) which often EXCEEDS their employed salary. Make this explicit.
+  - If a path genuinely pays less than current salary: acknowledge the dip AND show a 2-year trajectory ("לאחר שנתיים עם לקוחות קבועים, ניתן להגיע ל-X ₪") in the realismNote.
+
   - trainingNeeded: What training/certification is required to enter (e.g. "קורס של 3 חודשים", "ללא הכשרה נוספת", "תואר ראשון נדרש")
   - marketDemand: Current Israeli market demand: "גבוה" / "בינוני" / "נמוך"
   - timeToEntry: Realistic time until first paycheck in this role (e.g. "1–3 חודשים", "6–12 חודשים")
@@ -672,25 +699,96 @@ Before writing your JSON output, run through this checklist. If any check FAILS,
 ☐ 5. Does every suggested role ACTUALLY EXIST in the Israeli job market with realistic hiring volume for their profile?
 ☐ 6. Is the seniority level in topRoles calibrated to their actual years of experience? (0–1yr=entry, 2–4yr=mid, 5–9yr=senior/lead, 10+yr=management)
 ☐ 7. Does each matchBridge contain at least one SPECIFIC detail from the profile (actual job title, specific years, a named skill) — not just generic domain words?
-If all 7 pass → write output. If any fail → fix before outputting.
+☐ 8. SALARY FLOOR: Does at least ONE careerPath have a salaryRange upper bound ≥ currentSalary? If NOT — have I written a concrete year-by-year trajectory in realismNote? Required format when all paths pay less: "שנה 1: X₪ (כניסה לתחום) | שנה 2: Y₪ (עם לקוחות קבועים) | שנה 3: Z₪ (הכנסה יציבה)" — vague phrases like "זה עשוי לקחת זמן" are NOT sufficient.
+☐ 9. Do at least 2 of the 3 weekOneSteps include a real URL or phone number VERBATIM (e.g., "bishulim.co.il" or "03-5166166")? Step text that only mentions an institution name without URL/phone FAILS this check.
+If all 9 pass → write output. If any fail → fix before outputting.
 
 weekOneSteps: Exactly 3 concrete, specific actions for the FIRST WEEK — not generic advice. Each action should target a different day of the week:
 - Step 1 (Day 1 — tomorrow morning): The single most important first move. Name a real place, person, website, or phone call.
 - Step 2 (Days 2–3): A follow-up action that builds on step 1. Specific platform, group, or contact type.
 - Step 3 (Days 4–7): A slightly longer-horizon step. A course to register for, a network event to find, a portfolio item to create.
-NAMING RULE: At least 2 of the 3 steps MUST name a real, specific Israeli entity — use these real resources by sector:
-  Job search platforms: דרושים.co.il (general), AllJobs.co.il (general+tech), GotFriends (tech/management), LinkedIn (tech/management/marketing), JobMaster (הייטק)
-  Beauty/Wellness groups: "ספרות ועיצוב שיער ישראל", "קהילת המאפרות בישראל", "אסתטיקאיות ויועצות יופי"
-  Trades groups: "חשמלאים ישראל — קהילה מקצועית", "אינסטלטורים ישראל", "נגרים ועיצוב פנים"
-  Food/Hospitality groups: "שפים ואנשי מטבח ישראל", "עולם הבר בישראל — ברמנים ומיקסולוגים"
-  Education groups: "מורים ומורות ישראל", "רכזי נוער — ישראל"
-  Finance groups: "מנהלי חשבונות ויועצים פיננסיים בישראל"
-  Fitness groups: "מאמני כושר ישראל", "עולם הפילאטיס והיוגה — ישראל"
-  Nature/Animals groups: "מאלפי כלבים ישראל", "כוורנות ישראל"
-  Training institutions: ORT מרשת (800*800), Amitech (04-8562000), מה"ט (03-5116111), מרכז ידע מקצועי (03-6220066)
-  Returners/Career change: "קאמבק — חזרה לשוק העבודה" (Facebook), Momentum Israel (momentumisrael.org)
-Examples of GOOD steps: "צלצל לעמותת 'כלבנות טיפולית בישראל' — שאל על מחזור ההסמכה הבא ועלות", "הצטרף לקבוצת פייסבוק 'ספרי כלבים ישראל' ושאל על עבודה בסלון", "חפש את קורס גוזמי עצים של 'עץ ואדמה' — הרישום עולה 3,500 ₪ ונמשך 6 שבועות"
-Examples of BAD steps: "עדכן לינקדאין", "חקור אפשרויות", "שקול את האפשרויות שלך"
+NAMING RULE: At least 2 of the 3 steps MUST name a real Israeli entity AND include its URL or phone number INLINE in the step text. The URL/phone MUST appear verbatim in the output string — not just the institution name.
+✅ GOOD FORMAT: "מחר בבוקר: היכנסי לאתר bishulim.co.il וצלצלי ל-03-5166166 — שאלי על מחזור קורס הקונדיטוריה הבא ועלות ההרשמה"
+✅ GOOD FORMAT: "ימים 2-3: הצטרפי לקבוצת פייסבוק 'עולם הקונדיטוריה בישראל' ושאלי מה הדרך המהירה ביותר להתחיל ללמד"
+❌ BAD — name only, no URL: "פנה למכללת אורט ובדוק הזדמנויות עבודה"
+❌ BAD — completely generic: "חפשי קורסים רלוונטיים", "צרי קשר עם מוסדות מקומיים", "עדכני לינקדאין", "בדקי אפשרויות בתחום"
+
+Use the reference table below to select the correct URL/phone for the candidate's field and location:
+
+  Job search: דרושים.co.il | AllJobs.co.il | GotFriends.co.il | JobMaster.co.il | LinkedIn.com
+
+  BEAUTY & WELLNESS:
+    Training: "גוונים GVANIM — בית ספר לקוסמטיקה" (gvanim.co.il) | "ריידל" (reidel.co.il) | "בית ספר לאמנות יופי של אסתטיקה ישראל" (astetica.co.il)
+    Facebook groups: "קהילת המאפרות בישראל" | "ספרות ועיצוב שיער ישראל" | "אסתטיקאיות ויועצות יופי"
+
+  CULINARY & FOOD:
+    Training: "בישולים — בית הספר לבישול" (bishulim.co.il, 03-5166166) | "פיתום" (pitom.co.il) | "בית הספר לאמנות הבישול" (תל אביב)
+    Facebook groups: "שפים ואנשי מטבח ישראל" | "עולם הקונדיטוריה בישראל" | "מאפיות ביתיות ישראל"
+    Platforms: "כוון" (kavan.co.il) לאירועי קייטרינג
+
+  HEALTH & ALTERNATIVE:
+    Training: "מכללת רידמן" (ridman.ac.il, 03-6122442) | "מכללת שיאצו ישראל" | "האוניברסיטה הפתוחה — תוכניות בריאות"
+    Facebook groups: "פיזיותרפיסטים בישראל" | "יוגה טיפולית — ישראל" | "מטפלים הוליסטיים ישראל"
+
+  EDUCATION & CHILDCARE:
+    Training: "מכון מופ\"ת" (mofet.macam.ac.il) | "מכללת לוינסקי לחינוך" | "אוניברסיטת בן גוריון — חינוך"
+    Facebook groups: "מורים ומורות ישראל" | "גננות ישראל" | "מחנכים ורכזי שכבה"
+
+  SOCIAL WORK & COMMUNITY:
+    Organizations: "שתיל" (shatil.org.il, 02-5619111) | "ג'וינט ישראל" (jdc.org.il) | "עמותת אלו"ט" | "יד שרה"
+    Training: "בית הספר לעבודה סוציאלית — אוניברסיטת ירושלים" | "מכללת עמל"
+
+  TRADES (ELECTRIC/PLUMBING/CARPENTRY):
+    Training: "רשת ORT" (800*800) | "מכון הכשרה מקצועית עמל" (03-5116111) | "מה\"ט — מרכז לטכנולוגיה חינוכית"
+    Facebook groups: "חשמלאים ישראל — קהילה מקצועית" | "נגרים ועיצוב פנים — ישראל" | "אינסטלטורים ישראל"
+
+  INTERIOR DESIGN & ARCHITECTURE:
+    Training: "שנקר — עיצוב פנים" (shenkar.ac.il) | "HIT — מכון טכנולוגי חולון" (hit.ac.il) | "בצלאל — עיצוב פנים" (bezalel.ac.il)
+    Facebook groups: "מעצבי פנים ישראל" | "עיצוב הבית — ישראל"
+
+  FASHION & STYLING:
+    Training: "שנקר — עיצוב אופנה" (shenkar.ac.il) | "ויצ\"ו חיפה — עיצוב אופנה" | "המכללה לאמנות ועיצוב — ירושלים"
+    Facebook groups: "מעצבי אופנה ישראל" | "סטייליסטים ישראל"
+
+  FITNESS & SPORTS:
+    Training: "מכון וינגייט" (wingate.org.il, 09-8639100) | "ISRAFIT — הסמכת מאמנים" (israfit.co.il) | "מרכז הכשרה מקצועית לכושר"
+    Facebook groups: "מאמני כושר ישראל" | "עולם הפילאטיס והיוגה — ישראל"
+
+  MUSIC & ARTS:
+    Training: "המדרשה לאמנויות — תל אביב" | "המרכז המוסיקלי ירושלים" | "גיתית — בית ספר למוסיקה"
+    Facebook groups: "מוזיקאים ישראל" | "מורי גיטרה — ישראל" | "עולם המוסיקה הישראלית"
+
+  SECURITY & LAW ENFORCEMENT:
+    Training: "מרכז ההכשרה הביטחוני" | "קורסי בטחון פרטי — ISRAGUARD" | "מכון ה-ICT הרצליה"
+    Job platforms: "דרושים — ביטחון ואבטחה" | "גקסל ביטחון"
+
+  TOURISM & GUIDING:
+    Certification: "משרד התיירות — הסמכת מדריכי טיולים" (tourism.gov.il) | "האגודה לתיירות ישראלית" | "יד יצחק בן-צבי — קורסי מדריכים"
+    Facebook groups: "מדריכי טיולים ישראל" | "עולם התיירות הישראלית"
+
+  AGRICULTURE & NATURE:
+    Organizations: "נאות שמחה — חווה חינוכית" | "KKL ביה\"ס השדה" | "תנובה — תוכניות חקלאות"
+    Training: "מכללת רופין — חקלאות" (ruppin.ac.il) | "גליל ים — מרכז הכשרה חקלאית"
+
+  VETERINARY & ANIMALS:
+    Organizations: "רשות הטבע והגנים" (nature.org.il) | "החברה להגנת הטבע" (spni.org.il) | "עמותת 'תנו לחיות לחיות'"
+    Training: "בית הספר לווטרינריה — הרצליה" | "מרכז כוורנות ישראל"
+
+  WRITING & MEDIA:
+    Training: "בית הספר לעיתונאות — תל אביב" | "מכללת בית ברל — תקשורת" | "Udemy/Coursera בעברית — כתיבה יוצרת"
+    Platforms: "Up4You" | "Fiverr" (לפרילנס) | "תאגיד השידור 'כאן'" לעיתונות
+
+  CAREER CHANGE / RETURNERS:
+    Programs: "קאמבק — חזרה לשוק העבודה" (Facebook group) | Momentum Israel (momentumisrael.org) | "מחזירות — נשים חוזרות לעבודה"
+
+  LOCATION-SPECIFIC: When the profile includes a city — name institutions IN that city or region, not national ones:
+    ירושלים: "אוניברסיטת ירושלים", "בצלאל", "הדסה", "מכללת ירושלים"
+    חיפה/צפון: "טכניון", "אוניברסיטת חיפה", "ויצ\"ו חיפה", "מרכז הכשרה צפון"
+    באר שבע/דרום: "אוניברסיטת בן גוריון", "מכללת ספיר", "מרכז הכשרה דרום"
+    ראשון/מרכז: "אוניברסיטת תל אביב", "מכון וינגייט", "HIT חולון"
+
+Examples of GOOD steps: "מחר בבוקר: היכנסי לאתר bishulim.co.il וצלצלי ל-03-5166166 — שאלי על מחזור קורס הקונדיטוריה הבא ועלות ההרשמה" | "ימים 2-3: הצטרפי לקבוצת פייסבוק 'עולם הקונדיטוריה בישראל' ושאלי מה הדרך המהירה ביותר להתחיל ללמד"
+Examples of BAD steps: "חפשי קורסים רלוונטיים", "צרי קשר עם מוסדות מקומיים", "עדכני לינקדאין", "בדקי אפשרויות בתחום"
 
 realismNote: Use a "hard truth → reframe" structure. NEVER end on the negative. Format: [Honest constraint] + [BUT here's why this works for you specifically, referencing something real from their profile]. Example: "מדריכי כושר מרוויחים 6,000-12,000 ש"ח בתחילת הדרך — אבל עם לקוחות קבועים + שעות גמישות, זה בדיוק סוג הסביבה שאמרת שאתה/את מחפש/ת." The reframe MUST reference something specific from their profile (their lifestyle need, their stated value, their constraint) — generic closers like "אבל זה שווה את זה" are not acceptable. If the field has genuinely low pay AND low flexibility: state both truths, and move the reframe to weekOneSteps — give one concrete action to maximize income within the constraint.
 
