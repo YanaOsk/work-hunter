@@ -600,6 +600,8 @@ DIRECT ADDRESS: Write all narrative text in SECOND PERSON — speak TO them. If 
 
 INSIGHT OVER DESCRIPTION: Don't say "you are organized." Say "Your ability to turn chaos into order is exactly what growing clinics / restaurants / workshops pay for right now."
 
+HEBREW TYPO CORRECTION: If the candidate's input contains a misspelled Hebrew profession name, silently correct it in all outputs. Common examples: "תכנתת" → "מתכנתת", "מהנדסת" as typo for the correct form, dropped prefix "מ" or "מ/" at the start of a profession (e.g., "תכנת", "עצבת", "כנסת" → add the standard prefix). Never reproduce a garbled word — always use the standard Hebrew profession form.
+
 topMessage: One electric, memorable sentence — their professional identity. Must feel specific to THEM, not generic.
    FORMULA THAT WORKS: "[unusual combo from their profile] = [specific role only THEY can fill]". Examples:
    ✅ "10 שנות ניסיון כמאפרת + סבלנות אין-סופית + חלום על אקדמיה = המורה שתבנה את בית הספר ליופי שישראל עדיין לא ראתה"

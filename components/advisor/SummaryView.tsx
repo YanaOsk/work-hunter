@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { AdvisorState, CareerPath, LifePath, SkillGapItem, StudyInstitution, OnboardingPlan, FreelanceKit, PracticalPrep, SalaryResearch, TransitionRoadmap } from "@/lib/types";
+import { AdvisorState, CareerPath, LifePath, SkillGapItem, StudyInstitution, OnboardingPlan, FreelanceKit, PracticalPrep, SalaryResearch, TransitionRoadmap, LinkedInProfile } from "@/lib/types";
 import { useLanguage } from "../LanguageProvider";
 import { t } from "@/lib/i18n";
 import { queueAutoStart, queueAdvisorScoutContext } from "@/lib/autoStart";
@@ -37,7 +37,7 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
   const router = useRouter();
   const { data: session } = useSession();
   const tx = t[lang];
-  const { diagnosis, direction, cvReview, linkedIn, strategy, mockInterview, chosenPath, userProfile } = advisorState;
+  const { diagnosis, direction, cvReview, strategy, mockInterview, chosenPath, userProfile } = advisorState;
   const name = userProfile.parsedData?.name || "";
   const contentRef = useRef<HTMLDivElement>(null);
   // Always-fresh ref so closures inside functional setState updaters never spread stale advisorState
@@ -159,6 +159,32 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
   const [transitionLoading, setTransitionLoading] = useState(false);
   const [transitionError, setTransitionError] = useState("");
   const [transitionData, setTransitionData] = useState<TransitionRoadmap | null>(advisorState.transitionRoadmap ?? null);
+
+  const [linkedInLoading, setLinkedInLoading] = useState(false);
+  const [linkedInError, setLinkedInError] = useState("");
+  const [linkedInData, setLinkedInData] = useState<LinkedInProfile | null>(advisorState.linkedIn ?? null);
+
+  const loadLinkedIn = async () => {
+    setLinkedInLoading(true); setLinkedInError("");
+    try {
+      const res = await fetch("/api/advisor/linkedin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userProfile,
+          diagnosis,
+          currentLinkedin: null,
+          targetRole: diagnosis?.topRoles?.[0] ?? null,
+          lang,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      setLinkedInData(data as LinkedInProfile);
+      onUpdate?.({ ...advisorStateRef.current, linkedIn: data as LinkedInProfile });
+    } catch { setLinkedInError(lang === "he" ? "שגיאה — נסה שוב" : "Failed — try again"); }
+    finally { setLinkedInLoading(false); }
+  };
 
   const loadFreelance = async () => {
     setFreelanceLoading(true); setFreelanceError("");
@@ -1129,23 +1155,23 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
         )}
 
         {/* Section 4: LinkedIn Profile */}
-        {linkedIn && (
-          <Section title={tx.summarySection4}>
+        <Section title={tx.summarySection4}>
+          {linkedInData ? (
             <div className="space-y-4">
-              <CopyField label={tx.linkedinHeadline} copyLabel={tx.linkedinCopyHeadline} text={linkedIn.headline}>
-                <p className="text-white font-semibold">{linkedIn.headline}</p>
+              <CopyField label={tx.linkedinHeadline} copyLabel={tx.linkedinCopyHeadline} text={linkedInData.headline}>
+                <p className="text-white font-semibold">{linkedInData.headline}</p>
               </CopyField>
-              <CopyField label={tx.linkedinAbout} copyLabel={tx.linkedinCopyAbout} text={linkedIn.about}>
-                <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{linkedIn.about}</p>
+              <CopyField label={tx.linkedinAbout} copyLabel={tx.linkedinCopyAbout} text={linkedInData.about}>
+                <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{linkedInData.about}</p>
               </CopyField>
-              {linkedIn.experienceBullets?.length > 0 && (
+              {linkedInData.experienceBullets?.length > 0 && (
                 <CopyField
                   label={tx.linkedinExperience}
                   copyLabel={tx.linkedinCopyBullets}
-                  text={linkedIn.experienceBullets.map((b) => `• ${b}`).join("\n")}
+                  text={linkedInData.experienceBullets.map((b) => `• ${b}`).join("\n")}
                 >
                   <ul className="space-y-1">
-                    {linkedIn.experienceBullets.map((b, i) => (
+                    {linkedInData.experienceBullets.map((b, i) => (
                       <li key={i} className="text-white/80 text-sm flex gap-2">
                         <span className="text-sky-400 flex-shrink-0">•</span><span>{b}</span>
                       </li>
@@ -1153,29 +1179,33 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
                   </ul>
                 </CopyField>
               )}
-              {linkedIn.skills?.length > 0 && (
+              {linkedInData.skills?.length > 0 && (
                 <div>
                   <p className="text-purple-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.linkedinSkills}</p>
                   <div className="flex flex-wrap gap-2">
-                    {linkedIn.skills.map((s, i) => (
+                    {linkedInData.skills.map((s, i) => (
                       <span key={i} className="text-xs bg-purple-500/15 text-purple-300 border border-purple-500/25 px-2.5 py-1 rounded-full">{s}</span>
                     ))}
                   </div>
                 </div>
               )}
-              {linkedIn.keywords?.length > 0 && (
+              {linkedInData.keywords?.length > 0 && (
                 <div>
                   <p className="text-sky-300 text-xs font-semibold uppercase tracking-wide mb-2">{tx.linkedinKeywords}</p>
                   <div className="flex flex-wrap gap-2">
-                    {linkedIn.keywords.map((k, i) => (
+                    {linkedInData.keywords.map((k, i) => (
                       <span key={i} className="text-xs bg-sky-500/15 text-sky-300 border border-sky-500/25 px-2.5 py-1 rounded-full">{k}</span>
                     ))}
                   </div>
                 </div>
               )}
             </div>
-          </Section>
-        )}
+          ) : linkedInLoading ? (
+            <LoadingSpinner text={tx.linkedinGenerating} />
+          ) : (
+            <GenerateButton onClick={loadLinkedIn} icon="linkedin" label={tx.linkedinGenerate} error={linkedInError} />
+          )}
+        </Section>
 
         {/* Study-path users: point to Transition Roadmap instead of job strategy */}
         {isStudyPath && strategy && (
@@ -1516,6 +1546,7 @@ const GENERATE_ICONS: Record<string, React.ReactNode> = {
   map: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />,
   briefcase: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />,
   clipboard: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />,
+  linkedin: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z M4 6a2 2 0 100-4 2 2 0 000 4z" />,
 };
 
 function GenerateButton({ onClick, icon, label, error }: { onClick: () => void; icon: string; label: string; error?: string }) {
