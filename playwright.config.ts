@@ -7,8 +7,8 @@ export default defineConfig({
   workers: 1,
   globalSetup: "./tests/global-setup.ts",
   use: {
-    headless: false,
-    launchOptions: { slowMo: 350 },
+    headless: !!process.env.CI,
+    launchOptions: { slowMo: process.env.CI ? 0 : 350 },
     viewport: { width: 1280, height: 800 },
     storageState: "tests/.auth.json",
     video: "off",
@@ -20,8 +20,8 @@ export default defineConfig({
       name: "prod-users",
       testMatch: "**/prod-ui-test.spec.ts",
       use: {
-        headless: false,
-        launchOptions: { slowMo: 200 },
+        headless: !!process.env.CI,
+        launchOptions: { slowMo: process.env.CI ? 0 : 200 },
         viewport: { width: 1280, height: 900 },
         storageState: { cookies: [], origins: [] },
         video: "retain-on-failure",
