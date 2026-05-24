@@ -131,7 +131,13 @@ export default function AdvisorPageInner() {
       const fresh = createInitialAdvisorState(emptyProfile);
       saveAdvisorState(profileId, fresh);
       setAdvisorState(fresh);
-      // Also clear stale server state so future loads don't resurrect the old session
+      setView("map");
+      // Remove ?reset=true from URL so it doesn't re-trigger on back navigation
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete("reset");
+      cleanUrl.searchParams.delete("view");
+      window.history.replaceState({}, "", cleanUrl.toString());
+      // Overwrite stale server state so future loads don't resurrect the old session
       if (session?.user?.email) {
         fetch("/api/user-meta", { method: "PUT", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ advisorCurrentStage: "diagnosis", advisorCompletedCount: 0, advisorState: JSON.stringify(fresh) }) }).catch(() => {});
@@ -177,7 +183,7 @@ export default function AdvisorPageInner() {
       setAdvisorState(fresh);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileId, session?.user?.id, guestProfileId, sessionStatus]);
+  }, [profileId, session?.user?.id, guestProfileId, sessionStatus, resetSession]);
 
   useEffect(() => {
     if (!session?.user?.email || !profileId) return;

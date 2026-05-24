@@ -453,7 +453,7 @@ export default function ProfilePage() {
     archiveAdvisorState(profileId);
     setArchivedSessions(getAdvisorArchive(profileId));
     setAdvisor(null);
-    router.push(`/advisor?profileId=${profileId}&reset=true`);
+    router.replace(`/advisor?profileId=${profileId}&reset=true`);
   }
 
   async function deleteCV(id: string) {
