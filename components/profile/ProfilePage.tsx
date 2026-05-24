@@ -453,9 +453,7 @@ export default function ProfilePage() {
     archiveAdvisorState(profileId);
     setArchivedSessions(getAdvisorArchive(profileId));
     setAdvisor(null);
-    fetch("/api/user-meta", { method: "PUT", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ advisorCurrentStage: null, advisorCompletedCount: 0 }) }).catch(() => {});
-    router.push(`/advisor?profileId=${profileId}`);
+    router.push(`/advisor?profileId=${profileId}&reset=true`);
   }
 
   async function deleteCV(id: string) {

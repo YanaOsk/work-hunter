@@ -88,6 +88,7 @@ export default function AdvisorPageInner() {
   const { data: session, status: sessionStatus } = useSession();
   const { lang } = useLanguage();
   const guestProfileId = params.get("profileId");
+  const resetSession = params.get("reset") === "true";
   const [advisorState, setAdvisorState] = useState<AdvisorState | null>(null);
   const [previousSnapshot, setPreviousSnapshot] = useState<CompletionSnapshot | null>(null);
   const [view, setView] = useState<View>(() => (params.get("view") as View) ?? "map");
@@ -125,6 +126,19 @@ export default function AdvisorPageInner() {
     }
 
     const emptyProfile: UserProfile = { rawText: "", parsedData: {}, missingFields: [], clarifyingQuestions: [] };
+
+    if (resetSession) {
+      const fresh = createInitialAdvisorState(emptyProfile);
+      saveAdvisorState(profileId, fresh);
+      setAdvisorState(fresh);
+      // Also clear stale server state so future loads don't resurrect the old session
+      if (session?.user?.email) {
+        fetch("/api/user-meta", { method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ advisorCurrentStage: "diagnosis", advisorCompletedCount: 0, advisorState: JSON.stringify(fresh) }) }).catch(() => {});
+      }
+      return;
+    }
+
     const localState = getAdvisorState(profileId);
 
     if (localState) {
