@@ -101,10 +101,10 @@ export interface DiagnosisResult {
   hollandCode?: string;
   topMessage?: string;
   topRoles?: string[];
-  strengths: string[];
-  workEnvironmentFit: string[];
-  careerDirections: string[];
-  summary: string;
+  strengths?: string[];
+  workEnvironmentFit?: string[];
+  careerDirections?: string[];
+  summary?: string;
   completedAt: string;
   // Career advisor fields
   reflection?: string;

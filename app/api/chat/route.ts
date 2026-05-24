@@ -2,6 +2,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rateLimit";
 import { geminiChat } from "@/lib/gemini";
 import { CHAT_SYSTEM_PROMPT } from "@/lib/prompts";
 import { ChatMessage } from "@/lib/types";
@@ -23,6 +24,9 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const limited = await checkRateLimit(request, { windowMs: 60_000, maxRequests: 30 });
+  if (limited) return limited;
 
   try {
     const body = await request.json();

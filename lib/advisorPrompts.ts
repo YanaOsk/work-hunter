@@ -1069,20 +1069,20 @@ careerPaths: Exactly 3 paths. Each must come from the INTERSECTION of what they 
   - If a path genuinely pays less than current salary: acknowledge the dip AND show a 2-year trajectory ("לאחר שנתיים עם לקוחות קבועים, ניתן להגיע ל-X ₪") in the realismNote.
 
   - trainingNeeded: What training/certification is required to enter (e.g. "קורס של 3 חודשים", "ללא הכשרה נוספת", "תואר ראשון נדרש")
-  - marketDemand: Current Israeli market demand: "גבוה" / "בינוני" / "נמוך"
+  - marketDemand: Current Israeli market demand: "High" / "Medium" / "Saturated"
   - timeToEntry: Realistic time until first paycheck in this role (e.g. "1–3 חודשים", "6–12 חודשים")
 
 === CONSTRAINT VALIDATION — MANDATORY PRE-OUTPUT CHECK ===
 Before writing your JSON output, run through this checklist. If any check FAILS, revise the relevant fields before proceeding:
-☐ 1. Have I excluded every field/sector the candidate explicitly rejected? (Check topRoles, careerPaths, careerDirections)
-☐ 2. If they stated stability/fixed income need → is there zero freelance/self-employment in topRoles, careerPaths (ALL 3), AND careerDirections?
+☐ 1. Have I excluded every field/sector the candidate explicitly rejected? (Check careerPaths — all 3 titles and domains)
+☐ 2. If they stated stability/fixed income need → is there zero freelance/self-employment in ALL 3 careerPaths?
 ☐ 3. If they have a hard financial timeline → is careerPaths[0] a fast-track role with ≤ 4-week entry, not a long training program?
 ☐ 4. If I suggested a trade/certification role → did I name a SPECIFIC institution in THEIR region (not "any vocational school")?
 ☐ 5. Does every suggested role ACTUALLY EXIST in the Israeli job market with realistic hiring volume for their profile?
 ☐ 6. Is the seniority level in topRoles calibrated to their actual years of experience? (0–1yr=entry, 2–4yr=mid, 5–9yr=senior/lead, 10+yr=management)
 ☐ 7. Does each matchBridge contain at least one SPECIFIC detail from the profile (actual job title, specific years, a named skill) — not just generic domain words?
 ☐ 8. SALARY FLOOR: Does at least ONE careerPath have a salaryRange upper bound ≥ currentSalary? If NOT — have I written a concrete year-by-year trajectory in realismNote? Required format when all paths pay less: "שנה 1: X₪ (כניסה לתחום) | שנה 2: Y₪ (עם לקוחות קבועים) | שנה 3: Z₪ (הכנסה יציבה)" — vague phrases like "זה עשוי לקחת זמן" are NOT sufficient.
-☐ 9. Do at least 2 of the 3 weekOneSteps include a real URL or phone number VERBATIM (e.g., "bishulim.co.il" or "03-5166166")? Step text that only mentions an institution name without URL/phone FAILS this check.
+☐ 9. Does weekOneSteps[0] (Day 1-2) include a Google search string in format [חפשו בגוגל: 'ביטוי']? Does weekOneSteps[2] (Day 6-7) use ONLY real verified URLs — no invented .co.il domains or fake phone numbers?
 If all 9 pass → write output. If any fail → fix before outputting.
 
 weekOneSteps: Exactly 3 concrete, specific actions for the FIRST WEEK — not generic advice. Each action should target a different day of the week:
@@ -1176,26 +1176,21 @@ realismNote: Use a "hard truth → reframe" structure. NEVER end on the negative
 
 Respond with JSON only — no markdown, no explanation:
 {
-  "mbtiType": "XXXX",
-  "hollandCode": "XXX",
-  "topMessage": "...",
-  "topRoles": ["...", "..."],
-  "strengths": ["...", "..."],
-  "workEnvironmentFit": ["...", "...", "..."],
-  "careerDirections": ["...", "...", "...", "..."],
-  "summary": "...",
-  "reflection": "...",
+  "mbtiType": "An inferred 4-letter MBTI code based on rational/creative preferences.",
+  "hollandCode": "An inferred 3-letter Holland RIASEC code.",
+  "topMessage": "A sharp, text-only opening headline. NEVER use pseudo-equations or '+' signs between words.",
+  "reflection": "Deep psychological reflection. Must read between the lines. Cite specific text written by the user (e.g., specific traffic issues or physical passions) to demonstrate active human-grade listening. Avoid buzzwords like 'להגשים' or 'מסע'.",
   "careerPaths": [
     {
-      "title": "...",
-      "domain": "...",
-      "reasoning": "...",
-      "matchBridge": "...",
+      "title": "Exact, realistic job title used in Israel (e.g., 'מנהלת מותג אופנה דיגיטלי D2C', NOT synthetic wrappers).",
+      "domain": "The economic sector name.",
+      "reasoning": "Analytical breakdown of the path. Must name at least one real, strategic TRADEOFF or operational price (e.g., cash flow drop, high competition in Israel, long physical shifts) to preserve institutional consulting credibility.",
+      "matchBridge": "A professional prose sentence explaining how their past assets (e.g., 4 years of Full-Stack, 25 years of IDF logistics) give them an unfair advantage in this new field. NO EQUATIONS, NO SYNTHETIC PLASTIC FORMULAS.",
       "marketReality": {
-        "salaryRange": "X,000–Y,000 ₪",
-        "trainingNeeded": "...",
-        "marketDemand": "גבוה | בינוני | נמוך",
-        "timeToEntry": "..."
+        "salaryRange": "A tightly bounded range (e.g., '15,000–18,000 ₪'). NEVER provide spreads larger than 4,000 ₪. Base strictly on realistic 2026 junior/entry levels in Israel.",
+        "trainingNeeded": "Exact specific credential/pathway needed, sourced strictly from the accredited database. If no formal education is needed, state 'הכשרה מעשית קצרת מועד או קורס ייעודי'.",
+        "marketDemand": "High / Medium / Saturated",
+        "timeToEntry": "Realistic onboarding timeframe (e.g., '3–6 חודשים')."
       }
     },
     {
@@ -1203,18 +1198,22 @@ Respond with JSON only — no markdown, no explanation:
       "domain": "...",
       "reasoning": "...",
       "matchBridge": "...",
-      "marketReality": { "salaryRange": "...", "trainingNeeded": "...", "marketDemand": "...", "timeToEntry": "..." }
+      "marketReality": { "salaryRange": "...", "trainingNeeded": "...", "marketDemand": "High / Medium / Saturated", "timeToEntry": "..." }
     },
     {
       "title": "...",
       "domain": "...",
       "reasoning": "...",
       "matchBridge": "...",
-      "marketReality": { "salaryRange": "...", "trainingNeeded": "...", "marketDemand": "...", "timeToEntry": "..." }
+      "marketReality": { "salaryRange": "...", "trainingNeeded": "...", "marketDemand": "High / Medium / Saturated", "timeToEntry": "..." }
     }
   ],
-  "weekOneSteps": ["מחר בבוקר: ...", "ימים 2-3: ...", "ימים 4-7: ..."],
-  "realismNote": "..."
+  "weekOneSteps": [
+    "Day 1-2 (Research Framework): Sourced purely from active digital or desk research. No calls to offices. Must include optimized Google search strings in the exact format: [חפשו בגוגל: 'ביטוי חיפוש מדויק'].",
+    "Day 3-5 (Analysis Framework): Concrete independent execution steps (e.g., mapping local competitors, building a digital mood board, checking Ministry of Labor voucher eligibility).",
+    "Day 6-7 (First Actionable Leap): A low-friction digital step. NEVER invent phone numbers, placeholders, or fake web domains (e.g., no .co.il strings that are guessed). Include only real institution web paths if verified."
+  ],
+  "realismNote": "A direct, no-bullshit market reality warning tailored to their core demographic constraints (e.g., analyzing how frequent reserve duty impacts solo management, or how pregnancy dictates phased flexibility and low inventory risk)."
 }`;
 
 export const DIRECTION_ANALYSIS_PROMPT = (profile: string, diagnosis: string, userGoal: string) => `You are a senior career counselor in Israel. A client is at a crossroads and needs to decide between three life paths: being an employee, being self-employed/entrepreneur, or going back to studies.
