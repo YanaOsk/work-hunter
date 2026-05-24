@@ -203,8 +203,6 @@ export type AdvisorStage =
 export const STAGE_ORDER: AdvisorStage[] = [
   "diagnosis",
   "direction",
-  "cv",
-  "linkedin",
   "strategy",
 ];
 

@@ -79,6 +79,8 @@ function mergeIntoProfile(
 }
 
 function normalizeStage(stage: AdvisorStage): AdvisorStage {
+  // cv/linkedin removed from flow — migrate existing sessions forward
+  if (stage === "cv" || stage === "linkedin") return "strategy";
   return stage;
 }
 
@@ -279,10 +281,11 @@ export default function AdvisorPageInner() {
     completeAndAdvance({ direction: r, chosenPath: path, userProfile: enriched });
   };
 
-  const onCV = (r: CVReview) => completeAndAdvance({ cvReview: r });
-  const onCVSkip = () => completeAndAdvance({ cvSkipped: true });
-  const onLinkedIn = (r: LinkedInProfile) => completeAndAdvance({ linkedIn: r });
-  const onLinkedInSkip = () => completeAndAdvance({ linkedInSkipped: true });
+  // cv/linkedin are now summary-only tools — always return to summary on complete/skip
+  const onCV = (r: CVReview) => { persist({ ...advisorState, cvReview: r }); backToSummary(); };
+  const onCVSkip = () => { persist({ ...advisorState, cvSkipped: true }); backToSummary(); };
+  const onLinkedIn = (r: LinkedInProfile) => { persist({ ...advisorState, linkedIn: r }); backToSummary(); };
+  const onLinkedInSkip = () => { persist({ ...advisorState, linkedInSkipped: true }); backToSummary(); };
   const onStrategy = (r: SearchStrategy) => completeAndAdvance({ strategy: r });
   const onInterview = (r: MockInterview) => persist({ ...advisorState, mockInterview: r });
 
@@ -348,6 +351,8 @@ export default function AdvisorPageInner() {
         onOpenInterview={() => setViewAndUrl("interview")}
         onExit={handleExit}
         onUpdate={persist}
+        onLaunchCv={() => setViewAndUrl("cv")}
+        onLaunchLinkedin={() => setViewAndUrl("linkedin")}
       />
     );
   }
@@ -380,7 +385,7 @@ export default function AdvisorPageInner() {
     return wrap(
       <CVReviewTool
         advisorState={advisorState}
-        onBack={backToMap}
+        onBack={backToSummary}
         onComplete={onCV}
         onSkip={onCVSkip}
       />
@@ -391,7 +396,7 @@ export default function AdvisorPageInner() {
     return wrap(
       <LinkedInTool
         advisorState={advisorState}
-        onBack={backToMap}
+        onBack={backToSummary}
         onComplete={onLinkedIn}
         onSkip={onLinkedInSkip}
       />
