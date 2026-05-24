@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /auth/
+Disallow: /checkout
+Disallow: /subscription
+Disallow: /settings
+Disallow: /profile
+Disallow: /advisor
+Disallow: /tracker
+Disallow: /conversations
+
+Sitemap: https://workhunter.co.il/sitemap.xml
