@@ -247,7 +247,7 @@ export default function AdvisorPageInner() {
   const onDiagnosis = (r: DiagnosisResult) => {
     const enriched = mergeIntoProfile(advisorState.userProfile, {
       targetRoles: r.topRoles,
-      skills: r.strengths,
+      skills: r.strengths ?? [],
       additionalNotes: [
         r.topMessage ?? r.summary,
         r.mbtiType && `סוג אישיות: ${r.mbtiType}`,

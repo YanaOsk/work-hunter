@@ -878,7 +878,7 @@ export default function ProfilePage() {
                       <span className="text-purple-300 text-xs bg-purple-500/15 border border-purple-500/25 px-2.5 py-0.5 rounded-full">
                         {he ? PATH_LABELS[advisor.chosenPath]?.he ?? advisor.chosenPath : PATH_LABELS[advisor.chosenPath]?.en ?? advisor.chosenPath}
                       </span>
-                      {advisor.diagnosis?.strengths.slice(0, 3).map((s) => (
+                      {advisor.diagnosis?.strengths?.slice(0, 3).map((s) => (
                         <span key={s} className="text-white/35 text-xs bg-white/4 px-2 py-0.5 rounded-full">{s}</span>
                       ))}
                     </div>

@@ -694,8 +694,8 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               )}
             </div>
 
-            {/* Summary — personal address */}
-            <p className="text-white/85 leading-relaxed mb-5">{diagnosis.summary}</p>
+            {/* Summary — personal address (legacy field) */}
+            {diagnosis.summary && <p className="text-white/85 leading-relaxed mb-5">{diagnosis.summary}</p>}
 
             {/* Top roles with like/dislike */}
             {diagnosis.topRoles && diagnosis.topRoles.length > 0 && (
@@ -750,12 +750,14 @@ export default function SummaryView({ advisorState, onBack, onOpenInterview, onE
               </div>
             )}
 
-            {/* Strengths / environments / directions */}
-            <div className="grid md:grid-cols-3 gap-4">
-              <MiniList title={tx.diagnosisStrengths} items={diagnosis.strengths} color="emerald" />
-              <MiniList title={tx.diagnosisEnvironments} items={diagnosis.workEnvironmentFit} color="purple" />
-              <MiniList title={tx.diagnosisDirections} items={diagnosis.careerDirections} color="blue" />
-            </div>
+            {/* Strengths / environments / directions (legacy fields — absent in new diagnoses) */}
+            {(diagnosis.strengths?.length || diagnosis.workEnvironmentFit?.length || diagnosis.careerDirections?.length) && (
+              <div className="grid md:grid-cols-3 gap-4">
+                {diagnosis.strengths?.length ? <MiniList title={tx.diagnosisStrengths} items={diagnosis.strengths} color="emerald" /> : null}
+                {diagnosis.workEnvironmentFit?.length ? <MiniList title={tx.diagnosisEnvironments} items={diagnosis.workEnvironmentFit} color="purple" /> : null}
+                {diagnosis.careerDirections?.length ? <MiniList title={tx.diagnosisDirections} items={diagnosis.careerDirections} color="blue" /> : null}
+              </div>
+            )}
           </Section>
         )}
 
