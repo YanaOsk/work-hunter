@@ -39,7 +39,7 @@ export default function HeroSection({ onChoose }: Props) {
             <div className="flex flex-col sm:flex-row gap-3 mb-10">
               <button
                 onClick={() => onChoose("advisor")}
-                className="inline-flex items-center justify-center gap-2 text-white font-semibold px-7 py-3.5 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-sm"
+                className="inline-flex items-center justify-center gap-2 text-white text-on-color font-semibold px-7 py-3.5 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-sm"
                 style={{ background: "#5E6AD2", boxShadow: "0 4px 20px rgba(94,106,210,0.30)" }}
                 onMouseEnter={e => (e.currentTarget.style.background = "#6D79DB")}
                 onMouseLeave={e => (e.currentTarget.style.background = "#5E6AD2")}
@@ -68,7 +68,7 @@ export default function HeroSection({ onChoose }: Props) {
                   <span className="text-white font-bold text-lg leading-none tracking-tight">
                     <CountUp to={s.value} suffix={s.suffix} decimals={s.decimals ?? 0} duration={1400} />
                   </span>
-                  <span className="text-white/35 text-[10px] mt-0.5 uppercase tracking-wide">{s.label}</span>
+                  <span className="text-white/35 text-[11px] mt-0.5 uppercase tracking-wide">{s.label}</span>
                 </div>
               ))}
             </div>

@@ -45,7 +45,7 @@ function ReviewCard({ review, lang }: { review: (typeof REVIEWS)[0]; lang: strin
         </div>
         <div className="min-w-0">
           <p className="text-white/80 text-xs font-medium truncate">{name}</p>
-          <p className="text-white/35 text-[10px] truncate">{review.age} · {city}</p>
+          <p className="text-white/35 text-xs truncate">{review.age} · {city}</p>
         </div>
       </div>
     </div>

@@ -572,7 +572,7 @@ export default function ProfilePage() {
               {plan === "free" ? (
                 <Link
                   href="/pricing"
-                  className="flex items-center justify-center gap-1.5 w-full text-xs font-semibold text-white py-2 rounded-lg transition"
+                  className="flex items-center justify-center gap-1.5 w-full text-xs font-semibold text-white text-on-color py-2 rounded-lg transition"
                   style={{ background: "#5E6AD2", boxShadow: "0 0 0 1px rgba(94,106,210,0.35)" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "#6D79DB")}
                   onMouseLeave={e => (e.currentTarget.style.background = "#5E6AD2")}

@@ -35,7 +35,7 @@ export default function WelcomeModal({ userName, userEmail }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] backdrop-blur-md flex items-center justify-center p-4" style={{ background: "rgba(12,12,13,0.97)" }}>
+    <div className="fixed inset-0 z-[200] backdrop-blur-md flex items-center justify-center p-4 welcome-overlay">
       <div className="w-full max-w-2xl">
 
         {/* Header */}

@@ -210,7 +210,7 @@ export default function AuthButton({ plan = "free" }: { plan?: string }) {
   return (
     <Link
       href="/auth/signin"
-      className="h-9 inline-flex items-center px-4 text-sm font-semibold text-white rounded-lg transition"
+      className="h-9 inline-flex items-center px-4 text-sm font-semibold text-white text-on-color rounded-lg transition"
       style={{
         background: "#5E6AD2",
         boxShadow: "0 0 0 1px rgba(94,106,210,0.4), 0 2px 12px rgba(94,106,210,0.2)",

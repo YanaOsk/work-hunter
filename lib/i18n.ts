@@ -1069,7 +1069,7 @@ export const t = {
     selfIntroNameSub: "כדי שנוכל לדבר איתכם באמת, לא כמו בוט 😊",
     selfIntroNamePh: "השם שלך",
     selfIntroBasicsQ: "ספרו לנו קצת על עצמכם",
-    selfIntroBasicsSub: "רק הבסיס — כמה אתם בני ואיפה אתם גרים.",
+    selfIntroBasicsSub: "רק הבסיס — בני כמה אתם ואיפה אתם גרים.",
     selfIntroAgePh: "גיל",
     selfIntroLocationPh: "עיר או אזור",
     selfIntroStoryQ: "מה הסיפור שלכם בקצרה?",

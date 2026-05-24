@@ -356,7 +356,7 @@ export default function ApplicationTracker() {
         )}
 
         {/* Stats strip */}
-        <div className="grid grid-cols-4 gap-2 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
           {[
             { label: lang === "he" ? "שמורות" : "Saved", value: apps.length, color: "text-white/60" },
             { label: lang === "he" ? "הוגשו" : "Applied", value: totalApplied, color: "text-blue-300" },
@@ -806,10 +806,10 @@ function FollowUpTemplate({ label, text, lang }: { label: string; text: string; 
   return (
     <div className="bg-white/[0.03] border border-white/10 rounded-xl p-3">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-white/50 text-[10px] font-semibold uppercase tracking-wide">{label}</p>
+        <p className="text-white/50 text-xs font-semibold uppercase tracking-wide">{label}</p>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 text-[10px] text-white/30 hover:text-purple-300 transition"
+          className="flex items-center gap-1 text-xs text-white/30 hover:text-purple-300 transition"
         >
           {copied ? (
             <span className="text-emerald-400">✓ {lang === "he" ? "הועתק" : "Copied"}</span>

@@ -64,7 +64,7 @@ export default function IndustriesSection() {
             >
               <span className="text-2xl leading-none">{cat.emoji}</span>
               <p className="text-white text-[13px] font-semibold leading-tight">{cat.label}</p>
-              <p className="text-white/40 text-[10px] leading-relaxed">{cat.sample}</p>
+              <p className="text-white/40 text-[11px] leading-relaxed">{cat.sample}</p>
             </div>
           ))}
         </div>

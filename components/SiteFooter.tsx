@@ -88,7 +88,7 @@ export default function SiteFooter() {
           {/* Link columns */}
           {columns.map((col) => (
             <div key={col.label}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.10em] mb-3" style={{ color: `rgba(var(--foreground-rgb),0.35)` }}>
+              <p className="text-xs font-semibold uppercase tracking-[0.10em] mb-3" style={{ color: `rgba(var(--foreground-rgb),0.35)` }}>
                 {col.label}
               </p>
               <ul className="space-y-2">
@@ -115,7 +115,7 @@ export default function SiteFooter() {
         >
           <p className="text-xs" style={{ color: `rgba(var(--foreground-rgb),0.35)` }}>{tx.footerRights}</p>
           <div className="flex items-center gap-4">
-            <span className="text-[10px] uppercase tracking-widest" style={{ color: `rgba(var(--foreground-rgb),0.25)` }}>
+            <span className="text-xs uppercase tracking-widest" style={{ color: `rgba(var(--foreground-rgb),0.25)` }}>
               {he ? "עברית / English" : "Hebrew / English"}
             </span>
           </div>

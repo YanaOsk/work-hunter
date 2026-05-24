@@ -140,6 +140,17 @@ html.light .bg-amber-600 .text-white { color: #ffffff !important; }
 .text-on-color { color: #ffffff; }
 html.light .text-on-color { color: #ffffff !important; }
 
+/* ─── Linear accent (#5E6AD2 / #6D79DB) buttons keep white text ─────── */
+html.light .bg-\[#5E6AD2\].text-white,
+html.light .bg-\[#5E6AD2\] .text-white,
+html.light .bg-\[#6D79DB\].text-white,
+html.light .bg-\[#6D79DB\] .text-white { color: #ffffff !important; }
+/* inline style buttons with #5E6AD2 — use text-on-color class */
+
+/* ─── WelcomeModal overlay ───────────────────────────────────────────── */
+.welcome-overlay { background: rgba(12,12,13,0.97); }
+html.light .welcome-overlay { background: rgba(237,241,251,0.96); }
+
 /* ─── Colored text → light mode equivalents ──────────────────────────── */
 html.light .text-purple-200  { color: #3730a3 !important; }
 html.light .text-purple-300  { color: #4338ca !important; }

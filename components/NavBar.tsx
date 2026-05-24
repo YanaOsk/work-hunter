@@ -70,7 +70,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
           {isAuthenticated && !hasPaidPlan && (
             <Link
               href="/pricing"
-              className="hidden sm:inline-flex items-center gap-1.5 text-white text-sm font-semibold px-3.5 py-1.5 rounded-lg transition"
+              className="hidden sm:inline-flex items-center gap-1.5 text-white text-on-color text-sm font-semibold px-3.5 py-1.5 rounded-lg transition"
               style={{
                 background: "#5E6AD2",
                 boxShadow: "0 0 0 1px rgba(94,106,210,0.4), 0 2px 12px rgba(94,106,210,0.25)",
@@ -84,7 +84,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
           {!isAuthenticated && planReady && (
             <Link
               href="/auth/signin?callbackUrl=%2Fadvisor"
-              className="hidden sm:inline-flex text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition"
+              className="hidden sm:inline-flex text-white text-on-color text-sm font-semibold px-4 py-1.5 rounded-lg transition"
               style={{
                 background: "#5E6AD2",
                 boxShadow: "0 0 0 1px rgba(94,106,210,0.4), 0 2px 12px rgba(94,106,210,0.25)",
@@ -141,7 +141,7 @@ export default function NavBar({ hasPaidPlan = false, plan = "free", planReady =
             <Link
               href={isAuthenticated ? "/advisor" : "/auth/signin?callbackUrl=%2Fadvisor"}
               onClick={() => setMobileOpen(false)}
-              className="mt-2 text-white font-semibold py-3 rounded-lg transition text-center text-sm"
+              className="mt-2 text-white text-on-color font-semibold py-3 rounded-lg transition text-center text-sm"
               style={{ background: "#5E6AD2" }}
             >
               {tx.navStartFree}
