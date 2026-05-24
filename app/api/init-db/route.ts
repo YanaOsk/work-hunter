@@ -147,6 +147,39 @@ export async function GET() {
       )
     `;
 
+    await db`
+      CREATE TABLE IF NOT EXISTS advisor_sessions (
+        user_email TEXT PRIMARY KEY,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        stage TEXT,
+        full_state JSONB NOT NULL DEFAULT '{}'
+      )
+    `;
+
+    await db`
+      CREATE INDEX IF NOT EXISTS idx_advisor_sessions_updated ON advisor_sessions(updated_at)
+    `;
+
+    await db`
+      CREATE TABLE IF NOT EXISTS advisor_chat_log (
+        id SERIAL PRIMARY KEY,
+        user_email TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        user_message TEXT NOT NULL,
+        advisor_response TEXT NOT NULL,
+        context JSONB NOT NULL DEFAULT '{}',
+        message_index INTEGER NOT NULL DEFAULT 0
+      )
+    `;
+
+    await db`
+      CREATE INDEX IF NOT EXISTS idx_advisor_chat_log_email ON advisor_chat_log(user_email)
+    `;
+    await db`
+      CREATE INDEX IF NOT EXISTS idx_advisor_chat_log_created ON advisor_chat_log(created_at)
+    `;
+
     return NextResponse.json({ ok: true, message: "All tables created" });
   } catch (err) {
     console.error("init-db error:", err);
